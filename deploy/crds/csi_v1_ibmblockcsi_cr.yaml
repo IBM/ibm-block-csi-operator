@@ -1,0 +1,12 @@
+apiVersion: csi.ibm.com/v1
+kind: IBMBlockCSI
+metadata:
+  name: example-ibmblockcsi
+spec:
+  # Add fields here
+  controller:
+    repository: ibmcom/ibm-block-csi-controller-driver
+    tag: "1.0.0"
+  node:
+    repository: ibmcom/ibm-block-csi-node-driver
+    tag: "1.0.0"
