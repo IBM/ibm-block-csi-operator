@@ -2,11 +2,14 @@ package ibmblockcsi
 
 import (
 	"context"
+	"io/ioutil"
+	"path/filepath"
+	"strings"
 
 	csiv1 "github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -17,14 +20,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"sigs.k8s.io/controller-runtime/pkg/source"
+
+	"github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
+	"github.com/IBM/ibm-block-csi-driver-operator/pkg/util/decoder"
+	yamlutil "github.com/IBM/ibm-block-csi-driver-operator/pkg/util/yaml"
 )
 
 var log = logf.Log.WithName("controller_ibmblockcsi")
-
-/**
-* USER ACTION REQUIRED: This is a scaffold file intended for the user to modify with their own Controller
-* business logic.  Delete these comments after modifying this file.*
- */
 
 // Add creates a new IBMBlockCSI Controller and adds it to the Manager. The Manager will set fields on the Controller
 // and Start it when the Manager is Started.
@@ -77,8 +79,6 @@ type ReconcileIBMBlockCSI struct {
 
 // Reconcile reads that state of the cluster for a IBMBlockCSI object and makes changes based on the state read
 // and what is in the IBMBlockCSI.Spec
-// TODO(user): Modify this Reconcile function to implement your Controller logic.  This example creates
-// a Pod as an example
 // Note:
 // The Controller will requeue the Request to be processed again if the returned error is non-nil or
 // Result.Requeue is true, otherwise upon completion it will remove the work from the queue.
@@ -101,53 +101,93 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 	}
 
 	// Define a new Pod object
-	pod := newPodForCR(instance)
-
-	// Set IBMBlockCSI instance as the owner and controller
-	if err := controllerutil.SetControllerReference(instance, pod, r.scheme); err != nil {
-		return reconcile.Result{}, err
+	resources, err := generateAllResourcesForCR(instance)
+	if err != nil {
+		// something bad happened, the controller can not recover.
+		// you should check if anything is wrong with the yamls.
+		panic(err)
 	}
 
-	// Check if this Pod already exists
-	found := &corev1.Pod{}
-	err = r.client.Get(context.TODO(), types.NamespacedName{Name: pod.Name, Namespace: pod.Namespace}, found)
-	if err != nil && errors.IsNotFound(err) {
-		reqLogger.Info("Creating a new Pod", "Pod.Namespace", pod.Namespace, "Pod.Name", pod.Name)
-		err = r.client.Create(context.TODO(), pod)
-		if err != nil {
+	for _, resource := range resources {
+		// Set IBMBlockCSI instance as the owner and controller
+		if err := controllerutil.SetControllerReference(instance, resource, r.scheme); err != nil {
 			return reconcile.Result{}, err
 		}
 
-		// Pod created successfully - don't requeue
-		return reconcile.Result{}, nil
-	} else if err != nil {
-		return reconcile.Result{}, err
+		// Check if this resource already exists
+		var found runtime.Object
+		err = r.client.Get(context.TODO(), types.NamespacedName{Name: resource.Name, Namespace: resource.Namespace}, found)
+		if err != nil && errors.IsNotFound(err) {
+			reqLogger.Info("Creating a new resource", "Namespace", resource.Namespace, "Name", resource.Name)
+			err = r.client.Create(context.TODO(), resource)
+			if err != nil {
+				return reconcile.Result{}, err
+			}
+		} else if err != nil {
+			return reconcile.Result{}, err
+		}
+
+		// Resource already exists - don't requeue
+		reqLogger.Info("Skip reconcile: resource already exists", "Namespace", found.Namespace, "Name", found.Name)
 	}
 
-	// Pod already exists - don't requeue
-	reqLogger.Info("Skip reconcile: Pod already exists", "Pod.Namespace", found.Namespace, "Pod.Name", found.Name)
+	// Resource created successfully - don't requeue
 	return reconcile.Result{}, nil
 }
 
-// newPodForCR returns a busybox pod with the same name/namespace as the cr
-func newPodForCR(cr *csiv1.IBMBlockCSI) *corev1.Pod {
-	labels := map[string]string{
-		"app": cr.Name,
+// generateAllResourcesForCR returns a busybox pod with the same name/namespace as the cr
+func generateAllResourcesForCR(cr *csiv1.IBMBlockCSI) ([]*unstructured.Unstructured, error) {
+	ns := cr.Namespace
+	rootDir := config.DeployPath
+	files, err := ioutil.ReadDir(rootDir)
+	if err != nil {
+		return nil, err
 	}
-	return &corev1.Pod{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      cr.Name + "-pod",
-			Namespace: cr.Namespace,
-			Labels:    labels,
-		},
-		Spec: corev1.PodSpec{
-			Containers: []corev1.Container{
-				{
-					Name:    "busybox",
-					Image:   "busybox",
-					Command: []string{"sleep", "3600"},
-				},
-			},
-		},
+
+	objList := []*unstructured.Unstructured{}
+	for _, f := range files {
+		if f.IsDir() {
+			continue
+		}
+		fileName := f.Name()
+		if strings.HasSuffix(fileName, ".yaml") {
+			fullPath := filepath.Join(rootDir, fileName)
+			data, err := ioutil.ReadFile()
+			if err != nil {
+				return nil, err
+			}
+
+			data = updatePlaceholders(cr, data)
+			manifest, err := yamlutil.Split(data)
+			if err != nil {
+				return nil, err
+			}
+
+			for _, resource := range manifest {
+				obj, err := decoder.FromYamlToUnstructured(resource)
+				if err != nil {
+					return nil, err
+				}
+				obj.SetNamespace(ns)
+				objList = append(objList, obj)
+			}
+		}
 	}
+
+	return objList, nil
+}
+
+func updatePlaceholders(cr *csiv1.IBMBlockCSI, data []byte) []byte {
+	controllerRep := cr.Spec.Controller.Repository
+	controllerTag := cr.Spec.Controller.Tag
+	controllerUri := controllerRep + ":" + controllerTag
+
+	nodeRep := cr.Spec.Node.Repository
+	nodeTag := cr.Spec.Node.Tag
+	nodeUri := nodeRep + ":" + nodeTag
+
+	dataString := strings.Replace(string(data), config.ControllerImage, controllerUri, -1)
+	dataString = strings.Replace(dataString, config.NodeImage, nodeUri, -1)
+
+	return []byte(dataString)
 }

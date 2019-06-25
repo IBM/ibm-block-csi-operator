@@ -8,6 +8,7 @@ ENV OPERATOR=/usr/local/bin/ibm-block-csi-driver-operator \
 COPY build/_output/bin/ibm-block-csi-driver-operator ${OPERATOR}
 
 COPY build/bin /usr/local/bin
+COPY build/deploy /deploy
 RUN  /usr/local/bin/user_setup
 
 ENTRYPOINT ["/usr/local/bin/entrypoint"]
