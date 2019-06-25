@@ -21,7 +21,7 @@ func SplitFromFile(filename string) ([][]byte, error) {
 // Split splits YAML streams into individual documents.
 func Split(data []byte) ([][]byte, error) {
 	rc := ioutil.NopCloser(bytes.NewReader(data))
-	return split(f)
+	return split(rc)
 }
 
 // If an io.ErrShortBuffer error is returned, means that there is a very

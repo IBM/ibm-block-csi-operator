@@ -116,9 +116,9 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 
 		// Check if this resource already exists
 		var found runtime.Object
-		err = r.client.Get(context.TODO(), types.NamespacedName{Name: resource.Name, Namespace: resource.Namespace}, found)
+		err = r.client.Get(context.TODO(), types.NamespacedName{Name: resource.GetName(), Namespace: resource.GetNamespace()}, found)
 		if err != nil && errors.IsNotFound(err) {
-			reqLogger.Info("Creating a new resource", "Namespace", resource.Namespace, "Name", resource.Name)
+			reqLogger.Info("Creating a new resource", "Namespace", resource.GetNamespace(), "Name", resource.GetName())
 			err = r.client.Create(context.TODO(), resource)
 			if err != nil {
 				return reconcile.Result{}, err
@@ -128,7 +128,7 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 		}
 
 		// Resource already exists - don't requeue
-		reqLogger.Info("Skip reconcile: resource already exists", "Namespace", found.Namespace, "Name", found.Name)
+		reqLogger.Info("Skip reconcile: resource already exists", "Namespace", resource.GetNamespace(), "Name", resource.GetName())
 	}
 
 	// Resource created successfully - don't requeue
@@ -152,7 +152,7 @@ func generateAllResourcesForCR(cr *csiv1.IBMBlockCSI) ([]*unstructured.Unstructu
 		fileName := f.Name()
 		if strings.HasSuffix(fileName, ".yaml") {
 			fullPath := filepath.Join(rootDir, fileName)
-			data, err := ioutil.ReadFile()
+			data, err := ioutil.ReadFile(fullPath)
 			if err != nil {
 				return nil, err
 			}
