@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ibm-block-csi-driver-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: ibm-block-csi-driver-operator
+  template:
+    metadata:
+      labels:
+        name: ibm-block-csi-driver-operator
+    spec:
+      serviceAccountName: ibm-block-csi-driver-operator
+      containers:
+        - name: ibm-block-csi-driver-operator
+          # Replace this with the built image name
+          image: REPLACE_IMAGE
+          command:
+          - ibm-block-csi-driver-operator
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "ibm-block-csi-driver-operator"
