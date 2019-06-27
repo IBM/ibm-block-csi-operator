@@ -2,16 +2,20 @@ package ibmblockcsi
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"reflect"
 	"strings"
+	"time"
 
 	csiv1 "github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1"
-	corev1 "k8s.io/api/core/v1"
+	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/tools/record"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -22,9 +26,15 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	"github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
+	clustersyncer "github.com/IBM/ibm-block-csi-driver-operator/pkg/controller/ibmblockcsi/syncer"
+	"github.com/IBM/ibm-block-csi-driver-operator/pkg/internal/ibmblockcsi"
 	"github.com/IBM/ibm-block-csi-driver-operator/pkg/util/decoder"
 	yamlutil "github.com/IBM/ibm-block-csi-driver-operator/pkg/util/yaml"
+	"github.com/presslabs/controller-util/syncer"
 )
+
+// ReconcileTime is the delay between reconciliations
+const ReconcileTime = 30 * time.Second
 
 var log = logf.Log.WithName("controller_ibmblockcsi")
 
@@ -36,7 +46,11 @@ func Add(mgr manager.Manager) error {
 
 // newReconciler returns a new reconcile.Reconciler
 func newReconciler(mgr manager.Manager) reconcile.Reconciler {
-	return &ReconcileIBMBlockCSI{client: mgr.GetClient(), scheme: mgr.GetScheme()}
+	return &ReconcileIBMBlockCSI{
+		client:   mgr.GetClient(),
+		scheme:   mgr.GetScheme(),
+		recorder: mgr.GetRecorder("controller_ibmblockcsi"),
+	}
 }
 
 // add adds a new Controller to mgr with r as the reconcile.Reconciler
@@ -53,14 +67,19 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 		return err
 	}
 
-	// TODO(user): Modify this to be the types you create that are owned by the primary resource
-	// Watch for changes to secondary resource Pods and requeue the owner IBMBlockCSI
-	err = c.Watch(&source.Kind{Type: &corev1.Pod{}}, &handler.EnqueueRequestForOwner{
-		IsController: true,
-		OwnerType:    &csiv1.IBMBlockCSI{},
-	})
-	if err != nil {
-		return err
+	subresources := []runtime.Object{
+		&appsv1.StatefulSet{},
+		&appsv1.DaemonSet{},
+	}
+
+	for _, subresource := range subresources {
+		err = c.Watch(&source.Kind{Type: subresource}, &handler.EnqueueRequestForOwner{
+			IsController: true,
+			OwnerType:    &csiv1.IBMBlockCSI{},
+		})
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -73,8 +92,9 @@ var _ reconcile.Reconciler = &ReconcileIBMBlockCSI{}
 type ReconcileIBMBlockCSI struct {
 	// This client, initialized using mgr.Client() above, is a split client
 	// that reads objects from the cache and writes to the apiserver
-	client client.Client
-	scheme *runtime.Scheme
+	client   client.Client
+	scheme   *runtime.Scheme
+	recorder record.EventRecorder
 }
 
 // Reconcile reads that state of the cluster for a IBMBlockCSI object and makes changes based on the state read
@@ -87,8 +107,9 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 	reqLogger.Info("Reconciling IBMBlockCSI")
 
 	// Fetch the IBMBlockCSI instance
-	instance := &csiv1.IBMBlockCSI{}
-	err := r.client.Get(context.TODO(), request.NamespacedName, instance)
+	instance := ibmblockcsi.New(&csiv1.IBMBlockCSI{})
+	//instance := &csiv1.IBMBlockCSI{}
+	err := r.client.Get(context.TODO(), request.NamespacedName, instance.Unwrap())
 	if err != nil {
 		if errors.IsNotFound(err) {
 			// Request object not found, could have been deleted after reconcile request.
@@ -100,8 +121,35 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 		return reconcile.Result{}, err
 	}
 
+	r.scheme.Default(instance.Unwrap())
+	changed := instance.SetDefaults()
+
+	if err := instance.Validate(); err != nil {
+		err = fmt.Errorf("wrong IBMBlockCSI options: %v", err)
+		return reconcile.Result{reconcile.Result{RequeueAfter: ReconcileTime}}, err
+	}
+
+	// update CR if there was changes after defaulting
+	if changed {
+		err = r.client.Update(context.TODO(), instance.Unwrap())
+		if err != nil {
+			err = fmt.Errorf("failed to update IBMBlockCSI CR: %v", err)
+			return reconcile.Result{}, err
+		}
+	}
+
+	status := *instance.Status.DeepCopy()
+	defer func() {
+		if !reflect.DeepEqual(status, instance.Status) {
+			sErr := r.Status().Update(context.TODO(), instance.Unwrap())
+			if sErr != nil {
+				reqLogger.Error(sErr, "failed to update IBMBlockCSI status", "name", instance.Name)
+			}
+		}
+	}()
+
 	// Define a new Pod object
-	resources, err := generateAllResourcesForCR(instance)
+	resources, err := generateAllResourcesForCR(instance.Unwrap())
 	if err != nil {
 		// something bad happened, the controller can not recover.
 		// you should check if anything is wrong with the yamls.
@@ -110,7 +158,7 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 
 	for _, resource := range resources {
 		// Set IBMBlockCSI instance as the owner and controller
-		if err := controllerutil.SetControllerReference(instance, resource, r.scheme); err != nil {
+		if err := controllerutil.SetControllerReference(instance.Unwrap(), resource, r.scheme); err != nil {
 			return reconcile.Result{}, err
 		}
 
@@ -131,13 +179,19 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 		reqLogger.Info("Skip reconcile: resource already exists", "Namespace", resource.GetNamespace(), "Name", resource.GetName())
 	}
 
+	csiControllerSyncer := clustersyncer.NewCSIControllerSyncer(r.Client, r.scheme, instance)
+	if err = syncer.Sync(context.TODO(), csiControllerSyncer, r.recorder); err != nil {
+		return reconcile.Result{}, err
+	}
+
 	// Resource created successfully - don't requeue
 	return reconcile.Result{}, nil
 }
 
-// generateAllResourcesForCR returns a busybox pod with the same name/namespace as the cr
+// Generate all the resources required by CSI driver from source /deploy/ibm-block-csi-driver.yaml
 func generateAllResourcesForCR(cr *csiv1.IBMBlockCSI) ([]*unstructured.Unstructured, error) {
-	ns := cr.Namespace
+	//ns := cr.Namespace
+	ns := config.DefaultNamespace
 	rootDir := config.DeployPath
 	files, err := ioutil.ReadDir(rootDir)
 	if err != nil {
