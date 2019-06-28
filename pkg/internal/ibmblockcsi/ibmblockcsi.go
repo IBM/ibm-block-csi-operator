@@ -3,7 +3,7 @@ package ibmblockcsi
 import (
 	csiv1 "github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1"
 	"github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
-	"github.com/helm/pkg/version"
+	csiversion "github.com/IBM/ibm-block-csi-driver-operator/version"
 	"k8s.io/apimachinery/pkg/labels"
 )
 
@@ -29,7 +29,7 @@ func (c *IBMBlockCSI) GetAnnotations() labels.Set {
 	labels := labels.Set{
 		"app.kubernetes.io/name":       config.ProductName,
 		"app.kubernetes.io/instance":   c.Name,
-		"app.kubernetes.io/version":    version.Version,
+		"app.kubernetes.io/version":    csiversion.Version,
 		"app.kubernetes.io/managed-by": config.Name,
 	}
 
@@ -42,18 +42,18 @@ func (c *IBMBlockCSI) GetAnnotations() labels.Set {
 	return labels
 }
 
-func (c *IBMBlockCSI) GetComponentAnnotations(compoment string) labels.Set {
+func (c *IBMBlockCSI) GetComponentAnnotations(component string) labels.Set {
 	return labels.Set{
 		"app.kubernetes.io/component": component,
 	}
 }
 
 func (c *IBMBlockCSI) GetCSIControllerComponentAnnotations() labels.Set {
-	return c.GetComponentAnnotations(config.CSIController)
+	return c.GetComponentAnnotations(config.CSIController.String())
 }
 
 func (c *IBMBlockCSI) GetCSINodeComponentAnnotations() labels.Set {
-	return c.GetComponentAnnotations(config.CSINode)
+	return c.GetComponentAnnotations(config.CSINode.String())
 }
 
 func (c *IBMBlockCSI) GetCSIControllerAnnotations() labels.Set {

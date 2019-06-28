@@ -1,6 +1,7 @@
 package ibmblockcsi
 
 import (
+	csiv1 "github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1"
 	"github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
 )
 
@@ -11,7 +12,7 @@ import (
 func (c *IBMBlockCSI) SetDefaults() bool {
 	changed := false
 
-	if c.Spec == nil {
+	if c.Spec == (csiv1.IBMBlockCSISpec{}) {
 		c.Spec.Controller.Repository = config.ControllerRepository
 		c.Spec.Controller.Tag = config.ControllerTag
 		c.Spec.Node.Repository = config.NodeRepository

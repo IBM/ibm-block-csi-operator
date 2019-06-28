@@ -4,10 +4,9 @@ import (
 	"github.com/imdario/mergo"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/kubernetes/pkg/apis/core"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
@@ -24,9 +23,11 @@ const (
 	attacherContainerName                  = "csi-attacher"
 	controllerLivenessProbeContainerName   = "liveness-probe"
 
-	controllerContainerHealthPortName = "healthz"
-	controllerContainerHealthPort     = 9808
+	controllerContainerHealthPortName   = "healthz"
+	controllerContainerHealthPortNumber = 9808
 )
+
+var controllerContainerHealthPort = intstr.FromInt(controllerContainerHealthPortNumber)
 
 type csiControllerSyncer struct {
 	driver *ibmblockcsi.IBMBlockCSI
@@ -36,7 +37,7 @@ type csiControllerSyncer struct {
 func NewCSIControllerSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockcsi.IBMBlockCSI) syncer.Interface {
 	obj := &appsv1.StatefulSet{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: config.GetNameForResource(config.CSIController),
+			Name: config.GetNameForResource(config.CSIController, driver.Name),
 			//Namespace: driver.Namespace,
 			Namespace:   config.DefaultNamespace,
 			Annotations: driver.GetAnnotations(),
@@ -47,7 +48,7 @@ func NewCSIControllerSyncer(c client.Client, scheme *runtime.Scheme, driver *ibm
 		driver: driver,
 	}
 
-	return syncer.NewObjectSyncer(config.CSIController, driver.Unwrap(), obj, c, scheme, func(in runtime.Object) error {
+	return syncer.NewObjectSyncer(config.CSIController.String(), driver.Unwrap(), obj, c, scheme, func(in runtime.Object) error {
 		return sync.SyncFn(in)
 	})
 }
@@ -56,7 +57,7 @@ func (s *csiControllerSyncer) SyncFn(in runtime.Object) error {
 	out := in.(*appsv1.StatefulSet)
 
 	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCSIControllerComponentAnnotations())
-	out.Spec.ServiceName = config.GetNameForResource(config.CSIController)
+	out.Spec.ServiceName = config.GetNameForResource(config.CSIController, s.driver.Name)
 
 	// ensure template
 	out.Spec.Template.ObjectMeta.Labels = s.driver.GetCSIControllerComponentAnnotations()
@@ -78,7 +79,7 @@ func (s *csiControllerSyncer) ensurePodSpec() corev1.PodSpec {
 			FSGroup:   &fsGroup,
 			RunAsUser: &fsGroup,
 		},
-		ServiceAccountName: config.GetNameForResource(config.CSIControllerServiceAccount),
+		ServiceAccountName: config.GetNameForResource(config.CSIControllerServiceAccount, s.driver.Name),
 	}
 }
 
@@ -90,7 +91,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	)
 	controllerPlugin.Ports = ensurePorts(corev1.ContainerPort{
 		Name:          controllerContainerHealthPortName,
-		ContainerPort: controllerContainerHealthPort,
+		ContainerPort: controllerContainerHealthPortNumber,
 	})
 
 	//controllerPlugin.Resources = ensureResources(controllerContainerName)
@@ -130,7 +131,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		},
 	)
 
-	return []core.Container{
+	return []corev1.Container{
 		controllerPlugin,
 		registrar,
 		provisioner,
@@ -199,7 +200,7 @@ func (s *csiControllerSyncer) getVolumeMountsFor(name string) []corev1.VolumeMou
 		return []corev1.VolumeMount{
 			{
 				Name:      socketVolumeName,
-				MountPath: ControllerSocketVolumeMountPath,
+				MountPath: config.ControllerSocketVolumeMountPath,
 			},
 		}
 
@@ -207,7 +208,7 @@ func (s *csiControllerSyncer) getVolumeMountsFor(name string) []corev1.VolumeMou
 		return []corev1.VolumeMount{
 			{
 				Name:      socketVolumeName,
-				MountPath: ControllerLivenessProbeContainerSocketVolumeMountPath,
+				MountPath: config.ControllerLivenessProbeContainerSocketVolumeMountPath,
 			},
 		}
 	}
@@ -224,27 +225,6 @@ func (s *csiControllerSyncer) ensureVolumes() []corev1.Volume {
 
 func ensurePorts(ports ...corev1.ContainerPort) []corev1.ContainerPort {
 	return ports
-}
-
-func ensureResources(name string) corev1.ResourceRequirements {
-	limits := corev1.ResourceList{
-		corev1.ResourceCPU: resource.MustParse("50m"),
-	}
-	requests := corev1.ResourceList{
-		corev1.ResourceCPU: resource.MustParse("10m"),
-	}
-
-	switch name {
-	case containerExporterName:
-		limits = corev1.ResourceList{
-			corev1.ResourceCPU: resource.MustParse("100m"),
-		}
-	}
-
-	return corev1.ResourceRequirements{
-		Limits:   limits,
-		Requests: requests,
-	}
 }
 
 func ensureProbe(delay, timeout, period int32, handler corev1.Handler) *corev1.Probe {

@@ -5,10 +5,14 @@ import "fmt"
 // ResourceName is the type for aliasing resources that will be created.
 type ResourceName string
 
+func (rn ResourceName) String() string {
+	return string(rn)
+}
+
 const (
 	CSIController               ResourceName = "csi-controller"
 	CSINode                     ResourceName = "csi-node"
-	CSIControllerServiceAccount              = "csi-controller-sa"
+	CSIControllerServiceAccount ResourceName = "csi-controller-sa"
 )
 
 // GetNameForResource returns the name of a resource for a CSI driver

@@ -126,7 +126,7 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 
 	if err := instance.Validate(); err != nil {
 		err = fmt.Errorf("wrong IBMBlockCSI options: %v", err)
-		return reconcile.Result{reconcile.Result{RequeueAfter: ReconcileTime}}, err
+		return reconcile.Result{RequeueAfter: ReconcileTime}, err
 	}
 
 	// update CR if there was changes after defaulting
@@ -141,7 +141,7 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 	status := *instance.Status.DeepCopy()
 	defer func() {
 		if !reflect.DeepEqual(status, instance.Status) {
-			sErr := r.Status().Update(context.TODO(), instance.Unwrap())
+			sErr := r.client.Status().Update(context.TODO(), instance.Unwrap())
 			if sErr != nil {
 				reqLogger.Error(sErr, "failed to update IBMBlockCSI status", "name", instance.Name)
 			}
@@ -179,7 +179,7 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 		reqLogger.Info("Skip reconcile: resource already exists", "Namespace", resource.GetNamespace(), "Name", resource.GetName())
 	}
 
-	csiControllerSyncer := clustersyncer.NewCSIControllerSyncer(r.Client, r.scheme, instance)
+	csiControllerSyncer := clustersyncer.NewCSIControllerSyncer(r.client, r.scheme, instance)
 	if err = syncer.Sync(context.TODO(), csiControllerSyncer, r.recorder); err != nil {
 		return reconcile.Result{}, err
 	}
@@ -210,8 +210,6 @@ func generateAllResourcesForCR(cr *csiv1.IBMBlockCSI) ([]*unstructured.Unstructu
 			if err != nil {
 				return nil, err
 			}
-
-			data = updatePlaceholders(cr, data)
 			manifest, err := yamlutil.Split(data)
 			if err != nil {
 				return nil, err
@@ -229,19 +227,4 @@ func generateAllResourcesForCR(cr *csiv1.IBMBlockCSI) ([]*unstructured.Unstructu
 	}
 
 	return objList, nil
-}
-
-func updatePlaceholders(cr *csiv1.IBMBlockCSI, data []byte) []byte {
-	controllerRep := cr.Spec.Controller.Repository
-	controllerTag := cr.Spec.Controller.Tag
-	controllerUri := controllerRep + ":" + controllerTag
-
-	nodeRep := cr.Spec.Node.Repository
-	nodeTag := cr.Spec.Node.Tag
-	nodeUri := nodeRep + ":" + nodeTag
-
-	dataString := strings.Replace(string(data), config.ControllerImage, controllerUri, -1)
-	dataString = strings.Replace(dataString, config.NodeImage, nodeUri, -1)
-
-	return []byte(dataString)
 }
