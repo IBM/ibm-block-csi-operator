@@ -3,16 +3,14 @@ package ibmblockcsi
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
-	"path/filepath"
 	"reflect"
-	"strings"
 	"time"
 
 	csiv1 "github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1"
 	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
@@ -28,8 +26,6 @@ import (
 	"github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
 	clustersyncer "github.com/IBM/ibm-block-csi-driver-operator/pkg/controller/ibmblockcsi/syncer"
 	"github.com/IBM/ibm-block-csi-driver-operator/pkg/internal/ibmblockcsi"
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/util/decoder"
-	yamlutil "github.com/IBM/ibm-block-csi-driver-operator/pkg/util/yaml"
 	"github.com/presslabs/controller-util/syncer"
 )
 
@@ -37,6 +33,8 @@ import (
 const ReconcileTime = 30 * time.Second
 
 var log = logf.Log.WithName("controller_ibmblockcsi")
+
+type reconciler func(instance *ibmblockcsi.IBMBlockCSI) error
 
 // Add creates a new IBMBlockCSI Controller and adds it to the Manager. The Manager will set fields on the Controller
 // and Start it when the Manager is Started.
@@ -141,6 +139,7 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 	status := *instance.Status.DeepCopy()
 	defer func() {
 		if !reflect.DeepEqual(status, instance.Status) {
+			reqLogger.Info("updating IBMBlockCSI status", "name", instance.Name)
 			sErr := r.client.Status().Update(context.TODO(), instance.Unwrap())
 			if sErr != nil {
 				reqLogger.Error(sErr, "failed to update IBMBlockCSI status", "name", instance.Name)
@@ -148,39 +147,24 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 		}
 	}()
 
-	// Define a new Pod object
-	resources, err := generateAllResourcesForCR(instance.Unwrap())
-	if err != nil {
-		// something bad happened, the controller can not recover.
-		// you should check if anything is wrong with the yamls.
-		panic(err)
-	}
-
-	for _, resource := range resources {
-		// Set IBMBlockCSI instance as the owner and controller
-		if err := controllerutil.SetControllerReference(instance.Unwrap(), resource, r.scheme); err != nil {
+	// create the resources which never change if not exist
+	for _, rec := range []reconciler{
+		r.reconcileServiceAccount,
+		r.reconcileClusterRole,
+		r.reconcileClusterRoleBinding,
+	} {
+		if err = rec(instance); err != nil {
 			return reconcile.Result{}, err
 		}
-
-		// Check if this resource already exists
-		var found runtime.Object
-		err = r.client.Get(context.TODO(), types.NamespacedName{Name: resource.GetName(), Namespace: resource.GetNamespace()}, found)
-		if err != nil && errors.IsNotFound(err) {
-			reqLogger.Info("Creating a new resource", "Namespace", resource.GetNamespace(), "Name", resource.GetName())
-			err = r.client.Create(context.TODO(), resource)
-			if err != nil {
-				return reconcile.Result{}, err
-			}
-		} else if err != nil {
-			return reconcile.Result{}, err
-		}
-
-		// Resource already exists - don't requeue
-		reqLogger.Info("Skip reconcile: resource already exists", "Namespace", resource.GetNamespace(), "Name", resource.GetName())
 	}
 
+	// sync the resources which change over time
 	csiControllerSyncer := clustersyncer.NewCSIControllerSyncer(r.client, r.scheme, instance)
-	if err = syncer.Sync(context.TODO(), csiControllerSyncer, r.recorder); err != nil {
+	if err := syncer.Sync(context.TODO(), csiControllerSyncer, r.recorder); err != nil {
+		return reconcile.Result{}, err
+	}
+
+	if err := r.updateStatus(instance); err != nil {
 		return reconcile.Result{}, err
 	}
 
@@ -188,43 +172,126 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 	return reconcile.Result{}, nil
 }
 
-// Generate all the resources required by CSI driver from source /deploy/ibm-block-csi-driver.yaml
-func generateAllResourcesForCR(cr *csiv1.IBMBlockCSI) ([]*unstructured.Unstructured, error) {
-	//ns := cr.Namespace
-	ns := config.DefaultNamespace
-	rootDir := config.DeployPath
-	files, err := ioutil.ReadDir(rootDir)
+func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI) error {
+	controller := &appsv1.StatefulSet{}
+	err := r.client.Get(context.TODO(), types.NamespacedName{
+		Name:      config.GetNameForResource(config.CSIController, instance.Name),
+		Namespace: instance.Namespace,
+	}, controller)
+
 	if err != nil {
-		return nil, err
+		return err
+	}
+	instance.Status.Ready = controller.Status.ReadyReplicas == controller.Status.Replicas
+
+	// no need to push to status to API Server here.
+	return nil
+}
+
+func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBMBlockCSI) error {
+	recLogger := log.WithValues("Resource Type", "ServiceAccount")
+
+	sa := instance.GenerateControllerServiceAccount()
+	if err := controllerutil.SetControllerReference(instance.Unwrap(), sa, r.scheme); err != nil {
+		return err
+	}
+	found := &corev1.ServiceAccount{}
+	err := r.client.Get(context.TODO(), types.NamespacedName{
+		Name:      sa.Name,
+		Namespace: sa.Namespace,
+	}, found)
+	if err != nil && errors.IsNotFound(err) {
+		recLogger.Info("Creating a new ServiceAccount", "Namespace", sa.GetNamespace(), "Name", sa.GetName())
+		err = r.client.Create(context.TODO(), sa)
+		if err != nil {
+			return err
+		}
+	} else if err != nil {
+		recLogger.Error(err, "Failed to get ServiceAccount", "Name", sa.GetName())
+		return err
+	} else {
+		// Resource already exists - don't requeue
+		//recLogger.Info("Skip reconcile: ServiceAccount already exists", "Namespace", sa.GetNamespace(), "Name", sa.GetName())
 	}
 
-	objList := []*unstructured.Unstructured{}
-	for _, f := range files {
-		if f.IsDir() {
-			continue
-		}
-		fileName := f.Name()
-		if strings.HasSuffix(fileName, ".yaml") {
-			fullPath := filepath.Join(rootDir, fileName)
-			data, err := ioutil.ReadFile(fullPath)
-			if err != nil {
-				return nil, err
-			}
-			manifest, err := yamlutil.Split(data)
-			if err != nil {
-				return nil, err
-			}
+	return nil
+}
 
-			for _, resource := range manifest {
-				obj, err := decoder.FromYamlToUnstructured(resource)
-				if err != nil {
-					return nil, err
-				}
-				obj.SetNamespace(ns)
-				objList = append(objList, obj)
+func (r *ReconcileIBMBlockCSI) reconcileClusterRole(instance *ibmblockcsi.IBMBlockCSI) error {
+	recLogger := log.WithValues("Resource Type", "ClusterRole")
+
+	externalProvisioner := instance.GenerateExternalProvisionerClusterRole()
+	externalAttacher := instance.GenerateExternalAttacherClusterRole()
+	clusterDriverRegistrar := instance.GenerateClusterDriverRegistrarClusterRole()
+	externalSnapshotter := instance.GenerateExternalSnapshotterClusterRole()
+
+	for _, cr := range []*rbacv1.ClusterRole{
+		externalProvisioner,
+		externalAttacher,
+		clusterDriverRegistrar,
+		externalSnapshotter,
+	} {
+		if err := controllerutil.SetControllerReference(instance.Unwrap(), cr, r.scheme); err != nil {
+			return err
+		}
+		found := &rbacv1.ClusterRole{}
+		err := r.client.Get(context.TODO(), types.NamespacedName{
+			Name:      cr.Name,
+			Namespace: cr.Namespace,
+		}, found)
+		if err != nil && errors.IsNotFound(err) {
+			recLogger.Info("Creating a new ClusterRole", "Name", cr.GetName())
+			err = r.client.Create(context.TODO(), cr)
+			if err != nil {
+				return err
 			}
+		} else if err != nil {
+			recLogger.Error(err, "Failed to get ClusterRole", "Name", cr.GetName())
+			return err
+		} else {
+			// Resource already exists - don't requeue
+			//recLogger.Info("Skip reconcile: ClusterRole already exists", "Name", cr.GetName())
 		}
 	}
 
-	return objList, nil
+	return nil
+}
+
+func (r *ReconcileIBMBlockCSI) reconcileClusterRoleBinding(instance *ibmblockcsi.IBMBlockCSI) error {
+	recLogger := log.WithValues("Resource Type", "ClusterRoleBinding")
+
+	externalProvisioner := instance.GenerateExternalProvisionerClusterRoleBinding()
+	externalAttacher := instance.GenerateExternalAttacherClusterRoleBinding()
+	clusterDriverRegistrar := instance.GenerateClusterDriverRegistrarClusterRoleBinding()
+	externalSnapshotter := instance.GenerateExternalSnapshotterClusterRoleBinding()
+
+	for _, crb := range []*rbacv1.ClusterRoleBinding{
+		externalProvisioner,
+		externalAttacher,
+		clusterDriverRegistrar,
+		externalSnapshotter,
+	} {
+		if err := controllerutil.SetControllerReference(instance.Unwrap(), crb, r.scheme); err != nil {
+			return err
+		}
+		found := &rbacv1.ClusterRoleBinding{}
+		err := r.client.Get(context.TODO(), types.NamespacedName{
+			Name:      crb.Name,
+			Namespace: crb.Namespace,
+		}, found)
+		if err != nil && errors.IsNotFound(err) {
+			recLogger.Info("Creating a new ClusterRoleBinding", "Name", crb.GetName())
+			err = r.client.Create(context.TODO(), crb)
+			if err != nil {
+				return err
+			}
+		} else if err != nil {
+			recLogger.Error(err, "Failed to get ClusterRole", "Name", crb.GetName())
+			return err
+		} else {
+			// Resource already exists - don't requeue
+			//recLogger.Info("Skip reconcile: ClusterRoleBinding already exists", "Name", crb.GetName())
+		}
+	}
+	return nil
 }

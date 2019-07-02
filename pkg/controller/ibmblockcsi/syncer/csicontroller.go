@@ -37,9 +37,8 @@ type csiControllerSyncer struct {
 func NewCSIControllerSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockcsi.IBMBlockCSI) syncer.Interface {
 	obj := &appsv1.StatefulSet{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: config.GetNameForResource(config.CSIController, driver.Name),
-			//Namespace: driver.Namespace,
-			Namespace:   config.DefaultNamespace,
+			Name:        config.GetNameForResource(config.CSIController, driver.Name),
+			Namespace:   driver.Namespace,
 			Annotations: driver.GetAnnotations(),
 		},
 	}
