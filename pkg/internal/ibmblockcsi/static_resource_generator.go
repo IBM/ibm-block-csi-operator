@@ -58,7 +58,7 @@ func (c *IBMBlockCSI) GenerateExternalProvisionerClusterRole() *rbacv1.ClusterRo
 				Verbs:     []string{"get", "list"},
 			},
 			{
-				APIGroups: []string{"csi.storage.k8s.io"},
+				APIGroups: []string{c.GetCSIAPIGroup()},
 				Resources: []string{"csinodes"},
 				Verbs:     []string{"get", "list", "watch"},
 			},
@@ -103,7 +103,7 @@ func (c *IBMBlockCSI) GenerateExternalAttacherClusterRole() *rbacv1.ClusterRole 
 				Verbs:     []string{"get", "list", "watch", "update"},
 			},
 			{
-				APIGroups: []string{"csi.storage.k8s.io"},
+				APIGroups: []string{c.GetCSIAPIGroup()},
 				Resources: []string{"csinodes"},
 				Verbs:     []string{"get", "list", "watch"},
 			},
@@ -142,17 +142,26 @@ func (c *IBMBlockCSI) GenerateExternalAttacherClusterRoleBinding() *rbacv1.Clust
 }
 
 func (c *IBMBlockCSI) GenerateClusterDriverRegistrarClusterRole() *rbacv1.ClusterRole {
+	rules := []rbacv1.PolicyRule{
+		{
+			APIGroups: []string{c.GetCSIAPIGroup()},
+			Resources: []string{"csidrivers"},
+			Verbs:     []string{"create", "delete"},
+		},
+	}
+	if c.ServerVersion == "1.13" {
+		rules = append(rules, rbacv1.PolicyRule{
+			APIGroups: []string{"apiextensions.k8s.io"},
+			Resources: []string{"customresourcedefinitions"},
+			Verbs:     []string{"create", "list", "watch", "delete"},
+		})
+	}
+
 	return &rbacv1.ClusterRole{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: config.GetNameForResource(config.ClusterDriverRegistrarClusterRole, c.Name),
 		},
-		Rules: []rbacv1.PolicyRule{
-			{
-				APIGroups: []string{"csi.storage.k8s.io"},
-				Resources: []string{"csidrivers"},
-				Verbs:     []string{"create", "delete"},
-			},
-		},
+		Rules: rules,
 	}
 }
 
@@ -249,4 +258,11 @@ func (c *IBMBlockCSI) GenerateExternalSnapshotterClusterRoleBinding() *rbacv1.Cl
 			APIGroup: "rbac.authorization.k8s.io",
 		},
 	}
+}
+
+func (c *IBMBlockCSI) GetCSIAPIGroup() string {
+	if c.ServerVersion == "1.13" {
+		return "csi.storage.k8s.io"
+	}
+	return "storage.k8s.io"
 }

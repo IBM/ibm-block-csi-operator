@@ -10,12 +10,14 @@ import (
 // IBMBlockCSI is the wrapper for csiv1.IBMBlockCSI type
 type IBMBlockCSI struct {
 	*csiv1.IBMBlockCSI
+	ServerVersion string
 }
 
 // New returns a wrapper for csiv1.IBMBlockCSI
-func New(c *csiv1.IBMBlockCSI) *IBMBlockCSI {
+func New(c *csiv1.IBMBlockCSI, serverVersion string) *IBMBlockCSI {
 	return &IBMBlockCSI{
-		IBMBlockCSI: c,
+		IBMBlockCSI:   c,
+		ServerVersion: serverVersion,
 	}
 }
 

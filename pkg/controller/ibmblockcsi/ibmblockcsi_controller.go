@@ -13,6 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/record"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -26,6 +27,7 @@ import (
 	"github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
 	clustersyncer "github.com/IBM/ibm-block-csi-driver-operator/pkg/controller/ibmblockcsi/syncer"
 	"github.com/IBM/ibm-block-csi-driver-operator/pkg/internal/ibmblockcsi"
+	kubeutil "github.com/IBM/ibm-block-csi-driver-operator/pkg/util/kubernetes"
 	"github.com/presslabs/controller-util/syncer"
 )
 
@@ -42,12 +44,35 @@ func Add(mgr manager.Manager) error {
 	return add(mgr, newReconciler(mgr))
 }
 
+func getServerVersion() (string, error) {
+	clientConfig, err := kubeutil.KubeConfig()
+	if err != nil {
+		return "", err
+	}
+
+	kubeClient, err := kubernetes.NewForConfig(clientConfig)
+	if err != nil {
+		return "", err
+	}
+
+	return kubeutil.ServerVersion(kubeClient.Discovery())
+}
+
 // newReconciler returns a new reconcile.Reconciler
 func newReconciler(mgr manager.Manager) reconcile.Reconciler {
+
+	serverVersion, err := getServerVersion()
+	if err != nil {
+		panic(err)
+	}
+
+	log.Info(fmt.Sprintf("Kubernetes Version: %s", serverVersion))
+
 	return &ReconcileIBMBlockCSI{
-		client:   mgr.GetClient(),
-		scheme:   mgr.GetScheme(),
-		recorder: mgr.GetRecorder("controller_ibmblockcsi"),
+		client:        mgr.GetClient(),
+		scheme:        mgr.GetScheme(),
+		recorder:      mgr.GetRecorder("controller_ibmblockcsi"),
+		serverVersion: serverVersion,
 	}
 }
 
@@ -90,9 +115,10 @@ var _ reconcile.Reconciler = &ReconcileIBMBlockCSI{}
 type ReconcileIBMBlockCSI struct {
 	// This client, initialized using mgr.Client() above, is a split client
 	// that reads objects from the cache and writes to the apiserver
-	client   client.Client
-	scheme   *runtime.Scheme
-	recorder record.EventRecorder
+	client        client.Client
+	scheme        *runtime.Scheme
+	recorder      record.EventRecorder
+	serverVersion string
 }
 
 // Reconcile reads that state of the cluster for a IBMBlockCSI object and makes changes based on the state read
@@ -105,7 +131,7 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 	reqLogger.Info("Reconciling IBMBlockCSI")
 
 	// Fetch the IBMBlockCSI instance
-	instance := ibmblockcsi.New(&csiv1.IBMBlockCSI{})
+	instance := ibmblockcsi.New(&csiv1.IBMBlockCSI{}, r.serverVersion)
 	//instance := &csiv1.IBMBlockCSI{}
 	err := r.client.Get(context.TODO(), request.NamespacedName, instance.Unwrap())
 	if err != nil {
