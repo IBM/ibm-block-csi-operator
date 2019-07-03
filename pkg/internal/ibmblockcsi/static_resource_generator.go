@@ -59,7 +59,7 @@ func (c *IBMBlockCSI) GenerateExternalProvisionerClusterRole() *rbacv1.ClusterRo
 			},
 			{
 				APIGroups: []string{c.GetCSIAPIGroup()},
-				Resources: []string{"csinodes"},
+				Resources: []string{c.GetCSINodeObject()},
 				Verbs:     []string{"get", "list", "watch"},
 			},
 			{
@@ -104,7 +104,7 @@ func (c *IBMBlockCSI) GenerateExternalAttacherClusterRole() *rbacv1.ClusterRole 
 			},
 			{
 				APIGroups: []string{c.GetCSIAPIGroup()},
-				Resources: []string{"csinodes"},
+				Resources: []string{c.GetCSINodeObject()},
 				Verbs:     []string{"get", "list", "watch"},
 			},
 			{
@@ -265,4 +265,11 @@ func (c *IBMBlockCSI) GetCSIAPIGroup() string {
 		return "csi.storage.k8s.io"
 	}
 	return "storage.k8s.io"
+}
+
+func (c *IBMBlockCSI) GetCSINodeObject() string {
+	if c.ServerVersion == "1.13" {
+		return "csinodeinfos"
+	}
+	return "csinodes"
 }
