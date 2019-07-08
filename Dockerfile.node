@@ -1,0 +1,20 @@
+FROM golang:1.12.6
+
+WORKDIR /go/src/github.com/IBM/ibm-block-csi-driver-operator/
+COPY . .
+RUN CGO_ENABLED=1 GOOS=linux go build -o node-collector -gcflags all=-trimpath=${GOPATH} -asmflags all=-trimpath=${GOPATH} cmd/node/main.go
+
+
+FROM registry.access.redhat.com/ubi7/ubi-minimal:latest
+
+ENV PATH="/driver:${PATH}" \
+    USER_UID=1001 \
+    USER_NAME=ibm-block-csi-driver-operator
+WORKDIR /driver
+COPY --from=0 /go/src/github.com/IBM/ibm-block-csi-driver-operator/node-collector .
+COPY hack/docker-entrypoint.sh .
+RUN chmod -R 755 /driver
+USER ${USER_UID}
+
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["node-collector"]

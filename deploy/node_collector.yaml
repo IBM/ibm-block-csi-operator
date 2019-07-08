@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-collector
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      name: node-collector
+  template:
+    metadata:
+      labels:
+        name: node-collector
+    spec:
+      serviceAccountName: node-collector
+      initContainers:
+      - name: node-collector
+        image: stg-artifactory.haifa.ibm.com:5030/node-collector:0.0.1
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: iscsi
+          mountPath: /etc/iscsi
+        - name: fc
+          mountPath: /sys/class
+        env:
+        - name: WATCH_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+      volumes:
+      - name: iscsi
+        hostPath:
+          path: /etc/iscsi
+          type: DirectoryOrCreate
+      - name: fc
+        hostPath:
+          path: /sys/class
+          type: Directory
+      containers:
+      - name: sleep
+        image: stg-artifactory.haifa.ibm.com:5030/node-collector:0.0.1
+        imagePullPolicy: IfNotPresent
+        command:
+        - tail
+        - -f
+        - /dev/null
