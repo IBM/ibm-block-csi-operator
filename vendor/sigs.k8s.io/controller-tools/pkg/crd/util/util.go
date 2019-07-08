@@ -89,17 +89,7 @@ func PathHasProjectFile(filePath string) bool {
 
 // GetDomainFromProject get domain information from the PROJECT file under the path.
 func GetDomainFromProject(rootPath string) string {
-	return GetFieldFromProject("domain", rootPath)
-}
-
-// GetRepoFromProject get domain information from the PROJECT file under the path.
-func GetRepoFromProject(rootPath string) string {
-	return GetFieldFromProject("repo", rootPath)
-}
-
-// GetFieldFromProject get field information from the PROJECT file under the path.
-func GetFieldFromProject(fieldKey string, rootPath string) string {
-	var fieldVal string
+	var domain string
 
 	file, err := os.Open(path.Join(rootPath, "PROJECT"))
 	if err != nil {
@@ -113,18 +103,15 @@ func GetFieldFromProject(fieldKey string, rootPath string) string {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		if strings.HasPrefix(scanner.Text(), fmt.Sprintf("%s:", fieldKey)) {
-			fieldInfo := strings.Split(scanner.Text(), ":")
-			if len(fieldInfo) != 2 {
-				log.Fatalf("Unexpected %s info: %s", fieldKey, scanner.Text())
+		if strings.HasPrefix(scanner.Text(), "domain:") {
+			domainInfo := strings.Split(scanner.Text(), ":")
+			if len(domainInfo) != 2 {
+				log.Fatalf("Unexpected domain info: %s", scanner.Text())
 			}
-			fieldVal = strings.Replace(fieldInfo[1], " ", "", -1)
+			domain = strings.Replace(domainInfo[1], " ", "", -1)
 			break
 		}
 	}
-	if len(fieldVal) == 0 {
-		log.Fatalf("%s/PROJECT file is missing value for '%s'", rootPath, fieldKey)
-	}
 
-	return fieldVal
+	return domain
 }

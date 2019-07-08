@@ -1,12 +1,12 @@
 apiVersion: csi.ibm.com/v1
 kind: IBMBlockCSI
 metadata:
-  name: example-ibmblockcsi
+  name: ibm-block-csi
+  namespace: kube-system
 spec:
-  # Add fields here
   controller:
-    repository: ibmcom/ibm-block-csi-controller-driver
-    tag: "1.0.0"
+    repository: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-controller-driver
+    tag: "1.0.0_b48_origin.feature.k8s-deployment"
   node:
-    repository: ibmcom/ibm-block-csi-node-driver
+    repository: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-node-driver
     tag: "1.0.0"
