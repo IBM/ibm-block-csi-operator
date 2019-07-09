@@ -16,15 +16,16 @@ spec:
       serviceAccountName: ibm-block-csi-driver-operator
       containers:
         - name: ibm-block-csi-driver-operator
-          image: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-driver-operator:0.0.1
+          image: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-driver-operator:0.0.4
           imagePullPolicy: IfNotPresent
           command:
           - ibm-block-csi-driver-operator
           env:
             - name: WATCH_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
+              value: ""
+              #valueFrom:
+              #  fieldRef:
+              #    fieldPath: metadata.namespace
             - name: POD_NAME
               valueFrom:
                 fieldRef:

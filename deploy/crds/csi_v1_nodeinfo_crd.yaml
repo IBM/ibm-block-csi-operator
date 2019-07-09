@@ -31,15 +31,22 @@ spec:
           type: object
         status:
           properties:
-            iqn:
-              type: string
+            iqns:
+              items:
+                type: string
+              type: array
             wwpns:
               items:
                 type: string
               type: array
+            definedOnStorages:
+              items:
+                type: string
+              type: array
           required:
-          - iqn
+          - iqns
           - wwpns
+          # - definedOnStorages
           type: object
   version: v1
   versions:

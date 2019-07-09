@@ -234,10 +234,17 @@ func schema_pkg_apis_csi_v1_NodeInfoStatus(ref common.ReferenceCallback) common.
 				Description: "NodeInfoStatus defines the observed state of NodeInfo",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"iqn": {
+					"iqns": {
 						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
 						},
 					},
 					"wwpns": {
@@ -253,8 +260,21 @@ func schema_pkg_apis_csi_v1_NodeInfoStatus(ref common.ReferenceCallback) common.
 							},
 						},
 					},
+					"definedOnStorages": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
 				},
-				Required: []string{"iqn", "wwpns"},
+				Required: []string{"iqns", "wwpns", "definedOnStorages"},
 			},
 		},
 	}

@@ -5,6 +5,7 @@ const (
 	APIGroup         = "csi.ibm.com"
 	APIVersion       = "v1"
 	Name             = "ibm-block-csi-operator"
+	DriverName       = "ibm-block-csi-driver"
 	ProductName      = "ibm-block-csi"
 	DeployPath       = "/deploy"
 	DefaultNamespace = "kube-system"

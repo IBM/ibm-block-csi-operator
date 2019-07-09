@@ -30,10 +30,10 @@ func Sync(c client.Client) {
 
 	updateIscsi := false
 	updateFc := false
-	iqn, err := GetNodeIscsiIQN()
+	iqns, err := GetNodeIscsiIQNs()
 	if err == nil {
 		updateIscsi = true
-		log.Info("Got iscsi initiator", "iqn", iqn)
+		log.Info("Got iscsi initiators", "iqns", iqns)
 	} else {
 		log.Info("Iscsi initiator is not configured well", "err", err.Error())
 	}
@@ -86,8 +86,8 @@ func Sync(c client.Client) {
 	}
 
 	if updateIscsi {
-		//found.Status.Iqn = iqn
-		unstructured.SetNestedField(found.Object, iqn, "status", "iqn")
+		//found.Status.Iqns = iqns
+		unstructured.SetNestedStringSlice(found.Object, iqns, "status", "iqns")
 	}
 	if updateFc {
 		//found.Status.Wwpns = wwpns

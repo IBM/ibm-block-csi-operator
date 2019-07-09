@@ -13,16 +13,16 @@ const portName = "port_name"
 const portState = "port_state"
 const portOnline = "Online"
 
-func GetNodeIscsiIQN() (string, error) {
+func GetNodeIscsiIQNs() ([]string, error) {
 	if ok, err := exists(iqnPath); !ok || err != nil {
-		return "", err
+		return nil, err
 	}
 	iqnLine, err := ioutil.ReadFile(iqnPath)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	iqnLineStr := strings.TrimSpace(string(iqnLine))
-	return strings.Split(iqnLineStr, "=")[1], nil
+	return []string{strings.Split(iqnLineStr, "=")[1]}, nil
 }
 
 func GetNodeFcWWPNs() ([]string, error) {
