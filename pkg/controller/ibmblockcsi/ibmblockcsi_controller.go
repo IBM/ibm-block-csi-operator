@@ -190,6 +190,11 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 		return reconcile.Result{}, err
 	}
 
+	csiNodeSyncer := clustersyncer.NewCSINodeSyncer(r.client, r.scheme, instance)
+	if err := syncer.Sync(context.TODO(), csiNodeSyncer, r.recorder); err != nil {
+		return reconcile.Result{}, err
+	}
+
 	if err := r.updateStatus(instance); err != nil {
 		return reconcile.Result{}, err
 	}
@@ -208,7 +213,20 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI) e
 	if err != nil {
 		return err
 	}
-	instance.Status.Ready = controller.Status.ReadyReplicas == controller.Status.Replicas
+
+	node := &appsv1.DaemonSet{}
+	err = r.client.Get(context.TODO(), types.NamespacedName{
+		Name:      config.GetNameForResource(config.CSINode, instance.Name),
+		Namespace: instance.Namespace,
+	}, node)
+
+	if err != nil {
+		return err
+	}
+
+	instance.Status.ControllerReady = controller.Status.ReadyReplicas == controller.Status.Replicas
+	instance.Status.NodeReady = node.Status.DesiredNumberScheduled == node.Status.NumberAvailable
+	instance.Status.Ready = instance.Status.ControllerReady && instance.Status.NodeReady
 
 	// no need to push to status to API Server here.
 	return nil

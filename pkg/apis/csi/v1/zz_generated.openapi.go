@@ -165,8 +165,20 @@ func schema_pkg_apis_csi_v1_IBMBlockCSIStatus(ref common.ReferenceCallback) comm
 							Format:      "",
 						},
 					},
+					"controllerReady": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"boolean"},
+							Format: "",
+						},
+					},
+					"nodeReady": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"boolean"},
+							Format: "",
+						},
+					},
 				},
-				Required: []string{"ready"},
+				Required: []string{"ready", "controllerReady", "nodeReady"},
 			},
 		},
 	}

@@ -81,7 +81,7 @@ func (m *svcMediator) callAndRetryIfUnauthorized(method, url string, body map[st
 
 func (m *svcMediator) call(method, url string, headers, body map[string]string, into ...interface{}) (bool, error) {
 	m.logger.Info(
-		"Calling request %s %s, header is %v, body is %v",
+		"Calling request",
 		"method", method,
 		"url", url,
 		"headers", headers,

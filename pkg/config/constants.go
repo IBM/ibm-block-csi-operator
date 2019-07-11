@@ -16,7 +16,11 @@ const (
 	NodeRepository       = "ibmcom/ibm-block-csi-node-driver"
 
 	ControllerSocketVolumeMountPath                       = "/var/lib/csi/sockets/pluginproxy/"
+	NodeSocketVolumeMountPath                             = "/csi"
 	ControllerLivenessProbeContainerSocketVolumeMountPath = "/csi"
 	ControllerSocketPath                                  = "/var/lib/csi/sockets/pluginproxy/csi.sock"
+	NodeSocketPath                                        = "/csi/csi.sock"
+	NodeRegistrarSocketPath                               = "/registration/csi.sock"
 	CSIEndpoint                                           = "unix:///var/lib/csi/sockets/pluginproxy/csi.sock"
+	CSINodeEndpoint                                       = "unix:///csi/csi.sock"
 )

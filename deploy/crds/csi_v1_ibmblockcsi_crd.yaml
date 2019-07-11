@@ -65,6 +65,10 @@ spec:
           type: object
         status:
           properties:
+            controllerReady:
+              type: boolean
+            nodeReady:
+              type: boolean
             ready:
               description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
                 of cluster Important: Run "operator-sdk generate k8s" to regenerate
@@ -73,6 +77,8 @@ spec:
               type: boolean
           required:
           - ready
+          - controllerReady
+          - nodeReady
           type: object
   version: v1
   versions:

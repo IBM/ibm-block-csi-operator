@@ -16,7 +16,7 @@ spec:
       serviceAccountName: ibm-block-csi-driver-operator
       containers:
         - name: ibm-block-csi-driver-operator
-          image: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-driver-operator:0.0.4
+          image: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-driver-operator:0.0.5
           imagePullPolicy: IfNotPresent
           command:
           - ibm-block-csi-driver-operator
