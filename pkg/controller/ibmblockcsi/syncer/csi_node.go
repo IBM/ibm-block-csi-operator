@@ -83,7 +83,10 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	// node plugin container
 	nodePlugin := s.ensureContainer(nodeContainerName,
 		s.driver.GetCSINodeImage(),
-		[]string{"--csi-endpoint=$(CSI_ENDPOINT)"},
+		[]string{
+			"--csi-endpoint=$(CSI_ENDPOINT)",
+			"--v=$(CSI_LOGLEVEL)",
+		},
 	)
 	nodePlugin.Ports = ensurePorts(corev1.ContainerPort{
 		Name:          nodeContainerHealthPortName,
@@ -107,7 +110,11 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	// cluster driver registrar sidecar
 	registrar := s.ensureContainer(nodeDriverRegistrarContainerName,
 		config.NodeDriverRegistrarImage,
-		[]string{"--csi-address=$(ADDRESS)", "--v=5"},
+		[]string{
+			"--csi-address=$(ADDRESS)",
+			"--kubelet-registration-path=$(DRIVER_REG_SOCK_PATH)",
+			"--v=5",
+		},
 	)
 	registrar.Lifecycle = &corev1.Lifecycle{
 		PreStop: &corev1.Handler{
@@ -167,7 +174,7 @@ func (s *csiNodeSyncer) getEnvFor(name string) []corev1.EnvVar {
 			},
 			{
 				Name:  "CSI_LOGLEVEL",
-				Value: config.DefaultLogLevel,
+				Value: "5",
 			},
 			envVarFromField("KUBE_NODE_NAME", "spec.nodeName"),
 		}

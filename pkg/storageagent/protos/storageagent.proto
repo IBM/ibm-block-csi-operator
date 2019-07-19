@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+//option java_multiple_files = true;
+//option java_package = "io.grpc.examples.helloworld";
+//option java_outer_classname = "HelloWorldProto";
+//option objc_class_prefix = "HLW";
+
+package storageagent;
+
+// The storage agent service definition.
+service StorageAgent {
+  // Define a host on storage side.
+  rpc CreateHost (CreateHostRequest) returns (CreateHostReply) {}
+  rpc DeleteHost (DeleteHostRequest) returns (DeleteHostReply) {}
+  rpc ListHosts (ListHostsRequest) returns (ListHostsReply) {}
+}
+
+// Information about a specific host.
+message Host {
+  string identifier = 1;
+  string name = 2;
+  string status = 3;
+  string array = 4;
+  repeated string iqns = 5;
+  repeated string wwpns = 6;
+}
+
+message CreateHostRequest {
+  string name = 1;
+  repeated string iqns = 2;
+  repeated string wwpns = 3;
+  map<string, string> secrets = 4;
+}
+
+message CreateHostReply {
+  Host host = 1;
+}
+
+message DeleteHostRequest {
+  string name = 1;
+  map<string, string> secrets = 4;
+}
+
+message DeleteHostReply {
+  // Intentionally empty.
+}
+
+message ListHostsRequest {
+  // The name of the host. This field is OPTIONAL.
+  // If not specified, return all.
+  string name = 1;
+  map<string, string> secrets = 4;
+}
+
+message ListHostsReply {
+  repeated Host hosts = 1;
+}

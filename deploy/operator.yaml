@@ -16,7 +16,7 @@ spec:
       serviceAccountName: ibm-block-csi-driver-operator
       containers:
         - name: ibm-block-csi-driver-operator
-          image: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-driver-operator:0.0.5
+          image: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-driver-operator:0.0.6
           imagePullPolicy: IfNotPresent
           command:
           - ibm-block-csi-driver-operator
@@ -32,3 +32,21 @@ spec:
                   fieldPath: metadata.name
             - name: OPERATOR_NAME
               value: "ibm-block-csi-driver-operator"
+            - name: ENDPOINT
+              value: "unix:///storage/storage.sock:10086"
+          volumeMounts:
+            - name: socket-dir
+              mountPath: /storage/
+        - name: ibm-storage-agent
+          image: stg-artifactory.haifa.ibm.com:5030/ibm-storage-agent:v0.0.2
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: ENDPOINT
+              value: "unix:///storage/storage.sock:10086"
+          volumeMounts:
+            - name: socket-dir
+              mountPath: /storage/
+
+      volumes:
+        - name: socket-dir
+          emptyDir: {}

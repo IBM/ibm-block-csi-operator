@@ -19,8 +19,8 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/arrayactions"
 	"github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
+	"github.com/IBM/ibm-block-csi-driver-operator/pkg/storageagent"
 )
 
 var log = logf.Log.WithName("controller_volumeattachment")
@@ -237,6 +237,7 @@ func (r *ReconcileVolumeAttachment) processControllerPublishSecret(secret *corev
 }
 
 func defineHostOnArray(arrayAddr, user, password, host string, iscsiPorts, fcPorts []string) error {
-	client := arrayactions.NewSvcMediator(arrayAddr, user, password, log)
+	//client := arrayactions.NewSvcMediator(arrayAddr, user, password, log)
+	client := storageagent.NewStoragClient(arrayAddr, user, password, log)
 	return client.CreateHost(host, iscsiPorts, fcPorts)
 }
