@@ -53,17 +53,6 @@ rules:
   - watch
   - list
 - apiGroups:
-  - rbac.authorization.k8s.io
-  resources:
-  - clusterroles
-  - clusterrolebindings
-  verbs:
-  - create
-  - delete
-  - get
-  - watch
-  - list
-- apiGroups:
   - storage.k8s.io
   resources:
   - csidrivers

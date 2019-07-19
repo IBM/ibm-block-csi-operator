@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: node-collector
+  name: ibm-node-collector
   namespace: kube-system
 spec:
   selector:
     matchLabels:
-      name: node-collector
+      name: ibm-node-collector
   template:
     metadata:
       labels:
-        name: node-collector
+        name: ibm-node-collector
     spec:
-      serviceAccountName: node-collector
+      serviceAccountName: ibm-node-collector
       initContainers:
       - name: node-collector
-        image: stg-artifactory.haifa.ibm.com:5030/node-collector:0.0.1
+        image: stg-artifactory.haifa.ibm.com:5030/ibm-node-collector:v0.0.1
         imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: iscsi
