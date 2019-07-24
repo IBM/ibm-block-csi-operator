@@ -1,5 +1,5 @@
 package storageagent
 
-type StoragClient interface {
+type StorageClient interface {
 	CreateHost(name string, iscsiPorts, fcPorts []string) error
 }

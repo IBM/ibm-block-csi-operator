@@ -238,6 +238,6 @@ func (r *ReconcileVolumeAttachment) processControllerPublishSecret(secret *corev
 
 func defineHostOnArray(arrayAddr, user, password, host string, iscsiPorts, fcPorts []string) error {
 	//client := arrayactions.NewSvcMediator(arrayAddr, user, password, log)
-	client := storageagent.NewStoragClient(arrayAddr, user, password, log)
+	client := storageagent.NewStorageClient(arrayAddr, user, password, log)
 	return client.CreateHost(host, iscsiPorts, fcPorts)
 }

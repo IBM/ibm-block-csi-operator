@@ -6,6 +6,8 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/pkg/errors"
+
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 )
 
@@ -50,6 +52,52 @@ func iscsiadmDebug(output string, cmdError error) {
 	if cmdError != nil {
 		log.Info("Error returned from iscsiadm command", "error", cmdError.Error())
 	}
+}
+
+func DiscoverAndLoginPortals(portals []string) error {
+	log.Info("Starting to login portals: " + strings.Join(portals, ", "))
+	var err error
+	var failedPortals = []string{}
+
+	for _, portal := range portals {
+		e := DiscoverAndLogin(portal)
+		if e != nil {
+			log.Error(e, "Failed to login portal "+portal)
+			failedPortals = append(failedPortals, portal)
+			if err == nil {
+				err = e
+			}
+		}
+	}
+	log.Info("Finished to login portals")
+	if err != nil {
+		fp := strings.Join(failedPortals, ", ")
+		return errors.WithMessage(err, "Failed to login portals "+fp)
+	}
+	return nil
+}
+
+func DiscoverAndLogoutPortals(portals []string) error {
+	log.Info("Starting to logout portals: " + strings.Join(portals, ", "))
+	var err error
+	var failedPortals = []string{}
+
+	for _, portal := range portals {
+		e := DiscoverAndLogout(portal)
+		if e != nil {
+			log.Error(e, "Failed to logout portal "+portal)
+			failedPortals = append(failedPortals, portal)
+			if err == nil {
+				err = e
+			}
+		}
+	}
+	log.Info("Finished to logout portals")
+	if err != nil {
+		fp := strings.Join(failedPortals, ", ")
+		return errors.WithMessage(err, "Failed to logout portals "+fp)
+	}
+	return nil
 }
 
 func DiscoverAndLogin(portal string) error {

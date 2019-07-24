@@ -1,0 +1,48 @@
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: ibm-iscsi-utils
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      name: ibm-iscsi-utils
+  template:
+    metadata:
+      labels:
+        name: ibm-iscsi-utils
+    spec:
+      hostNetwork: true
+      containers:
+        - name: iscsi-utils
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["SYS_ADMIN"]
+            allowPrivilegeEscalation: true
+          image: stg-artifactory.haifa.ibm.com:5030/ibm-iscsi-agent:0.0.1
+          command: ["ibm-iscsi-agent", "--address", ":10086"]
+          imagePullPolicy: "IfNotPresent"
+          ports:
+          - name: iscsi
+		    containerPort: 10086
+          volumeMounts:
+            - mountPath: /lib/modules
+              name: lib-modules
+            - mountPath: /sys
+              name: sysfs
+            - mountPath: /dev
+              name: dev
+      volumes:
+        - name: lib-modules
+          hostPath:
+            path: /lib/modules
+            type: Directory
+        - name: sysfs
+          hostPath:
+            path: /sys
+            type: Directory
+        - name: dev
+          hostPath:
+            path: /dev
+            type: Directory
