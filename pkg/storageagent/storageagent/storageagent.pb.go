@@ -104,6 +104,55 @@ func (m *Host) GetWwpns() []string {
 	return nil
 }
 
+// Information about a specific iscsi target, including ip and iqn,
+// but only ip is mandatory since iqn can be discovered by iscsiadm.
+type IscsiTarget struct {
+	Address              string   `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
+	Iqn                  string   `protobuf:"bytes,2,opt,name=iqn,proto3" json:"iqn,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *IscsiTarget) Reset()         { *m = IscsiTarget{} }
+func (m *IscsiTarget) String() string { return proto.CompactTextString(m) }
+func (*IscsiTarget) ProtoMessage()    {}
+func (*IscsiTarget) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ed9012731fe56366, []int{1}
+}
+
+func (m *IscsiTarget) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_IscsiTarget.Unmarshal(m, b)
+}
+func (m *IscsiTarget) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_IscsiTarget.Marshal(b, m, deterministic)
+}
+func (m *IscsiTarget) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_IscsiTarget.Merge(m, src)
+}
+func (m *IscsiTarget) XXX_Size() int {
+	return xxx_messageInfo_IscsiTarget.Size(m)
+}
+func (m *IscsiTarget) XXX_DiscardUnknown() {
+	xxx_messageInfo_IscsiTarget.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_IscsiTarget proto.InternalMessageInfo
+
+func (m *IscsiTarget) GetAddress() string {
+	if m != nil {
+		return m.Address
+	}
+	return ""
+}
+
+func (m *IscsiTarget) GetIqn() string {
+	if m != nil {
+		return m.Iqn
+	}
+	return ""
+}
+
 type CreateHostRequest struct {
 	Name                 string            `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Iqns                 []string          `protobuf:"bytes,2,rep,name=iqns,proto3" json:"iqns,omitempty"`
@@ -118,7 +167,7 @@ func (m *CreateHostRequest) Reset()         { *m = CreateHostRequest{} }
 func (m *CreateHostRequest) String() string { return proto.CompactTextString(m) }
 func (*CreateHostRequest) ProtoMessage()    {}
 func (*CreateHostRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ed9012731fe56366, []int{1}
+	return fileDescriptor_ed9012731fe56366, []int{2}
 }
 
 func (m *CreateHostRequest) XXX_Unmarshal(b []byte) error {
@@ -178,7 +227,7 @@ func (m *CreateHostReply) Reset()         { *m = CreateHostReply{} }
 func (m *CreateHostReply) String() string { return proto.CompactTextString(m) }
 func (*CreateHostReply) ProtoMessage()    {}
 func (*CreateHostReply) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ed9012731fe56366, []int{2}
+	return fileDescriptor_ed9012731fe56366, []int{3}
 }
 
 func (m *CreateHostReply) XXX_Unmarshal(b []byte) error {
@@ -208,7 +257,7 @@ func (m *CreateHostReply) GetHost() *Host {
 
 type DeleteHostRequest struct {
 	Name                 string            `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Secrets              map[string]string `protobuf:"bytes,4,rep,name=secrets,proto3" json:"secrets,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Secrets              map[string]string `protobuf:"bytes,2,rep,name=secrets,proto3" json:"secrets,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
@@ -218,7 +267,7 @@ func (m *DeleteHostRequest) Reset()         { *m = DeleteHostRequest{} }
 func (m *DeleteHostRequest) String() string { return proto.CompactTextString(m) }
 func (*DeleteHostRequest) ProtoMessage()    {}
 func (*DeleteHostRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ed9012731fe56366, []int{3}
+	return fileDescriptor_ed9012731fe56366, []int{4}
 }
 
 func (m *DeleteHostRequest) XXX_Unmarshal(b []byte) error {
@@ -263,7 +312,7 @@ func (m *DeleteHostReply) Reset()         { *m = DeleteHostReply{} }
 func (m *DeleteHostReply) String() string { return proto.CompactTextString(m) }
 func (*DeleteHostReply) ProtoMessage()    {}
 func (*DeleteHostReply) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ed9012731fe56366, []int{4}
+	return fileDescriptor_ed9012731fe56366, []int{5}
 }
 
 func (m *DeleteHostReply) XXX_Unmarshal(b []byte) error {
@@ -288,7 +337,7 @@ type ListHostsRequest struct {
 	// The name of the host. This field is OPTIONAL.
 	// If not specified, return all.
 	Name                 string            `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Secrets              map[string]string `protobuf:"bytes,4,rep,name=secrets,proto3" json:"secrets,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Secrets              map[string]string `protobuf:"bytes,2,rep,name=secrets,proto3" json:"secrets,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
@@ -298,7 +347,7 @@ func (m *ListHostsRequest) Reset()         { *m = ListHostsRequest{} }
 func (m *ListHostsRequest) String() string { return proto.CompactTextString(m) }
 func (*ListHostsRequest) ProtoMessage()    {}
 func (*ListHostsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ed9012731fe56366, []int{5}
+	return fileDescriptor_ed9012731fe56366, []int{6}
 }
 
 func (m *ListHostsRequest) XXX_Unmarshal(b []byte) error {
@@ -344,7 +393,7 @@ func (m *ListHostsReply) Reset()         { *m = ListHostsReply{} }
 func (m *ListHostsReply) String() string { return proto.CompactTextString(m) }
 func (*ListHostsReply) ProtoMessage()    {}
 func (*ListHostsReply) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ed9012731fe56366, []int{6}
+	return fileDescriptor_ed9012731fe56366, []int{7}
 }
 
 func (m *ListHostsReply) XXX_Unmarshal(b []byte) error {
@@ -372,8 +421,87 @@ func (m *ListHostsReply) GetHosts() []*Host {
 	return nil
 }
 
+type ListIscsiTargetsRequest struct {
+	Secrets              map[string]string `protobuf:"bytes,1,rep,name=secrets,proto3" json:"secrets,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
+	XXX_unrecognized     []byte            `json:"-"`
+	XXX_sizecache        int32             `json:"-"`
+}
+
+func (m *ListIscsiTargetsRequest) Reset()         { *m = ListIscsiTargetsRequest{} }
+func (m *ListIscsiTargetsRequest) String() string { return proto.CompactTextString(m) }
+func (*ListIscsiTargetsRequest) ProtoMessage()    {}
+func (*ListIscsiTargetsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ed9012731fe56366, []int{8}
+}
+
+func (m *ListIscsiTargetsRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListIscsiTargetsRequest.Unmarshal(m, b)
+}
+func (m *ListIscsiTargetsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListIscsiTargetsRequest.Marshal(b, m, deterministic)
+}
+func (m *ListIscsiTargetsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListIscsiTargetsRequest.Merge(m, src)
+}
+func (m *ListIscsiTargetsRequest) XXX_Size() int {
+	return xxx_messageInfo_ListIscsiTargetsRequest.Size(m)
+}
+func (m *ListIscsiTargetsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListIscsiTargetsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListIscsiTargetsRequest proto.InternalMessageInfo
+
+func (m *ListIscsiTargetsRequest) GetSecrets() map[string]string {
+	if m != nil {
+		return m.Secrets
+	}
+	return nil
+}
+
+type ListIscsiTargetsReply struct {
+	Targets              []*IscsiTarget `protobuf:"bytes,1,rep,name=targets,proto3" json:"targets,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
+}
+
+func (m *ListIscsiTargetsReply) Reset()         { *m = ListIscsiTargetsReply{} }
+func (m *ListIscsiTargetsReply) String() string { return proto.CompactTextString(m) }
+func (*ListIscsiTargetsReply) ProtoMessage()    {}
+func (*ListIscsiTargetsReply) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ed9012731fe56366, []int{9}
+}
+
+func (m *ListIscsiTargetsReply) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListIscsiTargetsReply.Unmarshal(m, b)
+}
+func (m *ListIscsiTargetsReply) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListIscsiTargetsReply.Marshal(b, m, deterministic)
+}
+func (m *ListIscsiTargetsReply) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListIscsiTargetsReply.Merge(m, src)
+}
+func (m *ListIscsiTargetsReply) XXX_Size() int {
+	return xxx_messageInfo_ListIscsiTargetsReply.Size(m)
+}
+func (m *ListIscsiTargetsReply) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListIscsiTargetsReply.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListIscsiTargetsReply proto.InternalMessageInfo
+
+func (m *ListIscsiTargetsReply) GetTargets() []*IscsiTarget {
+	if m != nil {
+		return m.Targets
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*Host)(nil), "storageagent.Host")
+	proto.RegisterType((*IscsiTarget)(nil), "storageagent.IscsiTarget")
 	proto.RegisterType((*CreateHostRequest)(nil), "storageagent.CreateHostRequest")
 	proto.RegisterMapType((map[string]string)(nil), "storageagent.CreateHostRequest.SecretsEntry")
 	proto.RegisterType((*CreateHostReply)(nil), "storageagent.CreateHostReply")
@@ -383,38 +511,47 @@ func init() {
 	proto.RegisterType((*ListHostsRequest)(nil), "storageagent.ListHostsRequest")
 	proto.RegisterMapType((map[string]string)(nil), "storageagent.ListHostsRequest.SecretsEntry")
 	proto.RegisterType((*ListHostsReply)(nil), "storageagent.ListHostsReply")
+	proto.RegisterType((*ListIscsiTargetsRequest)(nil), "storageagent.ListIscsiTargetsRequest")
+	proto.RegisterMapType((map[string]string)(nil), "storageagent.ListIscsiTargetsRequest.SecretsEntry")
+	proto.RegisterType((*ListIscsiTargetsReply)(nil), "storageagent.ListIscsiTargetsReply")
 }
 
 func init() { proto.RegisterFile("storageagent.proto", fileDescriptor_ed9012731fe56366) }
 
 var fileDescriptor_ed9012731fe56366 = []byte{
-	// 410 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x54, 0xcb, 0x6e, 0xe2, 0x30,
-	0x14, 0xc5, 0x24, 0x30, 0xe2, 0x82, 0x06, 0xb8, 0x1a, 0x8d, 0x2c, 0x34, 0xc3, 0xa0, 0x2c, 0x46,
-	0x48, 0x33, 0x62, 0x41, 0x37, 0x2d, 0xbb, 0xaa, 0xa5, 0xaa, 0xd4, 0xaa, 0x0b, 0xf8, 0x02, 0xb7,
-	0x75, 0x69, 0xd4, 0x34, 0x09, 0xb6, 0x29, 0xca, 0x6f, 0xf4, 0x2f, 0xaa, 0x7e, 0x4f, 0xbf, 0xa6,
-	0x9b, 0xca, 0x0e, 0x0f, 0x13, 0x5e, 0x2b, 0x76, 0xbe, 0xf7, 0x5c, 0x9f, 0x7b, 0x7c, 0x4e, 0x14,
-	0x40, 0xa9, 0x22, 0xc1, 0x46, 0x9c, 0x8d, 0x78, 0xa8, 0x3a, 0xb1, 0x88, 0x54, 0x84, 0x15, 0xbb,
-	0xe7, 0xbd, 0x12, 0x70, 0x2f, 0x23, 0xa9, 0xb0, 0x09, 0xe0, 0xdf, 0xf3, 0x50, 0xf9, 0x0f, 0x3e,
-	0x17, 0x94, 0xb4, 0x48, 0xbb, 0x34, 0xb0, 0x3a, 0x88, 0xe0, 0x86, 0xec, 0x99, 0xd3, 0xbc, 0x41,
-	0xcc, 0x19, 0x7f, 0x42, 0x51, 0x2a, 0xa6, 0x26, 0x92, 0x3a, 0xa6, 0x3b, 0xab, 0xf0, 0x07, 0x14,
-	0x98, 0x10, 0x2c, 0xa1, 0xae, 0x69, 0xa7, 0x85, 0x66, 0xf0, 0xc7, 0xa1, 0xa4, 0x85, 0x96, 0xa3,
-	0x19, 0xf4, 0x59, 0x4f, 0x4e, 0xa7, 0x71, 0x28, 0x69, 0xd1, 0x34, 0xd3, 0xc2, 0xfb, 0x20, 0x50,
-	0x3f, 0x13, 0x9c, 0x29, 0xae, 0xa5, 0x0d, 0xf8, 0x78, 0xc2, 0xa5, 0x5a, 0x28, 0x20, 0x96, 0x82,
-	0x39, 0x67, 0x7e, 0x13, 0xa7, 0x63, 0x71, 0xe2, 0x05, 0x7c, 0x93, 0xfc, 0x4e, 0x70, 0x25, 0xa9,
-	0xdb, 0x72, 0xda, 0xe5, 0xee, 0xff, 0xce, 0x8a, 0x39, 0x6b, 0xfb, 0x3a, 0xc3, 0x74, 0xbc, 0x1f,
-	0x2a, 0x91, 0x0c, 0xe6, 0x97, 0x1b, 0x3d, 0xa8, 0xd8, 0x00, 0xd6, 0xc0, 0x79, 0xe2, 0xc9, 0x4c,
-	0x94, 0x3e, 0xea, 0xfd, 0x2f, 0x2c, 0x98, 0xcc, 0xad, 0x4a, 0x8b, 0x5e, 0xfe, 0x98, 0x78, 0x27,
-	0x50, 0xb5, 0xd7, 0xc4, 0x41, 0x82, 0x7f, 0xc1, 0x7d, 0x8c, 0xa4, 0x32, 0xf7, 0xcb, 0x5d, 0x5c,
-	0xd5, 0x64, 0xc6, 0x0c, 0xee, 0xbd, 0x13, 0xa8, 0x9f, 0xf3, 0x80, 0xef, 0xb7, 0x64, 0xdf, 0x43,
-	0xd7, 0x58, 0x0e, 0xf0, 0xd0, 0x3a, 0x54, 0xed, 0x35, 0x71, 0x90, 0x78, 0x6f, 0x04, 0x6a, 0xd7,
-	0xbe, 0x54, 0xba, 0x23, 0x77, 0xe9, 0xef, 0x67, 0xf5, 0xff, 0x5b, 0xd5, 0x9f, 0x25, 0x39, 0x80,
-	0xfc, 0x1e, 0x7c, 0xb7, 0xb6, 0xe8, 0x98, 0xda, 0x50, 0xd0, 0x31, 0x48, 0x4a, 0x8c, 0xa4, 0x4d,
-	0x39, 0xa5, 0x03, 0xdd, 0x4f, 0x02, 0x95, 0x61, 0x0a, 0x9e, 0x6a, 0x10, 0x6f, 0x00, 0x96, 0xa1,
-	0xe3, 0x9f, 0x3d, 0x5f, 0x5d, 0xe3, 0xf7, 0xf6, 0x01, 0x6d, 0x63, 0x4e, 0xf3, 0x2d, 0xbd, 0xcd,
-	0xf2, 0xad, 0x85, 0x9b, 0xe5, 0xcb, 0xc6, 0x92, 0xc3, 0x2b, 0x28, 0x2d, 0x1e, 0x8b, 0xcd, 0xdd,
-	0x5e, 0x37, 0x7e, 0x6d, 0xc5, 0x0d, 0xd9, 0x6d, 0xd1, 0xfc, 0x63, 0x8e, 0xbe, 0x02, 0x00, 0x00,
-	0xff, 0xff, 0x58, 0x85, 0xcb, 0xbe, 0x79, 0x04, 0x00, 0x00,
+	// 507 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x54, 0xcd, 0x8e, 0x12, 0x41,
+	0x10, 0xde, 0x66, 0x06, 0xc8, 0x16, 0xc4, 0x5d, 0x2a, 0xfe, 0x8c, 0x44, 0x57, 0x32, 0x46, 0x43,
+	0xa2, 0xe1, 0xc0, 0x5e, 0x5c, 0x6e, 0x46, 0xd7, 0x68, 0x24, 0x1e, 0x58, 0x1f, 0xc0, 0x76, 0x69,
+	0x71, 0x22, 0xce, 0x40, 0x77, 0xe3, 0x66, 0x5e, 0xc3, 0x57, 0xf0, 0x64, 0x7c, 0x1e, 0x8f, 0xbe,
+	0x8b, 0xa9, 0xee, 0x19, 0x68, 0x66, 0x60, 0xd9, 0x0b, 0xb7, 0xae, 0xea, 0xaa, 0xaf, 0xbe, 0xaf,
+	0xeb, 0x9b, 0x01, 0x54, 0x3a, 0x91, 0x7c, 0x22, 0xf8, 0x44, 0xc4, 0xba, 0x37, 0x93, 0x89, 0x4e,
+	0xb0, 0xe9, 0xe6, 0xc2, 0x9f, 0x0c, 0xfc, 0xb7, 0x89, 0xd2, 0x78, 0x02, 0x10, 0x8d, 0x45, 0xac,
+	0xa3, 0x2f, 0x91, 0x90, 0x01, 0xeb, 0xb0, 0xee, 0xe1, 0xc8, 0xc9, 0x20, 0x82, 0x1f, 0xf3, 0xef,
+	0x22, 0xa8, 0x98, 0x1b, 0x73, 0xc6, 0xbb, 0x50, 0x53, 0x9a, 0xeb, 0x85, 0x0a, 0x3c, 0x93, 0xcd,
+	0x22, 0xbc, 0x0d, 0x55, 0x2e, 0x25, 0x4f, 0x03, 0xdf, 0xa4, 0x6d, 0x40, 0x08, 0xd1, 0x3c, 0x56,
+	0x41, 0xb5, 0xe3, 0x11, 0x02, 0x9d, 0xa9, 0xf2, 0xea, 0x6a, 0x16, 0xab, 0xa0, 0x66, 0x92, 0x36,
+	0x08, 0xcf, 0xa0, 0xf1, 0x4e, 0x5d, 0xaa, 0xe8, 0x23, 0x97, 0x13, 0xa1, 0x31, 0x80, 0x3a, 0x1f,
+	0x8f, 0xa5, 0x50, 0x2a, 0xe3, 0x95, 0x87, 0x78, 0x0c, 0x5e, 0x34, 0x8f, 0x33, 0x4e, 0x74, 0x0c,
+	0xff, 0x32, 0x68, 0xbd, 0x92, 0x82, 0x6b, 0x41, 0xaa, 0x46, 0x62, 0xbe, 0x10, 0x4a, 0x2f, 0xc9,
+	0x33, 0x87, 0x7c, 0x4e, 0xa7, 0xb2, 0x89, 0x8e, 0xe7, 0xd0, 0xc1, 0x37, 0x50, 0x57, 0xe2, 0x52,
+	0x0a, 0xad, 0x02, 0xbf, 0xe3, 0x75, 0x1b, 0xfd, 0xe7, 0xbd, 0xb5, 0x77, 0x2d, 0xcd, 0xeb, 0x5d,
+	0xd8, 0xf2, 0xf3, 0x58, 0xcb, 0x74, 0x94, 0x37, 0xb7, 0x07, 0xd0, 0x74, 0x2f, 0x88, 0xfd, 0x37,
+	0x91, 0x66, 0xa4, 0xe8, 0x48, 0xf3, 0x7f, 0xf0, 0xe9, 0x22, 0x7f, 0x65, 0x1b, 0x0c, 0x2a, 0x2f,
+	0x58, 0x78, 0x06, 0x47, 0xee, 0x98, 0xd9, 0x34, 0xc5, 0xa7, 0xe0, 0x7f, 0x4d, 0x94, 0x36, 0xfd,
+	0x8d, 0x3e, 0xae, 0x73, 0x32, 0x65, 0xe6, 0x3e, 0xfc, 0xc3, 0xa0, 0xf5, 0x5a, 0x4c, 0xc5, 0xee,
+	0x27, 0x71, 0x84, 0x56, 0x36, 0x09, 0x2d, 0xa1, 0xec, 0x41, 0x68, 0x0b, 0x8e, 0xdc, 0x31, 0xb3,
+	0x69, 0x1a, 0xfe, 0x66, 0x70, 0x3c, 0x8c, 0x94, 0xa6, 0x8c, 0xba, 0x8e, 0xff, 0x79, 0x91, 0xff,
+	0xb3, 0x75, 0xfe, 0x45, 0x90, 0x3d, 0xd0, 0x1f, 0xc0, 0x2d, 0x67, 0x0a, 0xad, 0xa9, 0x0b, 0x55,
+	0x5a, 0x03, 0x79, 0xd7, 0xdb, 0xb2, 0x27, 0x5b, 0x10, 0xfe, 0x62, 0x70, 0x8f, 0x9a, 0x1d, 0xef,
+	0x2f, 0xe5, 0x0e, 0x57, 0xd2, 0x2c, 0x4e, 0xbf, 0x2c, 0x6d, 0x43, 0xdf, 0x1e, 0x14, 0x0e, 0xe1,
+	0x4e, 0x79, 0x18, 0x09, 0x3d, 0x85, 0xba, 0xb6, 0x71, 0x46, 0xf1, 0xfe, 0x3a, 0x45, 0xa7, 0x63,
+	0x94, 0x57, 0xf6, 0xff, 0x55, 0xa0, 0x79, 0x61, 0xab, 0x5e, 0x52, 0x15, 0x7e, 0x00, 0x58, 0x19,
+	0x1d, 0x1f, 0xed, 0xf8, 0xd2, 0xda, 0x0f, 0xb7, 0x17, 0x90, 0x75, 0x0e, 0x08, 0x6f, 0xe5, 0xa7,
+	0x22, 0x5e, 0xc9, 0xd0, 0x45, 0xbc, 0xa2, 0x15, 0x0f, 0xf0, 0x3d, 0x1c, 0x2e, 0x17, 0x8c, 0x27,
+	0xd7, 0xfb, 0xab, 0xfd, 0x60, 0xeb, 0xbd, 0x05, 0xfb, 0x64, 0x8d, 0xed, 0xbe, 0x25, 0x3e, 0xb9,
+	0xd1, 0x62, 0xdb, 0x8f, 0x77, 0x95, 0x99, 0x09, 0x9f, 0x6b, 0xe6, 0xa7, 0x7f, 0xfa, 0x3f, 0x00,
+	0x00, 0xff, 0xff, 0x9e, 0x88, 0xfc, 0x6e, 0x0a, 0x06, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -433,6 +570,7 @@ type StorageAgentClient interface {
 	CreateHost(ctx context.Context, in *CreateHostRequest, opts ...grpc.CallOption) (*CreateHostReply, error)
 	DeleteHost(ctx context.Context, in *DeleteHostRequest, opts ...grpc.CallOption) (*DeleteHostReply, error)
 	ListHosts(ctx context.Context, in *ListHostsRequest, opts ...grpc.CallOption) (*ListHostsReply, error)
+	ListIscsiTargets(ctx context.Context, in *ListIscsiTargetsRequest, opts ...grpc.CallOption) (*ListIscsiTargetsReply, error)
 }
 
 type storageAgentClient struct {
@@ -470,12 +608,22 @@ func (c *storageAgentClient) ListHosts(ctx context.Context, in *ListHostsRequest
 	return out, nil
 }
 
+func (c *storageAgentClient) ListIscsiTargets(ctx context.Context, in *ListIscsiTargetsRequest, opts ...grpc.CallOption) (*ListIscsiTargetsReply, error) {
+	out := new(ListIscsiTargetsReply)
+	err := c.cc.Invoke(ctx, "/storageagent.StorageAgent/ListIscsiTargets", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // StorageAgentServer is the server API for StorageAgent service.
 type StorageAgentServer interface {
 	// Define a host on storage side.
 	CreateHost(context.Context, *CreateHostRequest) (*CreateHostReply, error)
 	DeleteHost(context.Context, *DeleteHostRequest) (*DeleteHostReply, error)
 	ListHosts(context.Context, *ListHostsRequest) (*ListHostsReply, error)
+	ListIscsiTargets(context.Context, *ListIscsiTargetsRequest) (*ListIscsiTargetsReply, error)
 }
 
 // UnimplementedStorageAgentServer can be embedded to have forward compatible implementations.
@@ -490,6 +638,9 @@ func (*UnimplementedStorageAgentServer) DeleteHost(ctx context.Context, req *Del
 }
 func (*UnimplementedStorageAgentServer) ListHosts(ctx context.Context, req *ListHostsRequest) (*ListHostsReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListHosts not implemented")
+}
+func (*UnimplementedStorageAgentServer) ListIscsiTargets(ctx context.Context, req *ListIscsiTargetsRequest) (*ListIscsiTargetsReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListIscsiTargets not implemented")
 }
 
 func RegisterStorageAgentServer(s *grpc.Server, srv StorageAgentServer) {
@@ -550,6 +701,24 @@ func _StorageAgent_ListHosts_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _StorageAgent_ListIscsiTargets_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListIscsiTargetsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StorageAgentServer).ListIscsiTargets(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/storageagent.StorageAgent/ListIscsiTargets",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StorageAgentServer).ListIscsiTargets(ctx, req.(*ListIscsiTargetsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _StorageAgent_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "storageagent.StorageAgent",
 	HandlerType: (*StorageAgentServer)(nil),
@@ -565,6 +734,10 @@ var _StorageAgent_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListHosts",
 			Handler:    _StorageAgent_ListHosts_Handler,
+		},
+		{
+			MethodName: "ListIscsiTargets",
+			Handler:    _StorageAgent_ListIscsiTargets_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

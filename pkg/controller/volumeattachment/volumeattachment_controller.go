@@ -2,6 +2,8 @@ package volumeattachment
 
 import (
 	"context"
+	"time"
+
 	// b64 "encoding/base64"
 	"fmt"
 
@@ -95,7 +97,8 @@ func (r *ReconcileVolumeAttachment) Reconcile(request reconcile.Request) (reconc
 	err = r.processVolumeAttachment(volAtt)
 	if err != nil {
 		reqLogger.Error(err, "failed to processVolumeAttachment", "Namespace", volAtt.Namespace, "Name", volAtt.Name)
-		return reconcile.Result{}, err
+		// don't add back to the queue immediately
+		return reconcile.Result{RequeueAfter: time.Minute}, err
 	}
 
 	reqLogger.Info("Reconciled VolumeAttachment")
@@ -220,6 +223,17 @@ func (r *ReconcileVolumeAttachment) processControllerPublishSecret(secret *corev
 		nodeName, nodeInfo.Status.Iqns, nodeInfo.Status.Wwpns)
 	if err != nil {
 		sLogger.Error(err, "Failed to define host on storage")
+		return err
+	}
+
+	err = r.loginIscsiTargets(
+		string(arrayAddr),
+		string(secret.Data["username"]),
+		string(secret.Data["password"]),
+		nodeName,
+	)
+	if err != nil {
+		sLogger.Error(err, "Failed to login iscsi targets")
 		return err
 	}
 

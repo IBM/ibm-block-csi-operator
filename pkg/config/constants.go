@@ -2,15 +2,14 @@ package config
 
 // Add a field here if it never changes, if it changes over time, put it to settings.go
 const (
-	APIGroup         = "csi.ibm.com"
-	APIVersion       = "v1"
-	Name             = "ibm-block-csi-operator"
-	DriverName       = "ibm-block-csi-driver"
-	ProductName      = "ibm-block-csi"
-	DeployPath       = "/deploy"
-	DefaultNamespace = "kube-system"
-	DefaultLogLevel  = "DEBUG"
-	ControllerUserID = int64(9999)
+	APIGroup          = "csi.ibm.com"
+	APIVersion        = "v1"
+	Name              = "ibm-block-csi-operator"
+	DriverName        = "ibm-block-csi-driver"
+	ProductName       = "ibm-block-csi"
+	DeployPath        = "/deploy"
+	ENVIscsiAgentPort = "ISCSI_AGENT_PORT"
+	ENVEndpoint       = "ENDPOINT"
 
 	ControllerRepository = "ibmcom/ibm-block-csi-controller-driver"
 	NodeRepository       = "ibmcom/ibm-block-csi-node-driver"

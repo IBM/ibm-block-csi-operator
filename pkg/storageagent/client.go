@@ -47,6 +47,19 @@ func (c *storageClient) CreateHost(name string, iscsiPorts, fcPorts []string) er
 	return nil
 }
 
+func (c *storageClient) ListIscsiTargets() ([]*pb.IscsiTarget, error) {
+	resInterface, err := c.runGrpcCommand(
+		"ListIscsiTargets",
+		&pb.ListIscsiTargetsRequest{
+			Secrets: map[string]string{"management_address": c.arrayAddress, "username": c.username, "password": c.password}},
+	)
+	if err != nil {
+		return nil, err
+	}
+	res := resInterface.(*pb.ListIscsiTargetsReply)
+	return res.GetTargets(), nil
+}
+
 func (c *storageClient) runGrpcCommand(cmdName string, request interface{}, opts ...grpc.CallOption) (interface{}, error) {
 	c.logger.Info("Starting command", "command", cmdName)
 

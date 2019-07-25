@@ -20,7 +20,7 @@ type iscsiClient struct {
 func NewIscsiClient(address string, logger logr.Logger) IscsiClient {
 	return &iscsiClient{
 		address: address,
-		logger:  logger,
+		logger:  logger.WithValues("address", address),
 	}
 }
 

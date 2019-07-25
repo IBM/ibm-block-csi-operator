@@ -10,4 +10,8 @@ const (
 
 	ControllerTag = "1.0.0"
 	NodeTag       = "1.0.0"
+
+	DefaultNamespace = "kube-system"
+	DefaultLogLevel  = "DEBUG"
+	ControllerUserID = int64(9999)
 )

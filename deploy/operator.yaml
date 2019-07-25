@@ -34,11 +34,13 @@ spec:
               value: "ibm-block-csi-driver-operator"
             - name: ENDPOINT
               value: "unix:///storage/storage.sock:10086"
+            - name: ISCSI_AGENT_PORT
+              value: "10086"
           volumeMounts:
             - name: socket-dir
               mountPath: /storage/
         - name: ibm-storage-agent
-          image: stg-artifactory.haifa.ibm.com:5030/ibm-storage-agent:v0.0.2
+          image: stg-artifactory.haifa.ibm.com:5030/ibm-storage-agent:v0.0.3
           imagePullPolicy: IfNotPresent
           env:
             - name: ENDPOINT

@@ -3,6 +3,8 @@ package util
 import (
 	"fmt"
 	"reflect"
+
+	"google.golang.org/grpc"
 )
 
 func Invoke(any interface{}, name string, args ...interface{}) ([]reflect.Value, error) {
@@ -40,4 +42,23 @@ func Invoke(any interface{}, name string, args ...interface{}) ([]reflect.Value,
 		}
 	}
 	return method.Call(in), nil
+}
+
+// TestConnectivity test the given addresses one by one and return the
+// first successful one, if all failed, return empty.
+func TestConnectivity(addrs []string, port string) string {
+	for _, addr := range addrs {
+		var address string
+		if port == "" {
+			address = addr
+		} else {
+			address = fmt.Sprintf("%s:%s", addr, port)
+		}
+		conn, err := grpc.Dial(address, grpc.WithInsecure())
+		if err == nil {
+			conn.Close()
+			return addr
+		}
+	}
+	return ""
 }
