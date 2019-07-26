@@ -226,15 +226,18 @@ func (r *ReconcileVolumeAttachment) processControllerPublishSecret(secret *corev
 		return err
 	}
 
-	err = r.loginIscsiTargets(
-		string(arrayAddr),
-		string(secret.Data["username"]),
-		string(secret.Data["password"]),
-		nodeName,
-	)
-	if err != nil {
-		sLogger.Error(err, "Failed to login iscsi targets")
-		return err
+	// skip iscsi login if it is a fc host
+	if len(nodeInfo.Status.Wwpns) > 0 {
+		err = r.loginIscsiTargets(
+			string(arrayAddr),
+			string(secret.Data["username"]),
+			string(secret.Data["password"]),
+			nodeName,
+		)
+		if err != nil {
+			sLogger.Error(err, "Failed to login iscsi targets")
+			return err
+		}
 	}
 
 	definedArrays = append(definedArrays, string(arrayAddr))
