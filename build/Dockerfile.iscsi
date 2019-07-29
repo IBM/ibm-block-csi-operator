@@ -8,11 +8,10 @@ RUN CGO_ENABLED=1 GOOS=linux go build -o ibm-iscsi-utils -gcflags all=-trimpath=
 FROM registry.access.redhat.com/ubi7/ubi:7.6-177
 
 ENV PATH="/driver:${PATH}"
+RUN yum install -y iscsi-initiator-utils && yum clean all
 WORKDIR /driver
 COPY --from=0 /go/src/github.com/IBM/ibm-block-csi-driver-operator/ibm-iscsi-utils .
-COPY hack/iscsi.sh .
-RUN yum install -y iscsi-initiator-utils && yum clean all
+COPY build/iscsi.sh .
 RUN chmod -R 755 /driver
-# USER ${USER_UID}
 
 ENTRYPOINT ["./iscsi.sh"]

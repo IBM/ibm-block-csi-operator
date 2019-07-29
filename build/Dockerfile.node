@@ -12,7 +12,7 @@ ENV PATH="/driver:${PATH}" \
     USER_NAME=ibm-block-csi-driver-operator
 WORKDIR /driver
 COPY --from=0 /go/src/github.com/IBM/ibm-block-csi-driver-operator/ibm-node-collector .
-COPY hack/docker-entrypoint.sh .
+COPY build/docker-entrypoint.sh .
 RUN chmod -R 755 /driver
 USER ${USER_UID}
 
