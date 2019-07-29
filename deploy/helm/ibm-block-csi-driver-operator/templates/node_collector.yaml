@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: ibm-node-collector
-  namespace: kube-system
 spec:
   selector:
     matchLabels:
@@ -15,8 +14,8 @@ spec:
       serviceAccountName: ibm-node-collector
       initContainers:
       - name: node-collector
-        image: stg-artifactory.haifa.ibm.com:5030/ibm-node-collector:v0.0.1
-        imagePullPolicy: IfNotPresent
+        image: "{{ .Values.nodeCollector.image.repository }}:{{ .Values.nodeCollector.image.tag }}"
+        imagePullPolicy: {{ .Values.nodeCollector.image.pullPolicy }}
         volumeMounts:
         - name: iscsi
           mountPath: /etc/iscsi
@@ -38,8 +37,8 @@ spec:
           type: Directory
       containers:
       - name: sleep
-        image: stg-artifactory.haifa.ibm.com:5030/node-collector:0.0.1
-        imagePullPolicy: IfNotPresent
+        image: "{{ .Values.nodeCollector.image.repository }}:{{ .Values.nodeCollector.image.tag }}"
+        imagePullPolicy: {{ .Values.nodeCollector.image.pullPolicy }}
         command:
         - tail
         - -f

@@ -1,0 +1,26 @@
+iscsiAgent:
+  image:
+    repository: stg-artifactory.haifa.ibm.com:5030/ibm-iscsi-agent
+    tag: "0.0.1"
+    pullPolicy: IfNotPresent
+  address: :10086
+  port: 10086
+
+nodeCollector:
+  image:
+    repository: stg-artifactory.haifa.ibm.com:5030/ibm-node-collector
+    tag: "v0.0.1"
+    pullPolicy: IfNotPresent
+
+operator:
+  image:
+    repository: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-driver-operator
+    tag: "0.0.6"
+    pullPolicy: IfNotPresent
+  endpoint: "unix:///storage/storage.sock:10086"
+
+storageAgent:
+  image:
+    repository: stg-artifactory.haifa.ibm.com:5030/ibm-storage-agent
+    tag: "v0.0.3"
+    pullPolicy: IfNotPresent

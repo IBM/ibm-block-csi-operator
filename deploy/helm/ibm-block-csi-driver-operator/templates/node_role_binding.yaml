@@ -1,0 +1,12 @@
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: ibm-node-collector
+subjects:
+- kind: ServiceAccount
+  name: ibm-node-collector
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: ibm-node-collector
+  apiGroup: rbac.authorization.k8s.io

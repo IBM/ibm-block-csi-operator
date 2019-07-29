@@ -1,0 +1,12 @@
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: ibm-block-csi-driver-operator
+subjects:
+- kind: ServiceAccount
+  name: ibm-block-csi-driver-operator
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: ibm-block-csi-driver-operator
+  apiGroup: rbac.authorization.k8s.io

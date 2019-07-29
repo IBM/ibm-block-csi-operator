@@ -1,0 +1,9 @@
+Release {{ .Release.Name }} installation finished successfully.
+
+You can check the status by running:
+    helm status {{ .Release.Name }}
+
+Verify that all the pods are running. You can monitor the pod status by using:
+    kubectl get pods -n {{ .Release.Namespace }} -w
+
+When all the pods are running, you can install IBM Block CSI Driver by create a IBMBlockCSI customer resource.

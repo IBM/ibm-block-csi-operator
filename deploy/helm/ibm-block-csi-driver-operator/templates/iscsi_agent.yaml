@@ -2,7 +2,6 @@ kind: DaemonSet
 apiVersion: apps/v1
 metadata:
   name: ibm-iscsi-agent
-  namespace: kube-system
 spec:
   selector:
     matchLabels:
@@ -20,15 +19,14 @@ spec:
           capabilities:
             add: ["SYS_ADMIN"]
           allowPrivilegeEscalation: true
-        image: stg-artifactory.haifa.ibm.com:5030/ibm-iscsi-agent:0.0.1
-        command: ["ibm-iscsi-agent", "--address", ":10086"]
-        imagePullPolicy: IfNotPresent
+        image: "{{ .Values.iscsiAgent.image.repository }}:{{ .Values.iscsiAgent.image.tag }}"
+        imagePullPolicy: {{ .Values.iscsiAgent.image.pullPolicy }}
         env:
         - name: ADDRESS
-          value: :10086
+          value: {{ .Values.iscsiAgent.address }}
         ports:
         - name: iscsi
-		  containerPort: 10086
+		  containerPort: {{ .Values.iscsiAgent.port }}
         volumeMounts:
         - mountPath: /lib/modules
           name: lib-modules

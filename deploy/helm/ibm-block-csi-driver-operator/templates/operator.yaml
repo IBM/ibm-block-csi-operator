@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ibm-block-csi-driver-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: ibm-block-csi-driver-operator
+  template:
+    metadata:
+      labels:
+        name: ibm-block-csi-driver-operator
+    spec:
+      serviceAccountName: ibm-block-csi-driver-operator
+      containers:
+        - name: ibm-block-csi-driver-operator
+          image: "{{ .Values.operator.image.repository }}:{{ .Values.operator.image.tag }}"
+          imagePullPolicy: {{ .Values.operator.image.pullPolicy }}
+          command:
+          - ibm-block-csi-driver-operator
+          env:
+            - name: WATCH_NAMESPACE
+              value: ""
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: {{ .Chart.Name }}
+            - name: ENDPOINT
+              value: {{ .Values.operator.endpoint }}
+            - name: ISCSI_AGENT_PORT
+              value: {{ .Values.iscsiAgent.port }}
+          volumeMounts:
+            - name: socket-dir
+              mountPath: /storage/
+        - name: ibm-storage-agent
+          image: "{{ .Values.storageAgent.image.repository }}:{{ .Values.storageAgent.image.tag }}"
+          imagePullPolicy: {{ .Values.storageAgent.image.pullPolicy }}
+          env:
+            - name: ENDPOINT
+              value: {{ .Values.operator.endpoint }}
+          volumeMounts:
+            - name: socket-dir
+              mountPath: /storage/
+
+      volumes:
+        - name: socket-dir
+          emptyDir: {}

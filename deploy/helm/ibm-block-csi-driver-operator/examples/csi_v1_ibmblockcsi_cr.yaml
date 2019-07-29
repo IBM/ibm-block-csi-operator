@@ -1,0 +1,12 @@
+apiVersion: csi.ibm.com/v1
+kind: IBMBlockCSI
+metadata:
+  name: ibm-block-csi
+  namespace: kube-system
+spec:
+  controller:
+    repository: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-controller-driver
+    tag: "SVC_Storage_Action"
+  node:
+    repository: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-node-driver
+    tag: "1.0.0_b74_origin.feature.csi-node-daemonset"
