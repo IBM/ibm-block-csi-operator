@@ -26,6 +26,7 @@ const (
 	DeployPath        = "/deploy"
 	ENVIscsiAgentPort = "ISCSI_AGENT_PORT"
 	ENVEndpoint       = "ENDPOINT"
+	ENVNodeName       = "NODE_NAME"
 
 	ControllerRepository = "ibmcom/ibm-block-csi-controller-driver"
 	NodeRepository       = "ibmcom/ibm-block-csi-node-driver"

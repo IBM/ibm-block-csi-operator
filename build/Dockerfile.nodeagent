@@ -1,0 +1,18 @@
+FROM golang:1.12.6
+
+WORKDIR /go/src/github.com/IBM/ibm-block-csi-driver-operator/
+COPY . .
+RUN CGO_ENABLED=1 GOOS=linux go build -o ibm-node-agent -gcflags all=-trimpath=${GOPATH} -asmflags all=-trimpath=${GOPATH} cmd/node/main.go
+
+
+FROM registry.access.redhat.com/ubi7/ubi:7.6-177
+
+ENV PATH="/driver:${PATH}"
+RUN yum install -y iscsi-initiator-utils && yum clean all
+WORKDIR /driver
+COPY --from=0 /go/src/github.com/IBM/ibm-block-csi-driver-operator/ibm-node-agent .
+COPY build/node-agent.sh .
+RUN chmod -R 755 /driver
+
+ENTRYPOINT ["./node-agent.sh"]
+CMD ["ibm-node-agent"]

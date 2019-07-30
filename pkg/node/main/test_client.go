@@ -17,12 +17,7 @@
 package main
 
 import (
-	"flag"
-	"fmt"
-	"os"
-
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/node/server"
+	"github.com/IBM/ibm-block-csi-driver-operator/pkg/node/client"
 	"github.com/operator-framework/operator-sdk/pkg/log/zap"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 )
@@ -30,30 +25,19 @@ import (
 var log = logf.Log.WithName("node agent")
 
 func main() {
-
-	address := flag.String("address", "", "Listening Address")
-	flag.Parse()
-
 	logf.SetLogger(zap.Logger())
-
-	var addr string = *address
-	if addr == "" {
-		addr = os.Getenv("ADDRESS")
-		if addr == "" {
-			log.Error(nil, "--address or ENV ADDRESS is required!")
-			os.Exit(1)
-		}
-	}
-
-	nodeName := os.Getenv(config.ENVNodeName)
-	if nodeName == "" {
-		log.Error(fmt.Errorf("ENV %s is not set", config.ENVNodeName), "")
-		os.Exit(1)
-	}
-
-	log.Info("Start server", "node", nodeName)
-	if err := server.Serve(addr, nodeName); err != nil {
+	c := client.NewNodeClient("9.115.241.201:10086", log)
+	err := c.IscsiLogin([]string{"9.115.241.215", "9.115.241.219"})
+	if err != nil {
 		log.Error(err, "")
-		os.Exit(1)
 	}
+	err = c.IscsiLogout([]string{"9.115.241.215", "9.115.241.219"})
+	if err != nil {
+		log.Error(err, "")
+	}
+	node, err := c.GetNodeInfo("slave1.site2.lou")
+	if err != nil {
+		log.Error(err, "")
+	}
+	log.Info("", "node", node)
 }
