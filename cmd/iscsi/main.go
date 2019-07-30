@@ -22,7 +22,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/iscsi"
+	"github.com/IBM/ibm-block-csi-driver-operator/pkg/noe/iscsi"
 	"github.com/operator-framework/operator-sdk/pkg/log/zap"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 )
