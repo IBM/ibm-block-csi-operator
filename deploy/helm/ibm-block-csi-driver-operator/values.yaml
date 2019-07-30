@@ -3,13 +3,13 @@ iscsiAgent:
     repository: stg-artifactory.haifa.ibm.com:5030/ibm-iscsi-agent
     tag: "0.0.1"
     pullPolicy: IfNotPresent
-  address: :10086
+  address: ":10086"
   port: 10086
 
 nodeCollector:
   image:
     repository: stg-artifactory.haifa.ibm.com:5030/ibm-node-collector
-    tag: "v0.0.1"
+    tag: "0.0.3"
     pullPolicy: IfNotPresent
 
 operator:

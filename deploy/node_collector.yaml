@@ -6,16 +6,16 @@ metadata:
 spec:
   selector:
     matchLabels:
-      name: ibm-node-collector
+      app.kubernetes.io/name: ibm-node-collector
   template:
     metadata:
       labels:
-        name: ibm-node-collector
+        app.kubernetes.io/name: ibm-node-collector
     spec:
       serviceAccountName: ibm-node-collector
       initContainers:
       - name: node-collector
-        image: stg-artifactory.haifa.ibm.com:5030/ibm-node-collector:v0.0.1
+        image: stg-artifactory.haifa.ibm.com:5030/ibm-node-collector:0.0.3
         imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: iscsi
@@ -23,6 +23,8 @@ spec:
         - name: fc
           mountPath: /sys/class
         env:
+        - name: WATCH_NAMESPACE
+          value: ""
         - name: NODE_NAME
           valueFrom:
             fieldRef:
@@ -38,7 +40,7 @@ spec:
           type: Directory
       containers:
       - name: sleep
-        image: stg-artifactory.haifa.ibm.com:5030/node-collector:0.0.1
+        image: stg-artifactory.haifa.ibm.com:5030/ibm-node-collector:0.0.3
         imagePullPolicy: IfNotPresent
         command:
         - tail

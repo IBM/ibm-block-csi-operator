@@ -6,11 +6,11 @@ metadata:
 spec:
   selector:
     matchLabels:
-      name: ibm-iscsi-agent
+      app.kubernetes.io/name: ibm-iscsi-agent
   template:
     metadata:
       labels:
-        name: ibm-iscsi-agent
+        app.kubernetes.io/name: ibm-iscsi-agent
     spec:
       hostNetwork: true
       containers:
@@ -21,14 +21,13 @@ spec:
             add: ["SYS_ADMIN"]
           allowPrivilegeEscalation: true
         image: stg-artifactory.haifa.ibm.com:5030/ibm-iscsi-agent:0.0.1
-        command: ["ibm-iscsi-agent", "--address", ":10086"]
         imagePullPolicy: IfNotPresent
         env:
         - name: ADDRESS
           value: :10086
         ports:
         - name: iscsi
-		  containerPort: 10086
+          containerPort: 10086
         volumeMounts:
         - mountPath: /lib/modules
           name: lib-modules

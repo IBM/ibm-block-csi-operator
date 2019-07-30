@@ -5,11 +5,11 @@ metadata:
 spec:
   selector:
     matchLabels:
-      name: ibm-iscsi-agent
+      app.kubernetes.io/name: ibm-iscsi-agent
   template:
     metadata:
       labels:
-        name: ibm-iscsi-agent
+        app.kubernetes.io/name: ibm-iscsi-agent
     spec:
       hostNetwork: true
       containers:
@@ -23,10 +23,10 @@ spec:
         imagePullPolicy: {{ .Values.iscsiAgent.image.pullPolicy }}
         env:
         - name: ADDRESS
-          value: {{ .Values.iscsiAgent.address }}
+          value: {{ .Values.iscsiAgent.address | quote }}
         ports:
         - name: iscsi
-		  containerPort: {{ .Values.iscsiAgent.port }}
+          containerPort: {{ .Values.iscsiAgent.port }}
         volumeMounts:
         - mountPath: /lib/modules
           name: lib-modules

@@ -6,4 +6,4 @@ You can check the status by running:
 Verify that all the pods are running. You can monitor the pod status by using:
     kubectl get pods -n {{ .Release.Namespace }} -w
 
-When all the pods are running, you can install IBM Block CSI Driver by create a IBMBlockCSI customer resource.
+When all the pods are running, you can install IBM Block CSI Driver by create an IBMBlockCSI customer resource, you can find an example in the "examples" folder.

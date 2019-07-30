@@ -5,11 +5,11 @@ metadata:
 spec:
   selector:
     matchLabels:
-      name: ibm-node-collector
+      app.kubernetes.io/name: ibm-node-collector
   template:
     metadata:
       labels:
-        name: ibm-node-collector
+        app.kubernetes.io/name: ibm-node-collector
     spec:
       serviceAccountName: ibm-node-collector
       initContainers:
@@ -22,6 +22,8 @@ spec:
         - name: fc
           mountPath: /sys/class
         env:
+        - name: WATCH_NAMESPACE
+          value: ""
         - name: NODE_NAME
           valueFrom:
             fieldRef:
