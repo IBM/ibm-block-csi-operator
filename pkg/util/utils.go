@@ -21,6 +21,7 @@ import (
 	"reflect"
 
 	"google.golang.org/grpc"
+	corev1 "k8s.io/api/core/v1"
 )
 
 func Invoke(any interface{}, name string, args ...interface{}) ([]reflect.Value, error) {
@@ -77,4 +78,31 @@ func TestConnectivity(addrs []string, port string) string {
 		}
 	}
 	return ""
+}
+
+func GetNodeAddresses(node *corev1.Node) []string {
+	nodeAddresses := node.Status.Addresses
+	addrs := []string{}
+
+	// put internal ip first
+	for _, addr := range nodeAddresses {
+		if addr.Type == corev1.NodeInternalIP {
+			addrs = append(addrs, addr.Address)
+		}
+	}
+
+	// then external ip
+	for _, addr := range nodeAddresses {
+		if addr.Type == corev1.NodeExternalIP {
+			addrs = append(addrs, addr.Address)
+		}
+	}
+
+	// at last hostname
+	for _, addr := range nodeAddresses {
+		if addr.Type == corev1.NodeHostName {
+			addrs = append(addrs, addr.Address)
+		}
+	}
+	return addrs
 }

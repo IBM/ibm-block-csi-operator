@@ -23,7 +23,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/iscsi/client"
+	"github.com/IBM/ibm-block-csi-driver-operator/pkg/node/client"
 	"github.com/IBM/ibm-block-csi-driver-operator/pkg/storageagent"
 	"github.com/IBM/ibm-block-csi-driver-operator/pkg/util"
 	corev1 "k8s.io/api/core/v1"
@@ -42,29 +42,7 @@ func (r *ReconcileVolumeAttachment) getNodeAddresses(nodeName string) ([]string,
 		log.Error(err, "Failed to get Node", "name", nodeName)
 		return nil, err
 	}
-	nodeAddresses := node.Status.Addresses
-	addrs := []string{}
-
-	// put internal ip first
-	for _, addr := range nodeAddresses {
-		if addr.Type == corev1.NodeInternalIP {
-			addrs = append(addrs, addr.Address)
-		}
-	}
-
-	// then external ip
-	for _, addr := range nodeAddresses {
-		if addr.Type == corev1.NodeExternalIP {
-			addrs = append(addrs, addr.Address)
-		}
-	}
-
-	// at last hostname
-	for _, addr := range nodeAddresses {
-		if addr.Type == corev1.NodeHostName {
-			addrs = append(addrs, addr.Address)
-		}
-	}
+	addrs := util.GetNodeAddresses(node)
 
 	log.Info("Found node addresses", "addresses", addrs)
 	return addrs, nil
@@ -93,8 +71,8 @@ func (r *ReconcileVolumeAttachment) loginIscsiTargets(arrayAddr, user, password,
 		return err
 	}
 
-	c := client.NewIscsiClient(addr+":"+port, log)
-	return c.Login(targets)
+	c := client.NewNodeClient(addr+":"+port, log)
+	return c.IscsiLogin(targets)
 }
 
 func getIscsiTargetsFromArray(arrayAddr, user, password string) ([]string, error) {

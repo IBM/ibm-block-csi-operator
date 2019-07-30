@@ -27,6 +27,7 @@ const (
 	ENVIscsiAgentPort = "ISCSI_AGENT_PORT"
 	ENVEndpoint       = "ENDPOINT"
 	ENVNodeName       = "NODE_NAME"
+	Masterlabel       = "node-role.kubernetes.io/master"
 
 	ControllerRepository = "ibmcom/ibm-block-csi-controller-driver"
 	NodeRepository       = "ibmcom/ibm-block-csi-node-driver"
