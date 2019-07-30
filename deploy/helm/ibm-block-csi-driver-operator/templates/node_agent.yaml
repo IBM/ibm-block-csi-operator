@@ -1,32 +1,36 @@
 kind: DaemonSet
 apiVersion: apps/v1
 metadata:
-  name: ibm-iscsi-agent
+  name: ibm-node-agent
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: ibm-iscsi-agent
+      app.kubernetes.io/name: ibm-node-agent
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: ibm-iscsi-agent
+        app.kubernetes.io/name: ibm-node-agent
     spec:
       hostNetwork: true
       containers:
-      - name: iscsi-agent
+      - name: node-agent
         securityContext:
           privileged: true
           capabilities:
             add: ["SYS_ADMIN"]
           allowPrivilegeEscalation: true
-        image: "{{ .Values.iscsiAgent.image.repository }}:{{ .Values.iscsiAgent.image.tag }}"
-        imagePullPolicy: {{ .Values.iscsiAgent.image.pullPolicy }}
+        image: "{{ .Values.nodeAgent.image.repository }}:{{ .Values.nodeAgent.image.tag }}"
+        imagePullPolicy: {{ .Values.nodeAgent.image.pullPolicy }}
         env:
         - name: ADDRESS
-          value: {{ .Values.iscsiAgent.address | quote }}
+          value: {{ .Values.nodeAgent.address | quote }}
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
         ports:
-        - name: iscsi
-          containerPort: {{ .Values.iscsiAgent.port }}
+        - name: grpc
+          containerPort: {{ .Values.nodeAgent.port }}
         volumeMounts:
         - mountPath: /lib/modules
           name: lib-modules
@@ -34,6 +38,8 @@ spec:
           name: sysfs
         - mountPath: /dev
           name: dev
+        - name: iscsi
+          mountPath: /etc/iscsi
       volumes:
       - name: lib-modules
         hostPath:
@@ -47,3 +53,7 @@ spec:
         hostPath:
           path: /dev
           type: Directory
+      - name: iscsi
+        hostPath:
+          path: /etc/iscsi
+          type: DirectoryOrCreate
