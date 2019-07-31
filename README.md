@@ -1,7 +1,7 @@
 # ibm-block-csi-driver-operator
 The Container Storage Interface (CSI) Driver for IBM block storage systems enables container orchestrators such as Kubernetes to manage the life-cycle of persistent storage.
 
-It is the official operator to deploy and manage the CSI Driver for IBM block storage systems
+This is the official operator to deploy and manage the CSI Driver for IBM block storage systems.
 
 Supported container platforms:
   - Openshift v4.1
@@ -17,9 +17,9 @@ DISCLAIMER: The code is provided as is, without warranty. Any issue will be hand
 
 ## Installation
 
-#### Prerequisite
+### Prerequisite
 
-###### Install CSIDriver CRD - optional
+#### Install CSIDriver CRD - optional
 Enabling CSIDriver on Kubernetes (more details -> https://kubernetes-csi.github.io/docs/csi-driver-object.html#enabling-csidriver-on-kubernetes)
 
 In Kubernetes v1.13, because the feature was alpha, it was disabled by default. To enable the use of CSIDriver on these versions, do the following:
@@ -33,43 +33,32 @@ In Kubernetes v1.13, because the feature was alpha, it was disabled by default. 
 
 If the feature gate was not enabled then CSIDriver for the ibm-block-csi-driver will not be created automatically.
 
-#### 1. Install the CSI driver operator
+### 1. Install the CSI driver operator
+
+#### Install with helm
 ```sh
 
-#> curl https://raw.githubusercontent.com/IBM/ibm-block-csi-driver-operator/develop/deploy/ibm-block-csi-driver-operator.yaml > ibm-block-csi-driver-operator.yaml 
+#> helm repo add artifactory https://stg-artifactory.haifa.ibm.com/artifactory/chart-repo
+#> helm install --name ibm-block-csi-driver-operator --namespace kube-system artifactory/ibm-block-csi-driver-operator
 
-### Optional: Edit the `ibm-block-csi-driver-operator.yaml` file if you need to change the driver IMAGE URL and the listening port.
-
-#> kubectl apply -f ibm-block-csi-driver-operator.yaml
-serviceaccount/ibm-block-csi-controller-sa created
-clusterrole.rbac.authorization.k8s.io/ibm-block-csi-external-provisioner-role created
-clusterrolebinding.rbac.authorization.k8s.io/ibm-block-csi-external-provisioner-binding created
-clusterrole.rbac.authorization.k8s.io/ibm-block-csi-external-attacher-role created
-clusterrolebinding.rbac.authorization.k8s.io/ibm-block-csi-external-attacher-binding created
-clusterrole.rbac.authorization.k8s.io/ibm-block-csi-cluster-driver-registrar-role created
-clusterrolebinding.rbac.authorization.k8s.io/ibm-block-csi-cluster-driver-registrar-binding created
-clusterrole.rbac.authorization.k8s.io/ibm-block-csi-external-snapshotter-role created
-clusterrolebinding.rbac.authorization.k8s.io/ibm-block-csi-external-snapshotter-binding created
-statefulset.apps/ibm-block-csi-controller created
-daemonset.apps/ibm-block-csi-node created
 ```
-
-Verify operator is running (The ibm-block-csi-driver-operator pod should be in Running state):
+#### Install with yaml
 ```sh
-#> kubectl get -n kube-system pod --selector=app=ibm-block-csi-controller
-NAME                         READY   STATUS    RESTARTS   AGE
-ibm-block-csi-controller-0   5/5     Running   0          10m
 
-#> kubectl get -n kube-system pod --selector=app=ibm-block-csi-node
-NAME                       READY   STATUS    RESTARTS   AGE
-ibm-block-csi-node-xnfgp   3/3     Running   0          10m
-ibm-block-csi-node-zgh5h   3/3     Running   0          10m
+#> kubectl apply -f deploy/csi_driver.yaml  (install csi_driver.yaml only if you are using Kubernetes v.1.14+)
+#> kubectl apply -f deploy/ibm-block-csi-driver-operator.yaml
+
 ```
 
-#### 2. Create an IBMBlockCSI custom resource
-The operator is running, now you can create an IBMBlockCSI custom resource to install IBM block CSI Driver.
- 
-Create an IBMBlockCSI file (ibc.yaml) as follow and update the relevant fields:
+### 2. Verify operator is running (The ibm-block-csi-driver-operator pod should be in Running state):
+```sh
+#> kubectl get pod -l app.kubernetes.io/name=ibm-block-csi-driver-operator -n kube-system
+NAME                                             READY   STATUS    RESTARTS   AGE
+ibm-block-csi-driver-operator-5bb7996b86-xntss   2/2     Running   0          10m
+```
+
+### 3. Create an IBMBlockCSI custom resource
+Create an IBMBlockCSI yaml file (ibc.yaml) as follow and update the relevant fields:
 ```
 apiVersion: csi.ibm.com/v1
 kind: IBMBlockCSI
@@ -90,7 +79,7 @@ Apply it:
 #> kubectl apply -f ibc.yaml
 ```
 
-## Un-installation
+## Uninstallation
 
 #### 1. Delete the IBMBlockCSI custom resource
 ```
@@ -100,14 +89,19 @@ Apply it:
 
 #### 2. Delete the operator
 
+#### Delete with helm
 ```sh
-#> kubectl delete -f ibm-block-csi-driver-operator.yaml
-```
 
-Kubernetes version 1.13 automatically creates the CSIDriver `ibm-block-csi-driver`, but it does not delete it automatically when removing the driver manifest.
-So in order to clean up CSIDriver object, run the following commend:
+#> 
+#> helm delete --purge ibm-block-csi-driver-operator
+
+```
+#### Delete with yaml
 ```sh
-kubectl delete CSIDriver ibm-block-csi-driver
+
+#> kubectl delete CSIDriver ibm-block-csi-driver
+#> kubectl delete -f deploy/ibm-block-csi-driver-operator.yaml
+
 ```
 
 ## Licensing

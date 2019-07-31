@@ -1,0 +1,426 @@
+
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: ibmblockcsis.csi.ibm.com
+spec:
+  group: csi.ibm.com
+  names:
+    kind: IBMBlockCSI
+    listKind: IBMBlockCSIList
+    plural: ibmblockcsis
+    singular: ibmblockcsi
+    shortNames:
+    - ibc
+  scope: Namespaced
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          properties:
+            controller:
+              description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
+                Important: Run "operator-sdk generate k8s" to regenerate code after
+                modifying this file Add custom validation using kubebuilder tags:
+                https://book.kubebuilder.io/beyond_basics/generating_crd.html'
+              properties:
+                repository:
+                  description: The repository of the controller image
+                  type: string
+                tag:
+                  description: The tag of the controller image
+                  type: string
+              required:
+              - repository
+              - tag
+              type: object
+            node:
+              properties:
+                repository:
+                  description: The repository of the node image
+                  type: string
+                tag:
+                  description: The tag of the node image
+                  type: string
+              required:
+              - repository
+              - tag
+              type: object
+          required:
+          - controller
+          - node
+          type: object
+        status:
+          properties:
+            controllerReady:
+              type: boolean
+            nodeReady:
+              type: boolean
+            ready:
+              description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
+                of cluster Important: Run "operator-sdk generate k8s" to regenerate
+                code after modifying this file Add custom validation using kubebuilder
+                tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html'
+              type: boolean
+          required:
+          - ready
+          - controllerReady
+          - nodeReady
+          type: object
+  version: v1
+  versions:
+  - name: v1
+    served: true
+    storage: true
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: nodeinfos.csi.ibm.com
+spec:
+  group: csi.ibm.com
+  names:
+    kind: NodeInfo
+    listKind: NodeInfoList
+    plural: nodeinfos
+    singular: nodeinfo
+  scope: Cluster
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          type: object
+        status:
+          properties:
+            iqns:
+              items:
+                type: string
+              type: array
+            wwpns:
+              items:
+                type: string
+              type: array
+            definedOnStorages:
+              items:
+                type: string
+              type: array
+          required:
+          - iqns
+          - wwpns
+          # - definedOnStorages
+          type: object
+  version: v1
+  versions:
+  - name: v1
+    served: true
+    storage: true
+
+---
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: ibm-node-agent
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ibm-node-agent
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ibm-node-agent
+    spec:
+      hostNetwork: true
+      containers:
+      - name: node-agent
+        securityContext:
+          privileged: true
+          capabilities:
+            add: ["SYS_ADMIN"]
+          allowPrivilegeEscalation: true
+        image: stg-artifactory.haifa.ibm.com:5030/ibm-node-agent:0.0.1
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: ADDRESS
+          value: :10086
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        ports:
+        - name: grpc
+          containerPort: 10086
+        volumeMounts:
+        - mountPath: /lib/modules
+          name: lib-modules
+        - mountPath: /sys
+          name: sysfs
+        - mountPath: /dev
+          name: dev
+        - name: iscsi
+          mountPath: /etc/iscsi
+      volumes:
+      - name: lib-modules
+        hostPath:
+          path: /lib/modules
+          type: Directory
+      - name: sysfs
+        hostPath:
+          path: /sys
+          type: Directory
+      - name: dev
+        hostPath:
+          path: /dev
+          type: Directory
+      - name: iscsi
+        hostPath:
+          path: /etc/iscsi
+          type: DirectoryOrCreate
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ibm-block-csi-driver-operator
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ibm-block-csi-driver-operator
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ibm-block-csi-driver-operator
+    spec:
+      serviceAccountName: ibm-block-csi-driver-operator
+      containers:
+      - name: ibm-block-csi-driver-operator
+        image: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-driver-operator:0.0.7
+        imagePullPolicy: IfNotPresent
+        command:
+        - ibm-block-csi-driver-operator
+        env:
+        - name: WATCH_NAMESPACE
+          value: ""
+          #valueFrom:
+          #  fieldRef:
+          #    fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: OPERATOR_NAME
+          value: "ibm-block-csi-driver-operator"
+        - name: ENDPOINT
+          value: "unix:///storage/storage.sock:10086"
+        - name: ISCSI_AGENT_PORT
+          value: "10086"
+        volumeMounts:
+        - name: socket-dir
+          mountPath: /storage/
+      - name: ibm-storage-agent
+        image: stg-artifactory.haifa.ibm.com:5030/ibm-storage-agent:v0.0.3
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: ENDPOINT
+          value: "unix:///storage/storage.sock:10086"
+        volumeMounts:
+        - name: socket-dir
+          mountPath: /storage/
+
+      volumes:
+      - name: socket-dir
+        emptyDir: {}
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: ibm-block-csi-driver-operator
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - services
+  - endpoints
+  - persistentvolumeclaims
+  - persistentvolumes
+  - events
+  - configmaps
+  - secrets
+  verbs:
+  - '*'
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  - daemonsets
+  - replicasets
+  - statefulsets
+  verbs:
+  - '*'
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts
+  verbs:
+  - create
+  - delete
+  - get
+  - watch
+  - list
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterroles
+  - clusterrolebindings
+  verbs:
+  - create
+  - delete
+  - get
+  - watch
+  - list
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - volumeattachments
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - storageclasses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - monitoring.coreos.com
+  resources:
+  - servicemonitors
+  verbs:
+  - get
+  - create
+- apiGroups:
+  - apps
+  resourceNames:
+  - ibm-block-csi-driver-operator
+  resources:
+  - deployments/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - csidrivers
+  verbs:
+  - create
+  - delete
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - create
+  - list
+  - watch
+  - delete
+- apiGroups:
+  - csi.storage.k8s.io
+  resources:
+  - csidrivers
+  verbs:
+  - create
+  - delete
+- apiGroups:
+  - csi.storage.k8s.io
+  resources:
+  - csinodeinfos
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - snapshot.storage.k8s.io
+  resources:
+  - volumesnapshotcontents
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - csi.storage.k8s.io
+  resources:
+  - servicemonitors
+  verbs:
+  - get
+  - create
+- apiGroups:
+  - csi.ibm.com
+  resources:
+  - '*'
+  verbs:
+  - '*'
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: ibm-block-csi-driver-operator
+subjects:
+- kind: ServiceAccount
+  name: ibm-block-csi-driver-operator
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: ibm-block-csi-driver-operator
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ibm-block-csi-driver-operator
+  namespace: kube-system
