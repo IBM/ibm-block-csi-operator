@@ -21,17 +21,37 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
 
-// CreateDeletePredicate implements a default predicate on resource creation or deletion
+// CreateDeletePredicate implements a default predicate on resource creation or deletion events
 type CreateDeletePredicate struct {
 	predicate.Funcs
 }
 
-// no watch for update event
+// no watch for update events
 func (p CreateDeletePredicate) Update(e event.UpdateEvent) bool {
 	return false
 }
 
-// no watch for generic event
+// no watch for generic events
 func (p CreateDeletePredicate) Generic(e event.GenericEvent) bool {
+	return false
+}
+
+// CreatePredicate implements a default predicate on resource creation events
+type CreatePredicate struct {
+	predicate.Funcs
+}
+
+// no watch for update events
+func (p CreatePredicate) Update(e event.UpdateEvent) bool {
+	return false
+}
+
+// no watch for update events
+func (p CreatePredicate) Delete(e event.DeleteEvent) bool {
+	return false
+}
+
+// no watch for generic events
+func (p CreatePredicate) Generic(e event.GenericEvent) bool {
 	return false
 }

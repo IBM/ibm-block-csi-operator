@@ -24,6 +24,7 @@ import (
 	"fmt"
 
 	csiv1 "github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1"
+	"github.com/IBM/ibm-block-csi-driver-operator/pkg/controller/predicate"
 	corev1 "k8s.io/api/core/v1"
 	storagev1 "k8s.io/api/storage/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -63,7 +64,10 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	}
 
 	// Watch for changes to primary resource VolumeAttachment
-	err = c.Watch(&source.Kind{Type: &storagev1.VolumeAttachment{}}, &handler.EnqueueRequestForObject{})
+	err = c.Watch(
+		&source.Kind{Type: &storagev1.VolumeAttachment{}},
+		&handler.EnqueueRequestForObject{},
+		predicate.CreatePredicate{})
 	if err != nil {
 		return err
 	}
@@ -269,8 +273,8 @@ func (r *ReconcileVolumeAttachment) processControllerPublishSecret(secret *corev
 	return nil
 }
 
-func defineHostOnArray(arrayAddr, user, password, host string, iscsiPorts, fcPorts []string) error {
+func defineHostOnArray(arrayAddr, user, password, nodeName string, iscsiPorts, fcPorts []string) error {
 	//client := arrayactions.NewSvcMediator(arrayAddr, user, password, log)
 	client := storageagent.NewStorageClient(arrayAddr, user, password, log)
-	return client.CreateHost(host, iscsiPorts, fcPorts)
+	return client.CreateHost(nodeName, iscsiPorts, fcPorts)
 }
