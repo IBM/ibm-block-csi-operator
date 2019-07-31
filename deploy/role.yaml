@@ -11,6 +11,7 @@ rules:
   - services
   - endpoints
   - persistentvolumeclaims
+  - persistentvolumes
   - events
   - configmaps
   - secrets
@@ -19,7 +20,6 @@ rules:
 - apiGroups:
   - ""
   resources:
-  - persistentvolumes
   - nodes
   verbs:
   - get
@@ -58,14 +58,16 @@ rules:
 - apiGroups:
   - storage.k8s.io
   resources:
-  - csidrivers
+  - volumeattachments
   verbs:
-  - create
-  - delete
+  - get
+  - list
+  - watch
+  - update
 - apiGroups:
   - storage.k8s.io
   resources:
-  - volumeattachments
+  - storageclasses
   verbs:
   - get
   - list
@@ -85,6 +87,51 @@ rules:
   - deployments/finalizers
   verbs:
   - update
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - csidrivers
+  verbs:
+  - create
+  - delete
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - create
+  - list
+  - watch
+  - delete
+- apiGroups:
+  - csi.storage.k8s.io
+  resources:
+  - csidrivers
+  verbs:
+  - create
+  - delete
+- apiGroups:
+  - csi.storage.k8s.io
+  resources:
+  - csinodeinfos
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - snapshot.storage.k8s.io
+  resources:
+  - volumesnapshotcontents
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - csi.storage.k8s.io
+  resources:
+  - servicemonitors
+  verbs:
+  - get
+  - create
 - apiGroups:
   - csi.ibm.com
   resources:

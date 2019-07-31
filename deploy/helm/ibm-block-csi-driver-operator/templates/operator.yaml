@@ -31,7 +31,7 @@ spec:
         - name: ENDPOINT
           value: {{ .Values.operator.endpoint | quote }}
         - name: ISCSI_AGENT_PORT
-          value: {{ .Values.iscsiAgent.port | quote }}
+          value: {{ .Values.nodeAgent.port | quote }}
         volumeMounts:
         - name: socket-dir
           mountPath: /storage/
