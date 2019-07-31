@@ -19,6 +19,8 @@ package storageagent
 import (
 	"context"
 	"os"
+	"regexp"
+	"strings"
 	"time"
 
 	pb "github.com/IBM/ibm-block-csi-driver-operator/pkg/storageagent/storageagent"
@@ -28,6 +30,10 @@ import (
 )
 
 var address string
+var validStart = `^[a-zA-Z_]`
+var validLetter = `[^a-zA-Z0-9 \-._]`
+var replace = "_"
+var prefix = replace
 
 func init() {
 	setEndpoint()
@@ -49,10 +55,30 @@ func NewStorageClient(arrayAddress, username, password string, logger logr.Logge
 	}
 }
 
+// beautify formats the host name to a valid one.
+// rule for host name is: The name can contain letters, numbers, spaces, periods, dashes, and underscores. The name must begin with a letter or an underscore. The name must not begin or end with a space.
+func beautify(hostName string) string {
+	trimed := strings.TrimSpace(hostName)
+	startReg := regexp.MustCompile(validStart)
+	if !startReg.MatchString(trimed) {
+		trimed = prefix + trimed
+	}
+
+	nameReg := regexp.MustCompile(validLetter)
+	nameBytes := []byte(trimed)
+	ind := nameReg.FindAllIndex(nameBytes, -1)
+	for _, i := range ind {
+		nameBytes[i[0]] = replace[0]
+	}
+	return string(nameBytes)
+}
+
 func (c *storageClient) CreateHost(name string, iscsiPorts, fcPorts []string) error {
+	hostName := beautify(name)
+
 	resInterface, err := c.runGrpcCommand(
 		"CreateHost",
-		&pb.CreateHostRequest{Name: name, Iqns: iscsiPorts, Wwpns: fcPorts,
+		&pb.CreateHostRequest{Name: hostName, Iqns: iscsiPorts, Wwpns: fcPorts,
 			Secrets: map[string]string{"management_address": c.arrayAddress, "username": c.username, "password": c.password}},
 	)
 	if err != nil {
