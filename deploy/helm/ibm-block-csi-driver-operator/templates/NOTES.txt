@@ -8,7 +8,9 @@ Verify that all the pods are running. You can monitor the pod status by using:
 
 When all the pods are running, you can install IBM Block CSI Driver by create an IBMBlockCSI customer resource.
 Here is an example under "{{ .Chart.Name }}/examples/" folder:
+
 {{ .Files.Get "examples/csi_v1_ibmblockcsi_cr.yaml" }}
+
 If you are ok with all the fields, just install it by run:
     kubectl apply -f {{ .Chart.Name }}/examples/csi_v1_ibmblockcsi_cr.yaml
 Otherwide, edit the fields and run it.

@@ -165,13 +165,13 @@ func (c *IBMBlockCSI) GenerateClusterDriverRegistrarClusterRole() *rbacv1.Cluste
 			Verbs:     []string{"create", "delete"},
 		},
 	}
-	if c.ServerVersion == "1.13" {
-		rules = append(rules, rbacv1.PolicyRule{
-			APIGroups: []string{"apiextensions.k8s.io"},
-			Resources: []string{"customresourcedefinitions"},
-			Verbs:     []string{"create", "list", "watch", "delete"},
-		})
-	}
+	//if c.ServerVersion == "1.13" {
+	rules = append(rules, rbacv1.PolicyRule{
+		APIGroups: []string{"apiextensions.k8s.io"},
+		Resources: []string{"customresourcedefinitions"},
+		Verbs:     []string{"create", "list", "watch", "delete"},
+	})
+	//}
 
 	return &rbacv1.ClusterRole{
 		ObjectMeta: metav1.ObjectMeta{
