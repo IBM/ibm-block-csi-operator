@@ -18,31 +18,29 @@ package storageagent
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"regexp"
 	"strings"
 	"time"
 
+	"github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
 	pb "github.com/IBM/ibm-block-csi-driver-operator/pkg/storageagent/storageagent"
 	"github.com/IBM/ibm-block-csi-driver-operator/pkg/util"
 	"github.com/go-logr/logr"
 	"google.golang.org/grpc"
 )
 
-var address string
 var validStart = `^[a-zA-Z_]`
 var validLetter = `[^a-zA-Z0-9 \-._]`
 var replace = "_"
 var prefix = replace
 
-func init() {
-	setEndpoint()
-}
-
 var timeout = time.Second * 10
 
 type storageClient struct {
 	arrayAddress, username, password string
+	address                          string
 	logger                           logr.Logger
 }
 
@@ -51,26 +49,25 @@ func NewStorageClient(arrayAddress, username, password string, logger logr.Logge
 		arrayAddress: arrayAddress,
 		username:     username,
 		password:     password,
+		address:      getEndpoint(),
 		logger:       logger,
 	}
 }
 
 // beautify formats the host name to a valid one.
-// rule for host name is: The name can contain letters, numbers, spaces, periods, dashes, and underscores. The name must begin with a letter or an underscore. The name must not begin or end with a space.
+// rules:
+//     1. The name can contain letters, numbers, spaces, periods, dashes, and underscores.
+//     2. The name must begin with a letter or an underscore.
+//     3. The name must not begin or end with a space.
 func beautify(hostName string) string {
 	trimed := strings.TrimSpace(hostName)
 	startReg := regexp.MustCompile(validStart)
+	nameReg := regexp.MustCompile(validLetter)
+
 	if !startReg.MatchString(trimed) {
 		trimed = prefix + trimed
 	}
-
-	nameReg := regexp.MustCompile(validLetter)
-	nameBytes := []byte(trimed)
-	ind := nameReg.FindAllIndex(nameBytes, -1)
-	for _, i := range ind {
-		nameBytes[i[0]] = replace[0]
-	}
-	return string(nameBytes)
+	return nameReg.ReplaceAllString(trimed, "_")
 }
 
 func (c *storageClient) CreateHost(name string, iscsiPorts, fcPorts []string) error {
@@ -105,9 +102,9 @@ func (c *storageClient) ListIscsiTargets() ([]*pb.IscsiTarget, error) {
 func (c *storageClient) runGrpcCommand(cmdName string, request interface{}, opts ...grpc.CallOption) (interface{}, error) {
 	c.logger.Info("Starting command", "command", cmdName)
 
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	conn, err := grpc.Dial(c.address, grpc.WithInsecure())
 	if err != nil {
-		c.logger.Error(err, "Failed to connect server", "address", address)
+		c.logger.Error(err, "Failed to connect server", "address", c.address)
 		return nil, err
 	}
 	defer conn.Close()
@@ -137,9 +134,10 @@ func (c *storageClient) runGrpcCommand(cmdName string, request interface{}, opts
 	return res, nil
 }
 
-func setEndpoint() {
-	address = os.Getenv("ENDPOINT")
+func getEndpoint() string {
+	address := os.Getenv(config.ENVEndpoint)
 	if address == "" {
-		panic("env is not set")
+		panic(fmt.Sprintf("ENV %s is not set!", config.ENVEndpoint))
 	}
+	return address
 }

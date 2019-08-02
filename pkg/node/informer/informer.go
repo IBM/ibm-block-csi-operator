@@ -19,21 +19,33 @@ package informer
 import (
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/IBM/ibm-block-csi-driver-operator/pkg/node"
 )
 
-const iqnPath = "/etc/iscsi/initiatorname.iscsi"
-const fcPath = "/sys/class/fc_host"
+var iscsiPath = "/etc/iscsi"
+var iscsiFile = "initiatorname.iscsi"
+var iscsiFullPath = path.Join(iscsiPath, iscsiFile)
+var fcPath = "/sys/class/fc_host"
+
 const portName = "port_name"
 const portState = "port_state"
 const portOnline = "Online"
 
-func GetNodeIscsiIQNs() ([]string, error) {
-	if ok, err := exists(iqnPath); !ok || err != nil {
+type informer struct{}
+
+func NewInformer() node.NodeInformer {
+	return &informer{}
+}
+
+func (i *informer) GetNodeIscsiIQNs() ([]string, error) {
+	if ok, err := exists(iscsiFullPath); !ok || err != nil {
 		return nil, err
 	}
-	iqnLine, err := ioutil.ReadFile(iqnPath)
+	iqnLine, err := ioutil.ReadFile(iscsiFullPath)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +53,7 @@ func GetNodeIscsiIQNs() ([]string, error) {
 	return []string{strings.Split(iqnLineStr, "=")[1]}, nil
 }
 
-func GetNodeFcWWPNs() ([]string, error) {
+func (i *informer) GetNodeFcWWPNs() ([]string, error) {
 	if ok, err := exists(fcPath); !ok || err != nil {
 		return nil, err
 	}

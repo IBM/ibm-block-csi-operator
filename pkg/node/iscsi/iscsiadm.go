@@ -22,6 +22,7 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/IBM/ibm-block-csi-driver-operator/pkg/node"
 	"github.com/pkg/errors"
 
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
@@ -30,11 +31,13 @@ import (
 var log = logf.Log.WithName("iscsi")
 var execCommand = exec.Command
 
-type iscsiTarget struct {
-	portal, port, iqn string
+type iscsiAdmin struct{}
+
+func NewIscsiAdmin() node.IscsiAdmin {
+	return &iscsiAdmin{}
 }
 
-func iscsiCmd(args ...string) (string, error) {
+var iscsiCmd = func(args ...string) (string, error) {
 	cmd := execCommand("iscsiadm", args...)
 	var stdout bytes.Buffer
 	var iscsiadmError error
@@ -58,25 +61,16 @@ func iscsiCmd(args ...string) (string, error) {
 		}
 	}
 
-	iscsiadmDebug(string(stdout.Bytes()), iscsiadmError)
 	return string(stdout.Bytes()), iscsiadmError
 }
 
-func iscsiadmDebug(output string, cmdError error) {
-	debugOutput := strings.Replace(output, "\n", "\\n", -1)
-	log.Info("Output of iscsiadm command", "output", debugOutput)
-	if cmdError != nil {
-		log.Info("Error returned from iscsiadm command", "error", cmdError.Error())
-	}
-}
-
-func DiscoverAndLoginPortals(portals []string) error {
+func (i *iscsiAdmin) DiscoverAndLoginPortals(portals []string) error {
 	log.Info("Starting to login portals: " + strings.Join(portals, ", "))
 	var err error
 	var failedPortals = []string{}
 
 	for _, portal := range portals {
-		e := DiscoverAndLogin(portal)
+		e := i.DiscoverAndLogin(portal)
 		if e != nil {
 			log.Error(e, "Failed to login portal "+portal)
 			failedPortals = append(failedPortals, portal)
@@ -93,13 +87,13 @@ func DiscoverAndLoginPortals(portals []string) error {
 	return nil
 }
 
-func DiscoverAndLogoutPortals(portals []string) error {
+func (i *iscsiAdmin) DiscoverAndLogoutPortals(portals []string) error {
 	log.Info("Starting to logout portals: " + strings.Join(portals, ", "))
 	var err error
 	var failedPortals = []string{}
 
 	for _, portal := range portals {
-		e := DiscoverAndLogout(portal)
+		e := i.DiscoverAndLogout(portal)
 		if e != nil {
 			log.Error(e, "Failed to logout portal "+portal)
 			failedPortals = append(failedPortals, portal)
@@ -116,13 +110,13 @@ func DiscoverAndLogoutPortals(portals []string) error {
 	return nil
 }
 
-func DiscoverAndLogin(portal string) error {
-	targets, err := Discover(portal)
+func (i *iscsiAdmin) DiscoverAndLogin(portal string) error {
+	targets, err := i.Discover(portal)
 	if err != nil {
 		return err
 	}
 	for _, target := range targets {
-		targetErr := Login(target.iqn, target.portal+":"+target.port)
+		targetErr := i.Login(target.Iqn, target.Portal+":"+target.Port)
 		if targetErr != nil && err == nil {
 			err = targetErr
 		}
@@ -130,15 +124,15 @@ func DiscoverAndLogin(portal string) error {
 	return err
 }
 
-func DiscoverAndLogout(portal string) error {
-	targets, err := Discover(portal)
+func (i *iscsiAdmin) DiscoverAndLogout(portal string) error {
+	targets, err := i.Discover(portal)
 	if err != nil {
 		return err
 	}
 	for _, target := range targets {
-		targetErr := Logout(target.iqn, target.portal+":"+target.port)
+		targetErr := i.Logout(target.Iqn, target.Portal+":"+target.Port)
 		if targetErr == nil {
-			DeleteDBEntry(target.iqn)
+			i.DeleteDBEntry(target.Iqn)
 		}
 		if targetErr != nil && err == nil {
 			err = targetErr
@@ -149,21 +143,21 @@ func DiscoverAndLogout(portal string) error {
 
 // Login performs an iscsi login for the specified target
 // portal is an address with port
-func Login(tgtIQN, portal string) error {
+func (i *iscsiAdmin) Login(tgtIQN, portal string) error {
 	_, err := iscsiCmd([]string{"--mode", "node", "--targetname", tgtIQN, "--portal", portal, "--login"}...)
 	return err
 }
 
 // Logout performs an iscsi logout for the specified target
 // portal is an address with port
-func Logout(tgtIQN, portal string) error {
+func (i *iscsiAdmin) Logout(tgtIQN, portal string) error {
 	_, err := iscsiCmd([]string{"--mode", "node", "--targetname", tgtIQN, "--portal", portal, "--logout"}...)
 	return err
 }
 
 // Discover performs an iscsi discoverydb for the specified target
 // portal is an address without port
-func Discover(portal string) ([]*iscsiTarget, error) {
+func (i *iscsiAdmin) Discover(portal string) ([]*node.IscsiTarget, error) {
 	output, err := iscsiCmd([]string{"--mode", "discoverydb", "--type", "sendtargets", "--portal", portal, "--discover"}...)
 	if err != nil {
 		return nil, err
@@ -172,25 +166,25 @@ func Discover(portal string) ([]*iscsiTarget, error) {
 }
 
 // DeleteDBEntry deletes the iscsi db entry fo the specified target
-func DeleteDBEntry(tgtIQN string) error {
+func (i *iscsiAdmin) DeleteDBEntry(tgtIQN string) error {
 	_, err := iscsiCmd([]string{"--mode", "node", "--targetname", tgtIQN, "-o", "delete"}...)
 	return err
 
 }
 
 // record format is 1.2.3.4:3260,1 iqn.xxxxxxxxx
-func extractIscsiTargets(record string) []*iscsiTarget {
-	targets := []*iscsiTarget{}
+func extractIscsiTargets(record string) []*node.IscsiTarget {
+	targets := []*node.IscsiTarget{}
 	records := strings.Split(record, "\n")
 	for _, rec := range records {
 		result := strings.Split(rec, " ")
 		if len(result) != 2 {
 			continue
 		}
-		target := &iscsiTarget{iqn: result[1]}
+		target := &node.IscsiTarget{Iqn: result[1]}
 		portalAndPort := strings.Split(strings.Split(result[0], ",")[0], ":")
-		target.portal = portalAndPort[0]
-		target.port = portalAndPort[1]
+		target.Portal = portalAndPort[0]
+		target.Port = portalAndPort[1]
 		targets = append(targets, target)
 	}
 	return targets

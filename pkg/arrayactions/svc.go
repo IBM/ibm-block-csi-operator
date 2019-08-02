@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+// Deprecated: Use storageagent instead.
 package arrayactions
 
 import (

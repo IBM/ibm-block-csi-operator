@@ -20,6 +20,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/IBM/ibm-block-csi-driver-operator/pkg/node"
 	pb "github.com/IBM/ibm-block-csi-driver-operator/pkg/node/nodeagent"
 	"github.com/IBM/ibm-block-csi-driver-operator/pkg/util"
 	"github.com/go-logr/logr"
@@ -33,7 +34,7 @@ type nodeClient struct {
 	logger  logr.Logger
 }
 
-func NewNodeClient(address string, logger logr.Logger) NodeClient {
+func NewNodeClient(address string, logger logr.Logger) node.NodeClient {
 	return &nodeClient{
 		address: address,
 		logger:  logger.WithValues("address", address),

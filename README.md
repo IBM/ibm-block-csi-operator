@@ -33,7 +33,7 @@ In Kubernetes v1.13, because the feature was alpha, it was disabled by default. 
 
 If the feature gate was not enabled then CSIDriver for the ibm-block-csi-driver will not be created automatically.
 
-### 1. Install the CSI driver operator
+### Install the CSI driver operator
 
 #### Install with helm
 ```sh
@@ -50,15 +50,15 @@ If the feature gate was not enabled then CSIDriver for the ibm-block-csi-driver 
 
 ```
 
-### 2. Verify operator is running (The ibm-block-csi-driver-operator pod should be in Running state):
+### Verify operator is running (The ibm-block-csi-driver-operator pod should be in Running state):
 ```sh
 #> kubectl get pod -l app.kubernetes.io/name=ibm-block-csi-driver-operator -n kube-system
 NAME                                             READY   STATUS    RESTARTS   AGE
 ibm-block-csi-driver-operator-5bb7996b86-xntss   2/2     Running   0          10m
 ```
 
-### 3. Create an IBMBlockCSI custom resource
-Create an IBMBlockCSI yaml file (ibc.yaml) as follow and update the relevant fields:
+### Create an IBMBlockCSI custom resource
+Create an IBMBlockCSI yaml file (ibc.yaml) as following and update the relevant fields:
 ```
 apiVersion: csi.ibm.com/v1
 kind: IBMBlockCSI
@@ -81,18 +81,17 @@ Apply it:
 
 ## Uninstallation
 
-#### 1. Delete the IBMBlockCSI custom resource
+### 1. Delete the IBMBlockCSI custom resource
 ```
 #> kubectl delete -f ibc.yaml
 ```
 
 
-#### 2. Delete the operator
+### 2. Delete the operator
 
 #### Delete with helm
 ```sh
 
-#> 
 #> helm delete --purge ibm-block-csi-driver-operator
 
 ```

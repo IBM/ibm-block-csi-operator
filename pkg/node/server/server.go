@@ -40,11 +40,13 @@ func (s *server) GetNodeInfo(ctx context.Context, in *pb.GetNodeInfoRequest) (*p
 		return nil, status.Error(codes.InvalidArgument, "node name mismatch")
 	}
 
-	iqns, err := informer.GetNodeIscsiIQNs()
+	inf := informer.NewInformer()
+
+	iqns, err := inf.GetNodeIscsiIQNs()
 	if err != nil {
 		return nil, status.Convert(err).Err()
 	}
-	wwpns, err := informer.GetNodeFcWWPNs()
+	wwpns, err := inf.GetNodeFcWWPNs()
 	if err != nil {
 		return nil, status.Convert(err).Err()
 	}
@@ -56,7 +58,8 @@ func (s *server) GetNodeInfo(ctx context.Context, in *pb.GetNodeInfoRequest) (*p
 }
 
 func (s *server) IscsiLogin(ctx context.Context, in *pb.IscsiLoginRequest) (*pb.IscsiLoginReply, error) {
-	err := iscsi.DiscoverAndLoginPortals(in.GetTargets())
+	iscsiadm := iscsi.NewIscsiAdmin()
+	err := iscsiadm.DiscoverAndLoginPortals(in.GetTargets())
 	if err != nil {
 		return nil, status.Convert(err).Err()
 	}
@@ -64,7 +67,8 @@ func (s *server) IscsiLogin(ctx context.Context, in *pb.IscsiLoginRequest) (*pb.
 }
 
 func (s *server) IscsiLogout(ctx context.Context, in *pb.IscsiLogoutRequest) (*pb.IscsiLogoutReply, error) {
-	err := iscsi.DiscoverAndLogoutPortals(in.GetTargets())
+	iscsiadm := iscsi.NewIscsiAdmin()
+	err := iscsiadm.DiscoverAndLogoutPortals(in.GetTargets())
 	if err != nil {
 		return nil, status.Convert(err).Err()
 	}
