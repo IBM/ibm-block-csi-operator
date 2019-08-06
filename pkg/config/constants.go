@@ -18,19 +18,21 @@ package config
 
 // Add a field here if it never changes, if it changes over time, put it to settings.go
 const (
-	APIGroup          = "csi.ibm.com"
-	APIVersion        = "v1"
-	Name              = "ibm-block-csi-operator"
-	DriverName        = "ibm-block-csi-driver"
-	ProductName       = "ibm-block-csi"
-	DeployPath        = "/deploy"
-	ENVIscsiAgentPort = "ISCSI_AGENT_PORT"
-	ENVEndpoint       = "ENDPOINT"
-	ENVNodeName       = "NODE_NAME"
-	Masterlabel       = "node-role.kubernetes.io/master"
+	APIGroup    = "csi.ibm.com"
+	APIVersion  = "v1"
+	Name        = "ibm-block-csi-operator"
+	DriverName  = "ibm-block-csi-driver"
+	ProductName = "ibm-block-csi"
+	DeployPath  = "/deploy"
+	Masterlabel = "node-role.kubernetes.io/master"
 
 	ControllerRepository = "ibmcom/ibm-block-csi-controller-driver"
 	NodeRepository       = "ibmcom/ibm-block-csi-node-driver"
+
+	ENVIscsiAgentPort = "ISCSI_AGENT_PORT"
+	ENVEndpoint       = "ENDPOINT"
+	ENVNodeName       = "NODE_NAME"
+	ENVKubeVersion    = "KUBE_VERSION"
 
 	ControllerSocketVolumeMountPath                       = "/var/lib/csi/sockets/pluginproxy/"
 	NodeSocketVolumeMountPath                             = "/csi"

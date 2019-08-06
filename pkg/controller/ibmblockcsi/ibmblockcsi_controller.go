@@ -19,6 +19,7 @@ package ibmblockcsi
 import (
 	"context"
 	"fmt"
+	"os"
 	"reflect"
 	"time"
 
@@ -32,6 +33,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/record"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -40,7 +42,7 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
+	oconfig "github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
 	clustersyncer "github.com/IBM/ibm-block-csi-driver-operator/pkg/controller/ibmblockcsi/syncer"
 	"github.com/IBM/ibm-block-csi-driver-operator/pkg/internal/ibmblockcsi"
 	kubeutil "github.com/IBM/ibm-block-csi-driver-operator/pkg/util/kubernetes"
@@ -50,7 +52,7 @@ import (
 // ReconcileTime is the delay between reconciliations
 const ReconcileTime = 30 * time.Second
 
-var log = logf.Log.WithName("controller_ibmblockcsi")
+var log = logf.Log.WithName("ibmblockcsi_controller")
 
 type reconciler func(instance *ibmblockcsi.IBMBlockCSI) error
 
@@ -61,7 +63,11 @@ func Add(mgr manager.Manager) error {
 }
 
 func getServerVersion() (string, error) {
-	clientConfig, err := kubeutil.KubeConfig()
+	kubeVersion, found := os.LookupEnv(oconfig.ENVKubeVersion)
+	if found {
+		return kubeVersion, nil
+	}
+	clientConfig, err := config.GetConfig()
 	if err != nil {
 		return "", err
 	}
@@ -222,7 +228,7 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI) error {
 	controller := &appsv1.StatefulSet{}
 	err := r.client.Get(context.TODO(), types.NamespacedName{
-		Name:      config.GetNameForResource(config.CSIController, instance.Name),
+		Name:      oconfig.GetNameForResource(oconfig.CSIController, instance.Name),
 		Namespace: instance.Namespace,
 	}, controller)
 
@@ -232,7 +238,7 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI) e
 
 	node := &appsv1.DaemonSet{}
 	err = r.client.Get(context.TODO(), types.NamespacedName{
-		Name:      config.GetNameForResource(config.CSINode, instance.Name),
+		Name:      oconfig.GetNameForResource(oconfig.CSINode, instance.Name),
 		Namespace: instance.Namespace,
 	}, node)
 

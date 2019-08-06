@@ -247,7 +247,7 @@ func (r *ReconcileVolumeAttachment) processControllerPublishSecret(secret *corev
 	}
 
 	// skip iscsi login if it is a fc host
-	if len(nodeInfo.Status.Wwpns) > 0 {
+	if len(nodeInfo.Status.Wwpns) == 0 {
 		err = r.loginIscsiTargets(
 			string(arrayAddr),
 			string(secret.Data["username"]),

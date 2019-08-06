@@ -17,9 +17,15 @@
 package predicate
 
 import (
+	"reflect"
+
+	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 )
+
+var log = logf.KBLog.WithName("predicate").WithName("eventFilters")
 
 // CreateDeletePredicate implements a default predicate on resource creation or deletion events
 type CreateDeletePredicate struct {
@@ -53,5 +59,46 @@ func (p CreatePredicate) Delete(e event.DeleteEvent) bool {
 
 // no watch for generic events
 func (p CreatePredicate) Generic(e event.GenericEvent) bool {
+	return false
+}
+
+// NodePredicate implements a predicate for node controller
+// It only watches for create events which have Status.Addresses
+// and update events which change Status.Addresses
+// and delete events
+type NodePredicate struct {
+	predicate.ResourceVersionChangedPredicate
+}
+
+func (p NodePredicate) Create(e event.CreateEvent) bool {
+	node, ok := e.Object.(*corev1.Node)
+	if !ok {
+		log.Error(nil, "New runtime object is not a node", "event", e)
+		return false
+	}
+	return len(node.Status.Addresses) > 0
+}
+
+func (p NodePredicate) Update(e event.UpdateEvent) bool {
+	if !p.ResourceVersionChangedPredicate.Update(e) {
+		return false
+	}
+
+	oldNode, ok := e.ObjectOld.(*corev1.Node)
+	if !ok {
+		log.Error(nil, "Old runtime object is not a node", "event", e)
+		return false
+	}
+	newNode, ok := e.ObjectNew.(*corev1.Node)
+	if !ok {
+		log.Error(nil, "New runtime object is not a node", "event", e)
+		return false
+	}
+
+	return !reflect.DeepEqual(oldNode.Status.Addresses, newNode.Status.Addresses)
+}
+
+// no watch for generic events
+func (p NodePredicate) Generic(e event.GenericEvent) bool {
 	return false
 }

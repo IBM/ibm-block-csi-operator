@@ -28,8 +28,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var nodeName string
-
 // server is used to implement nodeagent.NodeAgentServer.
 type server struct {
 	nodeName string
@@ -51,7 +49,7 @@ func (s *server) GetNodeInfo(ctx context.Context, in *pb.GetNodeInfoRequest) (*p
 		return nil, status.Convert(err).Err()
 	}
 	return &pb.GetNodeInfoReply{Node: &pb.Node{
-		Name:  nodeName,
+		Name:  s.nodeName,
 		Iqns:  iqns,
 		Wwpns: wwpns,
 	}}, nil

@@ -69,7 +69,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	err = c.Watch(
 		&source.Kind{Type: &corev1.Node{}},
 		&handler.EnqueueRequestForObject{},
-		predicate.CreateDeletePredicate{},
+		predicate.NodePredicate{},
 	)
 	if err != nil {
 		return err
@@ -164,14 +164,13 @@ func (r *ReconcileNode) processNodeInfo(node *corev1.Node) error {
 				Name:      node.GetName(),
 				Namespace: "", // it is a cluster scope resource
 			}, found)
-			if err != nil {
-				log.Error(err, "Failed to get NodeInfo after creation", "Name", node.GetName())
-			} else {
+			if err == nil {
 				break
 			}
 			time.Sleep(time.Second)
 		}
 		if err != nil {
+			log.Error(err, "Failed to get NodeInfo after creation", "Name", node.GetName())
 			return err
 		}
 
