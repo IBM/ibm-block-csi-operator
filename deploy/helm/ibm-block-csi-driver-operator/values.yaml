@@ -12,6 +12,7 @@ operator:
     tag: "0.0.7"
     pullPolicy: IfNotPresent
   endpoint: "unix:///storage/storage.sock:10086"
+  enableHostDefine: "no"
 
 storageAgent:
   image:

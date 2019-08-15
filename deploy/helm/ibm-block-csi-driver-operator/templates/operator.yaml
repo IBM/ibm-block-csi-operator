@@ -22,6 +22,8 @@ spec:
         env:
         - name: WATCH_NAMESPACE
           value: ""
+        - name: ENABLE_HOST_DEFINE
+          value: "{{ .Values.operator.enableHostDefine }}"
         - name: POD_NAME
           valueFrom:
             fieldRef:

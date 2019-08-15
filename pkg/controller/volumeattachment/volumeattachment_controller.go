@@ -18,6 +18,7 @@ package volumeattachment
 
 import (
 	"context"
+	"os"
 	"time"
 
 	// b64 "encoding/base64"
@@ -111,6 +112,11 @@ func (r *ReconcileVolumeAttachment) Reconcile(request reconcile.Request) (reconc
 
 	if volAtt.Spec.Attacher != config.DriverName {
 		reqLogger.Info("Not managed by current driver, skip")
+		return reconcile.Result{}, nil
+	}
+
+	if os.Getenv("ENABLE_HOST_DEFINE") != "yes" {
+		reqLogger.Info("Skip reconciling VolumeAttachment")
 		return reconcile.Result{}, nil
 	}
 

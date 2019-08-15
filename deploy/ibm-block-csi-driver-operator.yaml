@@ -235,6 +235,8 @@ spec:
           #valueFrom:
           #  fieldRef:
           #    fieldPath: metadata.namespace
+        - name: ENABLE_HOST_DEFINE
+          value: ""
         - name: POD_NAME
           valueFrom:
             fieldRef:
@@ -359,6 +361,14 @@ rules:
   verbs:
   - create
   - delete
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - csinodes
+  verbs:
+  - get
+  - list
+  - watch
 - apiGroups:
   - apiextensions.k8s.io
   resources:
