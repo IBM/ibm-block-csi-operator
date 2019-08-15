@@ -101,6 +101,8 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 		s.driver.GetCSINodeImage(),
 		[]string{
 			"--csi-endpoint=$(CSI_ENDPOINT)",
+			"--hostname=$(KUBE_NODE_NAME)",
+			"--config-file-path=./config.yaml",
 			"--v=$(CSI_LOGLEVEL)",
 		},
 	)
@@ -211,6 +213,8 @@ func (s *csiNodeSyncer) getEnvFor(name string) []corev1.EnvVar {
 }
 
 func (s *csiNodeSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
+	mountPropagationB := corev1.MountPropagationBidirectional
+
 	switch name {
 	case nodeContainerName:
 		return []corev1.VolumeMount{
@@ -219,8 +223,9 @@ func (s *csiNodeSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 				MountPath: config.NodeSocketVolumeMountPath,
 			},
 			{
-				Name:      "mountpoint-dir",
-				MountPath: "/var/lib/kubelet/pods",
+				Name:             "mountpoint-dir",
+				MountPath:        "/var/lib/kubelet/pods",
+				MountPropagation: &mountPropagationB,
 			},
 			{
 				Name:      "device-dir",
@@ -233,6 +238,11 @@ func (s *csiNodeSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 			{
 				Name:      "sys-dir",
 				MountPath: "/sys",
+			},
+			{
+				Name:             "host-dir",
+				MountPath:        "/host",
+				MountPropagation: &mountPropagationB,
 			},
 		}
 
@@ -267,6 +277,7 @@ func (s *csiNodeSyncer) ensureVolumes() []corev1.Volume {
 		ensureVolume("device-dir", ensureHostPathVolumeSource("/dev", "Directory")),
 		ensureVolume("iscsi-dir", ensureHostPathVolumeSource("/etc/iscsi", "Directory")),
 		ensureVolume("sys-dir", ensureHostPathVolumeSource("/sys", "Directory")),
+		ensureVolume("host-dir", ensureHostPathVolumeSource("/", "Directory")),
 	}
 }
 
