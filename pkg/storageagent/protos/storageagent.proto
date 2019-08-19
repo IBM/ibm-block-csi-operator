@@ -1,9 +1,9 @@
 syntax = "proto3";
 
-//option java_multiple_files = true;
-//option java_package = "io.grpc.examples.helloworld";
-//option java_outer_classname = "HelloWorldProto";
-//option objc_class_prefix = "HLW";
+option java_multiple_files = true;
+option java_package = "com.ibm.storageagent";
+option java_outer_classname = "StorageAgentProto";
+option objc_class_prefix = "HLW";
 
 package storageagent;
 
@@ -20,10 +20,11 @@ service StorageAgent {
 message Host {
   string identifier = 1;
   string name = 2;
-  string status = 3;
-  string array = 4;
-  repeated string iqns = 5;
-  repeated string wwpns = 6;
+  string type = 3;
+  string status = 4;
+  string array = 5;
+  repeated string iqns = 6;
+  repeated string wwpns = 7;
 }
 
 // Information about a specific iscsi target, including ip and iqn,
@@ -33,20 +34,26 @@ message IscsiTarget {
   string iqn = 2;
 }
 
+// type is optional
 message CreateHostRequest {
   string name = 1;
-  repeated string iqns = 2;
-  repeated string wwpns = 3;
-  map<string, string> secrets = 4;
+  string type = 2;
+  repeated string iqns = 3;
+  repeated string wwpns = 4;
+  map<string, string> secrets = 5;
 }
 
 message CreateHostReply {
   Host host = 1;
 }
 
+// Either name or identifier is required
 message DeleteHostRequest {
-  string name = 1;
-  map<string, string> secrets = 2;
+  oneof unique_key {
+    string identifier = 1;
+    string name = 2;
+  }
+  map<string, string> secrets = 3;
 }
 
 message DeleteHostReply {
@@ -54,10 +61,13 @@ message DeleteHostReply {
 }
 
 message ListHostsRequest {
-  // The name of the host. This field is OPTIONAL.
-  // If not specified, return all.
-  string name = 1;
-  map<string, string> secrets = 2;
+  // Either name or identifier should be specified.
+  // The identifier and name are OPTIONAL, if not specified, return all.
+  oneof unique_key {
+    string identifier = 1;
+    string name = 2;
+  }
+  map<string, string> secrets = 3;
 }
 
 message ListHostsReply {
