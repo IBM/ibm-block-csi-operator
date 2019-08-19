@@ -251,7 +251,7 @@ spec:
         - name: socket-dir
           mountPath: /storage/
       - name: ibm-storage-agent
-        image: stg-artifactory.haifa.ibm.com:5030/ibm-storage-agent:v0.0.3
+        image: stg-artifactory.haifa.ibm.com:5030/ibm-storage-agent:0.0.4
         imagePullPolicy: IfNotPresent
         env:
         - name: ENDPOINT

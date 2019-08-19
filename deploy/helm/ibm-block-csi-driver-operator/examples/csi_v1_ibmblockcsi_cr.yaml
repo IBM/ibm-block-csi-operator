@@ -6,7 +6,7 @@ metadata:
 spec:
   controller:
     repository: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-controller-driver
-    tag: "SVC_Storage_Action"
+    tag: "1.0.0_b35_origin.develop"
   node:
     repository: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-node-driver
-    tag: "1.0.0_b74_origin.feature.csi-node-daemonset"
+    tag: "1.0.0_b35_origin.develop"

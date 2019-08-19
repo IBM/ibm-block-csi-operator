@@ -17,5 +17,5 @@ operator:
 storageAgent:
   image:
     repository: stg-artifactory.haifa.ibm.com:5030/ibm-storage-agent
-    tag: "v0.0.3"
+    tag: "0.0.4"
     pullPolicy: IfNotPresent
