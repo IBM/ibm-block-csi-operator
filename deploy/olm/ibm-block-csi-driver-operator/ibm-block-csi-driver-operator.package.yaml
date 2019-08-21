@@ -1,0 +1,5 @@
+packageName: ibm-block-csi-driver-operator
+channels:
+- name: beta
+  currentCSV: ibm-block-csi-driver-operator.v1.0.0
+defaultChannel: beta
