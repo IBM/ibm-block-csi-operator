@@ -116,6 +116,11 @@ func (r *ReconcileNode) Reconcile(request reconcile.Request) (reconcile.Result, 
 		return reconcile.Result{}, nil
 	}
 
+	if os.Getenv("ENABLE_HOST_DEFINE") != "yes" {
+		reqLogger.Info("Skip reconciling Node")
+		return reconcile.Result{}, nil
+	}
+
 	err = r.processNodeInfo(node)
 	if err != nil {
 		reqLogger.Error(err, "failed to processNodeInfo")

@@ -26,7 +26,11 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 )
+
+var log = logf.Log.WithName("server")
 
 // server is used to implement nodeagent.NodeAgentServer.
 type server struct {
@@ -37,6 +41,7 @@ func (s *server) GetNodeInfo(ctx context.Context, in *pb.GetNodeInfoRequest) (*p
 	if in.GetName() != s.nodeName {
 		return nil, status.Error(codes.InvalidArgument, "node name mismatch")
 	}
+	log.Info("Starting to GetNodeInfo")
 
 	inf := informer.NewInformer()
 
@@ -48,6 +53,7 @@ func (s *server) GetNodeInfo(ctx context.Context, in *pb.GetNodeInfoRequest) (*p
 	if err != nil {
 		return nil, status.Convert(err).Err()
 	}
+	log.Info("Finished to GetNodeInfo", "iqns", iqns, "wwpns", wwpns)
 	return &pb.GetNodeInfoReply{Node: &pb.Node{
 		Name:  s.nodeName,
 		Iqns:  iqns,
@@ -56,20 +62,24 @@ func (s *server) GetNodeInfo(ctx context.Context, in *pb.GetNodeInfoRequest) (*p
 }
 
 func (s *server) IscsiLogin(ctx context.Context, in *pb.IscsiLoginRequest) (*pb.IscsiLoginReply, error) {
+	log.Info("Starting to IscsiLogin", "targets", in.GetTargets())
 	iscsiadm := iscsi.NewIscsiAdmin()
 	err := iscsiadm.DiscoverAndLoginPortals(in.GetTargets())
 	if err != nil {
 		return nil, status.Convert(err).Err()
 	}
+	log.Info("Finished to IscsiLogin")
 	return &pb.IscsiLoginReply{}, nil
 }
 
 func (s *server) IscsiLogout(ctx context.Context, in *pb.IscsiLogoutRequest) (*pb.IscsiLogoutReply, error) {
+	log.Info("Starting to IscsiLogout", "targets", in.GetTargets())
 	iscsiadm := iscsi.NewIscsiAdmin()
 	err := iscsiadm.DiscoverAndLogoutPortals(in.GetTargets())
 	if err != nil {
 		return nil, status.Convert(err).Err()
 	}
+	log.Info("Finished to IscsiLogout")
 	return &pb.IscsiLogoutReply{}, nil
 }
 
