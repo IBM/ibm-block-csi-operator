@@ -46,6 +46,7 @@ import (
 	clustersyncer "github.com/IBM/ibm-block-csi-driver-operator/pkg/controller/ibmblockcsi/syncer"
 	"github.com/IBM/ibm-block-csi-driver-operator/pkg/internal/ibmblockcsi"
 	kubeutil "github.com/IBM/ibm-block-csi-driver-operator/pkg/util/kubernetes"
+	oversion "github.com/IBM/ibm-block-csi-driver-operator/version"
 	"github.com/presslabs/controller-util/syncer"
 )
 
@@ -248,7 +249,14 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI) e
 
 	instance.Status.ControllerReady = controller.Status.ReadyReplicas == controller.Status.Replicas
 	instance.Status.NodeReady = node.Status.DesiredNumberScheduled == node.Status.NumberAvailable
-	instance.Status.Ready = instance.Status.ControllerReady && instance.Status.NodeReady
+	phase := csiv1.DriverPhaseNone
+	if instance.Status.ControllerReady && instance.Status.NodeReady {
+		phase = csiv1.DriverPhaseRunning
+	} else {
+		phase = csiv1.DriverPhaseCreating
+	}
+	instance.Status.Phase = phase
+	instance.Status.Version = oversion.DriverVersion
 
 	// no need to push to status to API Server here.
 	return nil

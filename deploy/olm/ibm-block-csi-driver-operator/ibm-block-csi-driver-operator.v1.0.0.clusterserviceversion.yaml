@@ -4,12 +4,12 @@ metadata:
   name: ibm-block-csi-driver-operator.v1.0.0
   namespace: placeholder
   annotations:
-    capabilities: Basic Install
-    categories: Storage
+    capabilities: "Full Lifecycle"
+    categories: "Storage,Cloud Provider"
     certified: "false"
     containerImage: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-driver-operator:0.0.7
     createdAt: "2019-08-21T16:45:00Z"
-    description: Run IBM Block CSI driver on OpenShift.
+    description: "Run IBM Block CSI Driver on OpenShift."
     repository: https://github.ibm.com/luogj/ibm-block-csi-driver-operator
     support: IBM
     alm-examples: >-
@@ -36,7 +36,7 @@ metadata:
 spec:
   displayName: "IBM Block CSI Driver Operator"
   description: |
-    **IBM Block CSI driver** is a Container Storage Interface (CSI) Driver for IBM block storage systems which enables container orchestrators such as Kubernetes to manage the life-cycle of persistent storage.
+    **IBM Block CSI driver** is a Container Storage Interface (CSI) Driver for IBM block storage systems which enables container orchestrators to manage the life-cycle of persistent storage.
 
     This is the official operator to deploy and manage the CSI Driver for IBM block storage systems.
 
@@ -52,11 +52,12 @@ spec:
 
     Supported operating systems:
       - RHEL 7.x (x86 architecture)
+      - RHCOS 7.6 (x86 architecture)
 
-    ## Prerequisite
+    ## Pre-requisites
     
     ### Worker nodes preparation
-    Perform these steps for each worker node in Kubernetes cluster:
+    Perform these steps for each worker node in OpenShift:
     
     ### 1. Install Linux packages to ensure Fibre Channel and iSCSI connectivity
     Skip this step, if the packages are already installed.
@@ -86,7 +87,7 @@ spec:
       - RHEL 7.x: Remove the `find_multipaths yes` string from the `multipath.conf` file.
     
     #### 3. Configure storage system connectivity.
-    3.1. Define the hostname of each Kubernetes node on the relevant storage systems with the valid WWPN or IQN of the node.
+    3.1. Define the hostname of each OpenShift worker node on the relevant storage systems with the valid WWPN or IQN of the node.
     
     3.2. For Fiber Chanel, configure the relevant zoning from the storage to the host.
     
@@ -110,23 +111,16 @@ spec:
     Rescanning session [sid: 1, target: {storage system IQN},
     portal: {storage system iSCSI port IP},{port number}
     ```
-    
-    End of worker node setup.
-    
-    
-    ### Install CSIDriver CRD - optional
-    Enabling CSIDriver on Kubernetes (more details -> https://kubernetes-csi.github.io/docs/csi-driver-object.html#enabling-csidriver-on-kubernetes)
-    
-    In Kubernetes v1.13, because the feature was alpha, it was disabled by default. To enable the use of CSIDriver on these versions, do the following:
-    
-    1. Ensure the feature gate is enabled via the following Kubernetes feature flag: --feature-gates=CSIDriverRegistry=true
-       For example on kubeadm installation add the flag inside the `/etc/kubernetes/manifests/kube-apiserver.yaml`.
-    2. Either ensure the CSIDriver CRD is automatically installed via the Kubernetes Storage CRD addon OR manually install the CSIDriver CRD on the Kubernetes cluster with the following command:
+
+    ### Install CSIDriver CRD
+    Enabling CSIDriver on OpenShift
+    1. Enable Technology Preview features using feature gates, more details, please refer to https://docs.openshift.com/container-platform/4.1/nodes/clusters/nodes-cluster-enabling-features.html
+    2. Install the CSIDriver CRD on the OpenShift cluster with the following command:
+
        ```bash
-       $ kubectl create -f https://raw.githubusercontent.com/kubernetes/csi-api/master/pkg/crd/manifests/csidriver.yaml
+       $ oc create -f https://raw.githubusercontent.com/kubernetes/csi-api/master/pkg/crd/manifests/csidriver.yaml
        ```
-    
-    If the feature gate was not enabled then CSIDriver for the ibm-block-csi-driver will not be created automatically.
+
   keywords:
     - IBM
     - BlockStorage
@@ -170,39 +164,53 @@ spec:
         description: "Represents an IBM Block CSI Driver"
         resources:
           - kind: ServiceAccount
-            name: ''
             version: v1
           - kind: ClusterRole
-            name: ''
             version: rbac.authorization.k8s.io/v1beta1
           - kind: ClusterRoleBinding
-            name: ''
             version: rbac.authorization.k8s.io/v1beta1
           - kind: StatefulSet
-            name: ''
             version: apps/v1
           - kind: DaemonSet
-            name: ''
             version: apps/v1
-          - kind: Secret
-            name: ''
-            version: v1
-          - kind: StorageClass
-            name: ''
-            version: storage.k8s.io/v1
         specDescriptors:
-          - description: Controller Image Repository
-            displayName: Controller Image
-            path: controller.image
-          - description: Node Image Repository
-            displayName: Node Image
-            path: node.image
-        statusDescriptors:
-          - description: The status of each of the Pods for the IBM Block CSI Driver.
-            displayName: Pod Status
-            path: pods
+          - description: Controller Image Repository.
+            displayName: Controller Image Repository
+            path: controller.repository
             x-descriptors:
-              - 'urn:alm:descriptor:com.tectonic.ui:podStatuses'
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
+          - description: Controller Image Tag.
+            displayName: Controller Image Tag
+            path: controller.tag
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
+          - description: Node Image Repository.
+            displayName: Node Image Repository
+            path: node.repository
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
+          - description: Node Image Tag.
+            displayName: Node Image Tag
+            path: node.tag
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
+        statusDescriptors:
+          - description: The current status of the driver.
+            displayName: Status
+            path: phase
+            x-descriptors:
+              - 'urn:alm:descriptor:io.kubernetes.phase'
+          - description: Is the controller ready?
+            displayName: Controller Ready
+            path: controllerReady
+              - 'urn:alm:descriptor:text'
+          - description: Is the node ready?
+            displayName: Node Ready
+            path: nodeReady
+              - 'urn:alm:descriptor:text'
+          - description: The current version of the driver.
+            displayName: Version
+            path: version
   install:
     strategy: deployment
     spec:

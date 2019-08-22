@@ -76,7 +76,6 @@ spec:
                 tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html'
               type: boolean
           required:
-          - ready
           - controllerReady
           - nodeReady
           type: object

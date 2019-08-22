@@ -20,6 +20,15 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+type DriverPhase string
+
+const (
+	DriverPhaseNone     DriverPhase = ""
+	DriverPhaseCreating DriverPhase = "Creating"
+	DriverPhaseRunning  DriverPhase = "Running"
+	DriverPhaseFailed   DriverPhase = "Failed"
+)
+
 // IBMBlockCSISpec defines the desired state of IBMBlockCSI
 // +k8s:openapi-gen=true
 type IBMBlockCSISpec struct {
@@ -53,12 +62,13 @@ type IBMBlockCSINodeSpec struct {
 // IBMBlockCSIStatus defines the observed state of IBMBlockCSI
 // +k8s:openapi-gen=true
 type IBMBlockCSIStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
-	// Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html
-	Ready           bool `json:"ready"`
-	ControllerReady bool `json:"controllerReady"`
-	NodeReady       bool `json:"nodeReady"`
+	// Phase is the driver running phase
+	Phase           DriverPhase `json:"phase"`
+	ControllerReady bool        `json:"controllerReady"`
+	NodeReady       bool        `json:"nodeReady"`
+
+	// Version is the current driver version
+	Version string `json:"version"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
