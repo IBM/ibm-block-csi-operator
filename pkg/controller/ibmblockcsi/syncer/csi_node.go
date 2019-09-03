@@ -103,7 +103,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 			"--csi-endpoint=$(CSI_ENDPOINT)",
 			"--hostname=$(KUBE_NODE_NAME)",
 			"--config-file-path=./config.yaml",
-			"--v=$(CSI_LOGLEVEL)",
+			"--loglevel=$(CSI_LOGLEVEL)",
 		},
 	)
 	nodePlugin.Ports = ensurePorts(corev1.ContainerPort{
@@ -192,7 +192,7 @@ func (s *csiNodeSyncer) getEnvFor(name string) []corev1.EnvVar {
 			},
 			{
 				Name:  "CSI_LOGLEVEL",
-				Value: "5",
+				Value: "trace",
 			},
 			envVarFromField("KUBE_NODE_NAME", "spec.nodeName"),
 		}
