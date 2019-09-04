@@ -54,6 +54,13 @@ func (s *server) GetNodeInfo(ctx context.Context, in *pb.GetNodeInfoRequest) (*p
 		return nil, status.Convert(err).Err()
 	}
 	log.Info("Finished to GetNodeInfo", "iqns", iqns, "wwpns", wwpns)
+
+	if ctx.Err() == context.Canceled {
+		msg := "Client cancelled, abandoning."
+		log.Info(msg)
+		return nil, status.Error(codes.Canceled, msg)
+	}
+
 	return &pb.GetNodeInfoReply{Node: &pb.Node{
 		Name:  s.nodeName,
 		Iqns:  iqns,
@@ -69,6 +76,13 @@ func (s *server) IscsiLogin(ctx context.Context, in *pb.IscsiLoginRequest) (*pb.
 		return nil, status.Convert(err).Err()
 	}
 	log.Info("Finished to IscsiLogin")
+
+	if ctx.Err() == context.Canceled {
+		msg := "Client cancelled, abandoning."
+		log.Info(msg)
+		return nil, status.Error(codes.Canceled, msg)
+	}
+
 	return &pb.IscsiLoginReply{}, nil
 }
 
@@ -80,6 +94,13 @@ func (s *server) IscsiLogout(ctx context.Context, in *pb.IscsiLogoutRequest) (*p
 		return nil, status.Convert(err).Err()
 	}
 	log.Info("Finished to IscsiLogout")
+
+	if ctx.Err() == context.Canceled {
+		msg := "Client cancelled, abandoning."
+		log.Info(msg)
+		return nil, status.Error(codes.Canceled, msg)
+	}
+
 	return &pb.IscsiLogoutReply{}, nil
 }
 

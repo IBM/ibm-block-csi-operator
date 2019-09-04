@@ -20,6 +20,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"runtime"
 
@@ -28,6 +29,8 @@ import (
 
 	"github.com/IBM/ibm-block-csi-driver-operator/pkg/apis"
 	"github.com/IBM/ibm-block-csi-driver-operator/pkg/controller"
+	"github.com/IBM/ibm-block-csi-driver-operator/pkg/resources"
+	"github.com/IBM/ibm-block-csi-driver-operator/pkg/util/decoder"
 
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
 	"github.com/operator-framework/operator-sdk/pkg/leader"
@@ -36,6 +39,9 @@ import (
 	"github.com/operator-framework/operator-sdk/pkg/restmapper"
 	sdkVersion "github.com/operator-framework/operator-sdk/version"
 	"github.com/spf13/pflag"
+	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
@@ -53,6 +59,32 @@ func printVersion() {
 	log.Info(fmt.Sprintf("Go Version: %s", runtime.Version()))
 	log.Info(fmt.Sprintf("Go OS/Arch: %s/%s", runtime.GOOS, runtime.GOARCH))
 	log.Info(fmt.Sprintf("Version of operator-sdk: %v", sdkVersion.Version))
+}
+
+func createNodeAgent(c client.Client) error {
+	nodeAgent, err := resources.Deploy.Open("/node_agent.yaml")
+	if err != nil {
+		return err
+	}
+
+	yaml, err := ioutil.ReadAll(nodeAgent)
+	if err != nil {
+		return err
+	}
+
+	return createResourceFromYaml(c, yaml)
+}
+
+func createResourceFromYaml(c client.Client, yaml []byte) error {
+	obj, err := decoder.FromYamlToUnstructured(yaml)
+	if err != nil {
+		return err
+	}
+	return createResource(c, obj)
+}
+
+func createResource(c client.Client, obj *unstructured.Unstructured) error {
+	return c.Create(context.TODO(), obj)
 }
 
 func main() {
@@ -129,6 +161,20 @@ func main() {
 	_, err = metrics.ExposeMetricsPort(ctx, metricsPort)
 	if err != nil {
 		log.Info(err.Error())
+	}
+
+	if os.Getenv("INSTALL_NODE_AGENT") == "yes" {
+		log.Info("Starting to create node agent.")
+		err := createNodeAgent(mgr.GetClient())
+		if err != nil {
+			if errors.IsNotFound(err) {
+				log.Info("Node agent already exists.")
+			} else {
+				log.Error(err, "Failed to create node agent.")
+			}
+		} else {
+			log.Info("Finished to create node agent.")
+		}
 	}
 
 	log.Info("Starting the Cmd.")
