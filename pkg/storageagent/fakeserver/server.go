@@ -20,7 +20,7 @@ import (
 	"context"
 	"net"
 
-	pb "github.com/IBM/ibm-block-csi-driver-operator/pkg/storageagent/storageagent"
+	pb "github.com/IBM/ibm-block-csi-operator/pkg/storageagent/storageagent"
 	"google.golang.org/grpc"
 )
 

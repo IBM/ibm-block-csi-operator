@@ -4,7 +4,7 @@ CURRENT_PATH=$(dirname "$BASH_SOURCE")
 DEPLOY_PATH=$CURRENT_PATH/../deploy
 CRD_PATH=$DEPLOY_PATH/crds
 
-TARGET_FILE_NAME=ibm-block-csi-driver-operator.yaml
+TARGET_FILE_NAME=ibm-block-csi-operator.yaml
 TARGET_FILE=$DEPLOY_PATH/$TARGET_FILE_NAME
 
 excluded_files=("csi_driver.yaml" $TARGET_FILE_NAME)

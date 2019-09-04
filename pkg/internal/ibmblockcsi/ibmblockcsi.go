@@ -17,9 +17,9 @@
 package ibmblockcsi
 
 import (
-	csiv1 "github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1"
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
-	csiversion "github.com/IBM/ibm-block-csi-driver-operator/version"
+	csiv1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
+	"github.com/IBM/ibm-block-csi-operator/pkg/config"
+	csiversion "github.com/IBM/ibm-block-csi-operator/version"
 	"k8s.io/apimachinery/pkg/labels"
 )
 

@@ -1,4 +1,4 @@
-module github.com/IBM/ibm-block-csi-driver-operator
+module github.com/IBM/ibm-block-csi-operator
 
 go 1.12
 

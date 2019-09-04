@@ -4,8 +4,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/IBM/ibm-block-csi-driver-operator/pkg/node/fakeserver"
-	pb "github.com/IBM/ibm-block-csi-driver-operator/pkg/node/nodeagent"
+	. "github.com/IBM/ibm-block-csi-operator/pkg/node/fakeserver"
+	pb "github.com/IBM/ibm-block-csi-operator/pkg/node/nodeagent"
 )
 
 var _ = Describe("Store", func() {

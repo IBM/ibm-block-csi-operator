@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/apis"
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/controller"
+	"github.com/IBM/ibm-block-csi-operator/pkg/apis"
+	"github.com/IBM/ibm-block-csi-operator/pkg/config"
+	"github.com/IBM/ibm-block-csi-operator/pkg/controller"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"

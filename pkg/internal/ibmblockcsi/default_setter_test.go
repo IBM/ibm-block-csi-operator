@@ -4,9 +4,9 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	csiv1 "github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1"
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
-	. "github.com/IBM/ibm-block-csi-driver-operator/pkg/internal/ibmblockcsi"
+	csiv1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
+	"github.com/IBM/ibm-block-csi-operator/pkg/config"
+	. "github.com/IBM/ibm-block-csi-operator/pkg/internal/ibmblockcsi"
 )
 
 var _ = Describe("DefaultSetter", func() {

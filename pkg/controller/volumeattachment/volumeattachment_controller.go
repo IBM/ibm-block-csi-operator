@@ -24,8 +24,8 @@ import (
 	// b64 "encoding/base64"
 	"fmt"
 
-	csiv1 "github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1"
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/controller/predicate"
+	csiv1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
+	"github.com/IBM/ibm-block-csi-operator/pkg/controller/predicate"
 	corev1 "k8s.io/api/core/v1"
 	storagev1 "k8s.io/api/storage/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -39,8 +39,8 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/storageagent"
+	"github.com/IBM/ibm-block-csi-operator/pkg/config"
+	"github.com/IBM/ibm-block-csi-operator/pkg/storageagent"
 )
 
 var log = logf.Log.WithName("controller_volumeattachment")

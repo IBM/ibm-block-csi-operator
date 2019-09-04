@@ -8,7 +8,7 @@ nodeAgent:
 
 operator:
   image:
-    repository: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-driver-operator
+    repository: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-operator
     tag: "0.0.7"
     pullPolicy: IfNotPresent
   endpoint: "unix:///storage/storage.sock:10086"

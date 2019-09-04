@@ -105,7 +105,7 @@ If the feature gate was not enabled then CSIDriver for the ibm-block-csi-driver 
 
 ```bash
 $ helm repo add artifactory https://stg-artifactory.haifa.ibm.com/artifactory/chart-repo
-$ helm install --name ibm-block-csi-driver-operator --namespace kube-system artifactory/ibm-block-csi-driver-operator
+$ helm install --name ibm-block-csi-operator --namespace kube-system artifactory/ibm-block-csi-operator
 ```
 
 #### Install with yaml
@@ -113,15 +113,15 @@ $ helm install --name ibm-block-csi-driver-operator --namespace kube-system arti
 ```bash
 
 $ kubectl apply -f deploy/csi_driver.yaml  (install csi_driver.yaml only if you are using Kubernetes v.1.14+)
-$ kubectl apply -f deploy/ibm-block-csi-driver-operator.yaml
+$ kubectl apply -f deploy/ibm-block-csi-operator.yaml
 ```
 
 ### Verify operator is running:
 
 ```bash
-$ kubectl get pod -l app.kubernetes.io/name=ibm-block-csi-driver-operator -n kube-system
-NAME                                             READY   STATUS    RESTARTS   AGE
-ibm-block-csi-driver-operator-5bb7996b86-xntss   2/2     Running   0          10m
+$ kubectl get pod -l app.kubernetes.io/name=ibm-block-csi-operator -n kube-system
+NAME                                    READY   STATUS    RESTARTS   AGE
+ibm-block-csi-operator-5bb7996b86-xntss 2/2     Running   0          10m
 ```
 
 ### Create an IBMBlockCSI custom resource
@@ -175,12 +175,12 @@ $ kubectl delete -f ibc.yaml
 
 #### Delete with helm
 ```bash
-$ helm delete --purge ibm-block-csi-driver-operator
+$ helm delete --purge ibm-block-csi-operator
 ```
 #### Delete with yaml
 ```bash
 $ kubectl delete CSIDriver ibm-block-csi-driver
-$ kubectl delete -f deploy/ibm-block-csi-driver-operator.yaml
+$ kubectl delete -f deploy/ibm-block-csi-operator.yaml
 ```
 
 ## Licensing

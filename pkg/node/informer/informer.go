@@ -23,7 +23,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/node"
+	"github.com/IBM/ibm-block-csi-operator/pkg/node"
 )
 
 var iscsiPath = "/etc/iscsi"

@@ -2,7 +2,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   creationTimestamp: null
-  name: ibm-block-csi-driver-operator
+  name: ibm-block-csi-operator
 rules:
 - apiGroups:
   - ""
@@ -82,7 +82,7 @@ rules:
 - apiGroups:
   - apps
   resourceNames:
-  - ibm-block-csi-driver-operator
+  - ibm-block-csi-operator
   resources:
   - deployments/finalizers
   verbs:

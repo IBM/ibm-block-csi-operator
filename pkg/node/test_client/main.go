@@ -17,7 +17,7 @@
 package main
 
 import (
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/node/client"
+	"github.com/IBM/ibm-block-csi-operator/pkg/node/client"
 	"github.com/operator-framework/operator-sdk/pkg/log/zap"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 )

@@ -17,7 +17,7 @@
 package apis
 
 import (
-	v1 "github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1"
+	v1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
 )
 
 func init() {

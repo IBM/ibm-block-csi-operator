@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ibm-block-csi-driver-operator
+  name: ibm-block-csi-operator
   namespace: kube-system
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: ibm-block-csi-driver-operator
+      app.kubernetes.io/name: ibm-block-csi-operator
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: ibm-block-csi-driver-operator
+        app.kubernetes.io/name: ibm-block-csi-operator
     spec:
-      serviceAccountName: ibm-block-csi-driver-operator
+      serviceAccountName: ibm-block-csi-operator
       containers:
-      - name: ibm-block-csi-driver-operator
-        image: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-driver-operator:0.0.7
+      - name: ibm-block-csi-operator
+        image: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-operator:0.0.7
         imagePullPolicy: IfNotPresent
         command:
-        - ibm-block-csi-driver-operator
+        - ibm-block-csi-operator
         env:
         - name: WATCH_NAMESPACE
           value: ""
@@ -30,7 +30,7 @@ spec:
             fieldRef:
               fieldPath: metadata.name
         - name: OPERATOR_NAME
-          value: "ibm-block-csi-driver-operator"
+          value: "ibm-block-csi-operator"
         - name: ENDPOINT
           value: "unix:///storage/storage.sock:10086"
         - name: ISCSI_AGENT_PORT

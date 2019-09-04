@@ -25,8 +25,8 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/internal/ibmblockcsi"
+	"github.com/IBM/ibm-block-csi-operator/pkg/config"
+	"github.com/IBM/ibm-block-csi-operator/pkg/internal/ibmblockcsi"
 	"github.com/presslabs/controller-util/mergo/transformers"
 	"github.com/presslabs/controller-util/syncer"
 )

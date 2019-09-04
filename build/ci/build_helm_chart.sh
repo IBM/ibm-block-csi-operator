@@ -40,7 +40,7 @@ fi
 CHART_REPOSITORY_NAME="artifactory"
 CHART_FOLDER="artifactory-charts"
 INDEX_PATH="$CHART_REPOSITORY/index.yaml"
-CHART_NAME="ibm-block-csi-driver-operator"
+CHART_NAME="ibm-block-csi-operator"
 
 CURRENT_PATH=$(dirname "$BASH_SOURCE")
 PROJECT_ROOT="$CURRENT_PATH/../.."

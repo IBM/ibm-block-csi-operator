@@ -26,7 +26,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
-	version "github.com/IBM/ibm-block-csi-driver-operator/version"
+	version "github.com/IBM/ibm-block-csi-operator/version"
 )
 
 func ServerVersion(client discovery.DiscoveryInterface) (string, error) {

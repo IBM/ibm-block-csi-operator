@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/IBM/ibm-block-csi-driver-operator/pkg/util"
+	. "github.com/IBM/ibm-block-csi-operator/pkg/util"
 	corev1 "k8s.io/api/core/v1"
 )
 

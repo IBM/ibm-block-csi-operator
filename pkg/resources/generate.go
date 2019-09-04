@@ -5,7 +5,7 @@ package main
 import (
 	"log"
 
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/resources"
+	"github.com/IBM/ibm-block-csi-operator/pkg/resources"
 	"github.com/shurcooL/vfsgen"
 )
 

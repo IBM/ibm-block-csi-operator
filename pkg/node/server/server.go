@@ -20,9 +20,9 @@ import (
 	"context"
 	"net"
 
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/node/informer"
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/node/iscsi"
-	pb "github.com/IBM/ibm-block-csi-driver-operator/pkg/node/nodeagent"
+	"github.com/IBM/ibm-block-csi-operator/pkg/node/informer"
+	"github.com/IBM/ibm-block-csi-operator/pkg/node/iscsi"
+	pb "github.com/IBM/ibm-block-csi-operator/pkg/node/nodeagent"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

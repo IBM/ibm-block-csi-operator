@@ -29,14 +29,14 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1.IBMBlockCSI":               schema_pkg_apis_csi_v1_IBMBlockCSI(ref),
-		"github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1.IBMBlockCSIControllerSpec": schema_pkg_apis_csi_v1_IBMBlockCSIControllerSpec(ref),
-		"github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1.IBMBlockCSINodeSpec":       schema_pkg_apis_csi_v1_IBMBlockCSINodeSpec(ref),
-		"github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1.IBMBlockCSISpec":           schema_pkg_apis_csi_v1_IBMBlockCSISpec(ref),
-		"github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1.IBMBlockCSIStatus":         schema_pkg_apis_csi_v1_IBMBlockCSIStatus(ref),
-		"github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1.NodeInfo":                  schema_pkg_apis_csi_v1_NodeInfo(ref),
-		"github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1.NodeInfoSpec":              schema_pkg_apis_csi_v1_NodeInfoSpec(ref),
-		"github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1.NodeInfoStatus":            schema_pkg_apis_csi_v1_NodeInfoStatus(ref),
+		"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.IBMBlockCSI":               schema_pkg_apis_csi_v1_IBMBlockCSI(ref),
+		"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.IBMBlockCSIControllerSpec": schema_pkg_apis_csi_v1_IBMBlockCSIControllerSpec(ref),
+		"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.IBMBlockCSINodeSpec":       schema_pkg_apis_csi_v1_IBMBlockCSINodeSpec(ref),
+		"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.IBMBlockCSISpec":           schema_pkg_apis_csi_v1_IBMBlockCSISpec(ref),
+		"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.IBMBlockCSIStatus":         schema_pkg_apis_csi_v1_IBMBlockCSIStatus(ref),
+		"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.NodeInfo":                  schema_pkg_apis_csi_v1_NodeInfo(ref),
+		"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.NodeInfoSpec":              schema_pkg_apis_csi_v1_NodeInfoSpec(ref),
+		"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.NodeInfoStatus":            schema_pkg_apis_csi_v1_NodeInfoStatus(ref),
 	}
 }
 
@@ -68,19 +68,19 @@ func schema_pkg_apis_csi_v1_IBMBlockCSI(ref common.ReferenceCallback) common.Ope
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1.IBMBlockCSISpec"),
+							Ref: ref("github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.IBMBlockCSISpec"),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1.IBMBlockCSIStatus"),
+							Ref: ref("github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.IBMBlockCSIStatus"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1.IBMBlockCSISpec", "github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1.IBMBlockCSIStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.IBMBlockCSISpec", "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.IBMBlockCSIStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 
@@ -150,12 +150,12 @@ func schema_pkg_apis_csi_v1_IBMBlockCSISpec(ref common.ReferenceCallback) common
 					"controller": {
 						SchemaProps: spec.SchemaProps{
 							Description: "INSERT ADDITIONAL SPEC FIELDS - desired state of cluster Important: Run \"operator-sdk generate k8s\" to regenerate code after modifying this file Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html",
-							Ref:         ref("github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1.IBMBlockCSIControllerSpec"),
+							Ref:         ref("github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.IBMBlockCSIControllerSpec"),
 						},
 					},
 					"node": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1.IBMBlockCSINodeSpec"),
+							Ref: ref("github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.IBMBlockCSINodeSpec"),
 						},
 					},
 				},
@@ -163,7 +163,7 @@ func schema_pkg_apis_csi_v1_IBMBlockCSISpec(ref common.ReferenceCallback) common
 			},
 		},
 		Dependencies: []string{
-			"github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1.IBMBlockCSIControllerSpec", "github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1.IBMBlockCSINodeSpec"},
+			"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.IBMBlockCSIControllerSpec", "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.IBMBlockCSINodeSpec"},
 	}
 }
 
@@ -228,19 +228,19 @@ func schema_pkg_apis_csi_v1_NodeInfo(ref common.ReferenceCallback) common.OpenAP
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1.NodeInfoSpec"),
+							Ref: ref("github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.NodeInfoSpec"),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1.NodeInfoStatus"),
+							Ref: ref("github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.NodeInfoStatus"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1.NodeInfoSpec", "github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1.NodeInfoStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.NodeInfoSpec", "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.NodeInfoStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 

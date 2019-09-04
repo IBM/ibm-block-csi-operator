@@ -27,10 +27,10 @@ import (
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/apis"
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/controller"
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/resources"
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/util/decoder"
+	"github.com/IBM/ibm-block-csi-operator/pkg/apis"
+	"github.com/IBM/ibm-block-csi-operator/pkg/controller"
+	"github.com/IBM/ibm-block-csi-operator/pkg/resources"
+	"github.com/IBM/ibm-block-csi-operator/pkg/util/decoder"
 
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
 	"github.com/operator-framework/operator-sdk/pkg/leader"
@@ -126,7 +126,7 @@ func main() {
 	ctx := context.TODO()
 
 	// Become the leader before proceeding
-	err = leader.Become(ctx, "ibm-block-csi-driver-operator-lock")
+	err = leader.Become(ctx, "ibm-block-csi-operator-lock")
 	if err != nil {
 		log.Error(err, "")
 		os.Exit(1)

@@ -36,12 +36,12 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
-	csiv1 "github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1"
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/controller/predicate"
-	nodeclient "github.com/IBM/ibm-block-csi-driver-operator/pkg/node/client"
-	pb "github.com/IBM/ibm-block-csi-driver-operator/pkg/node/nodeagent"
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/util"
+	csiv1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
+	"github.com/IBM/ibm-block-csi-operator/pkg/config"
+	"github.com/IBM/ibm-block-csi-operator/pkg/controller/predicate"
+	nodeclient "github.com/IBM/ibm-block-csi-operator/pkg/node/client"
+	pb "github.com/IBM/ibm-block-csi-operator/pkg/node/nodeagent"
+	"github.com/IBM/ibm-block-csi-operator/pkg/util"
 )
 
 var log = logf.Log.WithName("node_controller")

@@ -24,9 +24,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
-	pb "github.com/IBM/ibm-block-csi-driver-operator/pkg/storageagent/storageagent"
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/util"
+	"github.com/IBM/ibm-block-csi-operator/pkg/config"
+	pb "github.com/IBM/ibm-block-csi-operator/pkg/storageagent/storageagent"
+	"github.com/IBM/ibm-block-csi-operator/pkg/util"
 	"github.com/go-logr/logr"
 	"google.golang.org/grpc"
 )

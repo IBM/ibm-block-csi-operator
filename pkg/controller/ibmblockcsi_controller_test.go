@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	csiv1 "github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1"
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
+	csiv1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
+	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	appsv1 "k8s.io/api/apps/v1"

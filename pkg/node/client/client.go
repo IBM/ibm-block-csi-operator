@@ -20,9 +20,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/node"
-	pb "github.com/IBM/ibm-block-csi-driver-operator/pkg/node/nodeagent"
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/util"
+	"github.com/IBM/ibm-block-csi-operator/pkg/node"
+	pb "github.com/IBM/ibm-block-csi-operator/pkg/node/nodeagent"
+	"github.com/IBM/ibm-block-csi-operator/pkg/util"
 	"github.com/go-logr/logr"
 	"google.golang.org/grpc"
 )

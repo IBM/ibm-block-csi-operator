@@ -23,7 +23,7 @@ import (
 	"reflect"
 	"time"
 
-	csiv1 "github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1"
+	csiv1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -42,11 +42,11 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
-	oconfig "github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
-	clustersyncer "github.com/IBM/ibm-block-csi-driver-operator/pkg/controller/ibmblockcsi/syncer"
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/internal/ibmblockcsi"
-	kubeutil "github.com/IBM/ibm-block-csi-driver-operator/pkg/util/kubernetes"
-	oversion "github.com/IBM/ibm-block-csi-driver-operator/version"
+	oconfig "github.com/IBM/ibm-block-csi-operator/pkg/config"
+	clustersyncer "github.com/IBM/ibm-block-csi-operator/pkg/controller/ibmblockcsi/syncer"
+	"github.com/IBM/ibm-block-csi-operator/pkg/internal/ibmblockcsi"
+	kubeutil "github.com/IBM/ibm-block-csi-operator/pkg/util/kubernetes"
+	oversion "github.com/IBM/ibm-block-csi-operator/version"
 	"github.com/presslabs/controller-util/syncer"
 )
 

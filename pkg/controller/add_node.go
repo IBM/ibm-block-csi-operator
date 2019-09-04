@@ -17,7 +17,7 @@
 package controller
 
 import (
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/controller/node"
+	"github.com/IBM/ibm-block-csi-operator/pkg/controller/node"
 )
 
 func init() {

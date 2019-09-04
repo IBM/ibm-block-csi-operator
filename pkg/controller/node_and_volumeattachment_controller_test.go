@@ -6,12 +6,12 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
+	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 
-	csiv1 "github.com/IBM/ibm-block-csi-driver-operator/pkg/apis/csi/v1"
-	fakenode "github.com/IBM/ibm-block-csi-driver-operator/pkg/node/fakeserver"
-	pb "github.com/IBM/ibm-block-csi-driver-operator/pkg/node/nodeagent"
-	fakestorage "github.com/IBM/ibm-block-csi-driver-operator/pkg/storageagent/fakeserver"
+	csiv1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
+	fakenode "github.com/IBM/ibm-block-csi-operator/pkg/node/fakeserver"
+	pb "github.com/IBM/ibm-block-csi-operator/pkg/node/nodeagent"
+	fakestorage "github.com/IBM/ibm-block-csi-operator/pkg/storageagent/fakeserver"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"

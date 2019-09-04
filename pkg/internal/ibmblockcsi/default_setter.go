@@ -17,7 +17,7 @@
 package ibmblockcsi
 
 import (
-	"github.com/IBM/ibm-block-csi-driver-operator/pkg/config"
+	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 )
 
 // SetDefaults set defaults if omitted in spec, returns true means CR should be updated on cluster.

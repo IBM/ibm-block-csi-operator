@@ -16,7 +16,7 @@
 
 package node
 
-import pb "github.com/IBM/ibm-block-csi-driver-operator/pkg/node/nodeagent"
+import pb "github.com/IBM/ibm-block-csi-operator/pkg/node/nodeagent"
 
 type IscsiTarget struct {
 	Portal, Port, Iqn string
