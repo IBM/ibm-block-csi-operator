@@ -34,7 +34,7 @@ metadata:
         }
       ]
 spec:
-  displayName: "IBM Block CSI Driver Operator"
+  displayName: "Operator for IBM block storage CSI driver"
   description: |
     **IBM Block CSI driver** is a Container Storage Interface (CSI) Driver for IBM block storage systems which enables container orchestrators to manage the life-cycle of persistent storage.
 
