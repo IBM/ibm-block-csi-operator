@@ -7,7 +7,7 @@ metadata:
     capabilities: "Full Lifecycle"
     categories: "Storage,Cloud Provider"
     certified: "false"
-    containerImage: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-operator:0.0.7
+    containerImage: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-operator:0.1.0
     createdAt: "2019-08-21T16:45:00Z"
     description: "Run IBM Block CSI Driver on OpenShift."
     repository: https://github.ibm.com/luogj/ibm-block-csi-operator
@@ -374,7 +374,7 @@ spec:
                 serviceAccountName: ibm-block-csi-operator
                 containers:
                 - name: ibm-block-csi-operator
-                  image: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-operator:0.0.7
+                  image: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-operator:0.1.0
                   imagePullPolicy: IfNotPresent
                   command:
                   - ibm-block-csi-operator

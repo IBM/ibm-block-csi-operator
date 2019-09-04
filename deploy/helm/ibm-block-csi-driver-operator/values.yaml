@@ -9,7 +9,7 @@ nodeAgent:
 operator:
   image:
     repository: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-operator
-    tag: "0.0.7"
+    tag: "0.1.0"
     pullPolicy: IfNotPresent
   endpoint: "unix:///storage/storage.sock:10086"
   enableHostDefine: "no"
