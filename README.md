@@ -12,7 +12,7 @@ Supported operating systems:
   - RHCOS 4.1 (x86 architecture)
 
 ## Prerequisite
-Please go to section [`Prerequisites for Driver Installation`](https://github.com/IBM/ibm-block-csi-driver#prerequisites-for-driver-installation) for details
+Please go to section [`Prerequisites for Driver Installation`](https://github.com/IBM/ibm-block-csi-driver#prerequisites-for-driver-installation) for details.
 
 ## Installation
 
@@ -24,9 +24,8 @@ curl https://raw.githubusercontent.com/IBM/ibm-block-csi-operator/develop/deploy
 2. Update the image fields in the ibm-block-csi-operator.yaml if the default values are not fit for you.
 3. Install the operator
 
+<!-- $ kubectl apply -f csi_driver.yaml  (download and install csi_driver.yaml only if you are using Kubernetes v.1.14+) -->
 ```bash
-
-[//]: # $ kubectl apply -f deploy/csi_driver.yaml  (install csi_driver.yaml only if you are using Kubernetes v.1.14+)
 $ kubectl apply -f ibm-block-csi-operator.yaml
 ```
 
@@ -85,9 +84,8 @@ $ kubectl delete -f ibc.yaml
 ```
 
 ### 2. Delete the operator
-
+<!-- $ kubectl delete CSIDriver ibm-block-csi-driver -->
 ```bash
-[//]: # $ kubectl delete CSIDriver ibm-block-csi-driver
 $ kubectl delete -f deploy/ibm-block-csi-operator.yaml
 ```
 
