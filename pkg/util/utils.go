@@ -17,11 +17,15 @@
 package util
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 
 	"google.golang.org/grpc"
 	corev1 "k8s.io/api/core/v1"
+
+	csiv1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // Invoke calls an objet's method by name
@@ -115,4 +119,32 @@ func GetNodeAddresses(node *corev1.Node) []string {
 		}
 	}
 	return addrs
+}
+
+func GetOperatorConfig(c client.Client) (*csiv1.Config, error) {
+	configList := &csiv1.ConfigList{}
+	err := c.List(context.TODO(), nil, configList)
+	if err != nil {
+		return nil, err
+	}
+	if len(configList.Items) == 0 {
+		return nil, fmt.Errorf("No operator configuration is found.")
+	}
+	return &(configList.Items[0]), nil
+}
+
+func IsDefineHostEnabled(c client.Client) bool {
+	conf, err := GetOperatorConfig(c)
+	if err != nil {
+		return false
+	}
+	return conf.Spec.DefineHost
+}
+
+func IsNodeAgentReady(c client.Client) bool {
+	conf, err := GetOperatorConfig(c)
+	if err != nil {
+		return false
+	}
+	return conf.Status.NodeAgent.Phase == csiv1.NodeAgentPhaseRunning
 }

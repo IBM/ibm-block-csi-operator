@@ -28,6 +28,7 @@ const (
 
 	ControllerRepository = "ibmcom/ibm-block-csi-controller-driver"
 	NodeRepository       = "ibmcom/ibm-block-csi-node-driver"
+	NodeAgentRepository  = "ibmcom/ibm-node-agent"
 
 	ENVIscsiAgentPort = "ISCSI_AGENT_PORT"
 	ENVEndpoint       = "ENDPOINT"

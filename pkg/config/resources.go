@@ -28,6 +28,7 @@ func (rn ResourceName) String() string {
 const (
 	CSIController                            ResourceName = "csi-controller"
 	CSINode                                  ResourceName = "csi-node"
+	NodeAgent                                ResourceName = "ibm-node-agent"
 	CSIControllerServiceAccount              ResourceName = "csi-controller-sa"
 	ExternalProvisionerClusterRole           ResourceName = "external-provisioner-clusterrole"
 	ExternalProvisionerClusterRoleBinding    ResourceName = "external-provisioner-clusterrolebinding"

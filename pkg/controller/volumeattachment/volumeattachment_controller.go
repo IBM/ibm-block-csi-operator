@@ -18,7 +18,6 @@ package volumeattachment
 
 import (
 	"context"
-	"os"
 	"time"
 
 	// b64 "encoding/base64"
@@ -41,6 +40,7 @@ import (
 
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/storageagent"
+	"github.com/IBM/ibm-block-csi-operator/pkg/util"
 )
 
 var log = logf.Log.WithName("controller_volumeattachment")
@@ -115,7 +115,7 @@ func (r *ReconcileVolumeAttachment) Reconcile(request reconcile.Request) (reconc
 		return reconcile.Result{}, nil
 	}
 
-	if os.Getenv("ENABLE_HOST_DEFINE") != "yes" {
+	if !util.IsDefineHostEnabled(r.client) {
 		reqLogger.Info("Skip reconciling VolumeAttachment")
 		return reconcile.Result{}, nil
 	}

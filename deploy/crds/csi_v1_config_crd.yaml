@@ -1,16 +1,14 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: ibmblockcsis.csi.ibm.com
+  name: configs.csi.ibm.com
 spec:
   group: csi.ibm.com
   names:
-    kind: IBMBlockCSI
-    listKind: IBMBlockCSIList
-    plural: ibmblockcsis
-    singular: ibmblockcsi
-    shortNames:
-    - ibc
+    kind: Config
+    listKind: ConfigList
+    plural: configs
+    singular: config
   scope: Namespaced
   subresources:
     status: {}
@@ -31,55 +29,41 @@ spec:
           type: object
         spec:
           properties:
-            controller:
-              description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-                Important: Run "operator-sdk generate k8s" to regenerate code after
-                modifying this file Add custom validation using kubebuilder tags:
-                https://book.kubebuilder.io/beyond_basics/generating_crd.html'
+            defineHost:
+              type: boolean
+            nodeAgent:
               properties:
+                port:
+                  description: The port of the node agent server
+                  type: string
                 repository:
-                  description: The repository of the controller image
+                  description: The repository of the node agent image
                   type: string
                 tag:
-                  description: The tag of the controller image
+                  description: The tag of the node agent image
                   type: string
               required:
               - repository
               - tag
-              type: object
-            node:
-              properties:
-                repository:
-                  description: The repository of the node image
-                  type: string
-                tag:
-                  description: The tag of the node image
-                  type: string
-              required:
-              - repository
-              - tag
+              - port
               type: object
           required:
-          - controller
-          - node
+          - defineHost
+          - nodeAgent
           type: object
         status:
           properties:
-            controllerReady:
-              type: boolean
-            nodeReady:
-              type: boolean
-            phase:
+            nodeAgent:
               description: Phase is the driver running phase
-              type: string
-            version:
-              description: Version is the current driver version
-              type: string
+              properties:
+                phase:
+                  description: Phase is the NodeAgent running phase
+                  type: string
+              required:
+              - phase
+              type: object
           required:
-          - phase
-          - controllerReady
-          - nodeReady
-          - version
+          - nodeAgent
           type: object
   version: v1
   versions:

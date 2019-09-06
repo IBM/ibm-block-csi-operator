@@ -7,8 +7,8 @@ metadata:
     capabilities: "Full Lifecycle"
     categories: "Storage,Cloud Provider"
     certified: "false"
-    containerImage: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-operator:0.1.0
-    createdAt: "2019-08-21T16:45:00Z"
+    containerImage: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-operator:0.1.1
+    createdAt: "2019-09-06T16:45:00Z"
     description: "Run IBM Block CSI Driver on OpenShift."
     repository: https://github.com/IBM/ibm-block-csi-operator
     support: IBM
@@ -31,6 +31,30 @@ metadata:
               "tag": "1.0.0_b35_origin.develop"
             }
           }
+        },
+        {
+          "apiVersion": "csi.ibm.com/v1",
+          "kind": "Config",
+          "metadata": {
+            "name": "config",
+            "namespace": "kube-system"
+          },
+          "spec": {
+            "defineHost": true,
+            "nodeAgent": {
+              "repository": "stg-artifactory.haifa.ibm.com:5030/ibm-node-agent",
+              "tag": "0.0.1",
+              "port": "10086"
+            }
+          }
+        },
+        {
+          "apiVersion": "csi.ibm.com/v1",
+          "kind": "NodeInfo",
+          "metadata": {
+            "name": "node-name"
+          },
+          "spec": {}
         }
       ]
 spec:
@@ -38,7 +62,7 @@ spec:
   description: |
     **IBM Block CSI driver** is a Container Storage Interface (CSI) Driver for IBM block storage systems which enables container orchestrators to manage the life-cycle of persistent storage.
 
-    This is the official operator to deploy and manage the CSI Driver for IBM block storage systems.
+    This is the official operator to deploy and manage IBM block storage CSI driver.
 
     Supported container platforms:
       - Openshift v4.1
@@ -52,7 +76,7 @@ spec:
 
     Supported operating systems:
       - RHEL 7.x (x86 architecture)
-      - RHCOS 7.6 (x86 architecture)
+      - RHCOS 4.1 (x86 architecture)
 
     ## Pre-requisites
     
@@ -203,14 +227,68 @@ spec:
           - description: Is the controller ready?
             displayName: Controller Ready
             path: controllerReady
+            x-descriptors:
               - 'urn:alm:descriptor:text'
           - description: Is the node ready?
             displayName: Node Ready
             path: nodeReady
+            x-descriptors:
               - 'urn:alm:descriptor:text'
           - description: The current version of the driver.
             displayName: Version
             path: version
+      - name: configs.csi.ibm.com
+        version: v1
+        group: csi.ibm.com
+        kind: Config
+        displayName: "Operator Configuration"
+        description: "Represents the configuration of the operator"
+        resources:
+          - kind: DaemonSet
+            version: apps/v1
+        specDescriptors:
+          - description: Need define host?
+            displayName: Define Host
+            path: defineHost
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:checkbox'
+          - description: Node Agent Image Repository.
+            displayName: Node Agent Image Repository
+            path: nodeAgent.repository
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
+          - description: Node Agent Image Tag.
+            displayName: Node Agent Image Tag
+            path: nodeAgent.tag
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
+          - description: Node Agent server port.
+            displayName: Node Agent Server Port
+            path: nodeAgent.port
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
+      - name: nodeinfos.csi.ibm.com
+        version: v1
+        group: csi.ibm.com
+        kind: NodeInfo
+        displayName: "Node Info"
+        description: "Represents an Node Info."
+        statusDescriptors:
+          - description: IQNs for this node.
+            displayName: IQNs
+            path: iqns
+            x-descriptors:
+              - 'urn:alm:descriptor:io.kubernetes.phase'
+          - description: WWPNs for this node
+            displayName: WWPNs
+            path: wwpns
+            x-descriptors:
+              - 'urn:alm:descriptor:text'
+          - description: Node is defined on the following storages.
+            displayName: Defined On Storages
+            path: definedOnStorages
+            x-descriptors:
+              - 'urn:alm:descriptor:text'
   install:
     strategy: deployment
     spec:
@@ -380,8 +458,6 @@ spec:
                   - ibm-block-csi-operator
                   env:
                   - name: WATCH_NAMESPACE
-                    value: ""
-                  - name: ENABLE_HOST_DEFINE
                     value: ""
                   - name: POD_NAME
                     valueFrom:

@@ -116,9 +116,14 @@ func (r *ReconcileNode) Reconcile(request reconcile.Request) (reconcile.Result, 
 		return reconcile.Result{}, nil
 	}
 
-	if os.Getenv("ENABLE_HOST_DEFINE") != "yes" {
+	if !util.IsDefineHostEnabled(r.client) {
 		reqLogger.Info("Skip reconciling Node")
 		return reconcile.Result{}, nil
+	}
+
+	if !util.IsNodeAgentReady(r.client) {
+		reqLogger.Info("Node Agent is not ready, try it later")
+		return reconcile.Result{RequeueAfter: 4 * time.Second}, nil
 	}
 
 	err = r.processNodeInfo(node)
