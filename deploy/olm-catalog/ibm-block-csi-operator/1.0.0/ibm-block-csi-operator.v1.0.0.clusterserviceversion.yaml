@@ -24,11 +24,11 @@ metadata:
           "spec": {
             "controller": {
               "repository": "stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-controller-driver",
-              "tag": "1.0.0_b35_origin.develop"
+              "tag": "1.0.0_b40_origin.develop"
             },
             "node": {
               "repository": "stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-node-driver",
-              "tag": "1.0.0_b35_origin.develop"
+              "tag": "1.0.0_b40_origin.develop"
             }
           }
         },
@@ -251,7 +251,7 @@ spec:
             displayName: Define Host
             path: defineHost
             x-descriptors:
-              - 'urn:alm:descriptor:com.tectonic.ui:checkbox'
+              - 'urn:alm:descriptor:com.tectonic.ui:booleanSwitch'
           - description: Node Agent Image Repository.
             displayName: Node Agent Image Repository
             path: nodeAgent.repository
@@ -267,6 +267,12 @@ spec:
             path: nodeAgent.port
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:text'
+        statusDescriptors:
+          - description: Node Agent Status.
+            displayName: Node Agent Status
+            path: nodeAgent.phase
+            x-descriptors:
+              - 'urn:alm:descriptor:io.kubernetes.phase'
       - name: nodeinfos.csi.ibm.com
         version: v1
         group: csi.ibm.com
@@ -452,7 +458,7 @@ spec:
                 serviceAccountName: ibm-block-csi-operator
                 containers:
                 - name: ibm-block-csi-operator
-                  image: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-operator:0.1.0
+                  image: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-operator:0.1.1
                   imagePullPolicy: IfNotPresent
                   command:
                   - ibm-block-csi-operator

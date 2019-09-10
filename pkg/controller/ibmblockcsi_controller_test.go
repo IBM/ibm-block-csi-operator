@@ -9,6 +9,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 )
@@ -54,11 +56,47 @@ var _ = Describe("Controller", func() {
 					Name:      ibcName,
 					Namespace: ns,
 				}
+
+				By("Getting IBMBlockCSI object after creation")
 				Eventually(func() (*csiv1.IBMBlockCSI, error) {
 					err := k8sClient.Get(context.Background(), key, found)
 					return found, err
 				}, timeout, interval).ShouldNot(BeNil())
 
+				By("Getting ServiceAccount")
+				sa := &corev1.ServiceAccount{}
+				saKey := types.NamespacedName{
+					Name:      config.GetNameForResource(config.CSIControllerServiceAccount, found.Name),
+					Namespace: found.Namespace,
+				}
+				Eventually(func() (*corev1.ServiceAccount, error) {
+					err := k8sClient.Get(context.Background(), saKey, sa)
+					return sa, err
+				}, timeout, interval).ShouldNot(BeNil())
+
+				By("Getting controller provisioner ClusterRole")
+				cr := &rbacv1.ClusterRole{}
+				crKey := types.NamespacedName{
+					Name:      config.GetNameForResource(config.ExternalProvisionerClusterRole, found.Name),
+					Namespace: "",
+				}
+				Eventually(func() (*rbacv1.ClusterRole, error) {
+					err := k8sClient.Get(context.Background(), crKey, cr)
+					return cr, err
+				}, timeout, interval).ShouldNot(BeNil())
+
+				By("Getting controller provisioner ClusterRoleBinding")
+				crb := &rbacv1.ClusterRoleBinding{}
+				crbKey := types.NamespacedName{
+					Name:      config.GetNameForResource(config.ExternalProvisionerClusterRoleBinding, found.Name),
+					Namespace: "",
+				}
+				Eventually(func() (*rbacv1.ClusterRoleBinding, error) {
+					err := k8sClient.Get(context.Background(), crbKey, crb)
+					return crb, err
+				}, timeout, interval).ShouldNot(BeNil())
+
+				By("Getting controller StatefulSet")
 				controller := &appsv1.StatefulSet{}
 				controllerKey := types.NamespacedName{
 					Name:      config.GetNameForResource(config.CSIController, found.Name),
@@ -68,6 +106,19 @@ var _ = Describe("Controller", func() {
 					err := k8sClient.Get(context.Background(), controllerKey, controller)
 					return controller, err
 				}, timeout, interval).ShouldNot(BeNil())
+
+				// securityContext.privileged: Forbidden: disallowed by cluster policy
+				// enable this check after the test cluster support running privileged contianers.
+				//				By("Getting node DaemonSet")
+				//				node := &appsv1.DaemonSet{}
+				//				nodeKey := types.NamespacedName{
+				//					Name:      config.GetNameForResource(config.CSINode, found.Name),
+				//					Namespace: found.Namespace,
+				//				}
+				//				Eventually(func() (*appsv1.DaemonSet, error) {
+				//					err := k8sClient.Get(context.Background(), nodeKey, node)
+				//					return node, err
+				//				}, timeout, interval).ShouldNot(BeNil())
 
 				close(done)
 			}, timeout.Seconds())

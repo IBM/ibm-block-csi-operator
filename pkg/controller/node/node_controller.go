@@ -39,6 +39,7 @@ import (
 	csiv1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/controller/predicate"
+	controllerutil "github.com/IBM/ibm-block-csi-operator/pkg/controller/util"
 	nodeclient "github.com/IBM/ibm-block-csi-operator/pkg/node/client"
 	pb "github.com/IBM/ibm-block-csi-operator/pkg/node/nodeagent"
 	"github.com/IBM/ibm-block-csi-operator/pkg/util"
@@ -116,12 +117,12 @@ func (r *ReconcileNode) Reconcile(request reconcile.Request) (reconcile.Result, 
 		return reconcile.Result{}, nil
 	}
 
-	if !util.IsDefineHostEnabled(r.client) {
+	if !controllerutil.IsDefineHostEnabled(r.client) {
 		reqLogger.Info("Skip reconciling Node")
 		return reconcile.Result{}, nil
 	}
 
-	if !util.IsNodeAgentReady(r.client) {
+	if !controllerutil.IsNodeAgentReady(r.client) {
 		reqLogger.Info("Node Agent is not ready, try it later")
 		return reconcile.Result{RequeueAfter: 4 * time.Second}, nil
 	}

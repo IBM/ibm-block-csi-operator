@@ -39,8 +39,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
+	controllerutil "github.com/IBM/ibm-block-csi-operator/pkg/controller/util"
 	"github.com/IBM/ibm-block-csi-operator/pkg/storageagent"
-	"github.com/IBM/ibm-block-csi-operator/pkg/util"
 )
 
 var log = logf.Log.WithName("controller_volumeattachment")
@@ -115,7 +115,7 @@ func (r *ReconcileVolumeAttachment) Reconcile(request reconcile.Request) (reconc
 		return reconcile.Result{}, nil
 	}
 
-	if !util.IsDefineHostEnabled(r.client) {
+	if !controllerutil.IsDefineHostEnabled(r.client) {
 		reqLogger.Info("Skip reconciling VolumeAttachment")
 		return reconcile.Result{}, nil
 	}
