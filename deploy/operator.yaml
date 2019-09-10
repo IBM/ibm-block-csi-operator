@@ -23,8 +23,6 @@ spec:
         env:
         - name: WATCH_NAMESPACE
           value: ""
-        - name: ENABLE_HOST_DEFINE
-          value: ""
         - name: POD_NAME
           valueFrom:
             fieldRef:
