@@ -1,0 +1,27 @@
+FROM golang:1.12.6
+
+WORKDIR /go/src/github.com/IBM/ibm-block-csi-operator/
+COPY . .
+RUN CGO_ENABLED=1 GOOS=linux go build \
+    -o build/_output/bin/ibm-block-csi-operator \
+    -gcflags all=-trimpath=${GOPATH} \
+	-asmflags all=-trimpath=${GOPATH} \
+	# -mod=vendor \
+	github.com/IBM/ibm-block-csi-operator/cmd/manager
+
+
+FROM registry.access.redhat.com/ubi7/ubi-minimal:7.7-98
+
+ENV OPERATOR=/usr/local/bin/ibm-block-csi-operator \
+    USER_UID=1001 \
+    USER_NAME=ibm-block-csi-operator
+
+# install operator binary
+COPY --from=0 /go/src/github.com/IBM/ibm-block-csi-operator/build/_output/bin/ibm-block-csi-operator ${OPERATOR}
+
+COPY build/bin /usr/local/bin
+RUN  /usr/local/bin/user_setup
+
+ENTRYPOINT ["/usr/local/bin/entrypoint"]
+
+USER ${USER_UID}
