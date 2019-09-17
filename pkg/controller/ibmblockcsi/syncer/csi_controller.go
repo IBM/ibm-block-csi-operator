@@ -133,9 +133,6 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 
 	// csi attacher sidecar
 	attacherImage := config.CSIAttacherImage
-	if s.driver.ServerVersion == "1.13" {
-		attacherImage = config.CSIAttacherImage_1_13
-	}
 	attacher := s.ensureContainer(attacherContainerName,
 		attacherImage,
 		[]string{"--csi-address=$(ADDRESS)", "--v=5"},

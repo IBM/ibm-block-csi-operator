@@ -231,10 +231,10 @@ func (s *csiNodeSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 				Name:      "device-dir",
 				MountPath: "/dev",
 			},
-			{
-				Name:      "iscsi-dir",
-				MountPath: "/etc/iscsi",
-			},
+			//{
+			//	Name:      "iscsi-dir",
+			//	MountPath: "/etc/iscsi",
+			//},
 			{
 				Name:      "sys-dir",
 				MountPath: "/sys",
@@ -275,7 +275,7 @@ func (s *csiNodeSyncer) ensureVolumes() []corev1.Volume {
 		ensureVolume("socket-dir", ensureHostPathVolumeSource("/var/lib/kubelet/plugins/ibm-block-csi-driver", "DirectoryOrCreate")),
 		ensureVolume("registration-dir", ensureHostPathVolumeSource("/var/lib/kubelet/plugins_registry", "Directory")),
 		ensureVolume("device-dir", ensureHostPathVolumeSource("/dev", "Directory")),
-		ensureVolume("iscsi-dir", ensureHostPathVolumeSource("/etc/iscsi", "Directory")),
+		// ensureVolume("iscsi-dir", ensureHostPathVolumeSource("/etc/iscsi", "Directory")),
 		ensureVolume("sys-dir", ensureHostPathVolumeSource("/sys", "Directory")),
 		ensureVolume("host-dir", ensureHostPathVolumeSource("/", "Directory")),
 	}

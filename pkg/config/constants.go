@@ -21,7 +21,7 @@ const (
 	APIGroup    = "csi.ibm.com"
 	APIVersion  = "v1"
 	Name        = "ibm-block-csi-operator"
-	DriverName  = "ibm-block-csi-driver"
+	DriverName  = "block.csi.ibm.com"
 	ProductName = "ibm-block-csi"
 	DeployPath  = "/deploy"
 	Masterlabel = "node-role.kubernetes.io/master"
