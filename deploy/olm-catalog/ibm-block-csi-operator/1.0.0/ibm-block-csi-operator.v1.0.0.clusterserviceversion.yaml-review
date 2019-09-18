@@ -60,35 +60,34 @@ metadata:
 spec:
   displayName: "Operator for IBM block storage CSI driver"
   description: |
-    **IBM Block CSI driver** is a Container Storage Interface (CSI) Driver for IBM block storage systems which enables container orchestrators to manage the life-cycle of persistent storage.
+    **IBM Block storage CSI driver** is a Container Storage Interface (CSI) Driver for IBM block storage systems which enables container orchestrators to manage the life cycle of persistent storage.
 
     This is the official operator to deploy and manage IBM block storage CSI driver.
 
     Supported container platforms:
-      - Openshift v4.1
+      - OpenShift v4.1
       - Kubernetes v1.13
 
     Supported IBM storage systems:
       - IBM FlashSystem 9100
       - IBM Spectrum Virtualize
       - IBM Storwize
-      - IBM FlashSystem A9000\R
+      - IBM FlashSystem A9000/R
 
     Supported operating systems:
       - RHEL 7.x (x86 architecture)
       - RHCOS 4.1 (x86 architecture)
 
-    ## Pre-requisites
+    ## Prerequisites
     
     ### Worker nodes preparation
     Perform these steps for each worker node in OpenShift:
     
-    ### 1. Install Linux packages to ensure Fibre Channel and iSCSI connectivity
-    Skip this step, if the packages are already installed.
+    ### 1. Install Linux packages to ensure Fibre Channel and iSCSI connectivity.
+    Skip this step if the packages are already installed.
     
     RHEL 7.x:
     ```bash
-    $ yum -y install sg3_utils
     $ yum -y install iscsi-initiator-utils   # only if iSCSI connectivity is required
     $ yum -y install xfsprogs                # Only if xfs filesystem is required.
     ```
@@ -113,7 +112,7 @@ spec:
     #### 3. Configure storage system connectivity.
     3.1. Define the hostname of each OpenShift worker node on the relevant storage systems with the valid WWPN or IQN of the node.
     
-    3.2. For Fiber Chanel, configure the relevant zoning from the storage to the host.
+    3.2. For Fibre Channel, configure the relevant zoning from the storage to the host.
     
     3.3. For iSCSI, perform these three steps.
     
@@ -128,7 +127,7 @@ spec:
     $ iscsiadm -m node -p ${storage system iSCSI port IP/hostname} --login
     ```
     
-    3.3.3. Verify that the login was successful and display all targets that you logged in. The portal value must be the iSCSI target IP address.
+    3.3.3. Verify that the login was successful and display all targets that you logged into. The portal value must be the iSCSI target IP address.
     
     ```bash
     $ iscsiadm -m session --rescan
@@ -136,9 +135,9 @@ spec:
     portal: {storage system iSCSI port IP},{port number}
     ```
 
-    ### Install CSIDriver CRD
+    ### Install the CSIDriver CRD
     Enabling CSIDriver on OpenShift
-    1. Enable Technology Preview features using feature gates, more details, please refer to https://docs.openshift.com/container-platform/4.1/nodes/clusters/nodes-cluster-enabling-features.html
+    1. Enable Technology Preview features using feature gates. For more details, refer to https://docs.openshift.com/container-platform/4.1/nodes/clusters/nodes-cluster-enabling-features.html
     2. Install the CSIDriver CRD on the OpenShift cluster with the following command:
 
        ```bash
