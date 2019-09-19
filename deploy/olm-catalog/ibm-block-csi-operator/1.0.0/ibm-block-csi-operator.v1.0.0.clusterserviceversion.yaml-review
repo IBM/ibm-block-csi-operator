@@ -9,7 +9,7 @@ metadata:
     certified: "false"
     containerImage: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-operator:0.1.1
     createdAt: "2019-09-06T16:45:00Z"
-    description: "Run IBM Block CSI Driver on OpenShift."
+    description: "Run IBM block storage CSI driver on OpenShift."
     repository: https://github.com/IBM/ibm-block-csi-operator
     support: IBM
     alm-examples: >-
@@ -183,8 +183,8 @@ spec:
         version: v1
         group: csi.ibm.com
         kind: IBMBlockCSI
-        displayName: "IBM Block CSI Driver"
-        description: "Represents an IBM Block CSI Driver"
+        displayName: "IBM block storage CSI driver"
+        description: "Represents an block storage CSI driver"
         resources:
           - kind: ServiceAccount
             version: v1
@@ -240,8 +240,8 @@ spec:
         version: v1
         group: csi.ibm.com
         kind: Config
-        displayName: "Operator Configuration"
-        description: "Represents the configuration of the operator"
+        displayName: "Operator configuration"
+        description: "Represents the configuration of the operator."
         resources:
           - kind: DaemonSet
             version: apps/v1
@@ -276,8 +276,8 @@ spec:
         version: v1
         group: csi.ibm.com
         kind: NodeInfo
-        displayName: "Node Info"
-        description: "Represents an Node Info."
+        displayName: "Node information"
+        description: "Represents information for a worker node."
         statusDescriptors:
           - description: IQNs for this node.
             displayName: IQNs
