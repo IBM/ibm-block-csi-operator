@@ -40,7 +40,7 @@ const (
 	ControllerLivenessProbeContainerSocketVolumeMountPath = "/csi"
 	ControllerSocketPath                                  = "/var/lib/csi/sockets/pluginproxy/csi.sock"
 	NodeSocketPath                                        = "/csi/csi.sock"
-	NodeRegistrarSocketPath                               = "/var/lib/kubelet/plugins/ibm-block-csi-driver/csi.sock"
+	NodeRegistrarSocketPath                               = "/var/lib/kubelet/plugins/block.csi.ibm.com/csi.sock"
 	CSIEndpoint                                           = "unix:///var/lib/csi/sockets/pluginproxy/csi.sock"
 	CSINodeEndpoint                                       = "unix:///csi/csi.sock"
 )
