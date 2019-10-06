@@ -84,7 +84,7 @@ $ kubectl delete -f ibc.yaml
 ```
 
 ### 2. Delete the operator
-<!-- $ kubectl delete CSIDriver ibm-block-csi-driver -->
+<!-- $ kubectl delete CSI operator and driver -->
 ```bash
 $ kubectl delete -f deploy/ibm-block-csi-operator.yaml
 ```

@@ -3,6 +3,9 @@ kind: Deployment
 metadata:
   name: ibm-block-csi-operator
   namespace: kube-system
+  labels:
+    product: ibm-block-csi-driver
+    csi: ibm
 spec:
   replicas: 1
   selector:
@@ -12,6 +15,8 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: ibm-block-csi-operator
+        product: ibm-block-csi-driver
+        csi: ibm
     spec:
       serviceAccountName: ibm-block-csi-operator
       containers:

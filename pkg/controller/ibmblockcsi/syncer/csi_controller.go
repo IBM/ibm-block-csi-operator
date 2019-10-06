@@ -143,7 +143,6 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		config.CSILivenessProbeImage,
 		[]string{
 			"--csi-address=/csi/csi.sock",
-			"--connection-timeout=3s",
 		},
 	)
 

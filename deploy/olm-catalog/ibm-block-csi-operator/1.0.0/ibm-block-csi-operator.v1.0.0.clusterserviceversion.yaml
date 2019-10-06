@@ -136,15 +136,6 @@ spec:
     portal: {storage system iSCSI port IP},{port number}
     ```
 
-    ### Install CSIDriver CRD
-    Enabling CSIDriver on OpenShift
-    1. Enable Technology Preview features using feature gates, more details, please refer to https://docs.openshift.com/container-platform/4.1/nodes/clusters/nodes-cluster-enabling-features.html
-    2. Install the CSIDriver CRD on the OpenShift cluster with the following command:
-
-       ```bash
-       $ oc create -f https://raw.githubusercontent.com/kubernetes/csi-api/master/pkg/crd/manifests/csidriver.yaml
-       ```
-
   keywords:
     - IBM
     - BlockStorage

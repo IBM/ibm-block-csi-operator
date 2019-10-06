@@ -2,7 +2,7 @@
 apiVersion: storage.k8s.io/v1beta1
 kind: CSIDriver
 metadata:
-  name: ibm-block-csi-driver
+  name: block.csi.ibm.com
 spec:
   attachRequired: true
   podInfoOnMount: false

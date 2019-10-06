@@ -147,7 +147,6 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 		config.CSILivenessProbeImage,
 		[]string{
 			"--csi-address=/csi/csi.sock",
-			"--connection-timeout=3s",
 		},
 	)
 
@@ -231,10 +230,6 @@ func (s *csiNodeSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 				Name:      "device-dir",
 				MountPath: "/dev",
 			},
-			//{
-			//	Name:      "iscsi-dir",
-			//	MountPath: "/etc/iscsi",
-			//},
 			{
 				Name:      "sys-dir",
 				MountPath: "/sys",

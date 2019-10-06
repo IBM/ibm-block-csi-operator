@@ -264,7 +264,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   creationTimestamp: null
-  name: ibm-block-csi-operator
+  name: ibm-block-csi-operator # TODO why needed here if already has dedicated file?
 rules:
 - apiGroups:
   - ""
