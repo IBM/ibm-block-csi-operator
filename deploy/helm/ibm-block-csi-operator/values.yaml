@@ -1,6 +1,6 @@
 nodeAgent:
   image:
-    repository: stg-artifactory.haifa.ibm.com:5030/ibm-node-agent
+    repository: ibmcom/ibm-node-agent
     tag: "0.0.1"
     pullPolicy: IfNotPresent
   address: ":10086"
@@ -8,14 +8,14 @@ nodeAgent:
 
 operator:
   image:
-    repository: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-operator
-    tag: "0.1.0"
+    repository: ibmcom/ibm-block-csi-operator
+    tag: "1.0.0"
     pullPolicy: IfNotPresent
   endpoint: "unix:///storage/storage.sock:10086"
   enableHostDefine: "no"
 
 storageAgent:
   image:
-    repository: stg-artifactory.haifa.ibm.com:5030/ibm-storage-agent
+    repository: ibmcom/ibm-storage-agent
     tag: "0.0.4"
     pullPolicy: IfNotPresent

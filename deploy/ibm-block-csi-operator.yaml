@@ -225,7 +225,7 @@ spec:
       serviceAccountName: ibm-block-csi-operator
       containers:
       - name: ibm-block-csi-operator
-        image: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-operator:0.1.0
+        image: ibmcom/ibm-block-csi-operator:1.0.0
         imagePullPolicy: IfNotPresent
         command:
         - ibm-block-csi-operator
@@ -246,7 +246,7 @@ spec:
         - name: socket-dir
           mountPath: /storage/
       - name: ibm-storage-agent
-        image: stg-artifactory.haifa.ibm.com:5030/ibm-storage-agent:0.0.4
+        image: ibmcom/ibm-storage-agent:0.0.4
         imagePullPolicy: IfNotPresent
         env:
         - name: ENDPOINT
