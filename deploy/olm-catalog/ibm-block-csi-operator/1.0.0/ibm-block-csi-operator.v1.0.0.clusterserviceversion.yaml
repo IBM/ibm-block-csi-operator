@@ -264,7 +264,7 @@ spec:
             path: nodeAgent.phase
             x-descriptors:
               - 'urn:alm:descriptor:io.kubernetes.phase'
-      - name: nodeinfos.csi.ibm.com
+      - name: nodeinfos.block.csi.ibm.com
         version: v1
         group: csi.ibm.com
         kind: NodeInfo
