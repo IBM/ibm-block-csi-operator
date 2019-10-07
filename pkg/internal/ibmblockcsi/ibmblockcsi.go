@@ -49,6 +49,8 @@ func (c *IBMBlockCSI) GetAnnotations() labels.Set {
 		"app.kubernetes.io/instance":   c.Name,
 		"app.kubernetes.io/version":    csiversion.Version,
 		"app.kubernetes.io/managed-by": config.Name,
+		"app.kubernetes.io/component":  config.Component
+		"app.kubernetes.io/part-of":    config.PartOf
 	}
 
 	if c.Annotations != nil {
