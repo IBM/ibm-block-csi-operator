@@ -147,7 +147,6 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 		config.CSILivenessProbeImage,
 		[]string{
 			"--csi-address=/csi/csi.sock",
-			"--connection-timeout=3s",
 		},
 	)
 
@@ -231,10 +230,6 @@ func (s *csiNodeSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 				Name:      "device-dir",
 				MountPath: "/dev",
 			},
-			//{
-			//	Name:      "iscsi-dir",
-			//	MountPath: "/etc/iscsi",
-			//},
 			{
 				Name:      "sys-dir",
 				MountPath: "/sys",
@@ -272,10 +267,9 @@ func (s *csiNodeSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 func (s *csiNodeSyncer) ensureVolumes() []corev1.Volume {
 	return []corev1.Volume{
 		ensureVolume("mountpoint-dir", ensureHostPathVolumeSource("/var/lib/kubelet/pods", "Directory")),
-		ensureVolume("socket-dir", ensureHostPathVolumeSource("/var/lib/kubelet/plugins/ibm-block-csi-driver", "DirectoryOrCreate")),
+		ensureVolume("socket-dir", ensureHostPathVolumeSource("/var/lib/kubelet/plugins/block.csi.ibm.com", "DirectoryOrCreate")),
 		ensureVolume("registration-dir", ensureHostPathVolumeSource("/var/lib/kubelet/plugins_registry", "Directory")),
 		ensureVolume("device-dir", ensureHostPathVolumeSource("/dev", "Directory")),
-		// ensureVolume("iscsi-dir", ensureHostPathVolumeSource("/etc/iscsi", "Directory")),
 		ensureVolume("sys-dir", ensureHostPathVolumeSource("/sys", "Directory")),
 		ensureVolume("host-dir", ensureHostPathVolumeSource("/", "Directory")),
 	}

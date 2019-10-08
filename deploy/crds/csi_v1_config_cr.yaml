@@ -5,7 +5,7 @@ metadata:
 spec:
   defineHost: true
   nodeAgent:
-    repository: stg-artifactory.haifa.ibm.com:5030/ibm-node-agent
+    repository: ibmcom/ibm-node-agent
     tag: "0.0.1"
     port: "10086"
 

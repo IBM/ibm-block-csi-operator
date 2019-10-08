@@ -7,7 +7,7 @@ metadata:
     capabilities: "Full Lifecycle"
     categories: "Storage,Cloud Provider"
     certified: "false"
-    containerImage: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-operator:0.1.1
+    containerImage: ibmcom/ibm-block-csi-operator:1.0.0
     createdAt: "2019-09-06T16:45:00Z"
     description: "Run IBM block storage CSI driver on OpenShift."
     repository: https://github.com/IBM/ibm-block-csi-operator
@@ -23,12 +23,12 @@ metadata:
           },
           "spec": {
             "controller": {
-              "repository": "stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-controller-driver",
-              "tag": "1.0.0_b40_origin.develop"
+              "repository": "ibmcom/ibm-block-csi-driver-controller",
+              "tag": "1.0.0"
             },
             "node": {
-              "repository": "stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-node-driver",
-              "tag": "1.0.0_b40_origin.develop"
+              "repository": "ibmcom/ibm-block-csi-driver-node",
+              "tag": "1.0.0"
             }
           }
         },
@@ -42,7 +42,7 @@ metadata:
           "spec": {
             "defineHost": true,
             "nodeAgent": {
-              "repository": "stg-artifactory.haifa.ibm.com:5030/ibm-node-agent",
+              "repository": "ibmcom/ibm-node-agent",
               "tag": "0.0.1",
               "port": "10086"
             }
@@ -134,15 +134,6 @@ spec:
     Rescanning session [sid: 1, target: {storage system IQN},
     portal: {storage system iSCSI port IP},{port number}
     ```
-
-    ### Install the CSIDriver CRD
-    Enabling CSIDriver on OpenShift
-    1. Enable Technology Preview features using feature gates. For more details, refer to https://docs.openshift.com/container-platform/4.1/nodes/clusters/nodes-cluster-enabling-features.html
-    2. Install the CSIDriver CRD on the OpenShift cluster with the following command:
-
-       ```bash
-       $ oc create -f https://raw.githubusercontent.com/kubernetes/csi-api/master/pkg/crd/manifests/csidriver.yaml
-       ```
 
   keywords:
     - IBM
@@ -457,7 +448,7 @@ spec:
                 serviceAccountName: ibm-block-csi-operator
                 containers:
                 - name: ibm-block-csi-operator
-                  image: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-operator:0.1.1
+                  image: ibmcom/ibm-block-csi-operator:1.0.0
                   imagePullPolicy: IfNotPresent
                   command:
                   - ibm-block-csi-operator
@@ -478,7 +469,7 @@ spec:
                   - name: socket-dir
                     mountPath: /storage/
                 - name: ibm-storage-agent
-                  image: stg-artifactory.haifa.ibm.com:5030/ibm-storage-agent:0.0.4
+                  image: ibmcom/ibm-storage-agent:0.0.4
                   imagePullPolicy: IfNotPresent
                   env:
                   - name: ENDPOINT
