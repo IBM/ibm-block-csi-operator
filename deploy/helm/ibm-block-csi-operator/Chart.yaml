@@ -1,5 +1,0 @@
-name: ibm-block-csi-operator
-version: 1.0.0
-kubeVersion: ">=1.13.0"
-description: A Helm chart for IBM Block CSI Driver Operator
-appVersion: 1.0.0
