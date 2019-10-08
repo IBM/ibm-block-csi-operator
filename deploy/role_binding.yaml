@@ -2,6 +2,9 @@ kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: ibm-block-csi-operator
+  labels:
+    product: ibm-block-csi-driver
+    csi: ibm
 subjects:
 - kind: ServiceAccount
   name: ibm-block-csi-operator

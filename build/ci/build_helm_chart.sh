@@ -30,9 +30,8 @@ function cleanup_helm()
 }
 
 PRODUCTION_BUILD=yes
-CHART_REPOSITORY="https://stg-artifactory.haifa.ibm.com/artifactory/chart-repo"
 
-if [ -z $CHART_REPOSITORY ]; then
+if [ -z "$CHART_REPOSITORY" ]; then
   echo "Warning: Set CHART_REPOSITORY if you want to build and upload Ubiquity helm chart!"
   exit 0
 fi

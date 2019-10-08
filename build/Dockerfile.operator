@@ -6,11 +6,10 @@ RUN CGO_ENABLED=1 GOOS=linux go build \
     -o build/_output/bin/ibm-block-csi-operator \
     -gcflags all=-trimpath=${GOPATH} \
 	-asmflags all=-trimpath=${GOPATH} \
-	# -mod=vendor \
 	github.com/IBM/ibm-block-csi-operator/cmd/manager
 
 
-FROM registry.access.redhat.com/ubi7/ubi-minimal:7.7-98
+FROM registry.access.redhat.com/ubi8/ubi-minimal:8.0-208
 
 ENV OPERATOR=/usr/local/bin/ibm-block-csi-operator \
     USER_UID=1001 \

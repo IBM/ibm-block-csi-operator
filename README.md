@@ -47,11 +47,11 @@ metadata:
   namespace: kube-system
 spec:
   controller:
-    repository: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-controller-driver
-    tag: "1.0.0_b40_origin.develop"
+    repository: ibmcom/ibm-block-csi-driver-controller
+    tag: "1.0.0"
   node:
-    repository: stg-artifactory.haifa.ibm.com:5030/ibm-block-csi-node-driver
-    tag: "1.0.0_b40_origin.develop"
+    repository: ibmcom/ibm-block-csi-driver-node
+    tag: "1.0.0"
 ```
 
 2. Apply it:
@@ -84,7 +84,7 @@ $ kubectl delete -f ibc.yaml
 ```
 
 ### 2. Delete the operator
-<!-- $ kubectl delete CSIDriver ibm-block-csi-driver -->
+<!-- $ kubectl delete CSI operator and driver -->
 ```bash
 $ kubectl delete -f deploy/ibm-block-csi-operator.yaml
 ```
