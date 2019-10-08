@@ -23,8 +23,6 @@ const (
 	Name        = "ibm-block-csi-operator"
 	DriverName  = "block.csi.ibm.com"
 	ProductName = "ibm-block-csi-driver"
-	Component   = "Operator"
-	PartOf      = "IBM Block CSI Driver"
 	DeployPath  = "/deploy"
 	Masterlabel = "node-role.kubernetes.io/master"
 

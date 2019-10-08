@@ -3,6 +3,9 @@ kind: ClusterRole
 metadata:
   creationTimestamp: null
   name: ibm-block-csi-operator
+  labels:
+    product: ibm-block-csi-driver
+    csi: ibm
 rules:
 - apiGroups:
   - ""
