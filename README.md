@@ -4,8 +4,8 @@ The Container Storage Interface (CSI) Driver for IBM block storage systems enabl
 This is the official operator to deploy and manage IBM block storage CSI driver.
 
 Supported container platforms:
-  - OpenShift v4.1
-  - Kubernetes v1.13
+  - OpenShift v4.2+
+  - Kubernetes v1.14+
 
 Supported operating systems:
   - RHEL 7.x (x86 architecture)
