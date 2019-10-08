@@ -1,18 +1,18 @@
 # Operator for IBM block storage CSI driver
-The Container Storage Interface (CSI) Driver for IBM block storage systems enables container orchestrators such as Kubernetes to manage the life-cycle of persistent storage.
+The Container Storage Interface (CSI) Driver for IBM block storage systems enables container orchestrators such as Kubernetes to manage the life cycle of persistent storage.
 
 This is the official operator to deploy and manage IBM block storage CSI driver.
 
 Supported container platforms:
-  - Openshift v4.1
+  - OpenShift v4.1
   - Kubernetes v1.13
 
 Supported operating systems:
   - RHEL 7.x (x86 architecture)
   - RHCOS 4.1 (x86 architecture)
 
-## Prerequisite
-Please go to section [`Prerequisites for Driver Installation`](https://github.com/IBM/ibm-block-csi-driver#prerequisites-for-driver-installation) for details.
+## Prerequisites
+Please see [`Prerequisites for Driver Installation`](https://github.com/IBM/ibm-block-csi-driver#prerequisites-for-driver-installation) for details.
 
 ## Installation
 
@@ -21,15 +21,15 @@ Please go to section [`Prerequisites for Driver Installation`](https://github.co
 ```bash
 curl https://raw.githubusercontent.com/IBM/ibm-block-csi-operator/develop/deploy/ibm-block-csi-operator.yaml > ibm-block-csi-operator.yaml
 ```
-2. Update the image fields in the ibm-block-csi-operator.yaml if the default values are not fit for you.
-3. Install the operator
+2. (Optional): If required, update the image fields in the ibm-block-csi-operator.yaml.
+3. Install the operator.
 
 <!-- $ kubectl apply -f csi_driver.yaml  (download and install csi_driver.yaml only if you are using Kubernetes v.1.14+) -->
 ```bash
 $ kubectl apply -f ibm-block-csi-operator.yaml
 ```
 
-### Verify operator is running:
+### Verify the operator is running:
 
 ```bash
 $ kubectl get pod -l app.kubernetes.io/name=ibm-block-csi-operator -n kube-system
@@ -38,7 +38,7 @@ ibm-block-csi-operator-5bb7996b86-xntss 2/2     Running   0          10m
 ```
 
 ### Create an IBMBlockCSI custom resource
-1. Create an IBMBlockCSI yaml file (ibc.yaml) as following and update the repository and tag if the default values are not fit for you:
+1. Create an IBMBlockCSI yaml file (ibc.yaml). If required, update the repository and tag values.
 ```
 apiVersion: csi.ibm.com/v1
 kind: IBMBlockCSI
@@ -54,13 +54,13 @@ spec:
     tag: "1.0.0_b40_origin.develop"
 ```
 
-2. Apply it:
+2. Apply the ibc.yaml file.
 
 ```bash
 $ kubectl apply -f ibc.yaml
 ```
 
-### Verify driver is running:
+### Verify the driver is running:
 
 ```bash
 $ kubectl get -n kube-system pod --selector=app=ibm-block-csi-controller
@@ -74,16 +74,16 @@ ibm-block-csi-node-zgh5h   3/3     Running   0          10m
 
 ```
 
-> **Note**: For further usage, please go to https://github.com/IBM/ibm-block-csi-driver
+> **Note**: For further usage details, refer to https://github.com/IBM/ibm-block-csi-driver
 
-## Uninstallation
+## Uninstalling
 
-### 1. Delete the IBMBlockCSI custom resource
+### 1. Delete the IBMBlockCSI custom resource.
 ```bash
 $ kubectl delete -f ibc.yaml
 ```
 
-### 2. Delete the operator
+### 2. Delete the operator.
 <!-- $ kubectl delete CSIDriver ibm-block-csi-driver -->
 ```bash
 $ kubectl delete -f deploy/ibm-block-csi-operator.yaml
