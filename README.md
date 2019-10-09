@@ -19,7 +19,7 @@ Please see [`Prerequisites for Driver Installation`](https://github.com/IBM/ibm-
 ### Install the operator
 1. Download the manifest from GitHub.
 ```bash
-curl https://raw.githubusercontent.com/IBM/ibm-block-csi-operator/develop/deploy/ibm-block-csi-operator.yaml > ibm-block-csi-operator.yaml
+curl https://raw.githubusercontent.com/IBM/ibm-block-csi-operator/develop/deploy/installer/generated/ibm-block-csi-operator.yaml > ibm-block-csi-operator.yaml
 ```
 2. (Optional): If required, update the image fields in the ibm-block-csi-operator.yaml.
 3. Install the operator.
