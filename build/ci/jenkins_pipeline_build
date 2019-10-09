@@ -6,8 +6,7 @@ pipeline {
         stage ('Run unit tests') {
             steps {
                 sh 'mkdir -p build/_output/reports && chmod 777 build/_output/reports'
-                sh 'go get github.com/onsi/ginkgo/ginkgo'
-                sh 'make test'
+                sh './build/ci/run_unittests.sh'
             }
         }
         stage ('Build and push images') {
