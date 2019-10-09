@@ -5,7 +5,8 @@ pipeline {
     stages {
         stage ('Run unit tests') {
             steps {
-				sh 'mkdir -p build/_output/reports && chmod 777 build/_output/reports'
+                sh 'mkdir -p build/_output/reports && chmod 777 build/_output/reports'
+                sh 'go get github.com/onsi/ginkgo/ginkgo'
                 sh 'make test'
             }
         }
@@ -18,7 +19,7 @@ pipeline {
     post {
         always {
             sh 'ls -la build/_output/reports/'
-            junit 'build/reports/*.xml'
+            // junit 'build/reports/*.xml'
             archiveArtifacts 'build/_output/reports/images_url'
             sh '[ -d build/_output/reports ] && rm -rf build/_output/reports'
             script {
