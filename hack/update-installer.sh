@@ -80,11 +80,12 @@ done
 os=`uname`
 # arch=`uname -i`
 
-if [[ os == "Darwin" ]]
+if [[ $os == "Darwin" ]]
 then
     sed -i '' -e '$d' $TARGET_FILE
     sed -i '' -e '$d' $TARGET_FILE
-elif [[ os == "Linux" ]]
+elif [[ $os == "Linux" ]]
+then
     sed -i '$d' $TARGET_FILE
     sed -i '$d' $TARGET_FILE
 fi
