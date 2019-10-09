@@ -5,12 +5,12 @@ pipeline {
     stages {
         stage ('Run unit tests') {
             steps {
+				sh 'mkdir -p build/_output/reports && chmod 777 build/_output/reports'
                 sh 'make test'
             }
         }
         stage ('Build and push images') {
             steps {
-				sh 'mkdir -p build/_output/reports && chmod 777 build/_output/reports'
                 sh './build/ci/build_image.sh build/_output/reports/images_url'
             }
         }
