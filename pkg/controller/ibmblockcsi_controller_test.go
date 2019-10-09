@@ -31,7 +31,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-var _ = Describe("Controller", func() {
+var _ = PDescribe("Controller", func() {
 
 	const timeout = time.Second * 30
 	const interval = time.Second * 1
