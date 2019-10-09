@@ -14,7 +14,7 @@
 
 FROM golang:1.12.6
 
-WORKDIR /go/src/github.com/ibm/ibm-block-csi-operator
+WORKDIR /go/src/github.com/IBM/ibm-block-csi-operator
 # ENV GO111MODULE=on
 
 RUN go get github.com/onsi/ginkgo/ginkgo
