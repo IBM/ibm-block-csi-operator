@@ -18,7 +18,7 @@ all: test
 
 .PHONY: test
 test: update
-	ginkgo -r
+	ginkgo -r -skipPackage pkg/controller
 
 .PHONY: update
 update:
