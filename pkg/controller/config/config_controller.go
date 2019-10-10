@@ -44,11 +44,17 @@ import (
 // ReconcileTime is the delay between reconciliations
 const ReconcileTime = 30 * time.Second
 
-var log = logf.Log.WithName("controller_config")
+var log = logf.Log.WithName("config_controller")
 
 // Add creates a new Config Controller and adds it to the Manager. The Manager will set fields on the Controller
 // and Start it when the Manager is Started.
 func Add(mgr manager.Manager) error {
+
+	if !controllerutil.IsDefineHostEnabled(mgr.GetClient()) {
+		log.Info("Skip config_controller")
+		return nil
+	}
+
 	return add(mgr, newReconciler(mgr))
 }
 

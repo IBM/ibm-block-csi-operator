@@ -3,80 +3,6 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: configs.csi.ibm.com
-spec:
-  group: csi.ibm.com
-  names:
-    kind: Config
-    listKind: ConfigList
-    plural: configs
-    singular: config
-  scope: Namespaced
-  subresources:
-    status: {}
-  validation:
-    openAPIV3Schema:
-      properties:
-        apiVersion:
-          description: 'APIVersion defines the versioned schema of this representation
-            of an object. Servers should convert recognized schemas to the latest
-            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
-          type: string
-        kind:
-          description: 'Kind is a string value representing the REST resource this
-            object represents. Servers may infer this from the endpoint the client
-            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
-          type: string
-        metadata:
-          type: object
-        spec:
-          properties:
-            defineHost:
-              type: boolean
-            nodeAgent:
-              properties:
-                port:
-                  description: The port of the node agent server
-                  type: string
-                repository:
-                  description: The repository of the node agent image
-                  type: string
-                tag:
-                  description: The tag of the node agent image
-                  type: string
-              required:
-              - repository
-              - tag
-              - port
-              type: object
-          required:
-          - defineHost
-          - nodeAgent
-          type: object
-        status:
-          properties:
-            nodeAgent:
-              description: Phase is the driver running phase
-              properties:
-                phase:
-                  description: Phase is the NodeAgent running phase
-                  type: string
-              required:
-              - phase
-              type: object
-          required:
-          - nodeAgent
-          type: object
-  version: v1
-  versions:
-  - name: v1
-    served: true
-    storage: true
-
----
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
   name: ibmblockcsis.csi.ibm.com
 spec:
   group: csi.ibm.com
@@ -164,62 +90,6 @@ spec:
     storage: true
 
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: nodeinfos.csi.ibm.com
-spec:
-  group: csi.ibm.com
-  names:
-    kind: NodeInfo
-    listKind: NodeInfoList
-    plural: nodeinfos
-    singular: nodeinfo
-  scope: Cluster
-  subresources:
-    status: {}
-  validation:
-    openAPIV3Schema:
-      properties:
-        apiVersion:
-          description: 'APIVersion defines the versioned schema of this representation
-            of an object. Servers should convert recognized schemas to the latest
-            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
-          type: string
-        kind:
-          description: 'Kind is a string value representing the REST resource this
-            object represents. Servers may infer this from the endpoint the client
-            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
-          type: string
-        metadata:
-          type: object
-        spec:
-          type: object
-        status:
-          properties:
-            definedOnStorages:
-              items:
-                type: string
-              type: array
-            iqns:
-              items:
-                type: string
-              type: array
-            wwpns:
-              items:
-                type: string
-              type: array
-          required:
-          - iqns
-          - wwpns
-          type: object
-  version: v1
-  versions:
-  - name: v1
-    served: true
-    storage: true
-
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -237,8 +107,6 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: ibm-block-csi-operator
-        product: ibm-block-csi-driver
-        csi: ibm
     spec:
       serviceAccountName: ibm-block-csi-operator
       containers:
@@ -256,26 +124,7 @@ spec:
               fieldPath: metadata.name
         - name: OPERATOR_NAME
           value: "ibm-block-csi-operator"
-        - name: ENDPOINT
-          value: "unix:///storage/storage.sock:10086"
-        - name: ISCSI_AGENT_PORT
-          value: "10086"
-        volumeMounts:
-        - name: socket-dir
-          mountPath: /storage/
-      - name: ibm-storage-agent
-        image: ibmcom/ibm-storage-agent:0.0.4
-        imagePullPolicy: IfNotPresent
-        env:
-        - name: ENDPOINT
-          value: "unix:///storage/storage.sock:10086"
-        volumeMounts:
-        - name: socket-dir
-          mountPath: /storage/
 
-      volumes:
-      - name: socket-dir
-        emptyDir: {}
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
