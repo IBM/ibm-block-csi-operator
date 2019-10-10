@@ -1,3 +1,5 @@
+#!/bin/bash -xe
+
 #
 # Copyright 2019 IBM Corp.
 #
@@ -14,12 +16,5 @@
 # limitations under the License.
 #
 
-all: test
-
-.PHONY: test
-test: update
-	ginkgo -r -skipPackage pkg/controller
-
-.PHONY: update
-update:
-	hack/update-all.sh
+docker build -f build/ci/Dockerfile.unittest -t operator-unittests .
+docker run --rm -t operator-unittests

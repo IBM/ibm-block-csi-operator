@@ -77,6 +77,15 @@ do
 done
 
 # delete the last "---"
-# this is only work on Mac, for linux, use sed -i '$d' $TARGET_FILE
-sed -i '' -e '$d' $TARGET_FILE
-sed -i '' -e '$d' $TARGET_FILE
+os=`uname`
+# arch=`uname -i`
+
+if [[ $os == "Darwin" ]]
+then
+    sed -i '' -e '$d' $TARGET_FILE
+    sed -i '' -e '$d' $TARGET_FILE
+elif [[ $os == "Linux" ]]
+then
+    sed -i '$d' $TARGET_FILE
+    sed -i '$d' $TARGET_FILE
+fi
