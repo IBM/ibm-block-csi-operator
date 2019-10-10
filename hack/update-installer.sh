@@ -27,6 +27,7 @@ TARGET_FILE_NAME=ibm-block-csi-operator.yaml
 TARGET_FILE=$DEPLOY_PATH/installer/generated/$TARGET_FILE_NAME
 
 excluded_files=("csi_driver.yaml" $TARGET_FILE_NAME)
+excluded_crds=("csi_v1_config_crd.yaml" "csi_v1_nodeinfo_crd.yaml")
 
 function contains()
 {
@@ -47,7 +48,7 @@ do
     file=$CRD_PATH/$file_name
     if test -f $file
     then
-        if [[ $file == *_crd.yaml ]]
+        if [[ $file == *_crd.yaml ]] && !(contains $file_name "${excluded_crds[@]}")
         then
             cat $file >> $TARGET_FILE
             printf "\n---\n" >> $TARGET_FILE
@@ -66,7 +67,8 @@ do
     then
         if !(contains $file_name "${excluded_files[@]}")
         then
-            cat $file >> $TARGET_FILE
+            # remove the commented-out lines
+            sed -e '/^[ \t]*#/d' $file >> $TARGET_FILE
             printf "\n---\n" >> $TARGET_FILE
         else
             echo "skip $file_name"

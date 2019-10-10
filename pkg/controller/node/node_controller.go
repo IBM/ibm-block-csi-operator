@@ -50,6 +50,12 @@ var log = logf.Log.WithName("node_controller")
 // Add creates a new Node Controller and adds it to the Manager. The Manager will set fields on the Controller
 // and Start it when the Manager is Started.
 func Add(mgr manager.Manager) error {
+
+	if !controllerutil.IsDefineHostEnabled(mgr.GetClient()) {
+		log.Info("Skip node_controller")
+		return nil
+	}
+
 	return add(mgr, newReconciler(mgr))
 }
 

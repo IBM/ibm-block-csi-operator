@@ -25,6 +25,7 @@ import (
 	csiv1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
 	oconfig "github.com/IBM/ibm-block-csi-operator/pkg/config"
 	configsyncer "github.com/IBM/ibm-block-csi-operator/pkg/controller/config/syncer"
+	controllerutil "github.com/IBM/ibm-block-csi-operator/pkg/controller/util"
 	operatorconfig "github.com/IBM/ibm-block-csi-operator/pkg/internal/config"
 	"github.com/presslabs/controller-util/syncer"
 	appsv1 "k8s.io/api/apps/v1"
@@ -44,11 +45,17 @@ import (
 // ReconcileTime is the delay between reconciliations
 const ReconcileTime = 30 * time.Second
 
-var log = logf.Log.WithName("controller_config")
+var log = logf.Log.WithName("config_controller")
 
 // Add creates a new Config Controller and adds it to the Manager. The Manager will set fields on the Controller
 // and Start it when the Manager is Started.
 func Add(mgr manager.Manager) error {
+
+	if !controllerutil.IsDefineHostEnabled(mgr.GetClient()) {
+		log.Info("Skip config_controller")
+		return nil
+	}
+
 	return add(mgr, newReconciler(mgr))
 }
 

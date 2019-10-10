@@ -15,8 +15,6 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: ibm-block-csi-operator
-        product: ibm-block-csi-driver
-        csi: ibm
     spec:
       serviceAccountName: ibm-block-csi-operator
       containers:
@@ -34,23 +32,23 @@ spec:
               fieldPath: metadata.name
         - name: OPERATOR_NAME
           value: "ibm-block-csi-operator"
-        - name: ENDPOINT
-          value: "unix:///storage/storage.sock:10086"
-        - name: ISCSI_AGENT_PORT
-          value: "10086"
-        volumeMounts:
-        - name: socket-dir
-          mountPath: /storage/
-      - name: ibm-storage-agent
-        image: ibmcom/ibm-storage-agent:0.0.4
-        imagePullPolicy: IfNotPresent
-        env:
-        - name: ENDPOINT
-          value: "unix:///storage/storage.sock:10086"
-        volumeMounts:
-        - name: socket-dir
-          mountPath: /storage/
+        #- name: ENDPOINT
+        #  value: "unix:///storage/storage.sock:10086"
+        #- name: ISCSI_AGENT_PORT
+        #  value: "10086"
+        #volumeMounts:
+        #- name: socket-dir
+        #  mountPath: /storage/
+      #- name: ibm-storage-agent
+        #image: ibmcom/ibm-storage-agent:0.0.4
+        #imagePullPolicy: IfNotPresent
+        #env:
+        #- name: ENDPOINT
+        #  value: "unix:///storage/storage.sock:10086"
+        #volumeMounts:
+        #- name: socket-dir
+        #  mountPath: /storage/
 
-      volumes:
-      - name: socket-dir
-        emptyDir: {}
+      #volumes:
+      #- name: socket-dir
+        #emptyDir: {}
