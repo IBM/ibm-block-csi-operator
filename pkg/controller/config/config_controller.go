@@ -25,6 +25,7 @@ import (
 	csiv1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
 	oconfig "github.com/IBM/ibm-block-csi-operator/pkg/config"
 	configsyncer "github.com/IBM/ibm-block-csi-operator/pkg/controller/config/syncer"
+	controllerutil "github.com/IBM/ibm-block-csi-operator/pkg/controller/util"
 	operatorconfig "github.com/IBM/ibm-block-csi-operator/pkg/internal/config"
 	"github.com/presslabs/controller-util/syncer"
 	appsv1 "k8s.io/api/apps/v1"
