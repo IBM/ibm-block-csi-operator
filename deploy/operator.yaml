@@ -17,8 +17,28 @@ spec:
         app.kubernetes.io/name: ibm-block-csi-operator
     spec:
       serviceAccountName: ibm-block-csi-operator
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: beta.kubernetes.io/arch
+                    operator: In
+                    values:
+                      - amd64
       containers:
       - name: ibm-block-csi-operator
+        resources:
+          requests:
+            memory: 50Mi
+            cpu: 50m
+          limits:
+            memory: 100Mi
+            cpu: 100m
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
         image: ibmcom/ibm-block-csi-operator:1.0.0
         imagePullPolicy: IfNotPresent
         command:
