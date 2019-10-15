@@ -21,11 +21,11 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/event"
+	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 )
 
-var log = logf.KBLog.WithName("predicate").WithName("eventFilters")
+var log = logf.Log.WithName("predicate").WithName("eventFilters")
 
 // CreateDeletePredicate implements a default predicate on resource creation or deletion events
 type CreateDeletePredicate struct {

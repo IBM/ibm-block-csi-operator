@@ -44,6 +44,7 @@ type NodeInfoStatus struct {
 // NodeInfo is the Schema for the nodeinfos API
 // +k8s:openapi-gen=true
 // +kubebuilder:subresource:status
+// +kubebuilder:resource:path=nodeinfos,scope=Cluster
 type NodeInfo struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

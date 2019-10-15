@@ -18,6 +18,7 @@ spec:
     status: {}
   validation:
     openAPIV3Schema:
+      description: IBMBlockCSI is the Schema for the ibmblockcsis API
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
@@ -32,8 +33,11 @@ spec:
         metadata:
           type: object
         spec:
+          description: IBMBlockCSISpec defines the desired state of IBMBlockCSI
           properties:
             controller:
+              description: IBMBlockCSIControllerSpec defines the desired state of
+                IBMBlockCSIController
               properties:
                 repository:
                   description: The repository of the controller image
@@ -46,6 +50,7 @@ spec:
               - tag
               type: object
             node:
+              description: IBMBlockCSINodeSpec defines the desired state of IBMBlockCSINode
               properties:
                 repository:
                   description: The repository of the node image
@@ -62,6 +67,7 @@ spec:
           - node
           type: object
         status:
+          description: IBMBlockCSIStatus defines the observed state of IBMBlockCSI
           properties:
             controllerReady:
               type: boolean
@@ -74,11 +80,12 @@ spec:
               description: Version is the current driver version
               type: string
           required:
-          - phase
           - controllerReady
           - nodeReady
+          - phase
           - version
           type: object
+      type: object
   version: v1
   versions:
   - name: v1
@@ -167,6 +174,7 @@ rules:
   resources:
   - pods
   - services
+  - services/finalizers
   - endpoints
   - persistentvolumeclaims
   - persistentvolumes
@@ -331,4 +339,3 @@ metadata:
   labels:
     product: ibm-block-csi-driver
     csi: ibm
-

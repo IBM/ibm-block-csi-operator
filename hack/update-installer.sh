@@ -27,7 +27,7 @@ TARGET_FILE_NAME=ibm-block-csi-operator.yaml
 TARGET_FILE=$DEPLOY_PATH/installer/generated/$TARGET_FILE_NAME
 
 excluded_files=("csi_driver.yaml" $TARGET_FILE_NAME)
-excluded_crds=("csi_v1_config_crd.yaml" "csi_v1_nodeinfo_crd.yaml")
+excluded_crds=("csi.ibm.com_configs_crd.yaml" "csi.ibm.com_nodeinfos_crd.yaml")
 
 function contains()
 {
