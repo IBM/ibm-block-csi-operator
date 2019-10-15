@@ -42,6 +42,7 @@ ENV OPERATOR=/usr/local/bin/ibm-block-csi-operator \
     USER_NAME=ibm-block-csi-operator
 
 COPY build/health_check.sh .
+RUN chmod 777 ./health_check.sh
 COPY ./LICENSE /licenses/
 # COPY ./NOTICES /licenses/
 
