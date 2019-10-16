@@ -20,6 +20,7 @@ RUN CGO_ENABLED=1 GOOS=linux go build \
     -o build/_output/bin/ibm-block-csi-operator \
     -gcflags all=-trimpath=${GOPATH} \
 	-asmflags all=-trimpath=${GOPATH} \
+	-mod=vendor \
 	github.com/IBM/ibm-block-csi-operator/cmd/manager
 
 
