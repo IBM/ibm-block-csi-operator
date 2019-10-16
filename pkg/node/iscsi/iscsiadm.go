@@ -25,7 +25,7 @@ import (
 	"github.com/IBM/ibm-block-csi-operator/pkg/node"
 	"github.com/pkg/errors"
 
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
+	logf "sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 var log = logf.Log.WithName("iscsi")

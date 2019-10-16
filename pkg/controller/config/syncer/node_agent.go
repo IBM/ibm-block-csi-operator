@@ -51,6 +51,7 @@ var nodeContainerHealthPort = intstr.FromInt(nodeContainerHealthPortNumber)
 
 type nodeAgentSyncer struct {
 	operatorConfig *operatorconfig.Config
+	obj            runtime.Object
 }
 
 // NewNodeAgentSyncer returns a syncer for node agent
@@ -65,15 +66,16 @@ func NewNodeAgentSyncer(c client.Client, scheme *runtime.Scheme, operatorConfig 
 
 	sync := &nodeAgentSyncer{
 		operatorConfig: operatorConfig,
+		obj:            obj,
 	}
 
-	return syncer.NewObjectSyncer(config.NodeAgent.String(), operatorConfig.Unwrap(), obj, c, scheme, func(in runtime.Object) error {
-		return sync.SyncFn(in)
+	return syncer.NewObjectSyncer(config.NodeAgent.String(), operatorConfig.Unwrap(), obj, c, scheme, func() error {
+		return sync.SyncFn()
 	})
 }
 
-func (s *nodeAgentSyncer) SyncFn(in runtime.Object) error {
-	out := in.(*appsv1.DaemonSet)
+func (s *nodeAgentSyncer) SyncFn() error {
+	out := s.obj.(*appsv1.DaemonSet)
 
 	out.Spec.Selector = metav1.SetAsLabelSelector(s.operatorConfig.GetNodeAgentPodLabels())
 	out.Spec.Template.ObjectMeta.Labels = s.operatorConfig.GetNodeAgentPodLabels()

@@ -48,6 +48,7 @@ var nodeContainerHealthPort = intstr.FromInt(nodeContainerHealthPortNumber)
 
 type csiNodeSyncer struct {
 	driver *ibmblockcsi.IBMBlockCSI
+	obj    runtime.Object
 }
 
 // NewCSINodeSyncer returns a syncer for CSI node
@@ -62,15 +63,16 @@ func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockc
 
 	sync := &csiNodeSyncer{
 		driver: driver,
+		obj:    obj,
 	}
 
-	return syncer.NewObjectSyncer(config.CSINode.String(), driver.Unwrap(), obj, c, scheme, func(in runtime.Object) error {
-		return sync.SyncFn(in)
+	return syncer.NewObjectSyncer(config.CSINode.String(), driver.Unwrap(), obj, c, scheme, func() error {
+		return sync.SyncFn()
 	})
 }
 
-func (s *csiNodeSyncer) SyncFn(in runtime.Object) error {
-	out := in.(*appsv1.DaemonSet)
+func (s *csiNodeSyncer) SyncFn() error {
+	out := s.obj.(*appsv1.DaemonSet)
 
 	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCSINodeComponentAnnotations())
 

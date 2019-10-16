@@ -7,7 +7,7 @@ metadata:
     capabilities: "Full Lifecycle"
     categories: "Storage,Cloud Provider"
     certified: "false"
-    containerImage: ibmcom/ibm-block-csi-operator:1.0.0
+    containerImage: ibmcom/ibm-block-csi-operator:0.9.0
     createdAt: "2019-09-06T16:45:00Z"
     description: "Run IBM block storage CSI driver on OpenShift."
     repository: https://github.com/IBM/ibm-block-csi-operator
@@ -24,11 +24,11 @@ metadata:
           "spec": {
             "controller": {
               "repository": "ibmcom/ibm-block-csi-driver-controller",
-              "tag": "1.0.0"
+              "tag": "0.9.0"
             },
             "node": {
               "repository": "ibmcom/ibm-block-csi-driver-node",
-              "tag": "1.0.0"
+              "tag": "0.9.0"
             }
           }
         }
@@ -214,6 +214,7 @@ spec:
               resources:
               - pods
               - services
+              - services/finalizers
               - endpoints
               - persistentvolumeclaims
               - persistentvolumes
@@ -364,9 +365,39 @@ spec:
                   app.kubernetes.io/name: ibm-block-csi-operator
               spec:
                 serviceAccountName: ibm-block-csi-operator
+                affinity:
+                  nodeAffinity:
+                    requiredDuringSchedulingIgnoredDuringExecution:
+                      nodeSelectorTerms:
+                        - matchExpressions:
+                            - key: beta.kubernetes.io/arch
+                              operator: In
+                              values:
+                                - amd64
                 containers:
                 - name: ibm-block-csi-operator
-                  image: ibmcom/ibm-block-csi-operator:1.0.0
+                  resources:
+                    requests:
+                      memory: 50Mi
+                      cpu: 50m
+                    limits:
+                      memory: 100Mi
+                      cpu: 100m
+                  readinessProbe:
+                    exec:
+                      command: ["./health_check.sh"]
+                    initialDelaySeconds: 3
+                    periodSeconds: 1
+                  livenessProbe:
+                    exec:
+                      command: ["./health_check.sh"]
+                    initialDelaySeconds: 10
+                    periodSeconds: 30
+                  securityContext:
+                    capabilities:
+                      drop:
+                      - ALL
+                  image: ibmcom/ibm-block-csi-operator:0.9.0
                   imagePullPolicy: IfNotPresent
                   command:
                   - ibm-block-csi-operator
@@ -379,23 +410,3 @@ spec:
                         fieldPath: metadata.name
                   - name: OPERATOR_NAME
                     value: "ibm-block-csi-operator"
-                  - name: ENDPOINT
-                    value: "unix:///storage/storage.sock:10086"
-                  - name: ISCSI_AGENT_PORT
-                    value: "10086"
-                  volumeMounts:
-                  - name: socket-dir
-                    mountPath: /storage/
-                - name: ibm-storage-agent
-                  image: ibmcom/ibm-storage-agent:0.0.4
-                  imagePullPolicy: IfNotPresent
-                  env:
-                  - name: ENDPOINT
-                    value: "unix:///storage/storage.sock:10086"
-                  volumeMounts:
-                  - name: socket-dir
-                    mountPath: /storage/
-
-                volumes:
-                - name: socket-dir
-                  emptyDir: {}

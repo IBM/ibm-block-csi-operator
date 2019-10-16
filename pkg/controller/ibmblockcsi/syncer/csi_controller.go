@@ -47,6 +47,7 @@ var controllerContainerHealthPort = intstr.FromInt(controllerContainerHealthPort
 
 type csiControllerSyncer struct {
 	driver *ibmblockcsi.IBMBlockCSI
+	obj    runtime.Object
 }
 
 // NewCSIControllerSyncer returns a syncer for CSI controller
@@ -61,15 +62,16 @@ func NewCSIControllerSyncer(c client.Client, scheme *runtime.Scheme, driver *ibm
 
 	sync := &csiControllerSyncer{
 		driver: driver,
+		obj:    obj,
 	}
 
-	return syncer.NewObjectSyncer(config.CSIController.String(), driver.Unwrap(), obj, c, scheme, func(in runtime.Object) error {
-		return sync.SyncFn(in)
+	return syncer.NewObjectSyncer(config.CSIController.String(), driver.Unwrap(), obj, c, scheme, func() error {
+		return sync.SyncFn()
 	})
 }
 
-func (s *csiControllerSyncer) SyncFn(in runtime.Object) error {
-	out := in.(*appsv1.StatefulSet)
+func (s *csiControllerSyncer) SyncFn() error {
+	out := s.obj.(*appsv1.StatefulSet)
 
 	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCSIControllerComponentAnnotations())
 	out.Spec.ServiceName = config.GetNameForResource(config.CSIController, s.driver.Name)

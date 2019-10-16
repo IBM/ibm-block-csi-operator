@@ -1,4 +1,4 @@
-FROM golang:1.12.6
+FROM golang:1.13.1
 
 WORKDIR /go/src/github.com/IBM/ibm-block-csi-operator/
 COPY . .
