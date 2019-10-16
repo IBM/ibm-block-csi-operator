@@ -58,6 +58,7 @@ func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockc
 			Name:        config.GetNameForResource(config.CSINode, driver.Name),
 			Namespace:   driver.Namespace,
 			Annotations: driver.GetAnnotations(),
+			Labels:      driver.GetLabels(),
 		},
 	}
 
@@ -74,10 +75,11 @@ func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockc
 func (s *csiNodeSyncer) SyncFn() error {
 	out := s.obj.(*appsv1.DaemonSet)
 
-	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCSINodeComponentAnnotations())
+	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCSINodeSelectorLabels())
 
 	// ensure template
-	out.Spec.Template.ObjectMeta.Labels = s.driver.GetCSINodeComponentAnnotations()
+	out.Spec.Template.ObjectMeta.Labels = s.driver.GetCSINodePodLabels()
+	out.Spec.Template.ObjectMeta.Annotations = s.driver.GetAnnotations()
 
 	err := mergo.Merge(&out.Spec.Template.Spec, s.ensurePodSpec(), mergo.WithTransformers(transformers.PodSpec))
 	if err != nil {
@@ -89,11 +91,14 @@ func (s *csiNodeSyncer) SyncFn() error {
 
 func (s *csiNodeSyncer) ensurePodSpec() corev1.PodSpec {
 	return corev1.PodSpec{
-		Containers:  s.ensureContainersSpec(),
-		Volumes:     s.ensureVolumes(),
-		HostNetwork: true,
-		DNSPolicy:   "ClusterFirstWithHostNet", // To have DNS options set along with hostNetwork, you have to specify DNS policy explicitly to 'ClusterFirstWithHostNet'
-		//ServiceAccountName: config.GetNameForResource(config.CSINodeServiceAccount, s.driver.Name),
+		Containers:         s.ensureContainersSpec(),
+		Volumes:            s.ensureVolumes(),
+		HostNetwork:        true,
+		DNSPolicy:          "ClusterFirstWithHostNet", // To have DNS options set along with hostNetwork, you have to specify DNS policy explicitly to 'ClusterFirstWithHostNet'
+		ServiceAccountName: "default",
+		Affinity: &corev1.Affinity{
+			NodeAffinity: ensureNodeAffinity(),
+		},
 	}
 }
 
@@ -116,16 +121,9 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	nodePlugin.SecurityContext = &corev1.SecurityContext{
 		Privileged: boolptr.True(),
 	}
+	fillSecurityContextCapabilities(nodePlugin.SecurityContext)
 
 	//nodePlugin.Resources = ensureResources(nodeContainerName)
-
-	nodePlugin.LivenessProbe = ensureProbe(10, 3, 10, corev1.Handler{
-		HTTPGet: &corev1.HTTPGetAction{
-			Path:   "/healthz",
-			Port:   nodeContainerHealthPort,
-			Scheme: corev1.URISchemeHTTP,
-		},
-	})
 
 	// cluster driver registrar sidecar
 	registrar := s.ensureContainer(nodeDriverRegistrarContainerName,
@@ -143,6 +141,8 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 			},
 		},
 	}
+	registrar.SecurityContext = &corev1.SecurityContext{}
+	fillSecurityContextCapabilities(registrar.SecurityContext)
 
 	// liveness probe sidecar
 	livenessProbe := s.ensureContainer(nodeLivenessProbeContainerName,
@@ -151,6 +151,8 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 			"--csi-address=/csi/csi.sock",
 		},
 	)
+	livenessProbe.SecurityContext = &corev1.SecurityContext{}
+	fillSecurityContextCapabilities(livenessProbe.SecurityContext)
 
 	return []corev1.Container{
 		nodePlugin,
@@ -167,6 +169,14 @@ func (s *csiNodeSyncer) ensureContainer(name, image string, args []string) corev
 		Args:            args,
 		Env:             s.getEnvFor(name),
 		VolumeMounts:    s.getVolumeMountsFor(name),
+		Resources:       ensureDefaultResources(),
+		LivenessProbe: ensureProbe(10, 3, 10, corev1.Handler{
+			HTTPGet: &corev1.HTTPGetAction{
+				Path:   "/healthz",
+				Port:   nodeContainerHealthPort,
+				Scheme: corev1.URISchemeHTTP,
+			},
+		}),
 	}
 }
 
@@ -285,5 +295,19 @@ func ensureHostPathVolumeSource(path, pathType string) corev1.VolumeSource {
 			Path: path,
 			Type: &t,
 		},
+	}
+}
+
+func fillSecurityContextCapabilities(sc *corev1.SecurityContext, add ...string) {
+	sc.Capabilities = &corev1.Capabilities{
+		Drop: []corev1.Capability{"ALL"},
+	}
+
+	if len(add) > 0 {
+		adds := []corev1.Capability{}
+		for _, a := range add {
+			adds = append(adds, corev1.Capability(a))
+		}
+		sc.Capabilities.Add = adds
 	}
 }

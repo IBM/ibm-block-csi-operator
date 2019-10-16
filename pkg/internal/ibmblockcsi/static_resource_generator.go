@@ -28,6 +28,7 @@ func (c *IBMBlockCSI) GenerateControllerServiceAccount() *corev1.ServiceAccount 
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      config.GetNameForResource(config.CSIControllerServiceAccount, c.Name),
 			Namespace: c.Namespace,
+			Labels:    c.GetLabels(),
 		},
 	}
 }
