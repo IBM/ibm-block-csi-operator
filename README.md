@@ -19,7 +19,7 @@ Please see [`Prerequisites for Driver Installation`](https://github.com/IBM/ibm-
 ### Install the operator
 1. Download the manifest from GitHub.
 ```bash
-curl https://raw.githubusercontent.com/IBM/ibm-block-csi-operator/develop/deploy/installer/generated/ibm-block-csi-operator.yaml > ibm-block-csi-operator.yaml
+curl https://raw.githubusercontent.com/IBM/ibm-block-csi-operator/master/deploy/ibm-block-csi-operator.yaml > ibm-block-csi-operator.yaml
 ```
 2. (Optional): If required, update the image fields in the ibm-block-csi-operator.yaml.
 3. Install the operator.
@@ -38,40 +38,36 @@ ibm-block-csi-operator-5bb7996b86-xntss 2/2     Running   0          10m
 ```
 
 ### Create an IBMBlockCSI custom resource
-1. Create an IBMBlockCSI yaml file (ibc.yaml). If required, update the repository and tag values.
-```
-apiVersion: csi.ibm.com/v1
-kind: IBMBlockCSI
-metadata:
-  name: ibm-block-csi
-  namespace: kube-system
-spec:
-  controller:
-    repository: ibmcom/ibm-block-csi-driver-controller
-    tag: "1.0.0"
-  node:
-    repository: ibmcom/ibm-block-csi-driver-node
-    tag: "1.0.0"
-```
 
-2. Apply the ibc.yaml file.
 
+1. Download the manifest from GitHub.
 ```bash
-$ kubectl apply -f ibc.yaml
+curl https://raw.githubusercontent.com/IBM/ibm-block-csi-operator/master/deploy/ibm-block-csi-operator-customer-resource.yaml > ibm-block-csi-operator-customer-resource.yaml
+```
+
+2. (Optional): If required, update the image fields in the ibm-block-csi-operator-customer-resource.yaml.
+
+3. Install the ibm-block-csi-operator-customer-resource.
+
+<!-- $ kubectl apply -f ibm-block-csi-operator-customer-resource.yaml -->
+```bash
+$ kubectl apply -f ibm-block-csi-operator-customer-resource.yaml
 ```
 
 ### Verify the driver is running:
 
 ```bash
-$ kubectl get -n kube-system pod --selector=app=ibm-block-csi-controller
-NAME                         READY   STATUS    RESTARTS   AGE
-ibm-block-csi-controller-0   5/5     Running   0          10m
+$> kubectl get all -n kube-system  -l csi
+NAME                             READY   STATUS    RESTARTS   AGE
+pod/ibm-block-csi-controller-0   5/5     Running   0          9m36s
+pod/ibm-block-csi-node-jvmvh     3/3     Running   0          9m36s
+pod/ibm-block-csi-node-tsppw     3/3     Running   0          9m36s
 
-$ kubectl get -n kube-system pod --selector=app=ibm-block-csi-node
-NAME                       READY   STATUS    RESTARTS   AGE
-ibm-block-csi-node-xnfgp   3/3     Running   0          10m
-ibm-block-csi-node-zgh5h   3/3     Running   0          10m
+NAME                                DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
+daemonset.apps/ibm-block-csi-node   2         2         2       2            2           <none>          9m36s
 
+NAME                                        READY   AGE
+statefulset.apps/ibm-block-csi-controller   1/1     9m36s
 ```
 
 > **Note**: For further usage details, refer to https://github.com/IBM/ibm-block-csi-driver
@@ -80,7 +76,7 @@ ibm-block-csi-node-zgh5h   3/3     Running   0          10m
 
 ### 1. Delete the IBMBlockCSI custom resource.
 ```bash
-$ kubectl delete -f ibc.yaml
+$ kubectl delete -f ibm-block-csi-operator-customer-resource.yaml
 ```
 
 ### 2. Delete the operator.
