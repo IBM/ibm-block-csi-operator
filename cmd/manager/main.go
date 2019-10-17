@@ -31,7 +31,7 @@ import (
 	"github.com/IBM/ibm-block-csi-operator/pkg/controller"
 
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
-	kubemetrics "github.com/operator-framework/operator-sdk/pkg/kube-metrics"
+	// kubemetrics "github.com/operator-framework/operator-sdk/pkg/kube-metrics"
 	"github.com/operator-framework/operator-sdk/pkg/leader"
 	"github.com/operator-framework/operator-sdk/pkg/log/zap"
 	"github.com/operator-framework/operator-sdk/pkg/metrics"
@@ -129,6 +129,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	/*
+	// NOTE: Should enable it back in later version - issue CSI-613
 	if err = serveCRMetrics(cfg); err != nil {
 		log.Info("Could not generate and serve custom resource metrics", "error", err.Error())
 	}
@@ -144,8 +146,6 @@ func main() {
 		log.Info("Could not create metrics Service", "error", err.Error())
 	}
 
-	/*
-	// NOTE: Should enable it back in later version - issue CSI-613
 	// CreateServiceMonitors will automatically create the prometheus-operator ServiceMonitor resources
 	// necessary to configure Prometheus to scrape metrics from this operator.
 	services := []*v1.Service{service}
@@ -169,6 +169,7 @@ func main() {
 	}
 }
 
+/*
 // serveCRMetrics gets the Operator/CustomResource GVKs and generates metrics based on those types.
 // It serves those metrics on "http://metricsHost:operatorMetricsPort".
 func serveCRMetrics(cfg *rest.Config) error {
@@ -192,3 +193,4 @@ func serveCRMetrics(cfg *rest.Config) error {
 	}
 	return nil
 }
+*/
