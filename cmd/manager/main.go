@@ -144,6 +144,8 @@ func main() {
 		log.Info("Could not create metrics Service", "error", err.Error())
 	}
 
+	/*
+	// NOTE: Should enable it back in later version - issue CSI-613
 	// CreateServiceMonitors will automatically create the prometheus-operator ServiceMonitor resources
 	// necessary to configure Prometheus to scrape metrics from this operator.
 	services := []*v1.Service{service}
@@ -156,6 +158,7 @@ func main() {
 			log.Info("Install prometheus-operator in your cluster to create ServiceMonitor objects", "error", err.Error())
 		}
 	}
+	*/
 
 	log.Info("Starting the Cmd.")
 
