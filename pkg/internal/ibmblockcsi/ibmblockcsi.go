@@ -47,6 +47,7 @@ func (c *IBMBlockCSI) GetLabels() labels.Set {
 	labels := labels.Set{
 		"app.kubernetes.io/name":       config.ProductName,
 		"app.kubernetes.io/instance":   c.Name,
+		"app.kubernetes.io/version":    csiversion.Version,
 		"app.kubernetes.io/managed-by": config.Name,
 	}
 

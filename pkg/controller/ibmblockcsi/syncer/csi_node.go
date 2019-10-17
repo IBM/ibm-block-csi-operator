@@ -119,9 +119,18 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	})
 
 	nodePlugin.SecurityContext = &corev1.SecurityContext{
-		Privileged: boolptr.True(),
+		Privileged:               boolptr.True(),
+		AllowPrivilegeEscalation: boolptr.True(),
 	}
-	fillSecurityContextCapabilities(nodePlugin.SecurityContext)
+	fillSecurityContextCapabilities(
+		nodePlugin.SecurityContext,
+		"CHOWN",
+		"FSETID",
+		"FOWNER",
+		"SETGID",
+		"SETUID",
+		"DAC_OVERRIDE",
+	)
 
 	//nodePlugin.Resources = ensureResources(nodeContainerName)
 
@@ -141,7 +150,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 			},
 		},
 	}
-	registrar.SecurityContext = &corev1.SecurityContext{}
+	registrar.SecurityContext = &corev1.SecurityContext{AllowPrivilegeEscalation: boolptr.False()}
 	fillSecurityContextCapabilities(registrar.SecurityContext)
 
 	// liveness probe sidecar
@@ -151,7 +160,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 			"--csi-address=/csi/csi.sock",
 		},
 	)
-	livenessProbe.SecurityContext = &corev1.SecurityContext{}
+	livenessProbe.SecurityContext = &corev1.SecurityContext{AllowPrivilegeEscalation: boolptr.False()}
 	fillSecurityContextCapabilities(livenessProbe.SecurityContext)
 
 	return []corev1.Container{

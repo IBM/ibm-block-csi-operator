@@ -28,6 +28,7 @@ import (
 
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/internal/ibmblockcsi"
+	"github.com/IBM/ibm-block-csi-operator/pkg/util/boolptr"
 	"github.com/presslabs/controller-util/mergo/transformers"
 	"github.com/presslabs/controller-util/syncer"
 )
@@ -182,7 +183,7 @@ func ensureNodeAffinity() *corev1.NodeAffinity {
 				{
 					MatchExpressions: []corev1.NodeSelectorRequirement{
 						{
-							Key:      "beta.kubernetes.io/arch",
+							Key:      "kubernetes.io/arch",
 							Operator: corev1.NodeSelectorOpIn,
 							Values:   []string{"amd64"},
 						},
@@ -194,7 +195,7 @@ func ensureNodeAffinity() *corev1.NodeAffinity {
 }
 
 func (s *csiControllerSyncer) ensureContainer(name, image string, args []string) corev1.Container {
-	sc := &corev1.SecurityContext{}
+	sc := &corev1.SecurityContext{AllowPrivilegeEscalation: boolptr.False()}
 	fillSecurityContextCapabilities(sc)
 	return corev1.Container{
 		Name:            name,
