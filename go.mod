@@ -6,15 +6,18 @@ require (
 	github.com/go-logr/logr v0.1.0
 	github.com/go-openapi/spec v0.17.2
 	github.com/go-test/deep v1.0.4 // indirect
-	github.com/golang/protobuf v1.3.1
+	github.com/golang/protobuf v1.3.2
 	github.com/imdario/mergo v0.3.7
-	github.com/onsi/ginkgo v1.8.0
-	github.com/onsi/gomega v1.5.0
+	github.com/onsi/ginkgo v1.10.2
+	github.com/onsi/gomega v1.7.0
 	github.com/operator-framework/operator-sdk v0.11.1-0.20191012024916-f419ad3f3dc5
 	github.com/pkg/errors v0.8.1
 	github.com/presslabs/controller-util v0.1.14-0.20190818132821-fc080f9430fa
 	github.com/spf13/pflag v1.0.3
+	golang.org/x/net v0.0.0-20191014212845-da9a3fd4c582 // indirect
+	golang.org/x/sys v0.0.0-20191018095205-727590c5006e // indirect
 	google.golang.org/grpc v1.19.1
+	gopkg.in/yaml.v2 v2.2.4 // indirect
 	k8s.io/api v0.0.0-20190918155943-95b840bb6a1f
 	k8s.io/apimachinery v0.0.0-20190913080033-27d36303b655
 	k8s.io/client-go v11.0.1-0.20190409021438-1a26190bd76a+incompatible

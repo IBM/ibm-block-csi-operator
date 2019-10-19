@@ -34,8 +34,6 @@ const (
 	ExternalProvisionerClusterRoleBinding    ResourceName = "external-provisioner-clusterrolebinding"
 	ExternalAttacherClusterRole              ResourceName = "external-attacher-clusterrole"
 	ExternalAttacherClusterRoleBinding       ResourceName = "external-attacher-clusterrolebinding"
-	ClusterDriverRegistrarClusterRole        ResourceName = "cluster-driver-registrar-clusterrole"
-	ClusterDriverRegistrarClusterRoleBinding ResourceName = "cluster-driver-registrar-clusterrolebinding"
 	ExternalSnapshotterClusterRole           ResourceName = "external-snapshotter-clusterrole"
 	ExternalSnapshotterClusterRoleBinding    ResourceName = "external-snapshotter-clusterrolebinding"
 )

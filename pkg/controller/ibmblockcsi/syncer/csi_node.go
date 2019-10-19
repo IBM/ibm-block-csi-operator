@@ -127,7 +127,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 		},
 	})
 
-	// cluster driver registrar sidecar
+	// node driver registrar sidecar
 	registrar := s.ensureContainer(nodeDriverRegistrarContainerName,
 		config.NodeDriverRegistrarImage,
 		[]string{
