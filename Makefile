@@ -14,12 +14,23 @@
 # limitations under the License.
 #
 
-all: test
+#all: test
+
+.PHONY: ibm-block-csi-operator
+ibm-block-csi-operator:
+	mkdir -p bin
+	CGO_ENABLED=1 GOOS=linux go build     -o build/_output/bin/ibm-block-csi-operator     -gcflags all=-trimpath=${GOPATH} -asmflags all=-trimpath=${GOPATH} -mod=vendor cmd/node/main.go
 
 .PHONY: test
-test: update
+test:
 	ginkgo -r -skipPackage pkg/controller
 
 .PHONY: update
 update:
 	hack/update-all.sh
+
+
+.PHONY: list
+list:
+	@$(MAKE) -pRrq -f $(lastword $(MAKEFILE_LIST)) : 2>/dev/null | awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | sort | egrep -v -e '^[^[:alnum:]]' -e '^$@$$'
+	
