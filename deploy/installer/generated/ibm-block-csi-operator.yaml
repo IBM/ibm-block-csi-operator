@@ -110,6 +110,8 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: ibm-block-csi-operator
+        product: ibm-block-csi-driver
+        csi: ibm
     spec:
       serviceAccountName: ibm-block-csi-operator
       affinity:
