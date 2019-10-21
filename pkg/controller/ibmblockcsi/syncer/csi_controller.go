@@ -162,12 +162,12 @@ func ensureDefaultResources() corev1.ResourceRequirements {
 
 func ensureResources(cpuRequests, cpuLimits, memoryRequests, memoryLimits string) corev1.ResourceRequirements {
 	requests := corev1.ResourceList{
-		corev1.ResourceRequestsCPU:    resource.MustParse(cpuRequests),
-		corev1.ResourceRequestsMemory: resource.MustParse(memoryRequests),
+		corev1.ResourceCPU:    resource.MustParse(cpuRequests),
+		corev1.ResourceMemory: resource.MustParse(memoryRequests),
 	}
 	limits := corev1.ResourceList{
-		corev1.ResourceLimitsCPU:    resource.MustParse(cpuLimits),
-		corev1.ResourceLimitsMemory: resource.MustParse(memoryLimits),
+		corev1.ResourceCPU:    resource.MustParse(cpuLimits),
+		corev1.ResourceMemory: resource.MustParse(memoryLimits),
 	}
 
 	return corev1.ResourceRequirements{
