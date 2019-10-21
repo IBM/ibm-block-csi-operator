@@ -42,8 +42,8 @@ func (c *IBMBlockCSI) Unwrap() *csiv1.IBMBlockCSI {
 	return c.IBMBlockCSI
 }
 
-// GetAnnotations returns all the annotations to be set on all resources
-func (c *IBMBlockCSI) GetAnnotations() labels.Set {
+// GetLabels returns all the labels to be set on all resources
+func (c *IBMBlockCSI) GetLabels() labels.Set {
 	labels := labels.Set{
 		"app.kubernetes.io/name":       config.ProductName,
 		"app.kubernetes.io/instance":   c.Name,
@@ -51,43 +51,57 @@ func (c *IBMBlockCSI) GetAnnotations() labels.Set {
 		"app.kubernetes.io/managed-by": config.Name,
 	}
 
-	if c.Annotations != nil {
-		for k, v := range c.Annotations {
-			labels[k] = v
+	if c.Labels != nil {
+		for k, v := range c.Labels {
+			if !labels.Has(k) {
+				labels[k] = v
+			}
 		}
 	}
 
 	return labels
 }
 
-func (c *IBMBlockCSI) GetComponentAnnotations(component string) labels.Set {
+// GetAnnotations returns all the annotations to be set on all resources
+func (c *IBMBlockCSI) GetAnnotations() labels.Set {
+	labels := labels.Set{
+		"productID":      config.ProductName,
+		"productName":    config.ProductName,
+		"productVersion": csiversion.Version,
+	}
+
+	if c.Annotations != nil {
+		for k, v := range c.Annotations {
+			if !labels.Has(k) {
+				labels[k] = v
+			}
+		}
+	}
+
+	return labels
+}
+
+// GetSelectorLabels returns labels used in label selectors
+func (c *IBMBlockCSI) GetSelectorLabels(component string) labels.Set {
 	return labels.Set{
 		"app.kubernetes.io/component": component,
 	}
 }
 
-func (c *IBMBlockCSI) GetCSIControllerComponentAnnotations() labels.Set {
-	return c.GetComponentAnnotations(config.CSIController.String())
+func (c *IBMBlockCSI) GetCSIControllerSelectorLabels() labels.Set {
+	return c.GetSelectorLabels(config.CSIController.String())
 }
 
-func (c *IBMBlockCSI) GetCSINodeComponentAnnotations() labels.Set {
-	return c.GetComponentAnnotations(config.CSINode.String())
+func (c *IBMBlockCSI) GetCSINodeSelectorLabels() labels.Set {
+	return c.GetSelectorLabels(config.CSINode.String())
 }
 
-func (c *IBMBlockCSI) GetCSIControllerAnnotations() labels.Set {
-	labels := c.GetLabels()
-	for k, v := range c.GetCSIControllerComponentAnnotations() {
-		labels[k] = v
-	}
-	return labels
+func (c *IBMBlockCSI) GetCSIControllerPodLabels() labels.Set {
+	return labels.Merge(c.GetLabels(), c.GetCSIControllerSelectorLabels())
 }
 
-func (c *IBMBlockCSI) GetCSINodeAnnotations() labels.Set {
-	labels := c.GetLabels()
-	for k, v := range c.GetCSINodeComponentAnnotations() {
-		labels[k] = v
-	}
-	return labels
+func (c *IBMBlockCSI) GetCSINodePodLabels() labels.Set {
+	return labels.Merge(c.GetLabels(), c.GetCSINodeSelectorLabels())
 }
 
 func (c *IBMBlockCSI) GetCSIControllerImage() string {
