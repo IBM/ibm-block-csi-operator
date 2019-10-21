@@ -25,6 +25,7 @@ import (
 	"github.com/IBM/ibm-block-csi-operator/pkg/apis"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/controller"
+	"github.com/IBM/ibm-block-csi-operator/pkg/util/boolptr"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
@@ -35,8 +36,8 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/runtime/signals"
 )
 
@@ -45,7 +46,7 @@ var k8sClient client.Client
 var k8sManager ctrl.Manager
 var testEnv *envtest.Environment
 var clientset *kubernetes.Clientset
-var kubeVersion = "1.13"
+var kubeVersion = "1.14"
 var nodeAgentPort = "10086"
 var storageAgentPort = "10010"
 var storageAgentAddress = "localhost:" + storageAgentPort
@@ -68,17 +69,17 @@ var _ = BeforeSuite(func(done Done) {
 	By("bootstrapping test environment")
 	if os.Getenv("TEST_USE_EXISTING_CLUSTER") == "true" {
 		testEnv = &envtest.Environment{
-			UseExistingCluster: true,
+			UseExistingCluster: boolptr.True(),
 		}
 	} else {
 		testEnv = &envtest.Environment{
-			CRDDirectoryPaths: []string{filepath.Join("..", "..", "deploy", "crds")},
+			CRDDirectoryPaths:  []string{filepath.Join("..", "..", "deploy", "crds")},
+			KubeAPIServerFlags: append([]string{"--allow-privileged=true"}, envtest.DefaultKubeAPIServerFlags...),
 		}
 	}
 
 	var err error
 
-	//testEnv.KubeAPIServerFlags = append(envtest.DefaultKubeAPIServerFlags, "--allow_privileged=true")
 	cfg, err = testEnv.Start()
 	Ω(err).ShouldNot(HaveOccurred())
 	Expect(cfg).ToNot(BeNil())
