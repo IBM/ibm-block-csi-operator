@@ -18,8 +18,7 @@
 
 .PHONY: ibm-block-csi-operator
 ibm-block-csi-operator:
-	mkdir -p bin
-	CGO_ENABLED=1 GOOS=linux go build     -o build/_output/bin/ibm-block-csi-operator     -gcflags all=-trimpath=${GOPATH} -asmflags all=-trimpath=${GOPATH} -mod=vendor cmd/node/main.go
+	CGO_ENABLED=1 GOOS=linux go build     -o build/_output/bin/ibm-block-csi-operator     -gcflags all=-trimpath=${GOPATH} -asmflags all=-trimpath=${GOPATH} -mod=vendor cmd/manager/main.go
 
 .PHONY: test
 test:
