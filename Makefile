@@ -21,7 +21,7 @@ ibm-block-csi-operator:
 	CGO_ENABLED=1 GOOS=linux go build     -o build/_output/bin/ibm-block-csi-operator     -gcflags all=-trimpath=${GOPATH} -asmflags all=-trimpath=${GOPATH} -mod=vendor cmd/manager/main.go
 
 .PHONY: test
-test:
+test: update
 	ginkgo -r -skipPackage pkg/controller
 
 .PHONY: update
