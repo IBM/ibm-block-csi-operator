@@ -27,6 +27,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
+	storagev1beta1 "k8s.io/api/storage/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 )
@@ -79,6 +80,17 @@ var _ = Describe("Controller", func() {
 					return found, err
 				}, timeout, interval).ShouldNot(BeNil())
 
+				By("Getting CSIDriver")
+				cd := &storagev1beta1.CSIDriver{}
+				cdKey := types.NamespacedName{
+					Name:      config.DriverName,
+					Namespace: "",
+				}
+				Eventually(func() (*storagev1beta1.CSIDriver, error) {
+					err := k8sClient.Get(context.Background(), cdKey, cd)
+					return cd, err
+				}, timeout, interval).ShouldNot(BeNil())
+
 				By("Getting ServiceAccount")
 				sa := &corev1.ServiceAccount{}
 				saKey := types.NamespacedName{
@@ -123,18 +135,16 @@ var _ = Describe("Controller", func() {
 					return controller, err
 				}, timeout, interval).ShouldNot(BeNil())
 
-				// securityContext.privileged: Forbidden: disallowed by cluster policy
-				// enable this check after the test cluster support running privileged contianers.
-				//				By("Getting node DaemonSet")
-				//				node := &appsv1.DaemonSet{}
-				//				nodeKey := types.NamespacedName{
-				//					Name:      config.GetNameForResource(config.CSINode, found.Name),
-				//					Namespace: found.Namespace,
-				//				}
-				//				Eventually(func() (*appsv1.DaemonSet, error) {
-				//					err := k8sClient.Get(context.Background(), nodeKey, node)
-				//					return node, err
-				//				}, timeout, interval).ShouldNot(BeNil())
+				By("Getting node DaemonSet")
+				node := &appsv1.DaemonSet{}
+				nodeKey := types.NamespacedName{
+					Name:      config.GetNameForResource(config.CSINode, found.Name),
+					Namespace: found.Namespace,
+				}
+				Eventually(func() (*appsv1.DaemonSet, error) {
+					err := k8sClient.Get(context.Background(), nodeKey, node)
+					return node, err
+				}, timeout, interval).ShouldNot(BeNil())
 
 				close(done)
 			}, timeout.Seconds())

@@ -26,7 +26,8 @@ import (
 
 func GetOperatorConfig(c client.Client) (*csiv1.Config, error) {
 	configList := &csiv1.ConfigList{}
-	err := c.List(context.TODO(), configList, nil)
+	fmt.Println(configList)
+	err := c.List(context.TODO(), configList)
 	if err != nil {
 		return nil, err
 	}

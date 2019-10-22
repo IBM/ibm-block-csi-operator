@@ -20,6 +20,7 @@ import (
 	"github.com/imdario/mergo"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -27,6 +28,7 @@ import (
 
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/internal/ibmblockcsi"
+	"github.com/IBM/ibm-block-csi-operator/pkg/util/boolptr"
 	"github.com/presslabs/controller-util/mergo/transformers"
 	"github.com/presslabs/controller-util/syncer"
 )
@@ -56,6 +58,7 @@ func NewCSIControllerSyncer(c client.Client, scheme *runtime.Scheme, driver *ibm
 			Name:        config.GetNameForResource(config.CSIController, driver.Name),
 			Namespace:   driver.Namespace,
 			Annotations: driver.GetAnnotations(),
+			Labels:      driver.GetLabels(),
 		},
 	}
 
@@ -72,11 +75,12 @@ func NewCSIControllerSyncer(c client.Client, scheme *runtime.Scheme, driver *ibm
 func (s *csiControllerSyncer) SyncFn() error {
 	out := s.obj.(*appsv1.StatefulSet)
 
-	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCSIControllerComponentAnnotations())
+	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCSIControllerSelectorLabels())
 	out.Spec.ServiceName = config.GetNameForResource(config.CSIController, s.driver.Name)
 
 	// ensure template
-	out.Spec.Template.ObjectMeta.Labels = s.driver.GetCSIControllerComponentAnnotations()
+	out.Spec.Template.ObjectMeta.Labels = s.driver.GetCSIControllerPodLabels()
+	out.Spec.Template.ObjectMeta.Annotations = s.driver.GetAnnotations()
 
 	err := mergo.Merge(&out.Spec.Template.Spec, s.ensurePodSpec(), mergo.WithTransformers(transformers.PodSpec))
 	if err != nil {
@@ -95,6 +99,9 @@ func (s *csiControllerSyncer) ensurePodSpec() corev1.PodSpec {
 			FSGroup:   &fsGroup,
 			RunAsUser: &fsGroup,
 		},
+		Affinity: &corev1.Affinity{
+			NodeAffinity: ensureNodeAffinity(),
+		},
 		ServiceAccountName: config.GetNameForResource(config.CSIControllerServiceAccount, s.driver.Name),
 	}
 }
@@ -110,15 +117,6 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		ContainerPort: controllerContainerHealthPortNumber,
 	})
 
-	//controllerPlugin.Resources = ensureResources(controllerContainerName)
-
-	controllerPlugin.LivenessProbe = ensureProbe(10, 3, 2, corev1.Handler{
-		HTTPGet: &corev1.HTTPGetAction{
-			Path:   "/healthz",
-			Port:   controllerContainerHealthPort,
-			Scheme: corev1.URISchemeHTTP,
-		},
-	})
 
 	// csi provisioner sidecar
 	provisioner := s.ensureContainer(provisionerContainerName,
@@ -149,15 +147,64 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	}
 }
 
+func ensureDefaultResources() corev1.ResourceRequirements {
+	return ensureResources("50m", "100m", "50Mi", "100Mi")
+}
+
+func ensureResources(cpuRequests, cpuLimits, memoryRequests, memoryLimits string) corev1.ResourceRequirements {
+	requests := corev1.ResourceList{
+		corev1.ResourceCPU:    resource.MustParse(cpuRequests),
+		corev1.ResourceMemory: resource.MustParse(memoryRequests),
+	}
+	limits := corev1.ResourceList{
+		corev1.ResourceCPU:    resource.MustParse(cpuLimits),
+		corev1.ResourceMemory: resource.MustParse(memoryLimits),
+	}
+
+	return corev1.ResourceRequirements{
+		Limits:   limits,
+		Requests: requests,
+	}
+}
+
+func ensureNodeAffinity() *corev1.NodeAffinity {
+	return &corev1.NodeAffinity{
+		RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+			NodeSelectorTerms: []corev1.NodeSelectorTerm{
+				{
+					MatchExpressions: []corev1.NodeSelectorRequirement{
+						{
+							Key:      "kubernetes.io/arch",
+							Operator: corev1.NodeSelectorOpIn,
+							Values:   []string{"amd64"},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func (s *csiControllerSyncer) ensureContainer(name, image string, args []string) corev1.Container {
+	sc := &corev1.SecurityContext{AllowPrivilegeEscalation: boolptr.False()}
+	fillSecurityContextCapabilities(sc)
 	return corev1.Container{
 		Name:            name,
 		Image:           image,
 		ImagePullPolicy: "IfNotPresent",
 		Args:            args,
 		//EnvFrom:         s.getEnvSourcesFor(name),
-		Env:          s.getEnvFor(name),
-		VolumeMounts: s.getVolumeMountsFor(name),
+		Env:             s.getEnvFor(name),
+		VolumeMounts:    s.getVolumeMountsFor(name),
+		SecurityContext: sc,
+		Resources:       ensureDefaultResources(),
+		LivenessProbe: ensureProbe(10, 3, 2, corev1.Handler{
+			HTTPGet: &corev1.HTTPGetAction{
+				Path:   "/healthz",
+				Port:   controllerContainerHealthPort,
+				Scheme: corev1.URISchemeHTTP,
+			},
+		}),
 	}
 }
 

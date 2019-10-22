@@ -4,11 +4,11 @@ metadata:
   name: ibm-block-csi-operator.v1.0.0
   namespace: placeholder
   annotations:
-    capabilities: "Full Lifecycle"
+    capabilities: "Seamless Upgrades"
     categories: "Storage,Cloud Provider"
-    certified: "false"
-    containerImage: ibmcom/ibm-block-csi-operator:0.9.0
-    createdAt: "2019-09-06T16:45:00Z"
+    certified: "true"
+    containerImage: ibmcom/ibm-block-csi-operator:1.0.0
+    createdAt: "2019-10-21T16:45:00Z"
     description: "Run IBM block storage CSI driver on OpenShift."
     repository: https://github.com/IBM/ibm-block-csi-operator
     support: IBM
@@ -24,11 +24,11 @@ metadata:
           "spec": {
             "controller": {
               "repository": "ibmcom/ibm-block-csi-driver-controller",
-              "tag": "0.9.0"
+              "tag": "1.0.0"
             },
             "node": {
               "repository": "ibmcom/ibm-block-csi-driver-node",
-              "tag": "0.9.0"
+              "tag": "1.0.0"
             }
           }
         }
@@ -115,11 +115,11 @@ spec:
     - IBM
     - BlockStorage
   version: 1.0.0
-  maturity: beta   # stable
+  maturity: stable
   maintainers:
     - name: Guang Jiong Lou
       email: luogj@cn.ibm.com
-  minKubeVersion: 1.13.1
+  minKubeVersion: 1.14.1
   provider:
     name: IBM
   links:

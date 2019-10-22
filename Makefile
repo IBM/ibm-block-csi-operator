@@ -22,7 +22,8 @@ ibm-block-csi-operator:
 
 .PHONY: test
 test: update
-	ginkgo -r -skipPackage pkg/controller
+	# for go 1.13+, set GOFLAGS to enable vendor mod
+	GO111MODULE=on GOFLAGS='-mod=vendor' ginkgo -r -skipPackage pkg/controller
 
 .PHONY: update
 update:

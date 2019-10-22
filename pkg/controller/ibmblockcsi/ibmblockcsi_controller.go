@@ -27,6 +27,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
+	storagev1beta1 "k8s.io/api/storage/v1beta1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -198,6 +199,7 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 
 	// create the resources which never change if not exist
 	for _, rec := range []reconciler{
+		r.reconcileCSIDriver,
 		r.reconcileServiceAccount,
 		r.reconcileClusterRole,
 		r.reconcileClusterRoleBinding,
@@ -259,6 +261,34 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI) e
 	instance.Status.Version = oversion.DriverVersion
 
 	// no need to push to status to API Server here.
+	return nil
+}
+
+func (r *ReconcileIBMBlockCSI) reconcileCSIDriver(instance *ibmblockcsi.IBMBlockCSI) error {
+	recLogger := log.WithValues("Resource Type", "CSIDriver")
+
+	cd := instance.GenerateCSIDriver()
+	if err := controllerutil.SetControllerReference(instance.Unwrap(), cd, r.scheme); err != nil {
+		return err
+	}
+	found := &storagev1beta1.CSIDriver{}
+	err := r.client.Get(context.TODO(), types.NamespacedName{
+		Name:      cd.Name,
+		Namespace: "",
+	}, found)
+	if err != nil && errors.IsNotFound(err) {
+		recLogger.Info("Creating a new CSIDriver", "Name", cd.GetName())
+		err = r.client.Create(context.TODO(), cd)
+		if err != nil {
+			return err
+		}
+	} else if err != nil {
+		recLogger.Error(err, "Failed to get CSIDriver", "Name", cd.GetName())
+		return err
+	} else {
+		// Resource already exists - don't requeue
+	}
+
 	return nil
 }
 
