@@ -18,10 +18,24 @@ package ibmblockcsi
 
 import (
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
+	"github.com/IBM/ibm-block-csi-operator/pkg/util/boolptr"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
+	storagev1beta1 "k8s.io/api/storage/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
+
+func (c *IBMBlockCSI) GenerateCSIDriver() *storagev1beta1.CSIDriver {
+	return &storagev1beta1.CSIDriver{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: config.DriverName,
+		},
+		Spec: storagev1beta1.CSIDriverSpec{
+			AttachRequired: boolptr.True(),
+			PodInfoOnMount: boolptr.False(),
+		},
+	}
+}
 
 func (c *IBMBlockCSI) GenerateControllerServiceAccount() *corev1.ServiceAccount {
 	return &corev1.ServiceAccount{
