@@ -260,6 +260,9 @@ rules:
   verbs:
   - create
   - delete
+  - get
+  - watch
+  - list
 - apiGroups:
   - storage.k8s.io
   resources:
@@ -278,34 +281,12 @@ rules:
   - watch
   - delete
 - apiGroups:
-  - csi.storage.k8s.io
-  resources:
-  - csidrivers
-  verbs:
-  - create
-  - delete
-- apiGroups:
-  - csi.storage.k8s.io
-  resources:
-  - csinodeinfos
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
   - snapshot.storage.k8s.io
   resources:
   - volumesnapshotcontents
   verbs:
   - get
   - list
-- apiGroups:
-  - csi.storage.k8s.io
-  resources:
-  - servicemonitors
-  verbs:
-  - get
-  - create
 - apiGroups:
   - csi.ibm.com
   resources:
