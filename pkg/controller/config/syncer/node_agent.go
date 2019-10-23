@@ -92,6 +92,8 @@ func (s *nodeAgentSyncer) ensurePodSpec() corev1.PodSpec {
 	return corev1.PodSpec{
 		Containers:  s.ensureContainersSpec(),
 		Volumes:     s.ensureVolumes(),
+		HostNetwork: true,
+		DNSPolicy:   "ClusterFirstWithHostNet", // To have DNS options set along with hostNetwork, you have to specify DNS policy explicitly to 'ClusterFirstWithHostNet'
 	}
 }
 
