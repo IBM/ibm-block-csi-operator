@@ -172,49 +172,6 @@ func (c *IBMBlockCSI) GenerateExternalAttacherClusterRoleBinding() *rbacv1.Clust
 	}
 }
 
-func (c *IBMBlockCSI) GenerateClusterDriverRegistrarClusterRole() *rbacv1.ClusterRole {
-	rules := []rbacv1.PolicyRule{
-		{
-			APIGroups: []string{c.GetCSIAPIGroup()},
-			Resources: []string{"csidrivers"},
-			Verbs:     []string{"create", "delete"},
-		},
-	}
-	//if c.ServerVersion == "1.13" {
-	rules = append(rules, rbacv1.PolicyRule{
-		APIGroups: []string{"apiextensions.k8s.io"},
-		Resources: []string{"customresourcedefinitions"},
-		Verbs:     []string{"create", "list", "watch", "delete"},
-	})
-	//}
-
-	return &rbacv1.ClusterRole{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: config.GetNameForResource(config.ClusterDriverRegistrarClusterRole, c.Name),
-		},
-		Rules: rules,
-	}
-}
-
-func (c *IBMBlockCSI) GenerateClusterDriverRegistrarClusterRoleBinding() *rbacv1.ClusterRoleBinding {
-	return &rbacv1.ClusterRoleBinding{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: config.GetNameForResource(config.ClusterDriverRegistrarClusterRoleBinding, c.Name),
-		},
-		Subjects: []rbacv1.Subject{
-			{
-				Kind:      "ServiceAccount",
-				Name:      config.GetNameForResource(config.CSIControllerServiceAccount, c.Name),
-				Namespace: c.Namespace,
-			},
-		},
-		RoleRef: rbacv1.RoleRef{
-			Kind:     "ClusterRole",
-			Name:     config.GetNameForResource(config.ClusterDriverRegistrarClusterRole, c.Name),
-			APIGroup: "rbac.authorization.k8s.io",
-		},
-	}
-}
 
 func (c *IBMBlockCSI) GenerateExternalSnapshotterClusterRole() *rbacv1.ClusterRole {
 	return &rbacv1.ClusterRole{
