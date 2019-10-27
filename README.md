@@ -17,6 +17,10 @@ Please see [`Prerequisites for Driver Installation`](https://github.com/IBM/ibm-
 ## Installation
 
 ### Install the operator
+
+> **Note**: The operator can be installed directly from the RedHat OpenShift web console, through the OperatorHub.
+
+
 1. Download the manifest from GitHub.
 ```bash
 curl https://raw.githubusercontent.com/IBM/ibm-block-csi-operator/master/deploy/installer/generated/ibm-block-csi-operator.yaml > ibm-block-csi-operator.yaml
