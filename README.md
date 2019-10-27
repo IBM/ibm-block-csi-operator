@@ -18,7 +18,8 @@ Please see [`Prerequisites for Driver Installation`](https://github.com/IBM/ibm-
 
 ### Install the operator
 
-> **Note**: You can install the operator via OperatorHub in OpenShift web console directly.
+> **Note**: The operator can be installed directly from the RedHat OpenShift web console, through the OperatorHub.
+
 
 1. Download the manifest from GitHub.
 ```bash
