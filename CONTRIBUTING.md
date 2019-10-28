@@ -18,4 +18,8 @@
 5. Run `operator-sdk add` to add a new api or controller, for more details, please refer to https://github.com/operator-framework/operator-sdk
 6. Run `operator-sdk generate k8s` and `operator-sdk generate openapi` after you change something in `pkg/apis`.
 
-
+## Package the Operator
+This repository makes use of the [Operator Framework](https://github.com/operator-framework) and its packaging concept for Operators. Make sure you read the following guides before packaging the operator and uploading to OperatorHub.
+- https://github.com/operator-framework/community-operators/blob/master/docs/contributing.md
+- https://github.com/operator-framework/operator-lifecycle-manager/blob/master/doc/design/building-your-csv.md
+- https://github.com/operator-framework/community-operators/blob/master/docs/required-fields.md
