@@ -93,6 +93,7 @@ func (s *csiNodeSyncer) ensurePodSpec() corev1.PodSpec {
 	return corev1.PodSpec{
 		Containers:         s.ensureContainersSpec(),
 		Volumes:            s.ensureVolumes(),
+		HostIPC:            true,
 		ServiceAccountName: "default",
 		Affinity: &corev1.Affinity{
 			NodeAffinity: ensureNodeAffinity(),
