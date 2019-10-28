@@ -110,6 +110,8 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: ibm-block-csi-operator
+        product: ibm-block-csi-driver
+        csi: ibm
     spec:
       serviceAccountName: ibm-block-csi-operator
       affinity:
@@ -117,7 +119,7 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
               - matchExpressions:
-                  - key: beta.kubernetes.io/arch
+                  - key: kubernetes.io/arch
                     operator: In
                     values:
                       - amd64
@@ -158,6 +160,23 @@ spec:
         - name: OPERATOR_NAME
           value: "ibm-block-csi-operator"
 
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: ibm-block-csi-operator
+  labels:
+    product: ibm-block-csi-driver
+    csi: ibm
+subjects:
+- kind: ServiceAccount
+  name: ibm-block-csi-operator
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: ibm-block-csi-operator
+  apiGroup: rbac.authorization.k8s.io
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -260,6 +279,9 @@ rules:
   verbs:
   - create
   - delete
+  - get
+  - watch
+  - list
 - apiGroups:
   - storage.k8s.io
   resources:
@@ -278,21 +300,6 @@ rules:
   - watch
   - delete
 - apiGroups:
-  - csi.storage.k8s.io
-  resources:
-  - csidrivers
-  verbs:
-  - create
-  - delete
-- apiGroups:
-  - csi.storage.k8s.io
-  resources:
-  - csinodeinfos
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
   - snapshot.storage.k8s.io
   resources:
   - volumesnapshotcontents
@@ -300,35 +307,11 @@ rules:
   - get
   - list
 - apiGroups:
-  - csi.storage.k8s.io
-  resources:
-  - servicemonitors
-  verbs:
-  - get
-  - create
-- apiGroups:
   - csi.ibm.com
   resources:
   - '*'
   verbs:
   - '*'
-
----
-kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: ibm-block-csi-operator
-  labels:
-    product: ibm-block-csi-driver
-    csi: ibm
-subjects:
-- kind: ServiceAccount
-  name: ibm-block-csi-operator
-  namespace: kube-system
-roleRef:
-  kind: ClusterRole
-  name: ibm-block-csi-operator
-  apiGroup: rbac.authorization.k8s.io
 
 ---
 apiVersion: v1

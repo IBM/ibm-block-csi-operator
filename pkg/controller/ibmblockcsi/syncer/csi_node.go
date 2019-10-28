@@ -131,9 +131,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 		"DAC_OVERRIDE",
 	)
 
-	//nodePlugin.Resources = ensureResources(nodeContainerName)
-
-	// cluster driver registrar sidecar
+	// node driver registrar sidecar
 	registrar := s.ensureContainer(nodeDriverRegistrarContainerName,
 		config.NodeDriverRegistrarImage,
 		[]string{

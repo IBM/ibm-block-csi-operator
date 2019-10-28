@@ -36,7 +36,6 @@ import (
 const (
 	socketVolumeName                       = "socket-dir"
 	controllerContainerName                = "ibm-block-csi-controller"
-	controllerDriverRegistrarContainerName = "cluster-driver-registrar"
 	provisionerContainerName               = "csi-provisioner"
 	attacherContainerName                  = "csi-attacher"
 	controllerLivenessProbeContainerName   = "liveness-probe"
@@ -118,13 +117,6 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		ContainerPort: controllerContainerHealthPortNumber,
 	})
 
-	//controllerPlugin.Resources = ensureResources(controllerContainerName)
-
-	// cluster driver registrar sidecar
-	registrar := s.ensureContainer(controllerDriverRegistrarContainerName,
-		config.ClusterDriverRegistrarImage,
-		[]string{"--csi-address=$(ADDRESS)", "--v=5"},
-	)
 
 	// csi provisioner sidecar
 	provisioner := s.ensureContainer(provisionerContainerName,
@@ -149,7 +141,6 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 
 	return []corev1.Container{
 		controllerPlugin,
-		registrar,
 		provisioner,
 		attacher,
 		livenessProbe,
@@ -248,7 +239,7 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 			},
 		}
 
-	case controllerDriverRegistrarContainerName, provisionerContainerName, attacherContainerName:
+	case provisionerContainerName, attacherContainerName:
 		return []corev1.EnvVar{
 			{
 				Name:  "ADDRESS",
@@ -261,7 +252,7 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 
 func (s *csiControllerSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 	switch name {
-	case controllerContainerName, controllerDriverRegistrarContainerName, provisionerContainerName, attacherContainerName:
+	case controllerContainerName, provisionerContainerName, attacherContainerName:
 		return []corev1.VolumeMount{
 			{
 				Name:      socketVolumeName,
