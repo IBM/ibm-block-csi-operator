@@ -11,10 +11,10 @@
 2. Run `make test` in the project root directory.
 
 ## Developing guidelines
+- Be sure to run `make update` or `make test` before you finish a commit.
 - If CRDs in `deploy/crds` are updated, the same file names located in `deploy/olm-catalog/ibm-block-csi-operator` must be updated accordingly.
 - If `role.yaml`, `role_binding.yaml`, or `operator.yaml` in `deploy` are updated, the ClusterServiceVersion(CSV) file in `deploy/olm-catalog/ibm-block-csi-operator` must be updated accordingly.
 - If `README.md` is updated, ClusterServiceVersion(CSV) file in `deploy/olm-catalog/ibm-block-csi-operator` must be updated accordingly.
-- Be sure to run `make update` or `make test` before you finish a commit.
 - Run `operator-sdk add` to add a new API or controller, for more details, please refer to https://github.com/operator-framework/operator-sdk.
 - Run `operator-sdk generate k8s` and `operator-sdk generate openapi` after you change something in `pkg/apis`.
 
