@@ -8,9 +8,9 @@ spec:
     kind: IBMBlockCSI
     listKind: IBMBlockCSIList
     plural: ibmblockcsis
-    singular: ibmblockcsi
     shortNames:
     - ibc
+    singular: ibmblockcsi
   scope: Namespaced
   subresources:
     status: {}
