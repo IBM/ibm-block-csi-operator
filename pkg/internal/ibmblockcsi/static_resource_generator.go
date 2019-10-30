@@ -83,11 +83,11 @@ func (c *IBMBlockCSI) GenerateExternalProvisionerClusterRole() *rbacv1.ClusterRo
 			//				Resources: []string{"volumesnapshots"},
 			//				Verbs:     []string{"get", "list"},
 			//			},
-			{
-				APIGroups: []string{"snapshot.storage.k8s.io"},
-				Resources: []string{"volumesnapshotcontents"},
-				Verbs:     []string{"get", "list"},
-			},
+			//			{
+			//				APIGroups: []string{"snapshot.storage.k8s.io"},
+			//				Resources: []string{"volumesnapshotcontents"},
+			//				Verbs:     []string{"get", "list"},
+			//			},
 			{
 				APIGroups: []string{c.GetCSIAPIGroup()},
 				Resources: []string{c.GetCSINodeObject()},
@@ -172,7 +172,6 @@ func (c *IBMBlockCSI) GenerateExternalAttacherClusterRoleBinding() *rbacv1.Clust
 	}
 }
 
-
 func (c *IBMBlockCSI) GenerateExternalSnapshotterClusterRole() *rbacv1.ClusterRole {
 	return &rbacv1.ClusterRole{
 		ObjectMeta: metav1.ObjectMeta{
@@ -204,21 +203,21 @@ func (c *IBMBlockCSI) GenerateExternalSnapshotterClusterRole() *rbacv1.ClusterRo
 				Resources: []string{"secrets"},
 				Verbs:     []string{"get", "list"},
 			},
-			{
-				APIGroups: []string{"snapshot.storage.k8s.io"},
-				Resources: []string{"volumesnapshotclasses"},
-				Verbs:     []string{"get", "list", "watch"},
-			},
+			//			{
+			//				APIGroups: []string{"snapshot.storage.k8s.io"},
+			//				Resources: []string{"volumesnapshotclasses"},
+			//				Verbs:     []string{"get", "list", "watch"},
+			//			},
 			//			{
 			//				APIGroups: []string{"snapshot.storage.k8s.io"},
 			//				Resources: []string{"volumesnapshots"},
 			//				Verbs:     []string{"get", "list", "watch", "update"},
 			//			},
-			{
-				APIGroups: []string{"snapshot.storage.k8s.io"},
-				Resources: []string{"volumesnapshotcontents"},
-				Verbs:     []string{"create", "get", "list", "watch", "update", "delete"},
-			},
+			//			{
+			//				APIGroups: []string{"snapshot.storage.k8s.io"},
+			//				Resources: []string{"volumesnapshotcontents"},
+			//				Verbs:     []string{"create", "get", "list", "watch", "update", "delete"},
+			//			},
 			{
 				APIGroups: []string{"apiextensions.k8s.io"},
 				Resources: []string{"customresourcedefinitions"},
