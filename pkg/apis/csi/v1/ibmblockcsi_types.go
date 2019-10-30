@@ -73,7 +73,7 @@ type IBMBlockCSIStatus struct {
 // IBMBlockCSI is the Schema for the ibmblockcsis API
 // +k8s:openapi-gen=true
 // +kubebuilder:subresource:status
-// +kubebuilder:resource:path=ibmblockcsis,scope=Namespaced
+// +kubebuilder:resource:path=ibmblockcsis,scope=Namespaced,shortName=ibc
 type IBMBlockCSI struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
