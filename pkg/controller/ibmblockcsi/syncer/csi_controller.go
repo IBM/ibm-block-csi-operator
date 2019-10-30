@@ -34,11 +34,11 @@ import (
 )
 
 const (
-	socketVolumeName                       = "socket-dir"
-	controllerContainerName                = "ibm-block-csi-controller"
-	provisionerContainerName               = "csi-provisioner"
-	attacherContainerName                  = "csi-attacher"
-	controllerLivenessProbeContainerName   = "liveness-probe"
+	socketVolumeName                     = "socket-dir"
+	controllerContainerName              = "ibm-block-csi-controller"
+	provisionerContainerName             = "csi-provisioner"
+	attacherContainerName                = "csi-attacher"
+	controllerLivenessProbeContainerName = "liveness-probe"
 
 	controllerContainerHealthPortName   = "healthz"
 	controllerContainerHealthPortNumber = 9808
@@ -112,11 +112,13 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		s.driver.GetCSIControllerImage(),
 		[]string{"--csi-endpoint=$(CSI_ENDPOINT)"},
 	)
+
+	controllerPlugin.Resources = ensureResources("40m", "300m", "40Mi", "200Mi")
+
 	controllerPlugin.Ports = ensurePorts(corev1.ContainerPort{
 		Name:          controllerContainerHealthPortName,
 		ContainerPort: controllerContainerHealthPortNumber,
 	})
-
 
 	// csi provisioner sidecar
 	provisioner := s.ensureContainer(provisionerContainerName,
@@ -148,7 +150,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 }
 
 func ensureDefaultResources() corev1.ResourceRequirements {
-	return ensureResources("50m", "100m", "50Mi", "100Mi")
+	return ensureResources("20m", "40m", "20Mi", "40Mi")
 }
 
 func ensureResources(cpuRequests, cpuLimits, memoryRequests, memoryLimits string) corev1.ResourceRequirements {
