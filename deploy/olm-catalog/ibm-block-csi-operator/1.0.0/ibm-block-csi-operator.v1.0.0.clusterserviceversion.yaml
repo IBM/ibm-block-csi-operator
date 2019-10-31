@@ -8,7 +8,7 @@ metadata:
     categories: "Storage,Cloud Provider"
     certified: "true"
     containerImage: ibmcom/ibm-block-csi-operator:1.0.0
-    createdAt: "2019-10-21T16:45:00Z"
+    createdAt: "2019-11-05T16:45:00Z"
     description: "Run IBM block storage CSI driver on OpenShift."
     repository: https://github.com/IBM/ibm-block-csi-operator
     support: IBM
@@ -41,8 +41,8 @@ spec:
     This is the official operator to deploy and manage IBM block storage CSI driver.
 
     Supported container platforms:
-      - OpenShift v4.2+
-      - Kubernetes v1.14+
+      - OpenShift v4.2
+      - Kubernetes v1.14
 
     Supported IBM storage systems:
       - IBM FlashSystem 9100
@@ -52,7 +52,6 @@ spec:
 
     Supported operating systems:
       - RHEL 7.x (x86 architecture)
-      - RHCOS 4.1 (x86 architecture)
 
     ## Prerequisites
     
@@ -77,6 +76,7 @@ spec:
     ```bash
     $ yum install device-mapper-multipath
     $ modprobe dm-multipath
+    $ systemctl enable multipathd
     $ systemctl start multipathd
     $ systemctl status multipathd
     $ multipath -ll
@@ -154,14 +154,19 @@ spec:
         description: "Represents an block storage CSI driver"
         resources:
           - kind: ServiceAccount
+            name: ''
             version: v1
           - kind: ClusterRole
+            name: ''
             version: rbac.authorization.k8s.io/v1beta1
           - kind: ClusterRoleBinding
+            name: ''
             version: rbac.authorization.k8s.io/v1beta1
           - kind: StatefulSet
+            name: ''
             version: apps/v1
           - kind: DaemonSet
+            name: ''
             version: apps/v1
         specDescriptors:
           - description: Controller Image Repository.
@@ -213,14 +218,47 @@ spec:
               - ""
               resources:
               - pods
-              - services
-              - services/finalizers
-              - endpoints
-              - persistentvolumeclaims
-              - persistentvolumes
-              - events
+              verbs:
+              - get
+            - apiGroups:
+              - ""
+              resources:
               - configmaps
+              verbs:
+              - get
+              - create
+              - delete
+            - apiGroups:
+              - ""
+              resources:
               - secrets
+              verbs:
+              - get
+              - list
+            - apiGroups:
+              - ""
+              resources:
+              - persistentvolumeclaims
+              verbs:
+              - get
+              - list
+              - watch
+              - update
+            - apiGroups:
+              - ""
+              resources:
+              - persistentvolumes
+              verbs:
+              - get
+              - list
+              - watch
+              - update
+              - create
+              - delete
+            - apiGroups:
+              - ""
+              resources:
+              - events
               verbs:
               - '*'
             - apiGroups:
@@ -236,10 +274,14 @@ spec:
               resources:
               - deployments
               - daemonsets
-              - replicasets
               - statefulsets
               verbs:
-              - '*'
+              - get
+              - list
+              - watch
+              - update
+              - create
+              - delete
             - apiGroups:
               - ""
               resources:
@@ -321,13 +363,6 @@ spec:
               - watch
               - delete
             - apiGroups:
-              - snapshot.storage.k8s.io
-              resources:
-              - volumesnapshotcontents
-              verbs:
-              - get
-              - list
-            - apiGroups:
               - csi.ibm.com
               resources:
               - '*'
@@ -378,7 +413,7 @@ spec:
                     capabilities:
                       drop:
                       - ALL
-                  image: ibmcom/ibm-block-csi-operator:0.9.0
+                  image: ibmcom/ibm-block-csi-operator:1.0.0
                   imagePullPolicy: IfNotPresent
                   command:
                   - ibm-block-csi-operator
