@@ -10,9 +10,9 @@ spec:
     kind: IBMBlockCSI
     listKind: IBMBlockCSIList
     plural: ibmblockcsis
-    singular: ibmblockcsi
     shortNames:
     - ibc
+    singular: ibmblockcsi
   scope: Namespaced
   subresources:
     status: {}
@@ -175,14 +175,47 @@ rules:
   - ""
   resources:
   - pods
-  - services
-  - services/finalizers
-  - endpoints
-  - persistentvolumeclaims
-  - persistentvolumes
-  - events
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
   - configmaps
+  verbs:
+  - get
+  - create
+  - delete
+- apiGroups:
+  - ""
+  resources:
   - secrets
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumes
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - create
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - events
   verbs:
   - '*'
 - apiGroups:
@@ -198,10 +231,14 @@ rules:
   resources:
   - deployments
   - daemonsets
-  - replicasets
   - statefulsets
   verbs:
-  - '*'
+  - get
+  - list
+  - watch
+  - update
+  - create
+  - delete
 - apiGroups:
   - ""
   resources:
@@ -282,13 +319,6 @@ rules:
   - list
   - watch
   - delete
-- apiGroups:
-  - snapshot.storage.k8s.io
-  resources:
-  - volumesnapshotcontents
-  verbs:
-  - get
-  - list
 - apiGroups:
   - csi.ibm.com
   resources:
