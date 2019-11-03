@@ -16,7 +16,7 @@ Supported IBM storage systems:
 Supported operating systems:
   - RHEL 7.x (x86 architecture)
 
-Full documentation can be found in the [IBM knowlage center](https://www.ibm.com/support/knowledgecenter/SSRQ8T).
+Full documentation can be found in the [IBM knowledge center](www.ibm.com/support/knowledgecenter/SSRQ8T).
 
 <br/>
 <br/>
@@ -168,9 +168,9 @@ metadata:
 type: Opaque
 stringData:
   management_address: <VALUE-2,VALUE-3> # Array management addresses
-  username: <VALUE-4>                   # Array username.  
+  username: <VALUE-4>                   # Array username
 data:
-  password: <VALUE-5 base64>            # Array password.
+  password: <VALUE-5 base64>            # Array password
 ```
 
 Apply the secret:
@@ -233,9 +233,8 @@ $ kubectl delete -f csi.ibm.com_v1_ibmblockcsi_cr.yaml
 ```
 
 ### 2. Delete the operator.
-<!-- $ kubectl delete CSIDriver ibm-block-csi-driver -->
 ```bash
-$ kubectl delete -f deploy/ibm-block-csi-operator.yaml
+$ kubectl delete -f ibm-block-csi-operator.yaml
 ```
 
 <br/>
