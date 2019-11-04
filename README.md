@@ -32,7 +32,7 @@ Perform these steps for each worker node in Kubernetes cluster:
 Skip this step if the packages are already installed.
 
 RHEL 7.x:
-```sh
+```bash
 yum -y install iscsi-initiator-utils   # Only if iSCSI connectivity is required
 yum -y install xfsprogs                # Only if XFS file system is required
 ```
@@ -43,7 +43,7 @@ You can also use the default `multipath.conf` file, located in the `/usr/share/d
 Verify that the `systemctl status multipathd` output indicates that the multipath status is active and error-free.
 
 RHEL 7.x:
-```sh
+```bash
 yum install device-mapper-multipath
 modprobe dm-multipath
 systemctl enable multipathd
@@ -61,22 +61,22 @@ multipath -ll
 
 3.3. For iSCSI, perform the following steps:
 
-3.3.1. Make sure that the login to the iSCSI targets is permanent and remains available after a reboot of the worker node. To do this, verify that the node.startup in the /etc/iscsi/iscsid.conf file is set to automatic. If not, set it as required and then restart the iscsid service `$> service iscsid restart`.
+3.3.1. Make sure that the login to the iSCSI targets is permanent and remains available after a reboot of the worker node. To do this, verify that the node.startup in the /etc/iscsi/iscsid.conf file is set to automatic. If not, set it as required and then restart the iscsid service `$ service iscsid restart`.
 
 3.3.2. Discover and log into at least two iSCSI targets on the relevant storage systems. (NOTE: Without at least two ports, multipath device will not be created.)
 
-```sh
-$> iscsiadm -m discoverydb -t st -p ${STORAGE-SYSTEM-iSCSI-PORT-IP1}:3260 --discover
-$> iscsiadm -m node -p ${STORAGE-SYSTEM-iSCSI-PORT-IP1} --login
+```bash
+$ iscsiadm -m discoverydb -t st -p ${STORAGE-SYSTEM-iSCSI-PORT-IP1}:3260 --discover
+$ iscsiadm -m node -p ${STORAGE-SYSTEM-iSCSI-PORT-IP1} --login
 
-$> iscsiadm -m discoverydb -t st -p ${STORAGE-SYSTEM-iSCSI-PORT-IP2}:3260 --discover
-$> iscsiadm -m node -p ${STORAGE-SYSTEM-iSCSI-PORT-IP2} --login
+$ iscsiadm -m discoverydb -t st -p ${STORAGE-SYSTEM-iSCSI-PORT-IP2}:3260 --discover
+$ iscsiadm -m node -p ${STORAGE-SYSTEM-iSCSI-PORT-IP2} --login
 ```
 
 3.3.3. Verify that the login was successful and display all targets that you logged into. The portal value must be the iSCSI target IP address.
 
-```sh
-$> iscsiadm -m session --rescan
+```bash
+$ iscsiadm -m session --rescan
 Rescanning session [sid: 1, target: {storage system IQN},
 portal: {STORAGE-SYSTEM-iSCSI-PORT-IP1},{port number}
 portal: {STORAGE-SYSTEM-iSCSI-PORT-IP2},{port number}
@@ -137,7 +137,7 @@ $ kubectl apply -f csi.ibm.com_v1_ibmblockcsi_cr.yaml
 ### Verify the driver is running:
 
 ```bash
-$> kubectl get all -n kube-system  -l csi
+$ kubectl get all -n kube-system  -l csi
 NAME                             READY   STATUS    RESTARTS   AGE
 pod/ibm-block-csi-controller-0   4/4     Running   0          9m36s
 pod/ibm-block-csi-node-jvmvh     3/3     Running   0          9m36s
@@ -178,14 +178,14 @@ data:
 Apply the secret:
 
 ```
-$> kubectl apply -f array-secret.yaml
+$ kubectl apply -f array-secret.yaml
 ```
 
 #### 2. Create storage classes
 
 Create a storage class yaml file `storageclass-gold.yaml` as follows, with the relevant capabilities, pool and, array secret:
 
-```sh
+```bash
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
@@ -205,8 +205,8 @@ parameters:
 
 Apply the storage class:
 
-```sh
-$> kubectl apply -f storageclass-gold.yaml
+```bash
+$ kubectl apply -f storageclass-gold.yaml
 storageclass.storage.k8s.io/gold created
 ```
 You can now run stateful applications using IBM block storage systems.
