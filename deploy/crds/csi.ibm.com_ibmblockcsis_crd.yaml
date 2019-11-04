@@ -60,9 +60,28 @@ spec:
               - repository
               - tag
               type: object
+            sidecars:
+              items:
+                properties:
+                  name:
+                    description: The name of the csi sidecar image
+                    type: string
+                  repository:
+                    description: The repository of the csi sidecar image
+                    type: string
+                  tag:
+                    description: The tag of the csi sidecar image
+                    type: string
+                required:
+                - name
+                - repository
+                - tag
+                type: object
+              type: array
           required:
           - controller
           - node
+          - sidecars
           type: object
         status:
           description: IBMBlockCSIStatus defines the observed state of IBMBlockCSI

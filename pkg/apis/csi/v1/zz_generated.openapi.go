@@ -253,12 +253,24 @@ func schema_pkg_apis_csi_v1_IBMBlockCSISpec(ref common.ReferenceCallback) common
 							Ref: ref("github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.IBMBlockCSINodeSpec"),
 						},
 					},
+					"sidecars": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.CSISidecar"),
+									},
+								},
+							},
+						},
+					},
 				},
-				Required: []string{"controller", "node"},
+				Required: []string{"controller", "node", "sidecars"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.IBMBlockCSIControllerSpec", "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.IBMBlockCSINodeSpec"},
+			"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.CSISidecar", "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.IBMBlockCSIControllerSpec", "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.IBMBlockCSINodeSpec"},
 	}
 }
 
