@@ -45,7 +45,7 @@ ENV OPERATOR=/usr/local/bin/ibm-block-csi-operator \
 COPY build/health_check.sh .
 RUN chmod 777 ./health_check.sh
 COPY ./LICENSE /licenses/
-# COPY ./NOTICES /licenses/
+COPY ./NOTICES /licenses/
 
 # install operator binary
 COPY --from=0 /go/src/github.com/IBM/ibm-block-csi-operator/build/_output/bin/ibm-block-csi-operator ${OPERATOR}
