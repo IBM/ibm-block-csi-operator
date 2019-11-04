@@ -17,6 +17,8 @@
 package syncer
 
 import (
+	"fmt"
+
 	"github.com/imdario/mergo"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -25,6 +27,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	csiv1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/internal/ibmblockcsi"
 	"github.com/IBM/ibm-block-csi-operator/pkg/util/boolptr"
@@ -136,7 +139,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 
 	// node driver registrar sidecar
 	registrar := s.ensureContainer(nodeDriverRegistrarContainerName,
-		config.NodeDriverRegistrarImage,
+		s.getCSINodeDriverRegistrarImage(),
 		[]string{
 			"--csi-address=$(ADDRESS)",
 			"--kubelet-registration-path=$(DRIVER_REG_SOCK_PATH)",
@@ -155,7 +158,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 
 	// liveness probe sidecar
 	livenessProbe := s.ensureContainer(nodeLivenessProbeContainerName,
-		config.CSILivenessProbeImage,
+		s.getLivenessProbeImage(),
 		[]string{
 			"--csi-address=/csi/csi.sock",
 		},
@@ -294,6 +297,26 @@ func (s *csiNodeSyncer) ensureVolumes() []corev1.Volume {
 		ensureVolume("sys-dir", ensureHostPathVolumeSource("/sys", "Directory")),
 		ensureVolume("host-dir", ensureHostPathVolumeSource("/", "Directory")),
 	}
+}
+
+func (s *csiNodeSyncer) getSidecarByName(name string) *csiv1.CSISidecar {
+	return getSidecarByName(s.driver, name)
+}
+
+func (s *csiNodeSyncer) getCSINodeDriverRegistrarImage() string {
+	sidecar := s.getSidecarByName(config.CSINodeDriverRegistrar)
+	if sidecar != nil {
+		return fmt.Sprintf("%s:%s", sidecar.Repository, sidecar.Tag)
+	}
+	return config.NodeDriverRegistrarImage
+}
+
+func (s *csiNodeSyncer) getLivenessProbeImage() string {
+	sidecar := s.getSidecarByName(config.LivenessProbe)
+	if sidecar != nil {
+		return fmt.Sprintf("%s:%s", sidecar.Repository, sidecar.Tag)
+	}
+	return config.CSILivenessProbeImage
 }
 
 func ensureHostPathVolumeSource(path, pathType string) corev1.VolumeSource {

@@ -29,11 +29,23 @@ const (
 	DriverPhaseFailed   DriverPhase = "Failed"
 )
 
+type CSISidecar struct {
+	// The name of the csi sidecar image
+	Name string `json:"name"`
+
+	// The repository of the csi sidecar image
+	Repository string `json:"repository"`
+
+	// The tag of the csi sidecar image
+	Tag string `json:"tag"`
+}
+
 // IBMBlockCSISpec defines the desired state of IBMBlockCSI
 // +k8s:openapi-gen=true
 type IBMBlockCSISpec struct {
 	Controller IBMBlockCSIControllerSpec `json:"controller"`
 	Node       IBMBlockCSINodeSpec       `json:"node"`
+	Sidecars   []CSISidecar              `json:"sidecars"`
 }
 
 // IBMBlockCSIControllerSpec defines the desired state of IBMBlockCSIController

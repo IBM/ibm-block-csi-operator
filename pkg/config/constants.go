@@ -35,6 +35,11 @@ const (
 	ENVNodeName       = "NODE_NAME"
 	ENVKubeVersion    = "KUBE_VERSION"
 
+	CSINodeDriverRegistrar = "csi-node-driver-registrar"
+	CSIProvisioner         = "csi-provisioner"
+	CSIAttacher            = "csi-attacher"
+	LivenessProbe          = "livenessprobe"
+
 	ControllerSocketVolumeMountPath                       = "/var/lib/csi/sockets/pluginproxy/"
 	NodeSocketVolumeMountPath                             = "/csi"
 	ControllerLivenessProbeContainerSocketVolumeMountPath = "/csi"
