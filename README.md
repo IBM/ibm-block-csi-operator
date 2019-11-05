@@ -185,7 +185,7 @@ $ kubectl apply -f array-secret.yaml
 
 Create a storage class yaml file `storageclass-gold.yaml` as follows, with the relevant capabilities, pool and, array secret:
 
-```bash
+```
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
