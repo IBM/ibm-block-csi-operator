@@ -82,9 +82,6 @@ portal: {STORAGE-SYSTEM-iSCSI-PORT-IP1},{port number}
 portal: {STORAGE-SYSTEM-iSCSI-PORT-IP2},{port number}
 ```
 
-End of worker node setup.
-
-
 
 
 <br/>
@@ -150,6 +147,11 @@ NAME                                        READY   AGE
 statefulset.apps/ibm-block-csi-controller   1/1     9m36s
 ```
 
+
+
+<br/>
+<br/>
+<br/>
 
 ## Configuring k8s secret and storage class 
 In order to use the driver, create the relevant storage classes and secrets, as needed.
