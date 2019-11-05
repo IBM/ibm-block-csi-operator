@@ -124,7 +124,7 @@ spec:
     Note: This section can be done also after the operator installation.
 
     This section describes how to:
-     1. Create a storage system secret - to define the storage credential (user and password) and its address.
+     1. Create a storage system secret - to define the storage system credentials (user and password) and its address.
      2. Configure the k8s storage class - to define the storage system pool name, secret reference, SpaceEfficiency (thin, compressed, or deduplicated) and fstype(xfs\ext4).
 
     #### 1. Create an array secret 

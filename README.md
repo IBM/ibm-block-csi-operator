@@ -157,7 +157,7 @@ statefulset.apps/ibm-block-csi-controller   1/1     9m36s
 In order to use the driver, create the relevant storage classes and secrets, as needed.
 
 This section describes how to:
- 1. Create a storage system secret - to define the storage credential (user and password) and its address.
+ 1. Create a storage system secret - to define the storage system credentials (user and password) and its address.
  2. Configure the k8s storage class - to define the storage system pool name, secret reference, SpaceEfficiency (thin, compressed, or deduplicated) and fstype(xfs\ext4).
 
 #### 1. Create an array secret 
