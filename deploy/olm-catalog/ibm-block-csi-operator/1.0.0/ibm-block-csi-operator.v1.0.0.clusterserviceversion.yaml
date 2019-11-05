@@ -62,7 +62,7 @@ spec:
     ### Preparing worker nodes
     Perform these steps for each worker node in OpenShift:
 
-    ### 1. Install Linux packages to ensure Fibre Channel and iSCSI connectivity.
+    #### 1. Install Linux packages to ensure Fibre Channel and iSCSI connectivity.
     Skip this step if the packages are already installed.
 
     RHEL 7.x:
