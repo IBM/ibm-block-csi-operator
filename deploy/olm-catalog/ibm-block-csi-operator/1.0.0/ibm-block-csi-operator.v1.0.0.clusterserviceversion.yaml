@@ -53,7 +53,7 @@ spec:
     Supported operating systems:
       - RHEL 7.x (x86 architecture)
 
-    Full documentation can be found in the [IBM knowledge center](www.ibm.com/support/knowledgecenter/SSRQ8T).
+    Full documentation can be found on the [IBM knowledge center](www.ibm.com/support/knowledgecenter/SSRQ8T).
 
     ## Prerequisites
 
@@ -115,13 +115,11 @@ spec:
     portal: {STORAGE-SYSTEM-iSCSI-PORT-IP2},{port number}
     ```
 
-    End of worker node setup.
-
 
 
     ## Configuring k8s secret and storage class
     In order to use the driver, create the relevant storage classes and secrets, as needed. 
-    Note: This section can be done before or after installing the operator.
+    Note: This section can be done also after the operator installation.
 
     This section describes how to:
      1. Create a storage system secret - to define the storage credential (user and password) and its address.
