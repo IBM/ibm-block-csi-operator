@@ -222,7 +222,7 @@ You can now run stateful applications using IBM block storage systems.
 
 
 ## Driver Usage
-> **Note**: For further usage details, refer to https://github.com/IBM/ibm-block-csi-driver
+> **Note**: For further usage details, refer to https://github.com/IBM/ibm-block-csi-driver. 
 >          In addition, full documentation can be found on the [IBM knowledge center](www.ibm.com/support/knowledgecenter/SSRQ8T).
 
 <br/>
