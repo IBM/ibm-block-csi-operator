@@ -636,7 +636,9 @@ spec:
                           type: array
                       type: object
                   type: object
-                pullPolicy:
+                imagePullPolicy:
+                  description: PullPolicy describes a policy for if/when to pull a
+                    container image
                   type: string
                 repository:
                   type: string
@@ -1291,7 +1293,9 @@ spec:
                           type: array
                       type: object
                   type: object
-                pullPolicy:
+                imagePullPolicy:
+                  description: PullPolicy describes a policy for if/when to pull a
+                    container image
                   type: string
                 repository:
                   type: string
@@ -1343,11 +1347,11 @@ spec:
             sidecars:
               items:
                 properties:
+                  imagePullPolicy:
+                    description: The pullPolicy of the csi sidecar image
+                    type: string
                   name:
                     description: The name of the csi sidecar image
-                    type: string
-                  pullPolicy:
-                    description: The pullPolicy of the csi sidecar image
                     type: string
                   repository:
                     description: The repository of the csi sidecar image

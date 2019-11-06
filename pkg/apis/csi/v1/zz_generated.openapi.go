@@ -199,7 +199,7 @@ func schema_pkg_apis_csi_v1_IBMBlockCSIControllerSpec(ref common.ReferenceCallba
 							Format: "",
 						},
 					},
-					"pullPolicy": {
+					"imagePullPolicy": {
 						SchemaProps: spec.SchemaProps{
 							Type:   []string{"string"},
 							Format: "",
@@ -228,7 +228,7 @@ func schema_pkg_apis_csi_v1_IBMBlockCSIControllerSpec(ref common.ReferenceCallba
 						},
 					},
 				},
-				Required: []string{"repository", "tag", "pullPolicy", "affinity", "tolerations"},
+				Required: []string{"repository", "tag", "imagePullPolicy", "affinity", "tolerations"},
 			},
 		},
 		Dependencies: []string{
@@ -255,7 +255,7 @@ func schema_pkg_apis_csi_v1_IBMBlockCSINodeSpec(ref common.ReferenceCallback) co
 							Format: "",
 						},
 					},
-					"pullPolicy": {
+					"imagePullPolicy": {
 						SchemaProps: spec.SchemaProps{
 							Type:   []string{"string"},
 							Format: "",
@@ -284,7 +284,7 @@ func schema_pkg_apis_csi_v1_IBMBlockCSINodeSpec(ref common.ReferenceCallback) co
 						},
 					},
 				},
-				Required: []string{"repository", "tag", "pullPolicy", "affinity", "tolerations"},
+				Required: []string{"repository", "tag", "imagePullPolicy", "affinity", "tolerations"},
 			},
 		},
 		Dependencies: []string{
