@@ -60,9 +60,29 @@ type IBMBlockCSISpec struct {
 	ImagePullSecrets []string `json:"imagePullSecrets"`
 }
 
-// IBMBlockCSIComponentSpec defines the desired state of IBMBlockCSIController
+// seems not work in this way, need to figure out why
+//// IBMBlockCSIComponentSpec defines the desired state of IBMBlockCSIController
+//// +k8s:openapi-gen=true
+//type BlockCSIComponent struct {
+//	Repository string `json:"repository"`
+//	Tag        string `json:"tag"`
+
+//	// +kubebuilder:validation:Optional
+//	PullPolicy string `json:"pullPolicy"`
+
+//	// +kubebuilder:validation:Optional
+//	Affinity *corev1.Affinity `json:"affinity"`
+
+//	// +listType=set
+//	// +kubebuilder:validation:Optional
+//	Tolerations []corev1.Toleration `json:"tolerations"`
+//}
+
+// IBMBlockCSIControllerSpec defines the desired state of IBMBlockCSIController
 // +k8s:openapi-gen=true
-type BlockCSIComponent struct {
+type IBMBlockCSIControllerSpec struct {
+	// BlockCSIComponent `json:"blockCSIComponent"`
+
 	Repository string `json:"repository"`
 	Tag        string `json:"tag"`
 
@@ -77,16 +97,23 @@ type BlockCSIComponent struct {
 	Tolerations []corev1.Toleration `json:"tolerations"`
 }
 
-// IBMBlockCSIControllerSpec defines the desired state of IBMBlockCSIController
-// +k8s:openapi-gen=true
-type IBMBlockCSIControllerSpec struct {
-	BlockCSIComponent `json:"blockCSIComponent"`
-}
-
 // IBMBlockCSINodeSpec defines the desired state of IBMBlockCSINode
 // +k8s:openapi-gen=true
 type IBMBlockCSINodeSpec struct {
-	BlockCSIComponent `json:"blockCSIComponent"`
+	// BlockCSIComponent `json:"blockCSIComponent"`
+
+	Repository string `json:"repository"`
+	Tag        string `json:"tag"`
+
+	// +kubebuilder:validation:Optional
+	PullPolicy string `json:"pullPolicy"`
+
+	// +kubebuilder:validation:Optional
+	Affinity *corev1.Affinity `json:"affinity"`
+
+	// +listType=set
+	// +kubebuilder:validation:Optional
+	Tolerations []corev1.Toleration `json:"tolerations"`
 }
 
 // IBMBlockCSIStatus defines the observed state of IBMBlockCSI

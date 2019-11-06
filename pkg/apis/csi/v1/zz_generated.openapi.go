@@ -27,7 +27,6 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.BlockCSIComponent":         schema_pkg_apis_csi_v1_BlockCSIComponent(ref),
 		"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.Config":                    schema_pkg_apis_csi_v1_Config(ref),
 		"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.ConfigSpec":                schema_pkg_apis_csi_v1_ConfigSpec(ref),
 		"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.ConfigStatus":              schema_pkg_apis_csi_v1_ConfigStatus(ref),
@@ -41,62 +40,6 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.NodeInfo":                  schema_pkg_apis_csi_v1_NodeInfo(ref),
 		"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.NodeInfoSpec":              schema_pkg_apis_csi_v1_NodeInfoSpec(ref),
 		"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.NodeInfoStatus":            schema_pkg_apis_csi_v1_NodeInfoStatus(ref),
-	}
-}
-
-func schema_pkg_apis_csi_v1_BlockCSIComponent(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "IBMBlockCSIComponentSpec defines the desired state of IBMBlockCSIController",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"repository": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"tag": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"pullPolicy": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"affinity": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("k8s.io/api/core/v1.Affinity"),
-						},
-					},
-					"tolerations": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "set",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/api/core/v1.Toleration"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"repository", "tag", "pullPolicy", "affinity", "tolerations"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/api/core/v1.Affinity", "k8s.io/api/core/v1.Toleration"},
 	}
 }
 
@@ -244,17 +187,52 @@ func schema_pkg_apis_csi_v1_IBMBlockCSIControllerSpec(ref common.ReferenceCallba
 				Description: "IBMBlockCSIControllerSpec defines the desired state of IBMBlockCSIController",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"blockCSIComponent": {
+					"repository": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.BlockCSIComponent"),
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"tag": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"pullPolicy": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"affinity": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("k8s.io/api/core/v1.Affinity"),
+						},
+					},
+					"tolerations": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "set",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/api/core/v1.Toleration"),
+									},
+								},
+							},
 						},
 					},
 				},
-				Required: []string{"blockCSIComponent"},
+				Required: []string{"repository", "tag", "pullPolicy", "affinity", "tolerations"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.BlockCSIComponent"},
+			"k8s.io/api/core/v1.Affinity", "k8s.io/api/core/v1.Toleration"},
 	}
 }
 
@@ -265,17 +243,52 @@ func schema_pkg_apis_csi_v1_IBMBlockCSINodeSpec(ref common.ReferenceCallback) co
 				Description: "IBMBlockCSINodeSpec defines the desired state of IBMBlockCSINode",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"blockCSIComponent": {
+					"repository": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.BlockCSIComponent"),
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"tag": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"pullPolicy": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"affinity": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("k8s.io/api/core/v1.Affinity"),
+						},
+					},
+					"tolerations": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "set",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/api/core/v1.Toleration"),
+									},
+								},
+							},
 						},
 					},
 				},
-				Required: []string{"blockCSIComponent"},
+				Required: []string{"repository", "tag", "pullPolicy", "affinity", "tolerations"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.BlockCSIComponent"},
+			"k8s.io/api/core/v1.Affinity", "k8s.io/api/core/v1.Toleration"},
 	}
 }
 
