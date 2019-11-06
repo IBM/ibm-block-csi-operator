@@ -53,7 +53,7 @@ var _ = Describe("DefaultSetter", func() {
 				ibc = &csiv1.IBMBlockCSI{
 					Spec: csiv1.IBMBlockCSISpec{
 						Controller: csiv1.IBMBlockCSIControllerSpec{
-							Repository: "test",
+							BlockCSIComponent: csiv1.BlockCSIComponent{Repository: "test"},
 						},
 					}}
 				ibcWrapper.IBMBlockCSI = ibc
@@ -74,7 +74,7 @@ var _ = Describe("DefaultSetter", func() {
 				ibc = &csiv1.IBMBlockCSI{
 					Spec: csiv1.IBMBlockCSISpec{
 						Controller: csiv1.IBMBlockCSIControllerSpec{
-							Tag: "test",
+							BlockCSIComponent: csiv1.BlockCSIComponent{Tag: "test"},
 						},
 					}}
 				ibcWrapper.IBMBlockCSI = ibc
@@ -95,7 +95,7 @@ var _ = Describe("DefaultSetter", func() {
 				ibc = &csiv1.IBMBlockCSI{
 					Spec: csiv1.IBMBlockCSISpec{
 						Node: csiv1.IBMBlockCSINodeSpec{
-							Repository: "test",
+							BlockCSIComponent: csiv1.BlockCSIComponent{Repository: "test"},
 						},
 					}}
 				ibcWrapper.IBMBlockCSI = ibc
@@ -116,7 +116,7 @@ var _ = Describe("DefaultSetter", func() {
 				ibc = &csiv1.IBMBlockCSI{
 					Spec: csiv1.IBMBlockCSISpec{
 						Node: csiv1.IBMBlockCSINodeSpec{
-							Tag: "test",
+							BlockCSIComponent: csiv1.BlockCSIComponent{Tag: "test"},
 						},
 					}}
 				ibcWrapper.IBMBlockCSI = ibc
