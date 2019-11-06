@@ -42,7 +42,7 @@ type CSISidecar struct {
 
 	// The pullPolicy of the csi sidecar image
 	// +kubebuilder:validation:Optional
-	PullPolicy corev1.PullPolicy `json:"pullPolicy"`
+	ImagePullPolicy corev1.PullPolicy `json:"pullPolicy"`
 }
 
 // IBMBlockCSISpec defines the desired state of IBMBlockCSI
@@ -87,7 +87,7 @@ type IBMBlockCSIControllerSpec struct {
 	Tag        string `json:"tag"`
 
 	// +kubebuilder:validation:Optional
-	PullPolicy string `json:"pullPolicy"`
+	ImagePullPolicy string `json:"pullPolicy"`
 
 	// +kubebuilder:validation:Optional
 	Affinity *corev1.Affinity `json:"affinity"`
@@ -106,7 +106,7 @@ type IBMBlockCSINodeSpec struct {
 	Tag        string `json:"tag"`
 
 	// +kubebuilder:validation:Optional
-	PullPolicy string `json:"pullPolicy"`
+	ImagePullPolicy string `json:"pullPolicy"`
 
 	// +kubebuilder:validation:Optional
 	Affinity *corev1.Affinity `json:"affinity"`

@@ -48,6 +48,8 @@ func GetNameForResource(name ResourceName, driverName string) string {
 		return fmt.Sprintf("%s-node", driverName)
 	case CSIControllerServiceAccount:
 		return fmt.Sprintf("%s-controller-sa", driverName)
+	case CSINodeServiceAccount:
+		return fmt.Sprintf("%s-node-sa", driverName)
 	default:
 		return fmt.Sprintf("%s-%s", driverName, name)
 	}

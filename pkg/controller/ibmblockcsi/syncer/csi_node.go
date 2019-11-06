@@ -122,6 +122,8 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 		ContainerPort: nodeContainerHealthPortNumber,
 	})
 
+	nodePlugin.ImagePullPolicy = s.driver.Spec.Node.ImagePullPolicy
+
 	nodePlugin.SecurityContext = &corev1.SecurityContext{
 		Privileged:               boolptr.True(),
 		AllowPrivilegeEscalation: boolptr.True(),
@@ -321,16 +323,16 @@ func (s *csiNodeSyncer) getLivenessProbeImage() string {
 
 func (s *csiNodeSyncer) getCSINodeDriverRegistrarPullPolicy() corev1.PullPolicy {
 	sidecar := s.getSidecarByName(config.CSINodeDriverRegistrar)
-	if sidecar != nil && sidecar.PullPolicy != "" {
-		return sidecar.PullPolicy
+	if sidecar != nil && sidecar.ImagePullPolicy != "" {
+		return sidecar.ImagePullPolicy
 	}
 	return corev1.PullIfNotPresent
 }
 
 func (s *csiNodeSyncer) getLivenessProbePullPolicy() corev1.PullPolicy {
 	sidecar := s.getSidecarByName(config.LivenessProbe)
-	if sidecar != nil && sidecar.PullPolicy != "" {
-		return sidecar.PullPolicy
+	if sidecar != nil && sidecar.ImagePullPolicy != "" {
+		return sidecar.ImagePullPolicy
 	}
 	return corev1.PullIfNotPresent
 }
