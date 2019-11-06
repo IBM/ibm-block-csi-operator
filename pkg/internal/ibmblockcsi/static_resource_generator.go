@@ -38,12 +38,38 @@ func (c *IBMBlockCSI) GenerateCSIDriver() *storagev1beta1.CSIDriver {
 }
 
 func (c *IBMBlockCSI) GenerateControllerServiceAccount() *corev1.ServiceAccount {
+	secrets := []corev1.LocalObjectReference{}
+	if len(c.Spec.ImagePullSecrets) > 0 {
+		for _, s := range c.Spec.ImagePullSecrets {
+			secrets = append(secrets, corev1.LocalObjectReference{Name: s})
+		}
+	}
+
 	return &corev1.ServiceAccount{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      config.GetNameForResource(config.CSIControllerServiceAccount, c.Name),
 			Namespace: c.Namespace,
 			Labels:    c.GetLabels(),
 		},
+		ImagePullSecrets: secrets,
+	}
+}
+
+func (c *IBMBlockCSI) GenerateNodeServiceAccount() *corev1.ServiceAccount {
+	secrets := []corev1.LocalObjectReference{}
+	if len(c.Spec.ImagePullSecrets) > 0 {
+		for _, s := range c.Spec.ImagePullSecrets {
+			secrets = append(secrets, corev1.LocalObjectReference{Name: s})
+		}
+	}
+
+	return &corev1.ServiceAccount{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      config.GetNameForResource(config.CSINodeServiceAccount, c.Name),
+			Namespace: c.Namespace,
+			Labels:    c.GetLabels(),
+		},
+		ImagePullSecrets: secrets,
 	}
 }
 

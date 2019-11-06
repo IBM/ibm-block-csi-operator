@@ -11,19 +11,48 @@ spec:
   controller:
     repository: ibmcom/ibm-block-csi-driver-controller
     tag: "1.0.0"
+    imagePullPolicy: IfNotPresent
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/arch
+                  operator: In
+                  values:
+                    - amd64
+
   node:
     repository: ibmcom/ibm-block-csi-driver-node
     tag: "1.0.0"
+    imagePullPolicy: IfNotPresent
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/arch
+                  operator: In
+                  values:
+                    - amd64
+
   sidecars:
   - name: csi-node-driver-registrar
     repository: quay.io/k8scsi/csi-node-driver-registrar
     tag: "v1.2.0"
+    imagePullPolicy: IfNotPresent
   - name: csi-provisioner
     repository: quay.io/k8scsi/csi-provisioner
     tag: "v1.3.0"
+    imagePullPolicy: IfNotPresent
   - name: csi-attacher
     repository: quay.io/k8scsi/csi-attacher
     tag: "v1.2.1"
+    imagePullPolicy: IfNotPresent
   - name: livenessprobe
     repository: quay.io/k8scsi/livenessprobe
     tag: "v1.1.0"
+    imagePullPolicy: IfNotPresent
+
+  imagePullSecrets:
+  - "secret1"

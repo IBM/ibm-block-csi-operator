@@ -17,6 +17,7 @@
 package v1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -38,6 +39,10 @@ type CSISidecar struct {
 
 	// The tag of the csi sidecar image
 	Tag string `json:"tag"`
+
+	// The pullPolicy of the csi sidecar image
+	// +kubebuilder:validation:Optional
+	PullPolicy corev1.PullPolicy `json:"pullPolicy"`
 }
 
 // IBMBlockCSISpec defines the desired state of IBMBlockCSI
@@ -45,27 +50,43 @@ type CSISidecar struct {
 type IBMBlockCSISpec struct {
 	Controller IBMBlockCSIControllerSpec `json:"controller"`
 	Node       IBMBlockCSINodeSpec       `json:"node"`
-	Sidecars   []CSISidecar              `json:"sidecars"`
+
+	// +listType=set
+	// +kubebuilder:validation:Optional
+	Sidecars []CSISidecar `json:"sidecars"`
+
+	// +listType=set
+	// +kubebuilder:validation:Optional
+	ImagePullSecrets []string `json:"imagePullSecrets"`
+}
+
+// IBMBlockCSIComponentSpec defines the desired state of IBMBlockCSIController
+// +k8s:openapi-gen=true
+type BlockCSIComponent struct {
+	Repository string `json:"repository"`
+	Tag        string `json:"tag"`
+
+	// +kubebuilder:validation:Optional
+	PullPolicy string `json:"pullPolicy"`
+
+	// +kubebuilder:validation:Optional
+	Affinity *corev1.Affinity `json:"affinity"`
+
+	// +listType=set
+	// +kubebuilder:validation:Optional
+	Tolerations []corev1.Toleration `json:"tolerations"`
 }
 
 // IBMBlockCSIControllerSpec defines the desired state of IBMBlockCSIController
 // +k8s:openapi-gen=true
 type IBMBlockCSIControllerSpec struct {
-	// The repository of the controller image
-	Repository string `json:"repository"`
-
-	// The tag of the controller image
-	Tag string `json:"tag"`
+	BlockCSIComponent `json:"blockCSIComponent"`
 }
 
 // IBMBlockCSINodeSpec defines the desired state of IBMBlockCSINode
 // +k8s:openapi-gen=true
 type IBMBlockCSINodeSpec struct {
-	// The repository of the node image
-	Repository string `json:"repository"`
-
-	// The tag of the node image
-	Tag string `json:"tag"`
+	BlockCSIComponent `json:"blockCSIComponent"`
 }
 
 // IBMBlockCSIStatus defines the observed state of IBMBlockCSI

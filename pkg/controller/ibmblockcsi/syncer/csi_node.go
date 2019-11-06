@@ -97,10 +97,9 @@ func (s *csiNodeSyncer) ensurePodSpec() corev1.PodSpec {
 		Containers:         s.ensureContainersSpec(),
 		Volumes:            s.ensureVolumes(),
 		HostIPC:            true,
-		ServiceAccountName: "default",
-		Affinity: &corev1.Affinity{
-			NodeAffinity: ensureNodeAffinity(),
-		},
+		ServiceAccountName: config.GetNameForResource(config.CSINodeServiceAccount, s.driver.Name),
+		Affinity:           s.driver.Spec.Node.Affinity,
+		Tolerations:        s.driver.Spec.Node.Tolerations,
 	}
 }
 
@@ -155,6 +154,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	}
 	registrar.SecurityContext = &corev1.SecurityContext{AllowPrivilegeEscalation: boolptr.False()}
 	fillSecurityContextCapabilities(registrar.SecurityContext)
+	registrar.ImagePullPolicy = s.getCSINodeDriverRegistrarPullPolicy()
 
 	// liveness probe sidecar
 	livenessProbe := s.ensureContainer(nodeLivenessProbeContainerName,
@@ -165,6 +165,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	)
 	livenessProbe.SecurityContext = &corev1.SecurityContext{AllowPrivilegeEscalation: boolptr.False()}
 	fillSecurityContextCapabilities(livenessProbe.SecurityContext)
+	livenessProbe.ImagePullPolicy = s.getCSINodeDriverRegistrarPullPolicy()
 
 	return []corev1.Container{
 		nodePlugin,
@@ -175,13 +176,12 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 
 func (s *csiNodeSyncer) ensureContainer(name, image string, args []string) corev1.Container {
 	return corev1.Container{
-		Name:            name,
-		Image:           image,
-		ImagePullPolicy: "IfNotPresent",
-		Args:            args,
-		Env:             s.getEnvFor(name),
-		VolumeMounts:    s.getVolumeMountsFor(name),
-		Resources:       ensureDefaultResources(),
+		Name:         name,
+		Image:        image,
+		Args:         args,
+		Env:          s.getEnvFor(name),
+		VolumeMounts: s.getVolumeMountsFor(name),
+		Resources:    ensureDefaultResources(),
 		LivenessProbe: ensureProbe(10, 3, 10, corev1.Handler{
 			HTTPGet: &corev1.HTTPGetAction{
 				Path:   "/healthz",
@@ -317,6 +317,22 @@ func (s *csiNodeSyncer) getLivenessProbeImage() string {
 		return fmt.Sprintf("%s:%s", sidecar.Repository, sidecar.Tag)
 	}
 	return config.CSILivenessProbeImage
+}
+
+func (s *csiNodeSyncer) getCSINodeDriverRegistrarPullPolicy() corev1.PullPolicy {
+	sidecar := s.getSidecarByName(config.CSINodeDriverRegistrar)
+	if sidecar != nil && sidecar.PullPolicy != "" {
+		return sidecar.PullPolicy
+	}
+	return corev1.PullIfNotPresent
+}
+
+func (s *csiNodeSyncer) getLivenessProbePullPolicy() corev1.PullPolicy {
+	sidecar := s.getSidecarByName(config.LivenessProbe)
+	if sidecar != nil && sidecar.PullPolicy != "" {
+		return sidecar.PullPolicy
+	}
+	return corev1.PullIfNotPresent
 }
 
 func ensureHostPathVolumeSource(path, pathType string) corev1.VolumeSource {

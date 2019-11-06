@@ -295,27 +295,34 @@ func (r *ReconcileIBMBlockCSI) reconcileCSIDriver(instance *ibmblockcsi.IBMBlock
 func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBMBlockCSI) error {
 	recLogger := log.WithValues("Resource Type", "ServiceAccount")
 
-	sa := instance.GenerateControllerServiceAccount()
-	if err := controllerutil.SetControllerReference(instance.Unwrap(), sa, r.scheme); err != nil {
-		return err
-	}
-	found := &corev1.ServiceAccount{}
-	err := r.client.Get(context.TODO(), types.NamespacedName{
-		Name:      sa.Name,
-		Namespace: sa.Namespace,
-	}, found)
-	if err != nil && errors.IsNotFound(err) {
-		recLogger.Info("Creating a new ServiceAccount", "Namespace", sa.GetNamespace(), "Name", sa.GetName())
-		err = r.client.Create(context.TODO(), sa)
-		if err != nil {
+	controller := instance.GenerateControllerServiceAccount()
+	node := instance.GenerateNodeServiceAccount()
+
+	for _, sa := range []*corev1.ServiceAccount{
+		controller,
+		node,
+	} {
+		if err := controllerutil.SetControllerReference(instance.Unwrap(), sa, r.scheme); err != nil {
 			return err
 		}
-	} else if err != nil {
-		recLogger.Error(err, "Failed to get ServiceAccount", "Name", sa.GetName())
-		return err
-	} else {
-		// Resource already exists - don't requeue
-		//recLogger.Info("Skip reconcile: ServiceAccount already exists", "Namespace", sa.GetNamespace(), "Name", sa.GetName())
+		found := &corev1.ServiceAccount{}
+		err := r.client.Get(context.TODO(), types.NamespacedName{
+			Name:      sa.Name,
+			Namespace: sa.Namespace,
+		}, found)
+		if err != nil && errors.IsNotFound(err) {
+			recLogger.Info("Creating a new ServiceAccount", "Namespace", sa.GetNamespace(), "Name", sa.GetName())
+			err = r.client.Create(context.TODO(), sa)
+			if err != nil {
+				return err
+			}
+		} else if err != nil {
+			recLogger.Error(err, "Failed to get ServiceAccount", "Name", sa.GetName())
+			return err
+		} else {
+			// Resource already exists - don't requeue
+			//recLogger.Info("Skip reconcile: ServiceAccount already exists", "Namespace", sa.GetNamespace(), "Name", sa.GetName())
+		}
 	}
 
 	return nil

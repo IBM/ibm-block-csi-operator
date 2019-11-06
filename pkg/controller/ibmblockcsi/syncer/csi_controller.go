@@ -102,9 +102,8 @@ func (s *csiControllerSyncer) ensurePodSpec() corev1.PodSpec {
 			FSGroup:   &fsGroup,
 			RunAsUser: &fsGroup,
 		},
-		Affinity: &corev1.Affinity{
-			NodeAffinity: ensureNodeAffinity(),
-		},
+		Affinity:           s.driver.Spec.Controller.Affinity,
+		Tolerations:        s.driver.Spec.Controller.Tolerations,
 		ServiceAccountName: config.GetNameForResource(config.CSIControllerServiceAccount, s.driver.Name),
 	}
 }
@@ -128,12 +127,14 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		s.getCSIProvisionerImage(),
 		[]string{"--csi-address=$(ADDRESS)", "--v=5"},
 	)
+	provisioner.ImagePullPolicy = s.getCSIProvisionerPullPolicy()
 
 	// csi attacher sidecar
 	attacher := s.ensureContainer(attacherContainerName,
 		s.getCSIAttacherImage(),
 		[]string{"--csi-address=$(ADDRESS)", "--v=5"},
 	)
+	attacher.ImagePullPolicy = s.getCSIAttacherPullPolicy()
 
 	// liveness probe sidecar
 	livenessProbe := s.ensureContainer(controllerLivenessProbeContainerName,
@@ -142,6 +143,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 			"--csi-address=/csi/csi.sock",
 		},
 	)
+	livenessProbe.ImagePullPolicy = s.getLivenessProbePullPolicy()
 
 	return []corev1.Container{
 		controllerPlugin,
@@ -193,10 +195,9 @@ func (s *csiControllerSyncer) ensureContainer(name, image string, args []string)
 	sc := &corev1.SecurityContext{AllowPrivilegeEscalation: boolptr.False()}
 	fillSecurityContextCapabilities(sc)
 	return corev1.Container{
-		Name:            name,
-		Image:           image,
-		ImagePullPolicy: "IfNotPresent",
-		Args:            args,
+		Name:  name,
+		Image: image,
+		Args:  args,
 		//EnvFrom:         s.getEnvSourcesFor(name),
 		Env:             s.getEnvFor(name),
 		VolumeMounts:    s.getVolumeMountsFor(name),
@@ -309,6 +310,30 @@ func (s *csiControllerSyncer) getLivenessProbeImage() string {
 		return fmt.Sprintf("%s:%s", sidecar.Repository, sidecar.Tag)
 	}
 	return config.CSILivenessProbeImage
+}
+
+func (s *csiControllerSyncer) getCSIAttacherPullPolicy() corev1.PullPolicy {
+	sidecar := s.getSidecarByName(config.CSIAttacher)
+	if sidecar != nil && sidecar.PullPolicy != "" {
+		return sidecar.PullPolicy
+	}
+	return corev1.PullIfNotPresent
+}
+
+func (s *csiControllerSyncer) getCSIProvisionerPullPolicy() corev1.PullPolicy {
+	sidecar := s.getSidecarByName(config.CSIProvisioner)
+	if sidecar != nil && sidecar.PullPolicy != "" {
+		return sidecar.PullPolicy
+	}
+	return corev1.PullIfNotPresent
+}
+
+func (s *csiControllerSyncer) getLivenessProbePullPolicy() corev1.PullPolicy {
+	sidecar := s.getSidecarByName(config.LivenessProbe)
+	if sidecar != nil && sidecar.PullPolicy != "" {
+		return sidecar.PullPolicy
+	}
+	return corev1.PullIfNotPresent
 }
 
 func ensurePorts(ports ...corev1.ContainerPort) []corev1.ContainerPort {
