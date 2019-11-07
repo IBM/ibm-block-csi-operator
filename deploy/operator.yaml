@@ -6,6 +6,9 @@ metadata:
   labels:
     product: ibm-block-csi-driver
     csi: ibm
+    app.kubernetes.io/name: ibm-block-csi-operator
+    app.kubernetes.io/instance: ibm-block-csi-operator
+    app.kubernetes.io/managed-by: ibm-block-csi-operator
 spec:
   replicas: 1
   selector:
@@ -15,8 +18,14 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: ibm-block-csi-operator
+        app.kubernetes.io/instance: ibm-block-csi-operator
+        app.kubernetes.io/managed-by: ibm-block-csi-operator
         product: ibm-block-csi-driver
         csi: ibm
+      annotations:
+        productName: ibm-block-csi-operator
+        productID: ibm-block-csi-operator
+        productVersion: "1.0.0"
     spec:
       serviceAccountName: ibm-block-csi-operator
       affinity:

@@ -17,6 +17,8 @@
 package syncer
 
 import (
+	"fmt"
+
 	"github.com/imdario/mergo"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -25,6 +27,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	csiv1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/internal/ibmblockcsi"
 	"github.com/IBM/ibm-block-csi-operator/pkg/util/boolptr"
@@ -94,10 +97,9 @@ func (s *csiNodeSyncer) ensurePodSpec() corev1.PodSpec {
 		Containers:         s.ensureContainersSpec(),
 		Volumes:            s.ensureVolumes(),
 		HostIPC:            true,
-		ServiceAccountName: "default",
-		Affinity: &corev1.Affinity{
-			NodeAffinity: ensureNodeAffinity(),
-		},
+		ServiceAccountName: config.GetNameForResource(config.CSINodeServiceAccount, s.driver.Name),
+		Affinity:           s.driver.Spec.Node.Affinity,
+		Tolerations:        s.driver.Spec.Node.Tolerations,
 	}
 }
 
@@ -120,6 +122,8 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 		ContainerPort: nodeContainerHealthPortNumber,
 	})
 
+	nodePlugin.ImagePullPolicy = s.driver.Spec.Node.ImagePullPolicy
+
 	nodePlugin.SecurityContext = &corev1.SecurityContext{
 		Privileged:               boolptr.True(),
 		AllowPrivilegeEscalation: boolptr.True(),
@@ -136,7 +140,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 
 	// node driver registrar sidecar
 	registrar := s.ensureContainer(nodeDriverRegistrarContainerName,
-		config.NodeDriverRegistrarImage,
+		s.getCSINodeDriverRegistrarImage(),
 		[]string{
 			"--csi-address=$(ADDRESS)",
 			"--kubelet-registration-path=$(DRIVER_REG_SOCK_PATH)",
@@ -152,16 +156,18 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	}
 	registrar.SecurityContext = &corev1.SecurityContext{AllowPrivilegeEscalation: boolptr.False()}
 	fillSecurityContextCapabilities(registrar.SecurityContext)
+	registrar.ImagePullPolicy = s.getCSINodeDriverRegistrarPullPolicy()
 
 	// liveness probe sidecar
 	livenessProbe := s.ensureContainer(nodeLivenessProbeContainerName,
-		config.CSILivenessProbeImage,
+		s.getLivenessProbeImage(),
 		[]string{
 			"--csi-address=/csi/csi.sock",
 		},
 	)
 	livenessProbe.SecurityContext = &corev1.SecurityContext{AllowPrivilegeEscalation: boolptr.False()}
 	fillSecurityContextCapabilities(livenessProbe.SecurityContext)
+	livenessProbe.ImagePullPolicy = s.getCSINodeDriverRegistrarPullPolicy()
 
 	return []corev1.Container{
 		nodePlugin,
@@ -172,13 +178,12 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 
 func (s *csiNodeSyncer) ensureContainer(name, image string, args []string) corev1.Container {
 	return corev1.Container{
-		Name:            name,
-		Image:           image,
-		ImagePullPolicy: "IfNotPresent",
-		Args:            args,
-		Env:             s.getEnvFor(name),
-		VolumeMounts:    s.getVolumeMountsFor(name),
-		Resources:       ensureDefaultResources(),
+		Name:         name,
+		Image:        image,
+		Args:         args,
+		Env:          s.getEnvFor(name),
+		VolumeMounts: s.getVolumeMountsFor(name),
+		Resources:    ensureDefaultResources(),
 		LivenessProbe: ensureProbe(10, 3, 10, corev1.Handler{
 			HTTPGet: &corev1.HTTPGetAction{
 				Path:   "/healthz",
@@ -294,6 +299,42 @@ func (s *csiNodeSyncer) ensureVolumes() []corev1.Volume {
 		ensureVolume("sys-dir", ensureHostPathVolumeSource("/sys", "Directory")),
 		ensureVolume("host-dir", ensureHostPathVolumeSource("/", "Directory")),
 	}
+}
+
+func (s *csiNodeSyncer) getSidecarByName(name string) *csiv1.CSISidecar {
+	return getSidecarByName(s.driver, name)
+}
+
+func (s *csiNodeSyncer) getCSINodeDriverRegistrarImage() string {
+	sidecar := s.getSidecarByName(config.CSINodeDriverRegistrar)
+	if sidecar != nil {
+		return fmt.Sprintf("%s:%s", sidecar.Repository, sidecar.Tag)
+	}
+	return config.NodeDriverRegistrarImage
+}
+
+func (s *csiNodeSyncer) getLivenessProbeImage() string {
+	sidecar := s.getSidecarByName(config.LivenessProbe)
+	if sidecar != nil {
+		return fmt.Sprintf("%s:%s", sidecar.Repository, sidecar.Tag)
+	}
+	return config.CSILivenessProbeImage
+}
+
+func (s *csiNodeSyncer) getCSINodeDriverRegistrarPullPolicy() corev1.PullPolicy {
+	sidecar := s.getSidecarByName(config.CSINodeDriverRegistrar)
+	if sidecar != nil && sidecar.ImagePullPolicy != "" {
+		return sidecar.ImagePullPolicy
+	}
+	return corev1.PullIfNotPresent
+}
+
+func (s *csiNodeSyncer) getLivenessProbePullPolicy() corev1.PullPolicy {
+	sidecar := s.getSidecarByName(config.LivenessProbe)
+	if sidecar != nil && sidecar.ImagePullPolicy != "" {
+		return sidecar.ImagePullPolicy
+	}
+	return corev1.PullIfNotPresent
 }
 
 func ensureHostPathVolumeSource(path, pathType string) corev1.VolumeSource {

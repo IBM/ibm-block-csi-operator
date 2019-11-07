@@ -189,22 +189,50 @@ func schema_pkg_apis_csi_v1_IBMBlockCSIControllerSpec(ref common.ReferenceCallba
 				Properties: map[string]spec.Schema{
 					"repository": {
 						SchemaProps: spec.SchemaProps{
-							Description: "The repository of the controller image",
-							Type:        []string{"string"},
-							Format:      "",
+							Type:   []string{"string"},
+							Format: "",
 						},
 					},
 					"tag": {
 						SchemaProps: spec.SchemaProps{
-							Description: "The tag of the controller image",
-							Type:        []string{"string"},
-							Format:      "",
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"imagePullPolicy": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"affinity": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("k8s.io/api/core/v1.Affinity"),
+						},
+					},
+					"tolerations": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "set",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/api/core/v1.Toleration"),
+									},
+								},
+							},
 						},
 					},
 				},
-				Required: []string{"repository", "tag"},
+				Required: []string{"repository", "tag", "imagePullPolicy", "affinity", "tolerations"},
 			},
 		},
+		Dependencies: []string{
+			"k8s.io/api/core/v1.Affinity", "k8s.io/api/core/v1.Toleration"},
 	}
 }
 
@@ -217,22 +245,50 @@ func schema_pkg_apis_csi_v1_IBMBlockCSINodeSpec(ref common.ReferenceCallback) co
 				Properties: map[string]spec.Schema{
 					"repository": {
 						SchemaProps: spec.SchemaProps{
-							Description: "The repository of the node image",
-							Type:        []string{"string"},
-							Format:      "",
+							Type:   []string{"string"},
+							Format: "",
 						},
 					},
 					"tag": {
 						SchemaProps: spec.SchemaProps{
-							Description: "The tag of the node image",
-							Type:        []string{"string"},
-							Format:      "",
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"imagePullPolicy": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"affinity": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("k8s.io/api/core/v1.Affinity"),
+						},
+					},
+					"tolerations": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "set",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("k8s.io/api/core/v1.Toleration"),
+									},
+								},
+							},
 						},
 					},
 				},
-				Required: []string{"repository", "tag"},
+				Required: []string{"repository", "tag", "imagePullPolicy", "affinity", "tolerations"},
 			},
 		},
+		Dependencies: []string{
+			"k8s.io/api/core/v1.Affinity", "k8s.io/api/core/v1.Toleration"},
 	}
 }
 
@@ -253,12 +309,47 @@ func schema_pkg_apis_csi_v1_IBMBlockCSISpec(ref common.ReferenceCallback) common
 							Ref: ref("github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.IBMBlockCSINodeSpec"),
 						},
 					},
+					"sidecars": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "set",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.CSISidecar"),
+									},
+								},
+							},
+						},
+					},
+					"imagePullSecrets": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "set",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
 				},
-				Required: []string{"controller", "node"},
+				Required: []string{"controller", "node", "sidecars", "imagePullSecrets"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.IBMBlockCSIControllerSpec", "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.IBMBlockCSINodeSpec"},
+			"github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.CSISidecar", "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.IBMBlockCSIControllerSpec", "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1.IBMBlockCSINodeSpec"},
 	}
 }
 
