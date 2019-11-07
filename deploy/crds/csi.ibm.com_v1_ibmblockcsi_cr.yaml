@@ -40,7 +40,6 @@ spec:
                   values:
                     - amd64
 
-# use this tolerations if you want to deploy node pod on masters.
 #    tolerations:
 #    - effect: NoSchedule
 #      key: node-role.kubernetes.io/master
@@ -64,6 +63,5 @@ spec:
     tag: "v1.1.0"
     imagePullPolicy: IfNotPresent
 
-# specify your own image pull secrets here.
 #  imagePullSecrets:
 #  - "secretName"

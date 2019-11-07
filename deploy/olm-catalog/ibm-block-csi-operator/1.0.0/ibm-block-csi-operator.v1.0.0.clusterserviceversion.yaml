@@ -7,7 +7,7 @@ metadata:
     capabilities: "Seamless Upgrades"
     categories: "Storage,Cloud Provider"
     certified: "true"
-    containerImage: ibmcom/ibm-block-csi-operator:1.0.0
+    containerImage: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.0.0
     createdAt: "2019-11-05T16:45:00Z"
     description: "Run IBM block storage CSI driver on OpenShift."
     repository: https://github.com/IBM/ibm-block-csi-operator
@@ -548,7 +548,7 @@ spec:
                     capabilities:
                       drop:
                       - ALL
-                  image: ibmcom/ibm-block-csi-operator:1.0.0
+                  image: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.0.0
                   imagePullPolicy: IfNotPresent
                   command:
                   - ibm-block-csi-operator
