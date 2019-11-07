@@ -171,6 +171,17 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 }
 
 func (s *csiNodeSyncer) ensureContainer(name, image string, args []string) corev1.Container {
+	var probe *corev1.Probe
+	if name == nodeContainerName {
+		probe = ensureProbe(10, 3, 10, corev1.Handler{
+			HTTPGet: &corev1.HTTPGetAction{
+				Path:   "/healthz",
+				Port:   nodeContainerHealthPort,
+				Scheme: corev1.URISchemeHTTP,
+			},
+		})
+	}
+
 	return corev1.Container{
 		Name:            name,
 		Image:           image,
@@ -179,13 +190,7 @@ func (s *csiNodeSyncer) ensureContainer(name, image string, args []string) corev
 		Env:             s.getEnvFor(name),
 		VolumeMounts:    s.getVolumeMountsFor(name),
 		Resources:       ensureDefaultResources(),
-		LivenessProbe: ensureProbe(10, 3, 10, corev1.Handler{
-			HTTPGet: &corev1.HTTPGetAction{
-				Path:   "/healthz",
-				Port:   nodeContainerHealthPort,
-				Scheme: corev1.URISchemeHTTP,
-			},
-		}),
+		LivenessProbe:   probe,
 	}
 }
 

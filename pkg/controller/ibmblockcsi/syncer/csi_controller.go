@@ -190,6 +190,17 @@ func ensureNodeAffinity() *corev1.NodeAffinity {
 func (s *csiControllerSyncer) ensureContainer(name, image string, args []string) corev1.Container {
 	sc := &corev1.SecurityContext{AllowPrivilegeEscalation: boolptr.False()}
 	fillSecurityContextCapabilities(sc)
+	var probe *corev1.Probe
+	if name == controllerContainerName {
+		probe = ensureProbe(10, 3, 2, corev1.Handler{
+				HTTPGet: &corev1.HTTPGetAction{
+					Path:   "/healthz",
+					Port:   controllerContainerHealthPort,
+					Scheme: corev1.URISchemeHTTP,
+				},
+			})
+	}
+
 	return corev1.Container{
 		Name:            name,
 		Image:           image,
@@ -200,13 +211,7 @@ func (s *csiControllerSyncer) ensureContainer(name, image string, args []string)
 		VolumeMounts:    s.getVolumeMountsFor(name),
 		SecurityContext: sc,
 		Resources:       ensureDefaultResources(),
-		LivenessProbe: ensureProbe(10, 3, 2, corev1.Handler{
-			HTTPGet: &corev1.HTTPGetAction{
-				Path:   "/healthz",
-				Port:   controllerContainerHealthPort,
-				Scheme: corev1.URISchemeHTTP,
-			},
-		}),
+		LivenessProbe:   probe,
 	}
 }
 
