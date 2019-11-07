@@ -124,6 +124,14 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 
 	nodePlugin.ImagePullPolicy = s.driver.Spec.Node.ImagePullPolicy
 
+	nodePlugin.LivenessProbe = ensureProbe(10, 3, 10, corev1.Handler{
+		HTTPGet: &corev1.HTTPGetAction{
+			Path:   "/healthz",
+			Port:   nodeContainerHealthPort,
+			Scheme: corev1.URISchemeHTTP,
+		},
+	})
+
 	nodePlugin.SecurityContext = &corev1.SecurityContext{
 		Privileged:               boolptr.True(),
 		AllowPrivilegeEscalation: boolptr.True(),
@@ -184,13 +192,6 @@ func (s *csiNodeSyncer) ensureContainer(name, image string, args []string) corev
 		Env:          s.getEnvFor(name),
 		VolumeMounts: s.getVolumeMountsFor(name),
 		Resources:    ensureDefaultResources(),
-		LivenessProbe: ensureProbe(10, 3, 10, corev1.Handler{
-			HTTPGet: &corev1.HTTPGetAction{
-				Path:   "/healthz",
-				Port:   nodeContainerHealthPort,
-				Scheme: corev1.URISchemeHTTP,
-			},
-		}),
 	}
 }
 
