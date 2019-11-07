@@ -123,6 +123,14 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	})
 	controllerPlugin.ImagePullPolicy = s.driver.Spec.Controller.ImagePullPolicy
 
+	controllerPlugin.LivenessProbe = ensureProbe(10, 3, 2, corev1.Handler{
+		HTTPGet: &corev1.HTTPGetAction{
+			Path:   "/healthz",
+			Port:   controllerContainerHealthPort,
+			Scheme: corev1.URISchemeHTTP,
+		},
+	})
+
 	// csi provisioner sidecar
 	provisioner := s.ensureContainer(provisionerContainerName,
 		s.getCSIProvisionerImage(),
@@ -204,13 +212,6 @@ func (s *csiControllerSyncer) ensureContainer(name, image string, args []string)
 		VolumeMounts:    s.getVolumeMountsFor(name),
 		SecurityContext: sc,
 		Resources:       ensureDefaultResources(),
-		LivenessProbe: ensureProbe(10, 3, 2, corev1.Handler{
-			HTTPGet: &corev1.HTTPGetAction{
-				Path:   "/healthz",
-				Port:   controllerContainerHealthPort,
-				Scheme: corev1.URISchemeHTTP,
-			},
-		}),
 	}
 }
 
