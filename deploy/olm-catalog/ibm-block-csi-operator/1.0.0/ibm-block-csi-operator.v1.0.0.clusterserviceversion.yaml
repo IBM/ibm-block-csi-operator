@@ -53,7 +53,7 @@ spec:
     Supported operating systems:
       - RHEL 7.x (x86 architecture)
 
-    > **Note**: The operator and its custom resource must be installed in the kube-system namespace.
+    > **Note**: The operator must be installed in the `kube-system` project.
 
     Full documentation can be found on the [IBM knowledge center](www.ibm.com/support/knowledgecenter/SSRQ8T).
 
