@@ -115,7 +115,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		[]string{"--csi-endpoint=$(CSI_ENDPOINT)"},
 	)
 
-	controllerPlugin.Resources = ensureResources("40m", "300m", "40Mi", "200Mi")
+	controllerPlugin.Resources = ensureResources("40m", "300m", "40Mi", "400Mi")
 
 	controllerPlugin.Ports = ensurePorts(corev1.ContainerPort{
 		Name:          controllerContainerHealthPortName,
@@ -163,7 +163,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 }
 
 func ensureDefaultResources() corev1.ResourceRequirements {
-	return ensureResources("20m", "40m", "20Mi", "40Mi")
+	return ensureResources("20m", "200m", "20Mi", "200Mi")
 }
 
 func ensureResources(cpuRequests, cpuLimits, memoryRequests, memoryLimits string) corev1.ResourceRequirements {
