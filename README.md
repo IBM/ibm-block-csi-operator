@@ -16,7 +16,7 @@ Supported IBM storage systems:
 Supported operating systems:
   - RHEL 7.x (x86 architecture)
 
-Full documentation can be found on the [IBM knowledge center](www.ibm.com/support/knowledgecenter/SSRQ8T).
+Full documentation can be found on the [IBM knowledge center](https://www.ibm.com/support/knowledgecenter/SSRQ8T).
 
 <br/>
 <br/>
@@ -222,7 +222,7 @@ storageclass.storage.k8s.io/gold created
 
 ## Driver Usage
 > **Note**: For further usage details, refer to https://github.com/IBM/ibm-block-csi-driver. 
->          In addition, full documentation can be found on the [IBM knowledge center](www.ibm.com/support/knowledgecenter/SSRQ8T).
+>          In addition, full documentation can be found on the [IBM knowledge center](https://www.ibm.com/support/knowledgecenter/SSRQ8T).
 
 <br/>
 <br/>
