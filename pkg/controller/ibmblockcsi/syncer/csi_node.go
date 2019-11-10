@@ -115,7 +115,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 		},
 	)
 
-	nodePlugin.Resources = ensureResources("40m", "300m", "40Mi", "200Mi")
+	nodePlugin.Resources = ensureResources("40m", "1000m", "40Mi", "400Mi")
 
 	nodePlugin.Ports = ensurePorts(corev1.ContainerPort{
 		Name:          nodeContainerHealthPortName,
