@@ -120,7 +120,7 @@ spec:
 
     > **Note**: The operator must be installed in the `kube-system` project.
 
-    Full documentation can be found on the [IBM knowledge center](www.ibm.com/support/knowledgecenter/SSRQ8T).
+    Full documentation can be found on the [IBM knowledge center](https://www.ibm.com/support/knowledgecenter/SSRQ8T).
 
 
     ## Prerequisites
