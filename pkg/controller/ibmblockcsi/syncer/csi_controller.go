@@ -115,7 +115,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		[]string{"--csi-endpoint=$(CSI_ENDPOINT)"},
 	)
 
-	controllerPlugin.Resources = ensureResources("40m", "300m", "40Mi", "400Mi")
+	controllerPlugin.Resources = ensureResources("40m", "800m", "40Mi", "400Mi")
 
 	controllerPlugin.Ports = ensurePorts(corev1.ContainerPort{
 		Name:          controllerContainerHealthPortName,
