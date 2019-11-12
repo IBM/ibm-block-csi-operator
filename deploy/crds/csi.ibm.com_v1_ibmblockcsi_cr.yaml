@@ -1,0 +1,67 @@
+apiVersion: csi.ibm.com/v1
+kind: IBMBlockCSI
+metadata:
+  name: ibm-block-csi
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: ibm-block-csi-operator
+    app.kubernetes.io/instance: ibm-block-csi-operator
+    app.kubernetes.io/managed-by: ibm-block-csi-operator
+spec:
+  # controller is a statefulSet with ibm-block-csi-driver-controller
+  # container and csi-provisioner, csi-attacher and livenessprobe sidecars.
+  controller:
+    repository: ibmcom/ibm-block-csi-driver-controller
+    tag: "1.0.0"
+    imagePullPolicy: IfNotPresent
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/arch
+                  operator: In
+                  values:
+                    - amd64
+
+  # node is a daemonSet with ibm-block-csi-driver-node container
+  # and csi-node-driver-registrar and livenessprobe sidecars.
+  node:
+    repository: ibmcom/ibm-block-csi-driver-node
+    tag: "1.0.0"
+    imagePullPolicy: IfNotPresent
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/arch
+                  operator: In
+                  values:
+                    - amd64
+
+#    tolerations:
+#    - effect: NoSchedule
+#      key: node-role.kubernetes.io/master
+#      operator: Exists
+
+  sidecars:
+  - name: csi-node-driver-registrar
+    repository: quay.io/k8scsi/csi-node-driver-registrar
+    tag: "v1.2.0"
+    imagePullPolicy: IfNotPresent
+  - name: csi-provisioner
+    repository: quay.io/k8scsi/csi-provisioner
+    tag: "v1.3.0"
+    imagePullPolicy: IfNotPresent
+  - name: csi-attacher
+    repository: quay.io/k8scsi/csi-attacher
+    tag: "v1.2.1"
+    imagePullPolicy: IfNotPresent
+  - name: livenessprobe
+    repository: quay.io/k8scsi/livenessprobe
+    tag: "v1.1.0"
+    imagePullPolicy: IfNotPresent
+
+#  imagePullSecrets:
+#  - "secretName"

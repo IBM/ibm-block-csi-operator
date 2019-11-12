@@ -1,11 +1,11 @@
-FROM registry.access.redhat.com/ubi7/ubi-minimal:latest
+FROM registry.access.redhat.com/ubi7/ubi-minimal:7.7-138
 
-ENV OPERATOR=/usr/local/bin/ibm-block-csi-driver-operator \
+ENV OPERATOR=/usr/local/bin/ibm-block-csi-operator \
     USER_UID=1001 \
-    USER_NAME=ibm-block-csi-driver-operator
+    USER_NAME=ibm-block-csi-operator
 
 # install operator binary
-COPY build/_output/bin/ibm-block-csi-driver-operator ${OPERATOR}
+COPY build/_output/bin/ibm-block-csi-operator ${OPERATOR}
 
 COPY build/bin /usr/local/bin
 RUN  /usr/local/bin/user_setup

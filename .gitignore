@@ -1,3 +1,6 @@
+.DS_Store
+*.bak/
+deploy/examples/
 # Temporary Build Files
 build/_output
 build/_test

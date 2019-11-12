@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package nodeagent;
+
+// The node agent service definition.
+service NodeAgent {
+  rpc GetNodeInfo (GetNodeInfoRequest) returns (GetNodeInfoReply) {}
+  rpc IscsiLogin (IscsiLoginRequest) returns (IscsiLoginReply) {}
+  rpc IscsiLogout (IscsiLogoutRequest) returns (IscsiLogoutReply) {}
+}
+
+message Node {
+  string name = 1;
+  repeated string iqns = 2;
+  repeated string wwpns = 3;
+}
+
+message GetNodeInfoRequest {
+  string name = 1;
+}
+
+message GetNodeInfoReply {
+  Node node = 1;
+}
+
+message IscsiLoginRequest {
+  repeated string targets = 1;
+}
+
+message IscsiLoginReply {
+  // Intentionally empty.
+}
+
+message IscsiLogoutRequest {
+  repeated string targets = 1;
+}
+
+message IscsiLogoutReply {
+  // Intentionally empty.
+}

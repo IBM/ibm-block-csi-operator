@@ -1,0 +1,58 @@
+# Copyright IBM Corporation 2019.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+FROM golang:1.13.1
+
+WORKDIR /go/src/github.com/IBM/ibm-block-csi-operator/
+COPY . .
+RUN CGO_ENABLED=1 GOOS=linux go build \
+    -o build/_output/bin/ibm-block-csi-operator \
+    -gcflags all=-trimpath=${GOPATH} \
+	-asmflags all=-trimpath=${GOPATH} \
+	-mod=vendor \
+	github.com/IBM/ibm-block-csi-operator/cmd/manager
+
+
+FROM registry.access.redhat.com/ubi7/ubi-minimal:7.7-138
+MAINTAINER IBM Storage
+
+###Required Labels
+LABEL name="Operator for IBM block storage CSI driver" \
+      vendor="IBM" \
+      version="1.0.0" \
+      release="b16" \
+      summary="The operator for IBM block storage CSI driver" \
+      description="The IBM block storage CSI driver enables container orchestrators, such as Kubernetes and OpenShift, to manage the life-cycle of persistent storage." \
+      io.k8s.display-name="Operator for IBM block storage CSI driver" \
+      io.k8s.description="The IBM block storage CSI driver enables container orchestrators, such as Kubernetes and OpenShift, to manage the life-cycle of persistent storage." \
+      io.openshift.tags=ibm,csi,ibm-block-csi-operator
+
+ENV OPERATOR=/usr/local/bin/ibm-block-csi-operator \
+    USER_UID=1001 \
+    USER_NAME=ibm-block-csi-operator
+
+COPY build/health_check.sh .
+RUN chmod 777 ./health_check.sh
+COPY ./LICENSE /licenses/
+COPY ./NOTICES /licenses/
+
+# install operator binary
+COPY --from=0 /go/src/github.com/IBM/ibm-block-csi-operator/build/_output/bin/ibm-block-csi-operator ${OPERATOR}
+
+COPY build/bin /usr/local/bin
+RUN  /usr/local/bin/user_setup
+
+ENTRYPOINT ["/usr/local/bin/entrypoint"]
+
+USER ${USER_UID}

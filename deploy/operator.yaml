@@ -1,33 +1,95 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ibm-block-csi-driver-operator
+  name: ibm-block-csi-operator
+  namespace: kube-system
+  labels:
+    product: ibm-block-csi-driver
+    csi: ibm
+    app.kubernetes.io/name: ibm-block-csi-operator
+    app.kubernetes.io/instance: ibm-block-csi-operator
+    app.kubernetes.io/managed-by: ibm-block-csi-operator
 spec:
   replicas: 1
   selector:
     matchLabels:
-      name: ibm-block-csi-driver-operator
+      app.kubernetes.io/name: ibm-block-csi-operator
   template:
     metadata:
       labels:
-        name: ibm-block-csi-driver-operator
+        app.kubernetes.io/name: ibm-block-csi-operator
+        app.kubernetes.io/instance: ibm-block-csi-operator
+        app.kubernetes.io/managed-by: ibm-block-csi-operator
+        product: ibm-block-csi-driver
+        csi: ibm
+      annotations:
+        productName: ibm-block-csi-operator
+        productID: ibm-block-csi-operator
+        productVersion: "1.0.0"
     spec:
-      serviceAccountName: ibm-block-csi-driver-operator
+      serviceAccountName: ibm-block-csi-operator
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/arch
+                    operator: In
+                    values:
+                      - amd64
       containers:
-        - name: ibm-block-csi-driver-operator
-          # Replace this with the built image name
-          image: REPLACE_IMAGE
-          command:
-          - ibm-block-csi-driver-operator
-          imagePullPolicy: Always
-          env:
-            - name: WATCH_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: OPERATOR_NAME
-              value: "ibm-block-csi-driver-operator"
+      - name: ibm-block-csi-operator
+        resources:
+          requests:
+            memory: 50Mi
+            cpu: 50m
+          limits:
+            memory: 100Mi
+            cpu: 100m
+        readinessProbe:
+          exec:
+            command: ["./health_check.sh"]
+          initialDelaySeconds: 3
+          periodSeconds: 1
+        livenessProbe:
+          exec:
+            command: ["./health_check.sh"]
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+        image: ibmcom/ibm-block-csi-operator:1.0.0
+        imagePullPolicy: IfNotPresent
+        command:
+        - ibm-block-csi-operator
+        env:
+        - name: WATCH_NAMESPACE
+          value: ""
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: OPERATOR_NAME
+          value: "ibm-block-csi-operator"
+        #- name: ENDPOINT
+        #  value: "unix:///storage/storage.sock:10086"
+        #- name: ISCSI_AGENT_PORT
+        #  value: "10086"
+        #volumeMounts:
+        #- name: socket-dir
+        #  mountPath: /storage/
+      #- name: ibm-storage-agent
+        #image: ibmcom/ibm-storage-agent:0.0.4
+        #imagePullPolicy: IfNotPresent
+        #env:
+        #- name: ENDPOINT
+        #  value: "unix:///storage/storage.sock:10086"
+        #volumeMounts:
+        #- name: socket-dir
+        #  mountPath: /storage/
+
+      #volumes:
+      #- name: socket-dir
+        #emptyDir: {}
