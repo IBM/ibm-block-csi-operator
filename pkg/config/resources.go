@@ -37,6 +37,10 @@ const (
 	ExternalAttacherClusterRoleBinding    ResourceName = "external-attacher-clusterrolebinding"
 	ExternalSnapshotterClusterRole        ResourceName = "external-snapshotter-clusterrole"
 	ExternalSnapshotterClusterRoleBinding ResourceName = "external-snapshotter-clusterrolebinding"
+	SCCForControllerClusterRole           ResourceName = "scc-controller"
+	SCCForControllerClusterRoleBinding    ResourceName = "scc-controller"
+	SCCForNodeClusterRole                 ResourceName = "scc-node"
+	SCCForNodeClusterRoleBinding          ResourceName = "scc-node"
 )
 
 // GetNameForResource returns the name of a resource for a CSI driver
