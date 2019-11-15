@@ -254,7 +254,7 @@ spec:
   maintainers:
     - name: Guang Jiong Lou
       email: luogj@cn.ibm.com
-  minKubeVersion: 1.14.1
+  minKubeVersion: 1.13.1
   provider:
     name: IBM
   links:

@@ -276,7 +276,7 @@ func (c *IBMBlockCSI) GenerateExternalSnapshotterClusterRoleBinding() *rbacv1.Cl
 func (c *IBMBlockCSI) GenerateSCCForControllerClusterRole() *rbacv1.ClusterRole {
 	return &rbacv1.ClusterRole{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: config.GetNameForResource(config.SCCForControllerClusterRole, c.Name),
+			Name: config.GetNameForResource(config.CSIControllerSCCClusterRole, c.Name),
 		},
 		Rules: []rbacv1.PolicyRule{
 			{
@@ -292,7 +292,7 @@ func (c *IBMBlockCSI) GenerateSCCForControllerClusterRole() *rbacv1.ClusterRole 
 func (c *IBMBlockCSI) GenerateSCCForControllerClusterRoleBinding() *rbacv1.ClusterRoleBinding {
 	return &rbacv1.ClusterRoleBinding{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: config.GetNameForResource(config.SCCForControllerClusterRoleBinding, c.Name),
+			Name: config.GetNameForResource(config.CSIControllerSCCClusterRoleBinding, c.Name),
 		},
 		Subjects: []rbacv1.Subject{
 			{
@@ -303,7 +303,7 @@ func (c *IBMBlockCSI) GenerateSCCForControllerClusterRoleBinding() *rbacv1.Clust
 		},
 		RoleRef: rbacv1.RoleRef{
 			Kind:     "ClusterRole",
-			Name:     config.GetNameForResource(config.SCCForControllerClusterRole, c.Name),
+			Name:     config.GetNameForResource(config.CSIControllerSCCClusterRole, c.Name),
 			APIGroup: "rbac.authorization.k8s.io",
 		},
 	}
@@ -312,7 +312,7 @@ func (c *IBMBlockCSI) GenerateSCCForControllerClusterRoleBinding() *rbacv1.Clust
 func (c *IBMBlockCSI) GenerateSCCForNodeClusterRole() *rbacv1.ClusterRole {
 	return &rbacv1.ClusterRole{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: config.GetNameForResource(config.SCCForNodeClusterRole, c.Name),
+			Name: config.GetNameForResource(config.CSINodeSCCClusterRole, c.Name),
 		},
 		Rules: []rbacv1.PolicyRule{
 			{
@@ -328,7 +328,7 @@ func (c *IBMBlockCSI) GenerateSCCForNodeClusterRole() *rbacv1.ClusterRole {
 func (c *IBMBlockCSI) GenerateSCCForNodeClusterRoleBinding() *rbacv1.ClusterRoleBinding {
 	return &rbacv1.ClusterRoleBinding{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: config.GetNameForResource(config.SCCForNodeClusterRoleBinding, c.Name),
+			Name: config.GetNameForResource(config.CSINodeSCCClusterRoleBinding, c.Name),
 		},
 		Subjects: []rbacv1.Subject{
 			{
@@ -339,7 +339,7 @@ func (c *IBMBlockCSI) GenerateSCCForNodeClusterRoleBinding() *rbacv1.ClusterRole
 		},
 		RoleRef: rbacv1.RoleRef{
 			Kind:     "ClusterRole",
-			Name:     config.GetNameForResource(config.SCCForNodeClusterRole, c.Name),
+			Name:     config.GetNameForResource(config.CSINodeSCCClusterRole, c.Name),
 			APIGroup: "rbac.authorization.k8s.io",
 		},
 	}
