@@ -548,7 +548,7 @@ spec:
                     requiredDuringSchedulingIgnoredDuringExecution:
                       nodeSelectorTerms:
                         - matchExpressions:
-                            - key: kubernetes.io/arch
+                            - key: beta.kubernetes.io/arch
                               operator: In
                               values:
                                 - amd64
