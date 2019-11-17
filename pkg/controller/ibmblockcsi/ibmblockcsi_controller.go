@@ -330,7 +330,8 @@ func (r *ReconcileIBMBlockCSI) reconcileCSIDriver113(instance *ibmblockcsi.IBMBl
 		// Resource already exists - don't requeue
 	} else if err != nil {
 		recLogger.Error(err, "Failed to create CSIDriver", "Name", cd.GetName())
-		return err
+		// don't return any error.
+		return nil
 	} else {
 		// Resource created - don't requeue
 	}
