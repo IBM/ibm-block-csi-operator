@@ -47,21 +47,10 @@ import (
 	oconfig "github.com/IBM/ibm-block-csi-operator/pkg/config"
 	clustersyncer "github.com/IBM/ibm-block-csi-operator/pkg/controller/ibmblockcsi/syncer"
 	"github.com/IBM/ibm-block-csi-operator/pkg/internal/ibmblockcsi"
-	decoder "github.com/IBM/ibm-block-csi-operator/pkg/util/decoder"
 	kubeutil "github.com/IBM/ibm-block-csi-operator/pkg/util/kubernetes"
 	oversion "github.com/IBM/ibm-block-csi-operator/version"
 	"github.com/presslabs/controller-util/syncer"
 )
-
-var csiDriver113 = `
-apiVersion: csi.storage.k8s.io/v1alpha1
-kind: CSIDriver
-metadata:
-  name: ibm-block-csi-driver
-spec:
-  attachRequired: true
-  podInfoOnMount: false
-`
 
 // ReconcileTime is the delay between reconciliations
 const ReconcileTime = 30 * time.Second
@@ -302,39 +291,12 @@ func (r *ReconcileIBMBlockCSI) reconcileCSIDriver(instance *ibmblockcsi.IBMBlock
 			return err
 		}
 	} else if err != nil {
-		if r.serverVersion == "1.13" {
-			return r.reconcileCSIDriver113(instance)
-		} else {
-			recLogger.Error(err, "Failed to get CSIDriver", "Name", cd.GetName())
-			return err
-		}
-	} else {
-		// Resource already exists - don't requeue
-	}
-
-	return nil
-}
-
-func (r *ReconcileIBMBlockCSI) reconcileCSIDriver113(instance *ibmblockcsi.IBMBlockCSI) error {
-	recLogger := log.WithValues("Resource Type", "CSIDriver")
-
-	cd, err := decoder.FromYamlToUnstructured([]byte(csiDriver113))
-	if err != nil {
-		panic(err)
-	}
-	if err := controllerutil.SetControllerReference(instance.Unwrap(), cd, r.scheme); err != nil {
+		recLogger.Error(err, "Failed to get CSIDriver", "Name", cd.GetName())
 		return err
-	}
-	err = r.client.Create(context.TODO(), cd)
-	if err != nil && errors.IsAlreadyExists(err) {
-		// Resource already exists - don't requeue
-	} else if err != nil {
-		recLogger.Error(err, "Failed to create CSIDriver", "Name", cd.GetName())
-		// don't return any error.
-		return nil
 	} else {
-		// Resource created - don't requeue
+		// Resource already exists - don't requeue
 	}
+
 	return nil
 }
 
