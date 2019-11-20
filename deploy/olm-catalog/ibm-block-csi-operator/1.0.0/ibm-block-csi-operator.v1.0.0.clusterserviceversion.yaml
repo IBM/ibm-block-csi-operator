@@ -8,7 +8,7 @@ metadata:
     categories: "Storage,Cloud Provider"
     certified: "true"
     containerImage: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.0.0
-    createdAt: "2019-11-16T13:14:00Z"
+    createdAt: "2019-11-19T13:14:00Z"
     description: "Run IBM block storage CSI driver on OpenShift."
     repository: https://github.com/IBM/ibm-block-csi-operator
     support: IBM
@@ -32,7 +32,7 @@ metadata:
                       {
                         "matchExpressions": [
                           {
-                            "key": "beta.kubernetes.io/arch",
+                            "key": "kubernetes.io/arch",
                             "operator": "In",
                             "values": [
                               "amd64"
@@ -56,7 +56,7 @@ metadata:
                       {
                         "matchExpressions": [
                           {
-                            "key": "beta.kubernetes.io/arch",
+                            "key": "kubernetes.io/arch",
                             "operator": "In",
                             "values": [
                               "amd64"
@@ -254,7 +254,7 @@ spec:
   maintainers:
     - name: Guang Jiong Lou
       email: luogj@cn.ibm.com
-  minKubeVersion: 1.13.1
+  minKubeVersion: 1.14.1
   provider:
     name: IBM
   links:
@@ -291,12 +291,6 @@ spec:
           - kind: ServiceAccount
             name: ''
             version: v1
-          - kind: ClusterRole
-            name: ''
-            version: rbac.authorization.k8s.io/v1beta1
-          - kind: ClusterRoleBinding
-            name: ''
-            version: rbac.authorization.k8s.io/v1beta1
           - kind: StatefulSet
             name: ''
             version: apps/v1
@@ -489,24 +483,6 @@ spec:
               - list
               - watch
             - apiGroups:
-              - csi.storage.k8s.io
-              resources:
-              - csidrivers
-              verbs:
-              - create
-              - delete
-              - get
-              - watch
-              - list
-            - apiGroups:
-              - csi.storage.k8s.io
-              resources:
-              - csinodeinfos
-              verbs:
-              - get
-              - list
-              - watch
-            - apiGroups:
               - security.openshift.io
               resourceNames:
               - anyuid
@@ -548,7 +524,7 @@ spec:
                     requiredDuringSchedulingIgnoredDuringExecution:
                       nodeSelectorTerms:
                         - matchExpressions:
-                            - key: beta.kubernetes.io/arch
+                            - key: kubernetes.io/arch
                               operator: In
                               values:
                                 - amd64

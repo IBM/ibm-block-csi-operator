@@ -1433,7 +1433,7 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
               - matchExpressions:
-                  - key: beta.kubernetes.io/arch
+                  - key: kubernetes.io/arch
                     operator: In
                     values:
                       - amd64
@@ -1623,24 +1623,6 @@ rules:
   - storage.k8s.io
   resources:
   - csinodes
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - csi.storage.k8s.io
-  resources:
-  - csidrivers
-  verbs:
-  - create
-  - delete
-  - get
-  - watch
-  - list
-- apiGroups:
-  - csi.storage.k8s.io
-  resources:
-  - csinodeinfos
   verbs:
   - get
   - list
