@@ -94,6 +94,12 @@ metadata:
                 "tag": "v1.1.0",
                 "imagePullPolicy": "IfNotPresent"
               }
+              {
+                "name": "csi-snapshotter",
+                "repository": "quay.io/k8scsi/csi-snapshotter",
+                "tag": "v1.2.2",
+                "imagePullPolicy": "IfNotPresent"
+              }
             ]
           }
         }

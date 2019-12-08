@@ -21,6 +21,7 @@ const (
 	CSIProvisionerImage         = "quay.io/k8scsi/csi-provisioner:v1.3.0"
 	CSIAttacherImage            = "quay.io/k8scsi/csi-attacher:v1.2.1"
 	CSILivenessProbeImage       = "quay.io/k8scsi/livenessprobe:v1.1.0"
+	CSISnapshotterImage       	= "quay.io/k8scsi/csi-snapshotter:v1.2.2"
 
 	ControllerTag = "1.0.0"
 	NodeTag       = "1.0.0"

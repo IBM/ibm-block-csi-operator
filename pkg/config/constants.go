@@ -39,6 +39,7 @@ const (
 	CSIProvisioner         = "csi-provisioner"
 	CSIAttacher            = "csi-attacher"
 	LivenessProbe          = "livenessprobe"
+	CSISnapshotter         = "csi-snapshotter"
 
 	ControllerSocketVolumeMountPath                       = "/var/lib/csi/sockets/pluginproxy/"
 	NodeSocketVolumeMountPath                             = "/csi"
