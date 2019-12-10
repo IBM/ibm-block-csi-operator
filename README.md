@@ -61,7 +61,7 @@ multipath -ll
 
 3.3. For iSCSI, perform the following steps:
 
-3.3.1. Make sure that the login to the iSCSI targets is permanent and remains available after a reboot of the worker node. To do this, verify that the node.startup in the /etc/iscsi/iscsid.conf file is set to automatic. If not, set it as required and then restart the iscsid service `$ service iscsid restart`.
+3.3.1. Make sure that the login to the iSCSI targets is permanent and remains available after a reboot of the worker node. To do this, verify that the node.startup in the `/etc/iscsi/iscsid.conf` file is set to automatic. If not, set it as required and then restart the iscsid service `$ service iscsid restart`.
 
 3.3.2. Discover and log into at least two iSCSI targets on the relevant storage systems. (NOTE: Without at least two ports, multipath device will not be created.)
 
