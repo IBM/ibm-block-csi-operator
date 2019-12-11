@@ -158,7 +158,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	// csi snapshotter sidecar
 	snapshotter := s.ensureContainer(snapshotterContainerName,
 		s.getCSISnapshotterImage(),
-		[]string{"--csi-address=/csi/csi.sock", "--v=5"},
+		[]string{"--csi-address=$(ADDRESS)", "--v=5"},
 	)
 	snapshotter.ImagePullPolicy = s.getCSISnapshotterPullPolicy()
 
@@ -255,7 +255,7 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 			},
 		}
 
-	case provisionerContainerName, attacherContainerName:
+	case provisionerContainerName, attacherContainerName, snapshotterContainerName:
 		return []corev1.EnvVar{
 			{
 				Name:  "ADDRESS",
