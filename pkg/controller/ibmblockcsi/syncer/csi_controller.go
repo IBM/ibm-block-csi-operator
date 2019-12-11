@@ -158,7 +158,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	// csi snapshotter sidecar
 	snapshotter := s.ensureContainer(snapshotterContainerName,
 		s.getCSISnapshotterImage(),
-		[]string{"--csi-address=$(ADDRESS)", "--v=5"},
+		[]string{"--csi-address=$(ADDRESS111)", "--v=5"},
 	)
 	snapshotter.ImagePullPolicy = s.getCSISnapshotterPullPolicy()
 
