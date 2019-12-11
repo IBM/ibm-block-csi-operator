@@ -26,11 +26,6 @@ CRD_PATH=$DEPLOY_PATH/crds
 TARGET_FILE_NAME=ibm-block-csi-operator.yaml
 TARGET_FILE=$DEPLOY_PATH/installer/generated/$TARGET_FILE_NAME
 
-SNAPSHOTS_CRDS_PATH="https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/master/config/crd"
-SNAPSHOTS_CRDS="snapshot.storage.k8s.io_volumesnapshotclasses.yaml \
-                snapshot.storage.k8s.io_volumesnapshotcontents.yaml \
-                snapshot.storage.k8s.io_volumesnapshots.yaml"
-
 excluded_files=("csi_driver.yaml" $TARGET_FILE_NAME)
 excluded_crds=("csi.ibm.com_configs_crd.yaml" "csi.ibm.com_nodeinfos_crd.yaml")
 
@@ -63,12 +58,6 @@ do
     else
         echo "skip $file_name, it is not a file"
     fi
-done
-
-# Snapshot related CRDs
-for crd in $SNAPSHOTS_CRDS
-do
-  curl $SNAPSHOTS_CRDS_PATH/$crd >> $TARGET_FILE_NAME
 done
 
 for file_name in $(ls $DEPLOY_PATH)
