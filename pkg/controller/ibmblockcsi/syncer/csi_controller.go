@@ -140,11 +140,11 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	provisioner.ImagePullPolicy = s.getCSIProvisionerPullPolicy()
 
 	// csi attacher sidecar
-	attacher := s.ensureContainer(attacherContainerName,
-		s.getCSIAttacherImage(),
-		[]string{"--csi-address=$(ADDRESS)", "--v=5"},
-	)
-	attacher.ImagePullPolicy = s.getCSIAttacherPullPolicy()
+	//attacher := s.ensureContainer(attacherContainerName,
+	//	s.getCSIAttacherImage(),
+	//	[]string{"--csi-address=$(ADDRESS)", "--v=5"},
+	//)
+	//attacher.ImagePullPolicy = s.getCSIAttacherPullPolicy()
 
 	// liveness probe sidecar
 	livenessProbe := s.ensureContainer(controllerLivenessProbeContainerName,
@@ -165,7 +165,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	return []corev1.Container{
 		controllerPlugin,
 		provisioner,
-		attacher,
+		//attacher,
 		livenessProbe,
 		snapshotter,
 	}
