@@ -113,7 +113,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	// controller plugin container
 	controllerPlugin := s.ensureContainer(controllerContainerName,
 		s.driver.GetCSIControllerImage(),
-		[]string{"--csi-endpoint=$(CSI_ENDPOINT)", "--feature-gates=VolumeSnapshotDataSource=true"},
+		[]string{"--csi-endpoint=$(CSI_ENDPOINT)"},
 	)
 
 	controllerPlugin.Resources = ensureResources("40m", "800m", "40Mi", "400Mi")
@@ -158,7 +158,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	// csi snapshotter sidecar
 	snapshotter := s.ensureContainer(snapshotterContainerName,
 		s.getCSISnapshotterImage(),
-		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--feature-gates=VolumeSnapshotDataSource=true"},
+		[]string{"--csi-address=$(ADDRESS)", "--v=5"},
 	)
 	snapshotter.ImagePullPolicy = s.getCSISnapshotterPullPolicy()
 
