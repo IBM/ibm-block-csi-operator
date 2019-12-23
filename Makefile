@@ -16,13 +16,13 @@
 
 #all: test
 
-.PHONY: ibm-block-csi-operator
-ibm-block-csi-operator:
+.PHONY: build
+build:
 	CGO_ENABLED=1 GOOS=linux go build     -o build/_output/bin/ibm-block-csi-operator     -gcflags all=-trimpath=${GOPATH} -asmflags all=-trimpath=${GOPATH} -mod=vendor cmd/manager/main.go
 
 .PHONY: test
 test: update
-	# for go 1.13+, set GOFLAGS to enable vendor mod
+	# for go 1.13+, set GOFLAGS to enable vendor mod for ginkgo
 	GO111MODULE=on GOFLAGS='-mod=vendor' ginkgo -r -skipPackage pkg/controller
 
 .PHONY: update
