@@ -27,7 +27,7 @@ docker pull owasp/dependency-check
 docker run --rm \
     --volume go.mod:/src \
     --volume "$DATA_DIRECTORY":/usr/share/dependency-check/data \
-    --volume "$REPORT_DIRECTORY":/report \\
+    --volume "$REPORT_DIRECTORY":/report \
     owasp/dependency-check \
     --scan /src \
     --exclude "${EXCLUDE}" \
