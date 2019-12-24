@@ -1,0 +1,39 @@
+pipeline {
+    agent {
+        label 'docker-engine'
+    }
+    stages {
+        stage ('Environment Setup')  {
+            steps {
+                sh 'mkdir -p build/reports && chmod 777 build/reports'
+            }
+        }
+        stage ('CSI operator: security code scanning') {
+            steps {
+                sh './build/ci/run_csi_code_scan.sh operator'
+            }
+        }
+        stage ('CSI operator dependencies: security code scanning') {
+            steps {
+                sh './build/ci/run_csi_code_scan.sh operator-dep'
+            }
+        }
+    }
+    post {
+        always {
+            sh 'ls -la build/reports/'
+            sh 'tar -zcvf build/reports.tar.gz build/reports'
+            archiveArtifacts artifacts: 'build/reports.tar.gz', fingerprint: true
+            script {
+                manager.addShortText("${env.GIT_BRANCH}")
+            }
+        }
+
+        cleanup {
+            script {
+                sh '[ -d build/reports ] && rm -rf build/reports'
+            }
+        }
+
+    }
+}
