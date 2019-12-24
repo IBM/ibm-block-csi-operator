@@ -23,8 +23,6 @@ if ! [ -x "$(command -v operator-sdk)" ]; then
   exit 1
 fi
 
-echo "run operator-sdk generate k8s"
 operator-sdk generate k8s
 
-echo "run operator-sdk generate openapi"
 operator-sdk generate openapi
