@@ -268,7 +268,7 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 
 func (s *csiControllerSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 	switch name {
-	case controllerContainerName, provisionerContainerName, attacherContainerName:
+	case controllerContainerName, provisionerContainerName, attacherContainerName, snapshotterContainerName:
 		return []corev1.VolumeMount{
 			{
 				Name:      socketVolumeName,
