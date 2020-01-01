@@ -12,7 +12,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh './build/ci/code_scanning/run_csi_code_scan.sh operator'
+                        sh './build/ci/code_scanning/run_csi_code_scan.sh csi-operator-code-scan'
                    } catch (exc) {
                         echo "${exc}"
                     }
@@ -23,7 +23,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh './build/ci/code_scanning/run_csi_code_scan.sh operator-dep'
+                        sh './build/ci/code_scanning/run_csi_code_scan.sh csi-operator-dep-code-scan'
                    } catch (exc) {
                         echo "${exc}"
                     }
