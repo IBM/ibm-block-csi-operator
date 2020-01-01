@@ -104,16 +104,16 @@ func (c *IBMBlockCSI) GenerateExternalProvisionerClusterRole() *rbacv1.ClusterRo
 				Resources: []string{"events"},
 				Verbs:     []string{"list", "watch", "create", "update", "patch"},
 			},
-			{
-				APIGroups: []string{"snapshot.storage.k8s.io"},
-				Resources: []string{"volumesnapshots"},
-				Verbs:     []string{"get", "list"},
-			},
-			{
-				APIGroups: []string{"snapshot.storage.k8s.io"},
-				Resources: []string{"volumesnapshotcontents"},
-				Verbs:     []string{"get", "list"},
-			},
+			//{
+			//	APIGroups: []string{"snapshot.storage.k8s.io"},
+			//	Resources: []string{"volumesnapshots"},
+			//	Verbs:     []string{"get", "list"},
+			//},
+			//{
+			//	APIGroups: []string{"snapshot.storage.k8s.io"},
+			//	Resources: []string{"volumesnapshotcontents"},
+			//	Verbs:     []string{"get", "list"},
+			//},
 			//{
 			//	APIGroups: []string{"snapshot.storage.k8s.io"},
 			//	Resources: []string{"volumesnapshotclasses"},
