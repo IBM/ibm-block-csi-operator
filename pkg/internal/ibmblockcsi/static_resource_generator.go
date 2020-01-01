@@ -234,21 +234,21 @@ func (c *IBMBlockCSI) GenerateExternalSnapshotterClusterRole() *rbacv1.ClusterRo
 				Resources: []string{"secrets"},
 				Verbs:     []string{"get", "list"},
 			},
-			//			{
-			//				APIGroups: []string{"snapshot.storage.k8s.io"},
-			//				Resources: []string{"volumesnapshotclasses"},
-			//				Verbs:     []string{"get", "list", "watch"},
-			//			},
-			//			{
-			//				APIGroups: []string{"snapshot.storage.k8s.io"},
-			//				Resources: []string{"volumesnapshots"},
-			//				Verbs:     []string{"get", "list", "watch", "update"},
-			//			},
-			//			{
-			//				APIGroups: []string{"snapshot.storage.k8s.io"},
-			//				Resources: []string{"volumesnapshotcontents"},
-			//				Verbs:     []string{"create", "get", "list", "watch", "update", "delete"},
-			//			},
+			{
+				APIGroups: []string{"snapshot.storage.k8s.io"},
+				Resources: []string{"volumesnapshotclasses"},
+				Verbs:     []string{"get", "list", "watch"},
+			},
+			{
+				APIGroups: []string{"snapshot.storage.k8s.io"},
+				Resources: []string{"volumesnapshots"},
+				Verbs:     []string{"get", "list", "watch", "update"},
+			},
+			{
+				APIGroups: []string{"snapshot.storage.k8s.io"},
+				Resources: []string{"volumesnapshotcontents"},
+				Verbs:     []string{"create", "get", "list", "watch", "update", "delete"},
+			},
 			{
 				APIGroups: []string{"apiextensions.k8s.io"},
 				Resources: []string{"customresourcedefinitions"},
