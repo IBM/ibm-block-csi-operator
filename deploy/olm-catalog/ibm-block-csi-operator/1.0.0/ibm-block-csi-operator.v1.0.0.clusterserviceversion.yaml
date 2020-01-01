@@ -512,6 +512,34 @@ spec:
               - '*'
               verbs:
               - '*'
+            - apiGroups:
+                - snapshot.storage.k8s.io
+              resources:
+                - volumesnapshotclasses
+              verbs:
+                - get
+                - watch
+                - list
+            - apiGroups:
+                - snapshot.storage.k8s.io
+              resources:
+                - volumesnapshotcontents
+              verbs:
+                - get
+                - watch
+                - list
+                - create
+                - update
+                - delete
+            - apiGroups:
+                - snapshot.storage.k8s.io
+              resources:
+                - volumesnapshots
+              verbs:
+                - get
+                - watch
+                - list
+                - update
       deployments:
         - name: ibm-block-csi-operator
           spec:
