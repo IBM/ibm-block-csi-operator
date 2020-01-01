@@ -1652,33 +1652,33 @@ rules:
   verbs:
   - '*'
 - apiGroups:
-    - snapshot.storage.k8s.io
+  - snapshot.storage.k8s.io
   resources:
-    - volumesnapshotclasses
+  - volumesnapshotclasses
   verbs:
-    - get
-    - watch
-    - list
+  - get
+  - watch
+  - list
 - apiGroups:
-    - snapshot.storage.k8s.io
+  - snapshot.storage.k8s.io
   resources:
-    - volumesnapshotcontents
+  - volumesnapshotcontents
   verbs:
-    - get
-    - watch
-    - list
-    - create
-    - update
-    - delete
+  - get
+  - watch
+  - list
+  - create
+  - update
+  - delete
 - apiGroups:
-    - snapshot.storage.k8s.io
+  - snapshot.storage.k8s.io
   resources:
-    - volumesnapshots
+  - volumesnapshots
   verbs:
-    - get
-    - watch
-    - list
-    - update
+  - get
+  - watch
+  - list
+  - update
 
 ---
 kind: ClusterRoleBinding
