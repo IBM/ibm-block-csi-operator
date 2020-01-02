@@ -26,4 +26,4 @@ RUN go get github.com/securego/gosec/cmd/gosec
 
 VOLUME /results
 
-ENTRYPOINT ["gosec", "-log", "/results/code_scan_operator_logs", "-out", "/results/code_scan_operator_res", "-no-fail", "./..."]
+ENTRYPOINT ["gosec", "-log", "/results/code_scan_operator.log", "-out", "/results/code_scan_operator", "-no-fail", "./..."]

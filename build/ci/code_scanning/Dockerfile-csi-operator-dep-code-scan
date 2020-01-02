@@ -25,4 +25,4 @@ RUN go get github.com/securego/gosec/cmd/gosec
 VOLUME /results
 WORKDIR vendor
 
-ENTRYPOINT ["gosec", "-log", "/results/code_scan_operator_dep_logs", "-out", "/results/code_scan_operator_dep_res", "-no-fail", "./..."]
+ENTRYPOINT ["gosec", "-log", "/results/code_scan_operator_dep.log", "-out", "/results/code_scan_operator_dep", "-no-fail", "./..."]
