@@ -540,6 +540,15 @@ spec:
                 - watch
                 - list
                 - update
+            - apiGroups:
+                - snapshot.storage.k8s.io
+              resources:
+                - volumesnapshots/status
+              verbs:
+                - get
+                - watch
+                - list
+                - update
       deployments:
         - name: ibm-block-csi-operator
           spec:
