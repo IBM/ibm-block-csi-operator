@@ -287,6 +287,11 @@ func (c *IBMBlockCSI) GenerateSCCForControllerClusterRole() *rbacv1.ClusterRole 
 			},
 			{
 				APIGroups: []string{"snapshot.storage.k8s.io"},
+				Resources: []string{"volumesnapshots/status"},
+				Verbs:     []string{"get", "list", "watch", "update"},
+			},
+			{
+				APIGroups: []string{"snapshot.storage.k8s.io"},
 				Resources: []string{"volumesnapshotcontents"},
 				Verbs:     []string{"create", "get", "list", "watch", "update", "delete"},
 			},
