@@ -1684,9 +1684,6 @@ rules:
   resources:
   - volumesnapshots/status
   verbs:
-  - get
-  - watch
-  - list
   - update
 
 ---

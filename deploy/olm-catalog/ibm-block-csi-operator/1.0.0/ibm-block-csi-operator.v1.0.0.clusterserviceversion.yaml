@@ -545,9 +545,6 @@ spec:
               resources:
                 - volumesnapshots/status
               verbs:
-                - get
-                - watch
-                - list
                 - update
       deployments:
         - name: ibm-block-csi-operator
