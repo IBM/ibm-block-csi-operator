@@ -173,7 +173,7 @@ func (c *IBMBlockCSI) GenerateExternalAttacherClusterRole() *rbacv1.ClusterRole 
 			},
 			{
 				APIGroups: []string{storageApiGroup},
-				Resources: []string{nodeResourceName},
+				Resources: []string{csiNodesResource},
 				Verbs:     []string{"get", "list", "watch"},
 			},
 			{
