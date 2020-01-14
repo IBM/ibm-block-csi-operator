@@ -299,7 +299,7 @@ func (s *csiControllerSyncer) getSidecarByName(name string) *csiv1.CSISidecar {
 	return getSidecarByName(s.driver, name)
 }
 
-// name: sidecar n ame as defined in yaml
+// name: sidecar name as defined in yaml
 // image: image of sidecar if it is not defined in yaml
 func (s *csiControllerSyncer) getSidecarImageByName(name string, image string) string {
 	sidecar := s.getSidecarByName(name)
