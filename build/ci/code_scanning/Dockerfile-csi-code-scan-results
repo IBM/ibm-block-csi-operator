@@ -12,16 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Build stage
-FROM golang:1.12.6 as builder
+FROM python:3.6.9
 
-WORKDIR /go/src/github.com/IBM/ibm-block-csi-operator
-ENV GO111MODULE=on
+RUN pip3 install deepdiff
 
-COPY cmd ./cmd
-COPY pkg ./pkg
-COPY version ./version
-RUN mkdir /results
-RUN go get github.com/securego/gosec/cmd/gosec
+COPY build/ci/code_scanning/code_scan_results_entrypoint.sh ./entrypoint.sh
+COPY build/ci/code_scanning/code_scan_results/* ./code_scan_results/
+RUN chmod u+x entrypoint.sh code_scan_results/*
 
-ENTRYPOINT ["/bin/sh", "-c", "/go/bin/gosec -fmt=json -no-fail ./... > /results/${TARGET_NAME}.json 2> /results/${TARGET_NAME}.log"]
+ENV CON_OUTPUT_PATH="/results"
+RUN mkdir ${CON_OUTPUT_PATH}
+
+ENV CON_BASELINE_PATH="/baseline_results"
+RUN mkdir ${CON_BASELINE_PATH}
+
+WORKDIR .
+
+ENTRYPOINT ["/bin/sh", "-c", "./entrypoint.sh"]
