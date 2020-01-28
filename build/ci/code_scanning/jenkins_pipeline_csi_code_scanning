@@ -1,31 +1,48 @@
+def run_csi_code_scan(target_name) {
+    EXIT_STATUS = sh(
+        returnStatus: true,
+        script: "./run_csi_code_scan.sh ${target_name} build/ci/code_scanning"
+    )
+    if (EXIT_STATUS == 1) {
+        currentBuild.result = 'FAILURE'
+        echo "Error: ${env.STAGE_NAME} stage failed, with exit status 1."
+    } else if (EXIT_STATUS == 2) {
+        if (currentBuild.result != 'FAILURE') {
+            currentBuild.result = 'UNSTABLE'
+        }
+        echo "Error: ${env.STAGE_NAME} stage failed, with exit status 2."
+    }
+}
+
 pipeline {
     agent {
         label 'docker-engine'
     }
     stages {
-        stage ('Environment Setup')  {
+        stage ('Environment Setup') {
             steps {
-                sh 'mkdir -p build/reports && chmod 777 build/reports'
+                sh '''
+                    mkdir -p build/reports && chmod 777 build/reports
+                    mkdir -p build/code_scan && chmod 777 build/code_scan
+                    wget https://raw.githubusercontent.com/IBM/ibm-block-csi-driver/develop/scripts/ci/code_scanning/run_csi_code_scan.sh
+                    chmod u+x run_csi_code_scan.sh
+                '''
             }
         }
-        stage ('CSI Operator: security code scanning') {
-            steps {
-                script {
-                    try {
-                        sh './build/ci/code_scanning/run_csi_code_scan.sh csi-operator-code-scan'
-                   } catch (exc) {
-                        echo "${exc}"
+        stage ('Running code scanning in parallel') {
+            parallel {
+                stage ('CSI Operator: security code scanning') {
+                    steps {
+                        script {
+                            run_csi_code_scan("csi-operator-code-scan")
+                        }
                     }
                 }
-            }
-        }
-        stage ('CSI Operator Dependencies: security code scanning') {
-            steps {
-                script {
-                    try {
-                        sh './build/ci/code_scanning/run_csi_code_scan.sh csi-operator-dep-code-scan'
-                   } catch (exc) {
-                        echo "${exc}"
+                stage ('CSI Operator Dependencies: security code scanning') {
+                    steps {
+                        script {
+                            run_csi_code_scan("csi-operator-dep-code-scan")
+                        }
                     }
                 }
             }
@@ -33,16 +50,21 @@ pipeline {
     }
     post {
         always {
-            sh 'ls -la build/reports/'
-            archiveArtifacts artifacts: 'build/reports/*', fingerprint: true
             script {
                 manager.addShortText("${env.GIT_BRANCH}")
             }
+            sh 'ls -la build/reports/'
+            archiveArtifacts artifacts: 'build/reports/csi-*/*', fingerprint: true
+            archiveArtifacts artifacts: 'build/code_scan/csi-*/*', fingerprint: true
         }
 
         cleanup {
             script {
-                sh '[ -d build/reports ] && rm -rf build/reports'
+                 sh '''
+                    [ -d build/reports ] && rm -rf build/reports
+                    [ -d build/code_scan ] && rm -rf build/code_scan
+                    [ -f run_csi_code_scan.sh ] && rm -rf run_csi_code_scan.sh
+                 '''
             }
         }
 
