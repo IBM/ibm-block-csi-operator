@@ -1,7 +1,7 @@
 def run_csi_code_scan(target_name) {
     EXIT_STATUS = sh(
         returnStatus: true,
-        script: "./build/ci/code_scanning/run_csi_code_scan.sh ${target_name}"
+        script: "./run_csi_code_scan.sh ${target_name} build/ci/code_scanning"
     )
     if (EXIT_STATUS == 1) {
         currentBuild.result = 'FAILURE'
@@ -24,6 +24,8 @@ pipeline {
                 sh '''
                     mkdir -p build/reports && chmod 777 build/reports
                     mkdir -p build/code_scan && chmod 777 build/code_scan
+                    wget https://raw.githubusercontent.com/IBM/ibm-block-csi-driver/develop/scripts/ci/code_scanning/run_csi_code_scan.sh
+                    chmod u+x run_csi_code_scan.sh
                 '''
             }
         }
@@ -61,6 +63,7 @@ pipeline {
                  sh '''
                     [ -d build/reports ] && rm -rf build/reports
                     [ -d build/code_scan ] && rm -rf build/code_scan
+                    [ -f run_csi_code_scan.sh ] && rm -rf run_csi_code_scan.sh
                  '''
             }
         }

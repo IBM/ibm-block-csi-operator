@@ -20,7 +20,7 @@ COPY build/ci/code_scanning/code_scan_results_entrypoint.sh ./entrypoint.sh
 COPY build/ci/code_scanning/code_scan_results/* ./code_scan_results/
 
 WORKDIR code_scan_results
-ENV CODE_SCANNING_DRIVER="https://raw.githubusercontent.com/IBM/ibm-block-csi-driver/feature/CSI-1022_check_code_scanning_results/scripts/ci/code_scanning/code_scan_results"
+ENV CODE_SCANNING_DRIVER="https://raw.githubusercontent.com/IBM/ibm-block-csi-driver/develop/scripts/ci/code_scanning/code_scan_results"
 RUN wget ${CODE_SCANNING_DRIVER}/diff_code_scan_results.py
 RUN wget ${CODE_SCANNING_DRIVER}/filter_code_scan_results.py
 RUN wget ${CODE_SCANNING_DRIVER}/json_utils.py
