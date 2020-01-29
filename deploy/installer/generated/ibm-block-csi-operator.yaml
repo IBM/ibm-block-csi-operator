@@ -1425,7 +1425,7 @@ spec:
       annotations:
         productName: ibm-block-csi-operator
         productID: ibm-block-csi-operator
-        productVersion: "1.0.0"
+        productVersion: "1.1.0"
     spec:
       serviceAccountName: ibm-block-csi-operator
       affinity:
@@ -1460,7 +1460,7 @@ spec:
           capabilities:
             drop:
             - ALL
-        image: ibmcom/ibm-block-csi-operator:1.0.0
+        image: ibmcom/ibm-block-csi-operator:1.1.0
         imagePullPolicy: IfNotPresent
         command:
         - ibm-block-csi-operator

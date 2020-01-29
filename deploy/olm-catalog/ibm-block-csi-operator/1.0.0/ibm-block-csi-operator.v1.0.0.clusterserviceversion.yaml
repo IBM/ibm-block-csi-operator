@@ -1,13 +1,13 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
-  name: ibm-block-csi-operator.v1.0.0
+  name: ibm-block-csi-operator.v1.1.0
   namespace: placeholder
   annotations:
     capabilities: "Seamless Upgrades"
     categories: "Storage,Cloud Provider"
     certified: "true"
-    containerImage: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.0.0
+    containerImage: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.1.0
     createdAt: "2019-11-19T13:14:00Z"
     description: "Run IBM block storage CSI driver on OpenShift."
     repository: https://github.com/IBM/ibm-block-csi-operator
@@ -23,7 +23,7 @@ metadata:
           "spec": {
             "controller": {
               "repository": "ibmcom/ibm-block-csi-driver-controller",
-              "tag": "1.0.0",
+              "tag": "1.1.0",
               "imagePullPolicy": "IfNotPresent",
               "affinity": {
                 "nodeAffinity": {
@@ -47,7 +47,7 @@ metadata:
             },
             "node": {
               "repository": "ibmcom/ibm-block-csi-driver-node",
-              "tag": "1.0.0",
+              "tag": "1.1.0",
               "imagePullPolicy": "IfNotPresent",
               "affinity": {
                 "nodeAffinity": {
@@ -249,7 +249,7 @@ spec:
     - IBM
     - BlockStorage
     - CSI
-  version: 1.0.0
+  version: 1.1.0
   maturity: stable
   maintainers:
     - name: Guang Jiong Lou
@@ -551,7 +551,7 @@ spec:
                     capabilities:
                       drop:
                       - ALL
-                  image: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.0.0
+                  image: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.1.0
                   imagePullPolicy: IfNotPresent
                   command:
                   - ibm-block-csi-operator
