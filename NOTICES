@@ -5,7 +5,7 @@ This file details additional third party software license agreements
 and third party notices and information that are required 
 to be reproduced for the following programs:
    
-Operator for IBM Block Storage CSI Driver version 1.1.0
+Operator for IBM Block Storage CSI Driver version 1.0.0
 
 
 
@@ -1040,7 +1040,7 @@ Version 7
 
 ===========================================================================
 END OF TERMS AND CONDITIONS FOR SEPARATELY LICENSED CODE for Operator for 
-IBM Block Storage CSI Driver version 1.1.0
+IBM Block Storage CSI Driver version 1.0.0
 ===========================================================================
 
 
@@ -1051,7 +1051,7 @@ IBM Block Storage CSI Driver version 1.1.0
 
 GNU GPL and / or LGPL Source Code for:
 
-Operator for IBM Block Storage CSI Driver Version 1.1.0 Third Party
+Operator for IBM Block Storage CSI Driver Version 1.0.0 Third Party
 Licenses and Notices
 
 ===========================================================================
@@ -1070,7 +1070,7 @@ the GNU Lesser General Public License 3.0.
     Prometheus version 1.8.2
 
 Source code to any of the above-listed packages distributed with Operator
-for IBM Block Storage CSI Driver Version 1.1.0 Third Party Licenses and
+for IBM Block Storage CSI Driver Version 1.0.0 Third Party Licenses and
 Notices is available at the website below, when a URL is provided, or by
 sending a request to the following address or email: 
 
@@ -3983,7 +3983,7 @@ END OF thrift NOTICES AND INFORMATION
 
 ===========================================================================
 END OF NOTICES AND INFORMATION FOR Operator for IBM Block
-Storage CSI Driver Version 1.1.0 Third Party Licenses and
+Storage CSI Driver Version 1.0.0 Third Party Licenses and
 Notices 
 ===========================================================================
 
