@@ -384,6 +384,7 @@ spec:
               - update
               - create
               - delete
+              - patch
             - apiGroups:
               - ""
               resources:
@@ -441,6 +442,7 @@ spec:
               - list
               - watch
               - update
+              - patch
             - apiGroups:
               - storage.k8s.io
               resources:
