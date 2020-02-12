@@ -157,7 +157,7 @@ func (c *IBMBlockCSI) GenerateExternalAttacherClusterRole() *rbacv1.ClusterRole 
 			{
 				APIGroups: []string{""},
 				Resources: []string{"persistentvolumes"},
-				Verbs:     []string{"get", "list", "watch", "update"},
+				Verbs:     []string{"get", "list", "watch", "update", "patch"},
 			},
 			{
 				APIGroups: []string{c.GetCSIAPIGroup()},
@@ -172,7 +172,7 @@ func (c *IBMBlockCSI) GenerateExternalAttacherClusterRole() *rbacv1.ClusterRole 
 			{
 				APIGroups: []string{"storage.k8s.io"},
 				Resources: []string{"volumeattachments"},
-				Verbs:     []string{"get", "list", "watch", "update"},
+				Verbs:     []string{"get", "list", "watch", "update", "patch"},
 			},
 		},
 	}
