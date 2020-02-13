@@ -1529,6 +1529,7 @@ rules:
   - update
   - create
   - delete
+  - patch
 - apiGroups:
   - ""
   resources:
@@ -1586,6 +1587,7 @@ rules:
   - list
   - watch
   - update
+  - patch
 - apiGroups:
   - storage.k8s.io
   resources:
