@@ -11,7 +11,7 @@ pipeline {
         }
         stage ('Build and push images') {
             steps {
-                sh './build/ci/build_image.sh build/_output/reports/images_url'
+                sh './build/ci/build_push_image.sh build/_output/reports/images_url'
             }
         }
     }
