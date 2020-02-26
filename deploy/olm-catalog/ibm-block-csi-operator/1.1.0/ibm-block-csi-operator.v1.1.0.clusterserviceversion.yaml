@@ -109,7 +109,6 @@ spec:
       - OpenShift v4.2
       - OpenShift v4.3
       - Kubernetes v1.14
-      - Kubernetes v1.15
       - Kubernetes v1.16
 
     Supported IBM storage systems:
@@ -254,6 +253,7 @@ spec:
     - BlockStorage
     - CSI
   version: 1.1.0
+  replaces: ibm-block-csi-operator.v1.0.0
   maturity: stable
   maintainers:
     - name: Guang Jiong Lou
