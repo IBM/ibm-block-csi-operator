@@ -145,7 +145,6 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 		"SETGID",
 		"SETUID",
 		"DAC_OVERRIDE",
-		//"SYS_ADMIN",
 	)
 
 	// node driver registrar sidecar
