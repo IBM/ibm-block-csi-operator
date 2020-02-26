@@ -145,7 +145,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 		"SETGID",
 		"SETUID",
 		"DAC_OVERRIDE",
-		"SYS_ADMIN",
+		//"SYS_ADMIN",
 	)
 
 	// node driver registrar sidecar
@@ -310,7 +310,7 @@ func (s *csiNodeSyncer) ensureVolumes() []corev1.Volume {
 		ensureVolume("sys-dir", ensureHostPathVolumeSource("/sys", "Directory")),
 		ensureVolume("host-dir", ensureHostPathVolumeSource("/", "Directory")),
 		ensureVolume("lib-modules", ensureHostPathVolumeSource("/lib/modules", "Directory")),
-		ensureVolume("iscsi", ensureHostPathVolumeSource("/etc/iscsi", "DirectoryOrCreate")),
+		ensureVolume("iscsi", ensureHostPathVolumeSource("/etc/iscsi", "Directory")),
 	}
 }
 
