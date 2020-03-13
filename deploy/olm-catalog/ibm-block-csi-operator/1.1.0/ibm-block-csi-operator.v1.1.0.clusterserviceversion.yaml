@@ -1,14 +1,14 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
-  name: ibm-block-csi-operator.v1.0.0
+  name: ibm-block-csi-operator.v1.1.0
   namespace: placeholder
   annotations:
     capabilities: "Seamless Upgrades"
     categories: "Storage,Cloud Provider"
     certified: "true"
-    containerImage: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.0.0
-    createdAt: "2019-11-19T13:14:00Z"
+    containerImage: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.1.0
+    createdAt: "2020-02-19T13:14:00Z"
     description: "Run IBM block storage CSI driver on OpenShift."
     repository: https://github.com/IBM/ibm-block-csi-operator
     support: IBM
@@ -23,7 +23,7 @@ metadata:
           "spec": {
             "controller": {
               "repository": "ibmcom/ibm-block-csi-driver-controller",
-              "tag": "1.0.0",
+              "tag": "1.1.0",
               "imagePullPolicy": "IfNotPresent",
               "affinity": {
                 "nodeAffinity": {
@@ -47,7 +47,7 @@ metadata:
             },
             "node": {
               "repository": "ibmcom/ibm-block-csi-driver-node",
-              "tag": "1.0.0",
+              "tag": "1.1.0",
               "imagePullPolicy": "IfNotPresent",
               "affinity": {
                 "nodeAffinity": {
@@ -107,18 +107,21 @@ spec:
 
     Supported container platforms:
       - OpenShift v4.2
+      - OpenShift v4.3
       - Kubernetes v1.14
+      - Kubernetes v1.16
 
     Supported IBM storage systems:
       - IBM FlashSystem 9100
       - IBM Spectrum Virtualize
       - IBM Storwize
       - IBM FlashSystem A9000/R
+      - IBM DS8880
+      - IBM DS8900
 
     Supported operating systems:
       - RHEL 7.x (x86 architecture)
-
-    > **Note**: The operator must be installed in the `kube-system` project.
+      - RHCOS
 
     Full documentation can be found on the [IBM knowledge center](https://www.ibm.com/support/knowledgecenter/SSRQ8T).
 
@@ -249,7 +252,8 @@ spec:
     - IBM
     - BlockStorage
     - CSI
-  version: 1.0.0
+  version: 1.1.0
+  replaces: ibm-block-csi-operator.v1.0.0
   maturity: stable
   maintainers:
     - name: Guang Jiong Lou
@@ -384,6 +388,7 @@ spec:
               - update
               - create
               - delete
+              - patch
             - apiGroups:
               - ""
               resources:
@@ -441,6 +446,7 @@ spec:
               - list
               - watch
               - update
+              - patch
             - apiGroups:
               - storage.k8s.io
               resources:
@@ -551,7 +557,7 @@ spec:
                     capabilities:
                       drop:
                       - ALL
-                  image: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.0.0
+                  image: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.1.0
                   imagePullPolicy: IfNotPresent
                   command:
                   - ibm-block-csi-operator
