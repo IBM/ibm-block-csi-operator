@@ -5,16 +5,21 @@ This is the official operator to deploy and manage IBM block storage CSI driver.
 
 Supported container platforms:
   - OpenShift v4.2
+  - OpenShift v4.3
   - Kubernetes v1.14
+  - Kubernetes v1.16
 
 Supported IBM storage systems:
   - IBM FlashSystem 9100
   - IBM Spectrum Virtualize
   - IBM Storwize
   - IBM FlashSystem A9000/R
+  - IBM DS8880
+  - IBM DS8900
 
 Supported operating systems:
   - RHEL 7.x (x86 architecture)
+  - RHCOS
 
 Full documentation can be found on the [IBM knowledge center](https://www.ibm.com/support/knowledgecenter/SSRQ8T).
 
@@ -92,7 +97,6 @@ portal: {STORAGE-SYSTEM-iSCSI-PORT-IP2},{port number}
 ## Installation
 
 ### Install the operator
-
 
 
 1. Download the manifest from GitHub.
@@ -228,6 +232,13 @@ storageclass.storage.k8s.io/gold created
 <br/>
 <br/>
 
+## Upgrading
+
+### 1. Upgrade the operator.
+The steps is the same with new installation, you can upgrade the operator by downloading new manifest and run `kubectl apply` again.
+
+### 2. Upgrade the IBMBlockCSI custom resource.
+The steps is the same with new installation, you can upgrade the custom resource by downloading new manifest and run `kubectl apply` again.
 
 ## Uninstalling
 
