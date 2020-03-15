@@ -24,7 +24,7 @@ operator_tag_latest=${operator_registry}:latest
 [ "$tag_latest" = "true" ] && taglatestflag="-t ${operator_tag_latest}" 
 
 echo "Build and push the Operator image"
-docker build -t ${operator_tag_specific} $taglatestflag -f build/Dockerfile.operator .
+docker build -t ${operator_tag_specific} $taglatestflag -f build/Dockerfile.operator --build-arg VERSION="${IMAGE_VERSION}" --build-arg BUILD_NUMBER="${BUILD_NUMBER}" .
 docker push ${operator_tag_specific}
 [ "$tag_latest" = "true" ] && docker push ${operator_tag_latest} || :
 
