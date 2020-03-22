@@ -52,7 +52,7 @@ spec:
     imagePullPolicy: IfNotPresent
   - name: csi-provisioner
     repository: quay.io/k8scsi/csi-provisioner
-    tag: "v1.3.0"
+    tag: "v1.4.0"
     imagePullPolicy: IfNotPresent
   - name: csi-attacher
     repository: quay.io/k8scsi/csi-attacher
