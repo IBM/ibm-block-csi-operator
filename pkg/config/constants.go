@@ -18,6 +18,8 @@ package config
 
 // Add a field here if it never changes, if it changes over time, put it to settings.go
 const (
+	OpenShift   = "OpenShift"
+	Kubernetes  = "Kubernetes"
 	APIGroup    = "csi.ibm.com"
 	APIVersion  = "v1"
 	Name        = "ibm-block-csi-operator"
@@ -30,11 +32,18 @@ const (
 	NodeRepository       = "ibmcom/ibm-block-csi-node-driver"
 	NodeAgentRepository  = "ibmcom/ibm-node-agent"
 
+	OpenShiftControllerRepository = "ibmcom/ibm-block-csi-controller-driver"
+	OpenShiftNodeRepository       = "ibmcom/ibm-block-csi-node-driver"
+	OpenShiftNodeAgentRepository  = "ibmcom/ibm-node-agent"
+
 	ENVIscsiAgentPort = "ISCSI_AGENT_PORT"
 	ENVEndpoint       = "ENDPOINT"
 	ENVNodeName       = "NODE_NAME"
 	ENVKubeVersion    = "KUBE_VERSION"
+	ENVPlatform       = "PLATFORM"
 
+	Controller             = "csi-controller"
+	Node                   = "csi-node"
 	CSINodeDriverRegistrar = "csi-node-driver-registrar"
 	CSIProvisioner         = "csi-provisioner"
 	CSIAttacher            = "csi-attacher"

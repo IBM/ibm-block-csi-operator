@@ -17,8 +17,6 @@
 package syncer
 
 import (
-	"fmt"
-
 	"github.com/imdario/mergo"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -28,7 +26,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	csiv1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/internal/ibmblockcsi"
 	"github.com/IBM/ibm-block-csi-operator/pkg/util/boolptr"
@@ -286,36 +283,20 @@ func (s *csiControllerSyncer) ensureVolumes() []corev1.Volume {
 	}
 }
 
-func (s *csiControllerSyncer) getSidecarByName(name string) *csiv1.CSISidecar {
-	return getSidecarByName(s.driver, name)
-}
-
 func (s *csiControllerSyncer) getCSIAttacherImage() string {
-	sidecar := s.getSidecarByName(config.CSIAttacher)
-	if sidecar != nil {
-		return fmt.Sprintf("%s:%s", sidecar.Repository, sidecar.Tag)
-	}
-	return config.CSIAttacherImage
+	return s.driver.GetSidecarImageByName(config.CSIAttacher)
 }
 
 func (s *csiControllerSyncer) getCSIProvisionerImage() string {
-	sidecar := s.getSidecarByName(config.CSIProvisioner)
-	if sidecar != nil {
-		return fmt.Sprintf("%s:%s", sidecar.Repository, sidecar.Tag)
-	}
-	return config.CSIProvisionerImage
+	return s.driver.GetSidecarImageByName(config.CSIProvisioner)
 }
 
 func (s *csiControllerSyncer) getLivenessProbeImage() string {
-	sidecar := s.getSidecarByName(config.LivenessProbe)
-	if sidecar != nil {
-		return fmt.Sprintf("%s:%s", sidecar.Repository, sidecar.Tag)
-	}
-	return config.CSILivenessProbeImage
+	return s.driver.GetSidecarImageByName(config.LivenessProbe)
 }
 
 func (s *csiControllerSyncer) getCSIAttacherPullPolicy() corev1.PullPolicy {
-	sidecar := s.getSidecarByName(config.CSIAttacher)
+	sidecar := s.dirver.getSidecarByName(config.CSIAttacher)
 	if sidecar != nil && sidecar.ImagePullPolicy != "" {
 		return sidecar.ImagePullPolicy
 	}
@@ -323,7 +304,7 @@ func (s *csiControllerSyncer) getCSIAttacherPullPolicy() corev1.PullPolicy {
 }
 
 func (s *csiControllerSyncer) getCSIProvisionerPullPolicy() corev1.PullPolicy {
-	sidecar := s.getSidecarByName(config.CSIProvisioner)
+	sidecar := s.dirver.getSidecarByName(config.CSIProvisioner)
 	if sidecar != nil && sidecar.ImagePullPolicy != "" {
 		return sidecar.ImagePullPolicy
 	}
@@ -331,7 +312,7 @@ func (s *csiControllerSyncer) getCSIProvisionerPullPolicy() corev1.PullPolicy {
 }
 
 func (s *csiControllerSyncer) getLivenessProbePullPolicy() corev1.PullPolicy {
-	sidecar := s.getSidecarByName(config.LivenessProbe)
+	sidecar := s.dirver.getSidecarByName(config.LivenessProbe)
 	if sidecar != nil && sidecar.ImagePullPolicy != "" {
 		return sidecar.ImagePullPolicy
 	}
@@ -357,13 +338,4 @@ func ensureVolume(name string, source corev1.VolumeSource) corev1.Volume {
 		Name:         name,
 		VolumeSource: source,
 	}
-}
-
-func getSidecarByName(driver *ibmblockcsi.IBMBlockCSI, name string) *csiv1.CSISidecar {
-	for _, sidecar := range driver.Spec.Sidecars {
-		if sidecar.Name == name {
-			return &sidecar
-		}
-	}
-	return nil
 }

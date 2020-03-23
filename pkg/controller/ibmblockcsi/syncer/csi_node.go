@@ -17,8 +17,6 @@
 package syncer
 
 import (
-	"fmt"
-
 	"github.com/imdario/mergo"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -27,7 +25,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	csiv1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/internal/ibmblockcsi"
 	"github.com/IBM/ibm-block-csi-operator/pkg/util/boolptr"
@@ -97,7 +94,7 @@ func (s *csiNodeSyncer) ensurePodSpec() corev1.PodSpec {
 		Containers:         s.ensureContainersSpec(),
 		Volumes:            s.ensureVolumes(),
 		HostIPC:            true,
-		HostNetwork: 		true,
+		HostNetwork:        true,
 		ServiceAccountName: config.GetNameForResource(config.CSINodeServiceAccount, s.driver.Name),
 		Affinity:           s.driver.Spec.Node.Affinity,
 		Tolerations:        s.driver.Spec.Node.Tolerations,
@@ -313,28 +310,16 @@ func (s *csiNodeSyncer) ensureVolumes() []corev1.Volume {
 	}
 }
 
-func (s *csiNodeSyncer) getSidecarByName(name string) *csiv1.CSISidecar {
-	return getSidecarByName(s.driver, name)
-}
-
 func (s *csiNodeSyncer) getCSINodeDriverRegistrarImage() string {
-	sidecar := s.getSidecarByName(config.CSINodeDriverRegistrar)
-	if sidecar != nil {
-		return fmt.Sprintf("%s:%s", sidecar.Repository, sidecar.Tag)
-	}
-	return config.NodeDriverRegistrarImage
+	return s.driver.GetSidecarImageByName(config.CSINodeDriverRegistrar)
 }
 
 func (s *csiNodeSyncer) getLivenessProbeImage() string {
-	sidecar := s.getSidecarByName(config.LivenessProbe)
-	if sidecar != nil {
-		return fmt.Sprintf("%s:%s", sidecar.Repository, sidecar.Tag)
-	}
-	return config.CSILivenessProbeImage
+	return s.driver.GetSidecarImageByName(config.LivenessProbe)
 }
 
 func (s *csiNodeSyncer) getCSINodeDriverRegistrarPullPolicy() corev1.PullPolicy {
-	sidecar := s.getSidecarByName(config.CSINodeDriverRegistrar)
+	sidecar := s.driver.getSidecarByName(config.CSINodeDriverRegistrar)
 	if sidecar != nil && sidecar.ImagePullPolicy != "" {
 		return sidecar.ImagePullPolicy
 	}
@@ -342,7 +327,7 @@ func (s *csiNodeSyncer) getCSINodeDriverRegistrarPullPolicy() corev1.PullPolicy 
 }
 
 func (s *csiNodeSyncer) getLivenessProbePullPolicy() corev1.PullPolicy {
-	sidecar := s.getSidecarByName(config.LivenessProbe)
+	sidecar := s.driver.getSidecarByName(config.LivenessProbe)
 	if sidecar != nil && sidecar.ImagePullPolicy != "" {
 		return sidecar.ImagePullPolicy
 	}

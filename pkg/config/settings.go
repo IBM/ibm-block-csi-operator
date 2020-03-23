@@ -16,11 +16,18 @@
 
 package config
 
+import "k8s.io/apimachinery/pkg/util/sets"
+
 const (
-	NodeDriverRegistrarImage    = "quay.io/k8scsi/csi-node-driver-registrar:v1.2.0"
-	CSIProvisionerImage         = "quay.io/k8scsi/csi-provisioner:v1.3.0"
-	CSIAttacherImage            = "quay.io/k8scsi/csi-attacher:v1.2.1"
-	CSILivenessProbeImage       = "quay.io/k8scsi/livenessprobe:v1.1.0"
+	NodeDriverRegistrarImage = "quay.io/k8scsi/csi-node-driver-registrar:v1.2.0"
+	CSIProvisionerImage      = "quay.io/k8scsi/csi-provisioner:v1.4.0"
+	CSIAttacherImage         = "quay.io/k8scsi/csi-attacher:v1.2.1"
+	CSILivenessProbeImage    = "quay.io/k8scsi/livenessprobe:v1.1.0"
+
+	OpenShiftNodeDriverRegistrarImage = "registry.redhat.io/openshift4/ose-csi-driver-registrar:v4.3"
+	OpenShiftCSIProvisionerImage      = "registry.redhat.io/openshift4/ose-csi-external-provisioner-rhel7:v4.3"
+	OpenShiftCSIAttacherImage         = "registry.redhat.io/openshift4/ose-csi-external-attacher:v4.3"
+	OpenShiftCSILivenessProbeImage    = "registry.redhat.io/openshift4/ose-csi-livenessprobe:v4.3"
 
 	ControllerTag = "1.1.0"
 	NodeTag       = "1.1.0"
@@ -32,3 +39,86 @@ const (
 
 	NodeAgentPort = "10086"
 )
+
+var ReplaceControllerVersions = sets.String{
+	ControllerRepository + ":" + "1.0.0": sets.Empty{},
+}
+
+var ReplaceNodeVersions = sets.String{
+	NodeRepository + ":" + "1.0.0": sets.Empty{},
+}
+
+var ReplaceCSIProvisionerVersions = sets.String{
+	"quay.io/k8scsi/csi-provisioner:v1.3.0": sets.Empty{},
+}
+
+var ReplaceCSIAttacherVersions = sets.String{}
+
+var ReplaceNodeDriverRegistrarVersions = sets.String{}
+
+var ReplaceLivenessProbeVersions = sets.String{}
+
+var ReplaceOpenShiftControllerVersions = sets.String{
+	OpenShiftControllerRepository + ":" + "1.0.0": sets.Empty{},
+}
+
+var ReplaceOpenShiftNodeVersions = sets.String{
+	OpenShiftNodeRepository + ":" + "1.0.0": sets.Empty{},
+}
+
+var ReplaceOpenShiftCSIProvisionerVersions = sets.String{
+	"quay.io/k8scsi/csi-provisioner:v1.3.0": sets.Empty{},
+}
+
+var ReplaceOpenShiftCSIAttacherVersions = sets.String{
+	"quay.io/k8scsi/csi-attacher:v1.2.1": sets.Empty{},
+}
+
+var ReplaceOpenShiftNodeDriverRegistrarVersions = sets.String{
+	"quay.io/k8scsi/csi-node-driver-registrar:v1.2.0": sets.Empty{},
+}
+
+var ReplaceOpenShiftLivenessProbeVersions = sets.String{
+	"quay.io/k8scsi/livenessprobe:v1.1.0": sets.Empty{},
+}
+
+func GetReplaceVersions(platform, image string) sets.String {
+	switch platform {
+	case OpenShift:
+		switch image {
+		case Controller:
+			return ReplaceOpenShiftControllerVersions
+		case Node:
+			return ReplaceOpenShiftNodeVersions
+		case CSIProvisioner:
+			return ReplaceOpenShiftCSIProvisionerVersions
+		case CSIAttacher:
+			return ReplaceOpenShiftCSIAttacherVersions
+		case CSINodeDriverRegistrar:
+			return ReplaceOpenShiftNodeDriverRegistrarVersions
+		case LivenessProbe:
+			return ReplaceOpenShiftLivenessProbeVersions
+		default:
+			return sets.String{}
+		}
+	case Kubernetes:
+		switch image {
+		case Controller:
+			return ReplaceControllerVersions
+		case Node:
+			return ReplaceNodeVersions
+		case CSIProvisioner:
+			return ReplaceCSIProvisionerVersions
+		case CSIAttacher:
+			return ReplaceCSIAttacherVersions
+		case CSINodeDriverRegistrar:
+			return ReplaceNodeDriverRegistrarVersions
+		case LivenessProbe:
+			return ReplaceLivenessProbeVersions
+		default:
+			return sets.String{}
+		}
+	default:
+		return sets.String{}
+	}
+}

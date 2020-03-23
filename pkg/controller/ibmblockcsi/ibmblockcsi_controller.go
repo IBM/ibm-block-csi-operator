@@ -65,46 +65,50 @@ func Add(mgr manager.Manager) error {
 	return add(mgr, newReconciler(mgr))
 }
 
-func getServerVersion() (string, error) {
+func getServerPlatformAndVersion() (string, string, error) {
 	kubeVersion, found := os.LookupEnv(oconfig.ENVKubeVersion)
 	if found {
-		return kubeVersion, nil
+		return oconfig.Kubernetes, os.Getenv(oconfig.ENVPlatform), nil
 	}
+
+	platform := oconfig.Kubernetes
 	clientConfig, err := config.GetConfig()
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	kubeClient, err := kubernetes.NewForConfig(clientConfig)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	serverVersion, err := kubeutil.ServerVersion(kubeClient.Discovery())
 	if err != nil {
-		return serverVersion, err
+		return "", "", err
 	}
 	if strings.HasSuffix(serverVersion, "+") {
 		serverVersion = strings.TrimSuffix(serverVersion, "+")
+		platform = oconfig.OpenShift
 	}
-	return serverVersion, nil
+	return platform, serverVersion, nil
 }
 
 // newReconciler returns a new reconcile.Reconciler
 func newReconciler(mgr manager.Manager) reconcile.Reconciler {
 
-	serverVersion, err := getServerVersion()
+	platform, serverVersion, err := getServerPlatformAndVersion()
 	if err != nil {
 		panic(err)
 	}
 
-	log.Info(fmt.Sprintf("Kubernetes Version: %s", serverVersion))
+	log.Info("Kubernetes platform: %s, Version: %s", platform, serverVersion)
 
 	return &ReconcileIBMBlockCSI{
 		client:        mgr.GetClient(),
 		scheme:        mgr.GetScheme(),
 		recorder:      mgr.GetEventRecorderFor("controller_ibmblockcsi"),
 		serverVersion: serverVersion,
+		platform:      platform,
 	}
 }
 
@@ -151,6 +155,7 @@ type ReconcileIBMBlockCSI struct {
 	scheme        *runtime.Scheme
 	recorder      record.EventRecorder
 	serverVersion string
+	platform      string
 }
 
 // Reconcile reads that state of the cluster for a IBMBlockCSI object and makes changes based on the state read
@@ -178,7 +183,7 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 	}
 
 	r.scheme.Default(instance.Unwrap())
-	changed := instance.SetDefaults()
+	changed := instance.SetDefaults(r.platform)
 
 	if err := instance.Validate(); err != nil {
 		err = fmt.Errorf("wrong IBMBlockCSI options: %v", err)
@@ -192,6 +197,7 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 			err = fmt.Errorf("failed to update IBMBlockCSI CR: %v", err)
 			return reconcile.Result{}, err
 		}
+		return reconcile.Result{}, nil
 	}
 
 	status := *instance.Status.DeepCopy()

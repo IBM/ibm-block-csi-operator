@@ -17,6 +17,8 @@
 package ibmblockcsi
 
 import (
+	"fmt"
+
 	csiv1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	csiversion "github.com/IBM/ibm-block-csi-operator/version"
@@ -118,4 +120,79 @@ func (c *IBMBlockCSI) GetCSINodeImage() string {
 		return c.Spec.Node.Repository
 	}
 	return c.Spec.Node.Repository + ":" + c.Spec.Node.Tag
+}
+
+func (c *IBMBlockCSI) GetSidecarNames() []string {
+	return []string{
+		config.CSIAttacher,
+		config.CSIProvisioner,
+		config.CSINodeDriverRegistrar,
+		config.LivenessProbe,
+	}
+}
+
+func (c *IBMBlockCSI) GetSidecarByName(name string) *csiv1.CSISidecar {
+	for _, sidecar := range c.Spec.Sidecars {
+		if sidecar.Name == name {
+			return &sidecar
+		}
+	}
+	return nil
+}
+
+func (c *IBMBlockCSI) GetSidecarImageByName(name string) string {
+	sidecar := c.GetSidecarByName(name)
+	if sidecar != nil {
+		return fmt.Sprintf("%s:%s", sidecar.Repository, sidecar.Tag)
+	}
+	return ""
+}
+
+func (c *IBMBlockCSI) GetDefaultImageByName(platform, name string) string {
+	switch platform {
+	case config.OpenShift:
+		return c.GetOpenShiftDefaultImageByName(name)
+	case config.Kubernetes:
+		return c.GetKubernetesDefaultImageByName(name)
+	default:
+		return ""
+	}
+}
+
+func (c *IBMBlockCSI) GetKubernetesDefaultImageByName(name string) string {
+	switch name {
+	case config.Controller:
+		return config.ControllerRepository + ":" + config.ControllerTag
+	case config.Node:
+		return config.NodeRepository + ":" + config.NodeTag
+	case config.CSIProvisioner:
+		return config.CSIProvisionerImage
+	case config.CSIAttacher:
+		return config.CSIAttacherImage
+	case config.CSINodeDriverRegistrar:
+		return config.NodeDriverRegistrarImage
+	case config.LivenessProbe:
+		return config.CSILivenessProbeImage
+	default:
+		return ""
+	}
+}
+
+func (c *IBMBlockCSI) GetOpenShiftDefaultImageByName(name string) string {
+	switch name {
+	case config.Controller:
+		return config.OpenShiftControllerRepository + ":" + config.ControllerTag
+	case config.Node:
+		return config.OpenShiftNodeRepository + ":" + config.NodeTag
+	case config.CSIProvisioner:
+		return config.OpenShiftCSIProvisionerImage
+	case config.CSIAttacher:
+		return config.OpenShiftCSIAttacherImage
+	case config.CSINodeDriverRegistrar:
+		return config.OpenShiftNodeDriverRegistrarImage
+	case config.LivenessProbe:
+		return config.OpenShiftCSILivenessProbeImage
+	default:
+		return ""
+	}
 }
