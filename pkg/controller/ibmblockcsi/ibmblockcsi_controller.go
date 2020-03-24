@@ -65,6 +65,8 @@ func Add(mgr manager.Manager) error {
 	return add(mgr, newReconciler(mgr))
 }
 
+// getServerPlatformAndVersion return the platfrom and version of the server.
+// Default platform is Kubernetes, if we can not get the details from server.
 func getServerPlatformAndVersion() (string, string, error) {
 	kubeVersion, found := os.LookupEnv(oconfig.ENVKubeVersion)
 	if found {

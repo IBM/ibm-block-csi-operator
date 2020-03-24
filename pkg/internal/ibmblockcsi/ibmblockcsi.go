@@ -157,7 +157,7 @@ func (c *IBMBlockCSI) GetSidecarImageByName(name string) string {
 	return ""
 }
 
-func (c *IBMBlockCSI) GetDefaultImageByName(platform, name string) string {
+func (c *IBMBlockCSI) GetDefaultImageByPlatformAndName(platform, name string) string {
 	switch platform {
 	case config.OpenShift:
 		return c.GetOpenShiftDefaultImageByName(name)

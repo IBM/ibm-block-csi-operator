@@ -35,7 +35,7 @@ func (c *IBMBlockCSI) SetDefaults(platform string) bool {
 
 	// if controller is empty
 	if c.Spec.Controller.Repository == "" {
-		regAndTag := strings.Split(c.GetDefaultImageByName(platform, config.Controller), ":")
+		regAndTag := strings.Split(c.GetDefaultImageByPlatformAndName(platform, config.Controller), ":")
 		c.Spec.Controller.Repository = regAndTag[0]
 		c.Spec.Controller.Tag = regAndTag[1]
 
@@ -44,18 +44,18 @@ func (c *IBMBlockCSI) SetDefaults(platform string) bool {
 
 	// if node is empty
 	if c.Spec.Node.Repository == "" {
-		regAndTag := strings.Split(c.GetDefaultImageByName(platform, config.Node), ":")
+		regAndTag := strings.Split(c.GetDefaultImageByPlatformAndName(platform, config.Node), ":")
 		c.Spec.Node.Repository = regAndTag[0]
 		c.Spec.Node.Tag = regAndTag[1]
 
 		changed = true
 	}
 
-	if ch := c.clearSidecars(platform); ch {
-		changed = ch
+	if sidecarChanged := c.clearSidecars(platform); sidecarChanged {
+		changed = sidecarChanged
 	}
-	if ch := c.setDefualtSidecars(platform); ch {
-		changed = ch
+	if sidecarChanged := c.setDefualtSidecars(platform); sidecarChanged {
+		changed = sidecarChanged
 	}
 
 	return changed
@@ -108,7 +108,7 @@ func (c *IBMBlockCSI) setDefualtSidecars(platform string) bool {
 	for _, name := range c.GetSidecarNames() {
 		sidecar := c.GetSidecarByName(name)
 		if sidecar == nil || sidecar.Repository == "" {
-			regAndTag := strings.Split(c.GetDefaultImageByName(platform, name), ":")
+			regAndTag := strings.Split(c.GetDefaultImageByPlatformAndName(platform, name), ":")
 			sidecar = &csiv1.CSISidecar{
 				Name:            name,
 				Repository:      regAndTag[0],
