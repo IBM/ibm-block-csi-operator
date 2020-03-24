@@ -319,19 +319,11 @@ func (s *csiNodeSyncer) getLivenessProbeImage() string {
 }
 
 func (s *csiNodeSyncer) getCSINodeDriverRegistrarPullPolicy() corev1.PullPolicy {
-	sidecar := s.driver.getSidecarByName(config.CSINodeDriverRegistrar)
-	if sidecar != nil && sidecar.ImagePullPolicy != "" {
-		return sidecar.ImagePullPolicy
-	}
-	return corev1.PullIfNotPresent
+	return s.driver.getSidecarPullPolicyByName(config.CSINodeDriverRegistrar)
 }
 
 func (s *csiNodeSyncer) getLivenessProbePullPolicy() corev1.PullPolicy {
-	sidecar := s.driver.getSidecarByName(config.LivenessProbe)
-	if sidecar != nil && sidecar.ImagePullPolicy != "" {
-		return sidecar.ImagePullPolicy
-	}
-	return corev1.PullIfNotPresent
+	return s.driver.getSidecarPullPolicyByName(config.LivenessProbe)
 }
 
 func ensureHostPathVolumeSource(path, pathType string) corev1.VolumeSource {

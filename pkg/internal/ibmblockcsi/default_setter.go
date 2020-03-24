@@ -31,7 +31,7 @@ func (c *IBMBlockCSI) SetDefaults(platform string) bool {
 	// repository is mandatory, tag is optional, but if repository is not set
 	// and tag is set, the tag will be overrided to the default one.
 
-	changed := c.replacePreviousVersion(platform)
+	changed := c.clearPreviousVersion(platform)
 
 	// if controller is empty
 	if c.Spec.Controller.Repository == "" {
@@ -51,7 +51,7 @@ func (c *IBMBlockCSI) SetDefaults(platform string) bool {
 		changed = true
 	}
 
-	if ch := c.replaceSidecars(platform); ch {
+	if ch := c.clearSidecars(platform); ch {
 		changed = ch
 	}
 	if ch := c.setDefualtSidecars(platform); ch {
@@ -61,11 +61,11 @@ func (c *IBMBlockCSI) SetDefaults(platform string) bool {
 	return changed
 }
 
-// replacePreviousVersion replaces the previous version of controller and node
-// images to new version during upgrade.
+// clearPreviousVersion clears the previous version of controller and node
+// images to empty value, so that they will be updated to the latest version.
 // For example: If current controller image is ibmcom/ibm-block-csi-controller-driver:1.0.0,
 // it will be cleared and updated to ibmcom/ibm-block-csi-controller-driver:1.1.0 in setDefault().
-func (c *IBMBlockCSI) replacePreviousVersion(platform string) bool {
+func (c *IBMBlockCSI) clearPreviousVersion(platform string) bool {
 	changed := false
 
 	// if controller is a replace version
@@ -85,7 +85,7 @@ func (c *IBMBlockCSI) replacePreviousVersion(platform string) bool {
 	return changed
 }
 
-func (c *IBMBlockCSI) replaceSidecars(platform string) bool {
+func (c *IBMBlockCSI) clearSidecars(platform string) bool {
 	changed := false
 	var updated []csiv1.CSISidecar
 
@@ -107,18 +107,18 @@ func (c *IBMBlockCSI) setDefualtSidecars(platform string) bool {
 
 	for _, name := range c.GetSidecarNames() {
 		sidecar := c.GetSidecarByName(name)
-		if sidecar != nil && sidecar.Repository != "" {
-			sidecars = append(sidecars, *sidecar)
-		} else {
+		if sidecar == nil || sidecar.Repository == "" {
 			regAndTag := strings.Split(c.GetDefaultImageByName(platform, name), ":")
-			sidecars = append(sidecars, csiv1.CSISidecar{
+			sidecar = &csiv1.CSISidecar{
 				Name:            name,
 				Repository:      regAndTag[0],
 				Tag:             regAndTag[1],
 				ImagePullPolicy: corev1.PullIfNotPresent,
-			})
+			}
 			changed = true
 		}
+		sidecars = append(sidecars, *sidecar)
+
 	}
 	c.Spec.Sidecars = sidecars
 	return changed

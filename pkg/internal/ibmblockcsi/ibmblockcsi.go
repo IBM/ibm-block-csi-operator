@@ -22,6 +22,7 @@ import (
 	csiv1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	csiversion "github.com/IBM/ibm-block-csi-operator/version"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 )
 
@@ -138,6 +139,14 @@ func (c *IBMBlockCSI) GetSidecarByName(name string) *csiv1.CSISidecar {
 		}
 	}
 	return nil
+}
+
+func (c *IBMBlockCSI) getSidecarPullPolicyByName(name string) corev1.PullPolicy {
+	sidecar := c.GetSidecarByName(name)
+	if sidecar != nil && sidecar.ImagePullPolicy != "" {
+		return sidecar.ImagePullPolicy
+	}
+	return corev1.PullIfNotPresent
 }
 
 func (c *IBMBlockCSI) GetSidecarImageByName(name string) string {
