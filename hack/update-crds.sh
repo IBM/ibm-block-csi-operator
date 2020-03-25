@@ -25,4 +25,4 @@ fi
 
 operator-sdk generate k8s
 
-operator-sdk generate crds
+operator-sdk generate openapi
