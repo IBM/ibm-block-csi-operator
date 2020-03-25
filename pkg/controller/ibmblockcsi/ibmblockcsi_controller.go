@@ -70,7 +70,11 @@ func Add(mgr manager.Manager) error {
 func getServerPlatformAndVersion() (string, string, error) {
 	kubeVersion, found := os.LookupEnv(oconfig.ENVKubeVersion)
 	if found {
-		return oconfig.Kubernetes, os.Getenv(oconfig.ENVPlatform), nil
+		platform := os.Getenv(oconfig.ENVPlatform)
+		if platform == "" {
+			platform = oconfig.Kubernetes
+		}
+		return platform, kubeVersion, nil
 	}
 
 	platform := oconfig.Kubernetes
