@@ -11,15 +11,16 @@ Supported container platforms:
 
 Supported IBM storage systems:
   - IBM FlashSystem 9100
-  - IBM Spectrum Virtualize
-  - IBM Storwize
+  - IBM Spectrum Virtualize Family
+    including IBM Flash family members built with IBM Spectrum Virtualize (FlashSystem 5010,
+    5030, 5100, 7200, 9100, 9200, 9200R) and IBM SAN Volume Controller (SVC) models SV2, SA2
   - IBM FlashSystem A9000/R
   - IBM DS8880
   - IBM DS8900
 
 Supported operating systems:
   - RHEL 7.x (x86 architecture)
-  - RHCOS
+  - RHCOS (x86 and IBM Z architecture)
 
 Full documentation can be found on the [IBM knowledge center](https://www.ibm.com/support/knowledgecenter/SSRQ8T).
 
@@ -33,8 +34,8 @@ Full documentation can be found on the [IBM knowledge center](https://www.ibm.co
 ### Preparing worker nodes
 Perform these steps for each worker node in Kubernetes cluster:
 
-#### 1. Install Linux packages to ensure Fibre Channel and iSCSI connectivity
-Skip this step if the packages are already installed.
+#### 1. Perform this step to ensure iSCSI connectivity, when using RHEL OS.
+If using RHCOS or if the packages are already installed, continue to the next step.
 
 RHEL 7.x:
 ```bash
@@ -42,12 +43,86 @@ yum -y install iscsi-initiator-utils   # Only if iSCSI connectivity is required
 yum -y install xfsprogs                # Only if XFS file system is required
 ```
 
-#### 2. Configure Linux multipath devices on the host 
-Create and set the relevant storage system parameters in the `/etc/multipath.conf` file. 
-You can also use the default `multipath.conf` file, located in the `/usr/share/doc/device-mapper-multipath-*` directory.
-Verify that the `systemctl status multipathd` output indicates that the multipath status is active and error-free.
+#### 2. Configure Linux multipath devices on the host, using one of the following procedures.
 
-RHEL 7.x:
+**Configuring for OpenShift Container Platform users (RHEL and RHCOS)**
+
+The following yaml file example is for both Fibre Channel and iSCSI configurations. To support iSCSI, uncomment the last two lines in the file:
+
+
+**Important:** The  `99-ibm-attach.yaml` configuration file overrides any files that already exist on your system. Only use this file if the files mentioned in the yaml below are not already created. If one (or more) have been created, edit this yaml file, as necessary.
+
+Save the `99-ibm-attach.yaml` file.
+```bash
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+labels:
+machineconfiguration.openshift.io/role: worker
+name: 99-ibm-attach
+spec:
+config:
+ignition:
+version: 2.2.0
+storage:
+files:
+- path: /etc/multipath.conf
+mode: 384
+filesystem: root
+contents:
+source: data:,defaults%20%7B%0A%20%20%20%20path_checker%20tur%0A%20%20%20%20path_selector
+%20%22round-robin%200%22%0A%20%20%20%20rr_weight%20uniform%0A%20%20%20%20prio%20const%0A
+%20%20%20%20rr_min_io_rq%201%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%0A%20%20%20%20polling_interval
+%2030%0A%20%20%20%20path_grouping_policy%20multibus%0A%20%20%20%20find_multipaths%20yes%0A
+%20%20%20%20no_path_retry%20fail%0A%20%20%20%20user_friendly_names%20yes%0A%20%20%20%20failback
+%20immediate%0A%20%20%20%20checker_timeout%2010%0A%20%20%20%20fast_io_fail_tmo%20off%0A%7D%0A%0Adevices
+%20%7B%0A%20%20%20%20device%20%7B%0A%20%20%20%20%20%20%20%20path_checker%20tur%0A
+%20%20%20%20%20%20%20%20product%20%22FlashSystem%22%0A%20%20%20%20%20%20%20%20vendor%20%22IBM%22%0A
+%20%20%20%20%20%20%20%20rr_weight%20uniform%0A%20%20%20%20%20%20%20%20rr_min_io_rq
+%204%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%0A%20%20%20%20%20%20%20%20path_grouping_policy
+%20multibus%0A%20%20%20%20%20%20%20%20path_selector%20%22round-robin%200%22%0A
+%20%20%20%20%20%20%20%20no_path_retry%20fail%0A%20%20%20%20%20%20%20%20failback%20immediate%0A
+%20%20%20%20%7D%0A%20%20%20%20device%20%7B%0A%20%20%20%20%20%20%20%20path_checker%20tur%0A
+%20%20%20%20%20%20%20%20product%20%22FlashSystem-9840%22%0A%20%20%20%20%20%20%20%20vendor%20%22IBM%22%0A
+%20%20%20%20%20%20%20%20fast_io_fail_tmo%20off%0A%20%20%20%20%20%20%20%20rr_weight%20uniform%0A
+%20%20%20%20%20%20%20%20rr_min_io_rq%201000%20%20%20%20%20%20%20%20%20%20%20%20%0A
+%20%20%20%20%20%20%20%20path_grouping_policy%20multibus%0A%20%20%20%20%20%20%20%20path_selector
+%20%22round-robin%200%22%0A%20%20%20%20%20%20%20%20no_path_retry%20fail%0A
+%20%20%20%20%20%20%20%20failback%20immediate%0A%20%20%20%20%7D%0A%20%20%20%20device%20%7B%0A
+%20%20%20%20%20%20%20%20vendor%20%22IBM%22%0A%20%20%20%20%20%20%20%20product%20%222145%22%0A
+%20%20%20%20%20%20%20%20path_checker%20tur%0A%20%20%20%20%20%20%20%20features%20%221%20queue_if_no_path
+%22%0A%20%20%20%20%20%20%20%20path_grouping_policy%20group_by_prio%0A
+%20%20%20%20%20%20%20%20path_selector%20%22service-time%200%22%20%23%20Used%20by%20Red%20Hat%207.x%0A
+%20%20%20%20%20%20%20%20prio%20alua%0A%20%20%20%20%20%20%20%20rr_min_io_rq%201%0A
+%20%20%20%20%20%20%20%20rr_weight%20uniform%20%0A%20%20%20%20%20%20%20%20no_path_retry%20%225%22%0A
+%20%20%20%20%20%20%20%20dev_loss_tmo%20120%0A%20%20%20%20%20%20%20%20failback%20immediate%0A%20%20%20%7D
+%0A%7D%0A
+verification: {}
+- path: /etc/udev/rules.d/99-ibm-2145.rules
+mode: 420
+filesystem: root
+contents:
+source: data:,%23%20Set%20SCSI%20command%20timeout%20to%20120s%20%28default%20%3D%3D
+%2030%20or%2060%29%20for%20IBM%202145%20devices%0ASUBSYSTEM%3D%3D%22block%22%2C%20ACTION%3D%3D%22add
+%22%2C%20ENV%7BID_VENDOR%7D%3D%3D%22IBM%22%2CENV%7BID_MODEL%7D%3D%3D%222145%22%2C%20RUN%2B%3D%22/bin/sh
+%20-c%20%27echo%20120%20%3E/sys/block/%25k/device/timeout%27%22%0A
+verification: {}
+systemd:
+units:
+- name: multipathd.service
+enabled: true
+# Uncomment the following lines if this MachineConfig will be used with iSCSI connectivity
+#- name: iscsid.service
+#    enabled: true
+```
+
+Apply the yaml file.
+```bash
+oc apply -f 99-ibm-attach.yaml
+```
+
+RHEL users should verify that the `systemctl status multipathd` output indicates that the multipath status is active and error-free.
+
 ```bash
 yum install device-mapper-multipath
 modprobe dm-multipath
@@ -57,35 +132,25 @@ systemctl status multipathd
 multipath -ll
 ```
 
-**Important:** When configuring Linux multipath devices, verify that the `find_multipaths` parameter in the `multipath.conf` file is disabled. In RHEL 7.x, remove the`find_multipaths yes` string from the `multipath.conf` file.
+**Configuring for Kubernetes users (RHEL)**
+Create and set the relevant storage system parameters in the `/etc/multipath.conf` file. You can also use the default `multipath.conf` file, located in the `/usr/share/doc/device-mapper-multipath-*` directory.
+
+Verify that the `systemctl status multipathd` output indicates that the multipath status is active and error-free.
+
+```bash
+yum install device-mapper-multipath
+modprobe dm-multipath
+systemctl enable multipathd
+systemctl start multipathd
+systemctl status multipathd
+multipath -ll
+```
 
 #### 3. Configure storage system connectivity
 3.1. Define the hostname of each Kubernetes node on the relevant storage systems with the valid WWPN(for Fibre Channel) or IQN(for iSCSI) of the node. 
 
 3.2. For Fibre Channel, configure the relevant zoning from the storage to the host.
 
-3.3. For iSCSI, perform the following steps:
-
-3.3.1. Make sure that the login to the iSCSI targets is permanent and remains available after a reboot of the worker node. To do this, verify that the node.startup in the /etc/iscsi/iscsid.conf file is set to automatic. If not, set it as required and then restart the iscsid service `$ service iscsid restart`.
-
-3.3.2. Discover and log into at least two iSCSI targets on the relevant storage systems. (NOTE: Without at least two ports, multipath device will not be created.)
-
-```bash
-$ iscsiadm -m discoverydb -t st -p ${STORAGE-SYSTEM-iSCSI-PORT-IP1}:3260 --discover
-$ iscsiadm -m node -p ${STORAGE-SYSTEM-iSCSI-PORT-IP1} --login
-
-$ iscsiadm -m discoverydb -t st -p ${STORAGE-SYSTEM-iSCSI-PORT-IP2}:3260 --discover
-$ iscsiadm -m node -p ${STORAGE-SYSTEM-iSCSI-PORT-IP2} --login
-```
-
-3.3.3. Verify that the login was successful and display all targets that you logged into. The portal value must be the iSCSI target IP address.
-
-```bash
-$ iscsiadm -m session --rescan
-Rescanning session [sid: 1, target: {storage system IQN},
-portal: {STORAGE-SYSTEM-iSCSI-PORT-IP1},{port number}
-portal: {STORAGE-SYSTEM-iSCSI-PORT-IP2},{port number}
-```
 
 
 
@@ -105,16 +170,18 @@ curl https://raw.githubusercontent.com/IBM/ibm-block-csi-operator/master/deploy/
 ```
 2. (Optional): If required, update the image fields in the ibm-block-csi-operator.yaml.
 
-3. Install the operator.
+3. Use the `kubectl create ns <namespace>` command to create a project namespace.
+
+4. Install the operator, while using a user-defined namespace.
 
 ```bash
-$ kubectl apply -f ibm-block-csi-operator.yaml
+$ kubectl -n <namespace> apply -f ibm-block-csi-operator.yaml
 ```
 
 ### Verify the operator is running:
 
 ```bash
-$ kubectl get pod -l app.kubernetes.io/name=ibm-block-csi-operator -n kube-system
+$ kubectl get pod -l app.kubernetes.io/name=ibm-block-csi-operator -n <namespace>
 NAME                                    READY   STATUS    RESTARTS   AGE
 ibm-block-csi-operator-5bb7996b86-xntss 2/2     Running   0          10m
 ```
@@ -132,13 +199,13 @@ curl https://raw.githubusercontent.com/IBM/ibm-block-csi-operator/master/deploy/
 3. Install the csi.ibm.com_v1_ibmblockcsi_cr.yaml.
 
 ```bash
-$ kubectl apply -f csi.ibm.com_v1_ibmblockcsi_cr.yaml
+$ kubectl -n <namespace> apply -f csi.ibm.com_v1_ibmblockcsi_cr.yaml
 ```
 
 ### Verify the driver is running:
 
 ```bash
-$ kubectl get all -n kube-system  -l csi
+$ kubectl get all -n <namespace>  -l csi
 NAME                             READY   STATUS    RESTARTS   AGE
 pod/ibm-block-csi-controller-0   4/4     Running   0          9m36s
 pod/ibm-block-csi-node-jvmvh     3/3     Running   0          9m36s
@@ -162,7 +229,7 @@ In order to use the driver, create the relevant storage classes and secrets, as 
 
 This section describes how to:
  1. Create a storage system secret - to define the storage system credentials (user and password) and its address.
- 2. Configure the k8s storage class - to define the storage system pool name, secret reference, SpaceEfficiency (thin, compressed, or deduplicated) and fstype (xfs\ext4).
+ 2. Configure the storage class - to define the storage system pool name, secret reference, `SpaceEfficiency`, and `fstype`.
 
 #### 1. Create an array secret 
 Create a secret file as follows `array-secret.yaml` and update the relevant credentials:
@@ -172,7 +239,7 @@ kind: Secret
 apiVersion: v1
 metadata:
   name: <VALUE-1>
-  namespace: kube-system
+  namespace: <user-defined namespace>
 type: Opaque
 stringData:
   management_address: <VALUE-2,VALUE-3> # Array management addresses
@@ -187,9 +254,29 @@ Apply the secret:
 $ kubectl apply -f array-secret.yaml
 ```
 
+To create the secret using a command line terminal, use the following command:
+```bash
+kubectl create secret generic <NAME> --from-literal=username=<USER> --fromliteral=
+password=<PASSWORD>
+--from-literal=management_address=<ARRAY_MGMT> -n <namespace>
+```
+
 #### 2. Create storage classes
 
-Create a storage class `storageclass-gold.yaml` file as follows, with the relevant capabilities, pool and, array secret:
+Create a storage class `storageclass-gold.yaml` file as follows, with the relevant capabilities, pool and, array secret.
+
+Use the `SpaceEfficiency` parameters for each storage system. These values are not case sensitive:
+* IBM FlashSystem A9000 and A9000R
+	* Always includes deduplication and compression.
+	No need to specify during configuration.
+* IBM Spectrum Virtualize Family
+	* `thin`
+	* `compressed`
+	* `deduplicated`
+* IBM DS8000 Family
+	* `standard` (default value)
+	* `thin`
+	**NOTE:** If not specified, the default value is `standard`.
 
 ```
 kind: StorageClass
@@ -199,7 +286,7 @@ metadata:
 provisioner: block.csi.ibm.com
 parameters:
   #SpaceEfficiency: <VALUE>    # Optional: Values applicable for Storwize are: thin, compressed, or deduplicated
-  pool: <VALUE_POOL_NAME>
+  pool: <VALUE_POOL_NAME>	   # DS8000 Family paramater is VALUE_POOL_ID
 
   csi.storage.k8s.io/provisioner-secret-name: <VALUE_ARRAY_SECRET>
   csi.storage.k8s.io/provisioner-secret-namespace: <VALUE_ARRAY_SECRET_NAMESPACE>
@@ -207,6 +294,8 @@ parameters:
   csi.storage.k8s.io/controller-publish-secret-namespace: <VALUE_ARRAY_SECRET_NAMESPACE>
 
   csi.storage.k8s.io/fstype: xfs   # Optional: Values ext4/xfs. The default is ext4.
+  volume_name_prefix: <prefix_name> # Optional: DS8000 Family maximum prefix length is 5 characters.
+										        Maximum prefix length for other systems is 20 characters.
 ```
 
 Apply the storage class:
@@ -235,7 +324,7 @@ storageclass.storage.k8s.io/gold created
 ## Upgrading
 
 ### 1. Upgrade the operator.
-The steps is the same with new installation, you can upgrade the operator by downloading new manifest and run `kubectl apply` again.
+The steps is the same as uninstalling and then with new installation, you can upgrade the operator by downloading new manifest and run `kubectl apply` again.
 
 ### 2. Upgrade the IBMBlockCSI custom resource.
 The steps is the same with new installation, you can upgrade the custom resource by downloading new manifest and run `kubectl apply` again.
@@ -258,7 +347,7 @@ $ kubectl delete -f ibm-block-csi-operator.yaml
 
 ## Licensing
 
-Copyright 2019 IBM Corp.
+Copyright 2020 IBM Corp.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
