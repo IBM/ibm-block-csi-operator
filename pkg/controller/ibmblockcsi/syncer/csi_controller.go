@@ -296,15 +296,15 @@ func (s *csiControllerSyncer) getLivenessProbeImage() string {
 }
 
 func (s *csiControllerSyncer) getCSIAttacherPullPolicy() corev1.PullPolicy {
-	return s.driver.getSidecarPullPolicyByName(config.CSIAttacher)
+	return s.driver.GetSidecarPullPolicyByName(config.CSIAttacher)
 }
 
 func (s *csiControllerSyncer) getCSIProvisionerPullPolicy() corev1.PullPolicy {
-	return s.driver.getSidecarPullPolicyByName(config.CSIProvisioner)
+	return s.driver.GetSidecarPullPolicyByName(config.CSIProvisioner)
 }
 
 func (s *csiControllerSyncer) getLivenessProbePullPolicy() corev1.PullPolicy {
-	return s.driver.getSidecarPullPolicyByName(config.LivenessProbe)
+	return s.driver.GetSidecarPullPolicyByName(config.LivenessProbe)
 }
 
 func ensurePorts(ports ...corev1.ContainerPort) []corev1.ContainerPort {

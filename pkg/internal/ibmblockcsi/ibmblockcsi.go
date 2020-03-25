@@ -141,7 +141,7 @@ func (c *IBMBlockCSI) GetSidecarByName(name string) *csiv1.CSISidecar {
 	return nil
 }
 
-func (c *IBMBlockCSI) getSidecarPullPolicyByName(name string) corev1.PullPolicy {
+func (c *IBMBlockCSI) GetSidecarPullPolicyByName(name string) corev1.PullPolicy {
 	sidecar := c.GetSidecarByName(name)
 	if sidecar != nil && sidecar.ImagePullPolicy != "" {
 		return sidecar.ImagePullPolicy
