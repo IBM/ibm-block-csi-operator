@@ -19,12 +19,14 @@ ENV GO111MODULE=on \
     GOROOT=/usr/local/go
 
 RUN go get github.com/onsi/ginkgo/ginkgo
-RUN RELEASE_VERSION=v0.12.0 \
-    && curl -LO https://github.com/operator-framework/operator-sdk/releases/download/${RELEASE_VERSION}/operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu \
-	&& chmod +x operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu \
+RUN RELEASE_VERSION=v0.16.0 \
+    && ARCH=$(uname -m) \
+    && SDK_ASSET=operator-sdk-${RELEASE_VERSION}-${ARCH}-linux-gnu \
+    && curl -LO https://github.com/operator-framework/operator-sdk/releases/download/${RELEASE_VERSION}/${SDK_ASSET} \
+	&& chmod +x ${SDK_ASSET} \
 	&& mkdir -p /usr/local/bin/ \
-	&& cp operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu /usr/local/bin/operator-sdk \
-	&& rm operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu
+	&& cp ${SDK_ASSET} /usr/local/bin/operator-sdk \
+	&& rm ${SDK_ASSET}
 
 
 COPY . .
