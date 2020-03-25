@@ -20,7 +20,7 @@ Supported operating systems:
   - RHEL 7.x (x86 architecture)
   - RHCOS (x86 and IBM Z architecture)
 
-Full documentation can be found on the [IBM knowledge center](https://www.ibm.com/support/knowledgecenter/SSRQ8T).
+Full documentation can be found on the [IBM Knowledge Center](https://www.ibm.com/support/knowledgecenter/SSRQ8T).
 
 <br/>
 <br/>
@@ -48,7 +48,7 @@ yum -y install xfsprogs                # Only if XFS file system is required
 The following yaml file example is for both Fibre Channel and iSCSI configurations. To support iSCSI, uncomment the last two lines in the file:
 
 
-**Important:** The  `99-ibm-attach.yaml` configuration file overrides any files that already exist on your system. Only use this file if the files mentioned in the yaml below are not already created. If one (or more) have been created, edit this yaml file, as necessary.
+**Important:** The  `99-ibm-attach.yaml` configuration file overrides any files that already exist on your system. Only use this file if the files mentioned in the yaml below are not already created. If one or more have been created, edit this yaml file, as necessary.
 
 Save the `99-ibm-attach.yaml` file.
 ```bash
@@ -234,14 +234,14 @@ Create a secret file as follows `array-secret.yaml` and update the relevant cred
 kind: Secret
 apiVersion: v1
 metadata:
-  name: <VALUE-1>
+  name: <VALUE_NAME>
   namespace: <user-defined namespace>
 type: Opaque
 stringData:
-  management_address: <VALUE-2,VALUE-3> # Array management addresses
-  username: <VALUE-4>                   # Array username
+  management_address: <ADDRESS-1, ADDRESS-2> # Array management addresses
+  username: <USERNAME>                   # Array username
 data:
-  password: <VALUE-5 base64>            # Array password
+  password: <PASSWORD base64>            # Array password
 ```
 
 Apply the secret:
