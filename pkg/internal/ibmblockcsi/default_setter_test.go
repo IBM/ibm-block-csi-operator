@@ -52,6 +52,12 @@ var _ = Describe("DefaultSetter", func() {
 				Expect(ibc.Spec.Node.Repository).To(Equal(config.NodeRepository))
 				Expect(ibc.Spec.Node.Tag).To(Equal(config.NodeTag))
 				Expect(ibc.Spec.Sidecars).To(HaveLen(4))
+				Expect(ibc.Spec.ImagePullSecrets).NotTo(BeNil())
+				Expect(ibc.Spec.ImagePullSecrets).To(HaveLen(0))
+				Expect(ibc.Spec.Controller.Tolerations).NotTo(BeNil())
+				Expect(ibc.Spec.Controller.Tolerations).To(HaveLen(0))
+				Expect(ibc.Spec.Node.Tolerations).NotTo(BeNil())
+				Expect(ibc.Spec.Node.Tolerations).To(HaveLen(0))
 			})
 		})
 

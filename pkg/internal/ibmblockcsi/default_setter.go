@@ -58,7 +58,20 @@ func (c *IBMBlockCSI) SetDefaults(platform string) bool {
 		changed = sidecarChanged
 	}
 
+	c.setDefaultSliceFields()
+
 	return changed
+}
+func (c *IBMBlockCSI) setDefaultSliceFields() {
+	if c.Spec.ImagePullSecrets == nil {
+		c.Spec.ImagePullSecrets = []string{}
+	}
+	if c.Spec.Controller.Tolerations == nil {
+		c.Spec.Controller.Tolerations = []corev1.Toleration{}
+	}
+	if c.Spec.Node.Tolerations == nil {
+		c.Spec.Node.Tolerations = []corev1.Toleration{}
+	}
 }
 
 // clearPreviousVersion clears the previous version of controller and node
