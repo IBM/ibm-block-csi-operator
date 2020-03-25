@@ -234,8 +234,8 @@ Create a secret file as follows `array-secret.yaml` and update the relevant cred
 kind: Secret
 apiVersion: v1
 metadata:
-  name: <VALUE_NAME>
-  namespace: <user-defined namespace>
+  name: <NAME>
+  namespace: <NAMESPACE>
 type: Opaque
 stringData:
   management_address: <ADDRESS-1, ADDRESS-2> # Array management addresses
