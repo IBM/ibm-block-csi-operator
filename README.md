@@ -11,9 +11,7 @@ Supported container platforms:
 
 Supported IBM storage systems:
   - IBM FlashSystem 9100
-  - IBM Spectrum Virtualize Family
-    including IBM Flash family members built with IBM Spectrum Virtualize (FlashSystem 5010,
-    5030, 5100, 7200, 9100, 9200, 9200R) and IBM SAN Volume Controller (SVC) models SV2, SA2
+  - IBM Spectrum Virtualize Family (including IBM Flash family members built with IBM Spectrum Virtualize (FlashSystem 5010, 5030, 5100, 7200, 9100, 9200, 9200R) and IBM SAN Volume Controller (SVC) models SV2, SA2)
   - IBM FlashSystem A9000/R
   - IBM DS8880
   - IBM DS8900
@@ -45,7 +43,7 @@ yum -y install xfsprogs                # Only if XFS file system is required
 
 #### 2. Configure Linux multipath devices on the host, using one of the following procedures.
 
-**Configuring for OpenShift Container Platform users (RHEL and RHCOS)**
+##### 2.1 Configuring for OpenShift Container Platform users (RHEL and RHCOS)
 
 The following yaml file example is for both Fibre Channel and iSCSI configurations. To support iSCSI, uncomment the last two lines in the file:
 
@@ -132,7 +130,7 @@ systemctl status multipathd
 multipath -ll
 ```
 
-**Configuring for Kubernetes users (RHEL)**
+##### 2.2 Configuring for Kubernetes users (RHEL)
 Create and set the relevant storage system parameters in the `/etc/multipath.conf` file. You can also use the default `multipath.conf` file, located in the `/usr/share/doc/device-mapper-multipath-*` directory.
 
 Verify that the `systemctl status multipathd` output indicates that the multipath status is active and error-free.
@@ -150,8 +148,6 @@ multipath -ll
 3.1. Define the hostname of each Kubernetes node on the relevant storage systems with the valid WWPN(for Fibre Channel) or IQN(for iSCSI) of the node. 
 
 3.2. For Fibre Channel, configure the relevant zoning from the storage to the host.
-
-
 
 
 <br/>
@@ -274,9 +270,8 @@ Use the `SpaceEfficiency` parameters for each storage system. These values are n
 	* `compressed`
 	* `deduplicated`
 * IBM DS8000 Family
-	* `standard` (default value)
+	* `standard` (default value, if not specified)
 	* `thin`
-	**NOTE:** If not specified, the default value is `standard`.
 
 ```
 kind: StorageClass
@@ -324,10 +319,10 @@ storageclass.storage.k8s.io/gold created
 ## Upgrading
 
 ### 1. Upgrade the operator.
-The steps is the same as uninstalling and then with new installation, you can upgrade the operator by downloading new manifest and run `kubectl apply` again.
+The steps is the same as new installation, you can upgrade the operator by downloading new manifest and run `kubectl apply` again.
 
 ### 2. Upgrade the IBMBlockCSI custom resource.
-The steps is the same with new installation, you can upgrade the custom resource by downloading new manifest and run `kubectl apply` again.
+If you didn't change any default values in previous version, the IBMBlockCSI custom resource will be upgraded automatically. Otherwise, you can downloading the new manifest and run `kubectl apply` to upgrage it.
 
 ## Uninstalling
 
