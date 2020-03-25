@@ -35,7 +35,7 @@ func (c *IBMBlockCSI) SetDefaults(platform string) bool {
 
 	// if controller is empty
 	if c.Spec.Controller.Repository == "" {
-		regAndTag := strings.Split(c.GetDefaultImageByPlatformAndName(platform, config.Controller), ":")
+		regAndTag := strings.Split(c.GetDefaultImageByPlatformAndName(platform, config.ControllerImage), ":")
 		c.Spec.Controller.Repository = regAndTag[0]
 		c.Spec.Controller.Tag = regAndTag[1]
 
@@ -44,14 +44,14 @@ func (c *IBMBlockCSI) SetDefaults(platform string) bool {
 
 	// if node is empty
 	if c.Spec.Node.Repository == "" {
-		regAndTag := strings.Split(c.GetDefaultImageByPlatformAndName(platform, config.Node), ":")
+		regAndTag := strings.Split(c.GetDefaultImageByPlatformAndName(platform, config.NodeImage), ":")
 		c.Spec.Node.Repository = regAndTag[0]
 		c.Spec.Node.Tag = regAndTag[1]
 
 		changed = true
 	}
 
-	if sidecarChanged := c.clearSidecars(platform); sidecarChanged {
+	if sidecarChanged := c.clearSidecarPreviousVersion(platform); sidecarChanged {
 		changed = sidecarChanged
 	}
 	if sidecarChanged := c.setDefualtSidecars(platform); sidecarChanged {
@@ -69,14 +69,14 @@ func (c *IBMBlockCSI) clearPreviousVersion(platform string) bool {
 	changed := false
 
 	// if controller is a replace version
-	if config.GetReplaceVersions(platform, config.Controller).Has(c.GetCSIControllerImage()) {
+	if config.GetReplaceVersions(platform, config.ControllerImage).Has(c.GetCSIControllerImage()) {
 		c.Spec.Controller.Repository = ""
 		c.Spec.Controller.Tag = ""
 		changed = true
 	}
 
 	// if node is a replace version
-	if config.GetReplaceVersions(platform, config.Node).Has(c.GetCSINodeImage()) {
+	if config.GetReplaceVersions(platform, config.NodeImage).Has(c.GetCSINodeImage()) {
 		c.Spec.Node.Repository = ""
 		c.Spec.Node.Tag = ""
 		changed = true
@@ -85,7 +85,7 @@ func (c *IBMBlockCSI) clearPreviousVersion(platform string) bool {
 	return changed
 }
 
-func (c *IBMBlockCSI) clearSidecars(platform string) bool {
+func (c *IBMBlockCSI) clearSidecarPreviousVersion(platform string) bool {
 	changed := false
 	var updated []csiv1.CSISidecar
 

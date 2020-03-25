@@ -86,9 +86,9 @@ func GetReplaceVersions(platform, image string) sets.String {
 	switch platform {
 	case OpenShift:
 		switch image {
-		case Controller:
+		case ControllerImage:
 			return ReplaceOpenShiftControllerVersions
-		case Node:
+		case NodeImage:
 			return ReplaceOpenShiftNodeVersions
 		case CSIProvisioner:
 			return ReplaceOpenShiftCSIProvisionerVersions
@@ -103,9 +103,9 @@ func GetReplaceVersions(platform, image string) sets.String {
 		}
 	case Kubernetes:
 		switch image {
-		case Controller:
+		case ControllerImage:
 			return ReplaceControllerVersions
-		case Node:
+		case NodeImage:
 			return ReplaceNodeVersions
 		case CSIProvisioner:
 			return ReplaceCSIProvisionerVersions

@@ -42,8 +42,8 @@ const (
 	ENVKubeVersion    = "KUBE_VERSION"
 	ENVPlatform       = "PLATFORM"
 
-	Controller             = "csi-controller"
-	Node                   = "csi-node"
+	ControllerImage        = "csi-controller"
+	NodeImage              = "csi-node"
 	CSINodeDriverRegistrar = "csi-node-driver-registrar"
 	CSIProvisioner         = "csi-provisioner"
 	CSIAttacher            = "csi-attacher"

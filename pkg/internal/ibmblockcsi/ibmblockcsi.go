@@ -170,9 +170,9 @@ func (c *IBMBlockCSI) GetDefaultImageByPlatformAndName(platform, name string) st
 
 func (c *IBMBlockCSI) GetKubernetesDefaultImageByName(name string) string {
 	switch name {
-	case config.Controller:
+	case config.ControllerImage:
 		return config.ControllerRepository + ":" + config.ControllerTag
-	case config.Node:
+	case config.NodeImage:
 		return config.NodeRepository + ":" + config.NodeTag
 	case config.CSIProvisioner:
 		return config.CSIProvisionerImage
@@ -189,9 +189,9 @@ func (c *IBMBlockCSI) GetKubernetesDefaultImageByName(name string) string {
 
 func (c *IBMBlockCSI) GetOpenShiftDefaultImageByName(name string) string {
 	switch name {
-	case config.Controller:
+	case config.ControllerImage:
 		return config.OpenShiftControllerRepository + ":" + config.ControllerTag
-	case config.Node:
+	case config.NodeImage:
 		return config.OpenShiftNodeRepository + ":" + config.NodeTag
 	case config.CSIProvisioner:
 		return config.OpenShiftCSIProvisionerImage
