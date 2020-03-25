@@ -32,8 +32,8 @@ const (
 	NodeRepository       = "ibmcom/ibm-block-csi-driver-node"
 	NodeAgentRepository  = "ibmcom/ibm-node-agent"
 
-	OpenShiftControllerRepository = "ibmcom/ibm-block-csi-controller-driver"
-	OpenShiftNodeRepository       = "ibmcom/ibm-block-csi-node-driver"
+	OpenShiftControllerRepository = "ibmcom/ibm-block-csi-driver-controller"
+	OpenShiftNodeRepository       = "ibmcom/ibm-block-csi-driver-node"
 	OpenShiftNodeAgentRepository  = "ibmcom/ibm-node-agent"
 
 	ENVIscsiAgentPort = "ISCSI_AGENT_PORT"
