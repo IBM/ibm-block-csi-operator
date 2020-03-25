@@ -28,8 +28,8 @@ const (
 	DeployPath  = "/deploy"
 	Masterlabel = "node-role.kubernetes.io/master"
 
-	ControllerRepository = "ibmcom/ibm-block-csi-controller-driver"
-	NodeRepository       = "ibmcom/ibm-block-csi-node-driver"
+	ControllerRepository = "ibmcom/ibm-block-csi-driver-controller"
+	NodeRepository       = "ibmcom/ibm-block-csi-driver-node"
 	NodeAgentRepository  = "ibmcom/ibm-node-agent"
 
 	OpenShiftControllerRepository = "ibmcom/ibm-block-csi-controller-driver"
