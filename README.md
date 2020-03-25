@@ -280,7 +280,7 @@ metadata:
   name: gold
 provisioner: block.csi.ibm.com
 parameters:
-  #SpaceEfficiency: <VALUE>    # Optional: Values applicable for Storwize are: thin, compressed, or deduplicated
+  #SpaceEfficiency: <VALUE>    # Optional: Values applicable for Spectrum Virtualize Family are: thin, compressed, or deduplicated
   pool: <VALUE_POOL_NAME>	   # DS8000 Family paramater is VALUE_POOL_ID
 
   csi.storage.k8s.io/provisioner-secret-name: <VALUE_ARRAY_SECRET>
