@@ -11,9 +11,7 @@ Supported container platforms:
 
 Supported IBM storage systems:
   - IBM FlashSystem 9100
-  - IBM Spectrum Virtualize Family
-    including IBM Flash family members built with IBM Spectrum Virtualize (FlashSystem 5010,
-    5030, 5100, 7200, 9100, 9200, 9200R) and IBM SAN Volume Controller (SVC) models SV2, SA2
+  - IBM Spectrum Virtualize Family (including IBM Flash family members built with IBM Spectrum Virtualize (FlashSystem 5010, 5030, 5100, 7200, 9100, 9200, 9200R) and IBM SAN Volume Controller (SVC) models SV2, SA2)
   - IBM FlashSystem A9000/R
   - IBM DS8880
   - IBM DS8900
@@ -22,7 +20,7 @@ Supported operating systems:
   - RHEL 7.x (x86 architecture)
   - RHCOS (x86 and IBM Z architecture)
 
-Full documentation can be found on the [IBM knowledge center](https://www.ibm.com/support/knowledgecenter/SSRQ8T).
+Full documentation can be found on the [IBM Knowledge Center](https://www.ibm.com/support/knowledgecenter/SSRQ8T).
 
 <br/>
 <br/>
@@ -45,24 +43,22 @@ yum -y install xfsprogs                # Only if XFS file system is required
 
 #### 2. Configure Linux multipath devices on the host, using one of the following procedures.
 
-**Configuring for OpenShift Container Platform users (RHEL and RHCOS)**
+##### 2.1 Configuring for OpenShift Container Platform users (RHEL and RHCOS)
 
-The following yaml file example is for Fibre Channel. For use with iSCSI, the yaml file name can be changed (for example, to `99-iscsi-attach.yaml`) and the following lines should be added to the end of the file:
-```
- - name: iscsid.service
-   enabled: true
-```
+The following yaml file example is for both Fibre Channel and iSCSI configurations. To support iSCSI, uncomment the last two lines in the file:
 
-**Important:** The `99-fc-attach.yaml` configuration file overrides any files that already exist on your system. Only use this file if the files mentioned in the yaml below are not already created. If one (or more) have been created, edit this yaml file, as necessary.
 
-Save the `99-fc-attach.yaml` file.
+**Important:** The  `99-ibm-attach.yaml` configuration file overrides any files that already exist on your system. Only use this file if the files mentioned in the yaml below are not already created. If one or more have been created, edit this yaml file, as necessary.
+
+Save the `99-ibm-attach.yaml` file.
+
 ```bash
 apiVersion: machineconfiguration.openshift.io/v1
 kind: MachineConfig
 metadata:
 labels:
 machineconfiguration.openshift.io/role: worker
-name: 99-fc-attach
+name: 99-ibm-attach
 spec:
 config:
 ignition:
@@ -114,11 +110,14 @@ systemd:
 units:
 - name: multipathd.service
 enabled: true
+# Uncomment the following lines if this MachineConfig will be used with iSCSI connectivity
+#- name: iscsid.service
+#    enabled: true
 ```
 
 Apply the yaml file.
 ```bash
-oc apply -f 99-fc-attach.yaml
+oc apply -f 99-ibm-attach.yaml
 ```
 
 RHEL users should verify that the `systemctl status multipathd` output indicates that the multipath status is active and error-free.
@@ -132,7 +131,7 @@ systemctl status multipathd
 multipath -ll
 ```
 
-**Configuring for Kubernetes users (RHEL)**
+##### 2.2 Configuring for Kubernetes users (RHEL)
 Create and set the relevant storage system parameters in the `/etc/multipath.conf` file. You can also use the default `multipath.conf` file, located in the `/usr/share/doc/device-mapper-multipath-*` directory.
 
 Verify that the `systemctl status multipathd` output indicates that the multipath status is active and error-free.
@@ -243,14 +242,14 @@ Create a secret file as follows `array-secret.yaml` and update the relevant cred
 kind: Secret
 apiVersion: v1
 metadata:
-  name: <VALUE-1>
-  namespace: <user-defined namespace>
+  name: <NAME>
+  namespace: <NAMESPACE>
 type: Opaque
 stringData:
-  management_address: <VALUE-2,VALUE-3> # Array management addresses
-  username: <VALUE-4>                   # Array username
+  management_address: <ADDRESS-1, ADDRESS-2> # Array management addresses
+  username: <USERNAME>                   # Array username
 data:
-  password: <VALUE-5 base64>            # Array password
+  password: <PASSWORD base64>            # Array password
 ```
 
 Apply the secret:
@@ -277,9 +276,8 @@ Use the `SpaceEfficiency` parameters for each storage system. These values are n
 	* `compressed`
 	* `deduplicated`
 * IBM DS8000 Family
-	* `standard` (default value)
+	* `standard` (default value, if not specified)
 	* `thin`
-	**NOTE:** If not specified, the default value is `standard`.
 
 ```
 kind: StorageClass
@@ -288,7 +286,7 @@ metadata:
   name: gold
 provisioner: block.csi.ibm.com
 parameters:
-  #SpaceEfficiency: <VALUE>    # Optional: Values applicable for Storwize are: thin, compressed, or deduplicated
+  #SpaceEfficiency: <VALUE>    # Optional: Values applicable for Spectrum Virtualize Family are: thin, compressed, or deduplicated
   pool: <VALUE_POOL_NAME>	   # DS8000 Family paramater is VALUE_POOL_ID
 
   csi.storage.k8s.io/provisioner-secret-name: <VALUE_ARRAY_SECRET>
@@ -326,10 +324,10 @@ storageclass.storage.k8s.io/gold created
 ## Upgrading
 
 ### 1. Upgrade the operator.
-The steps is the same as uninstalling and then with new installation, you can upgrade the operator by downloading new manifest and run `kubectl apply` again.
+The steps is the same as new installation, you can upgrade the operator by downloading new manifest and run `kubectl apply` again.
 
 ### 2. Upgrade the IBMBlockCSI custom resource.
-The steps is the same with new installation, you can upgrade the custom resource by downloading new manifest and run `kubectl apply` again.
+If you didn't change any default values in previous version, the IBMBlockCSI custom resource will be upgraded automatically. Otherwise, you can downloading the new manifest and run `kubectl apply` to upgrage it.
 
 ## Uninstalling
 
