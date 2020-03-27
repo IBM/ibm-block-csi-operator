@@ -323,11 +323,7 @@ storageclass.storage.k8s.io/gold created
 
 ## Upgrading
 
-### 1. Upgrade the operator.
-The steps is the same as new installation, you can upgrade the operator by downloading new manifest and run `kubectl apply` again.
-
-### 2. Upgrade the IBMBlockCSI custom resource.
-If you didn't change any default values in previous version, the IBMBlockCSI custom resource will be upgraded automatically. Otherwise, you can downloading the new manifest and run `kubectl apply` to upgrage it.
+We do not support upgrading, you should uninstall it and install it again.
 
 ## Uninstalling
 
