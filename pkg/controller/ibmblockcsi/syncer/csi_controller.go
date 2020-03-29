@@ -134,14 +134,16 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	// csi provisioner sidecar
 	provisioner := s.ensureContainer(provisionerContainerName,
 		s.getCSIProvisionerImage(),
-		[]string{"--csi-address=$(ADDRESS)", "--v=5"},
+		// TODO: make timeout configurable
+		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s"},
 	)
 	provisioner.ImagePullPolicy = s.getCSIProvisionerPullPolicy()
 
 	// csi attacher sidecar
 	attacher := s.ensureContainer(attacherContainerName,
 		s.getCSIAttacherImage(),
-		[]string{"--csi-address=$(ADDRESS)", "--v=5"},
+		// TODO: make timeout configurable
+		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s"},
 	)
 	attacher.ImagePullPolicy = s.getCSIAttacherPullPolicy()
 
