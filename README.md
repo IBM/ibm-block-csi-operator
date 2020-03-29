@@ -323,7 +323,7 @@ storageclass.storage.k8s.io/gold created
 
 ## Upgrading
 
-We do not support upgrading, you should uninstall it and install it again.
+In order to upgrade the CSI operator and driver from a previous version, uninstall the existing driver and then install the newer version.
 
 ## Uninstalling
 
