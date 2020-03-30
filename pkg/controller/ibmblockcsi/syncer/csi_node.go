@@ -97,6 +97,7 @@ func (s *csiNodeSyncer) ensurePodSpec() corev1.PodSpec {
 		Containers:         s.ensureContainersSpec(),
 		Volumes:            s.ensureVolumes(),
 		HostIPC:            true,
+		HostNetwork: 		true,
 		ServiceAccountName: config.GetNameForResource(config.CSINodeServiceAccount, s.driver.Name),
 		Affinity:           s.driver.Spec.Node.Affinity,
 		Tolerations:        s.driver.Spec.Node.Tolerations,
@@ -266,6 +267,14 @@ func (s *csiNodeSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 				MountPath:        "/host",
 				MountPropagation: &mountPropagationB,
 			},
+			{
+				Name:      "lib-modules",
+				MountPath: "/lib/modules",
+			},
+			{
+				Name:      "iscsi",
+				MountPath: "/etc/iscsi",
+			},
 		}
 
 	case nodeDriverRegistrarContainerName:
@@ -299,6 +308,8 @@ func (s *csiNodeSyncer) ensureVolumes() []corev1.Volume {
 		ensureVolume("device-dir", ensureHostPathVolumeSource("/dev", "Directory")),
 		ensureVolume("sys-dir", ensureHostPathVolumeSource("/sys", "Directory")),
 		ensureVolume("host-dir", ensureHostPathVolumeSource("/", "Directory")),
+		ensureVolume("lib-modules", ensureHostPathVolumeSource("/lib/modules", "Directory")),
+		ensureVolume("iscsi", ensureHostPathVolumeSource("/etc/iscsi", "Directory")),
 	}
 }
 

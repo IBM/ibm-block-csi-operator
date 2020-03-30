@@ -22,8 +22,8 @@ const (
 	CSIAttacherImage            = "quay.io/k8scsi/csi-attacher:v1.2.1"
 	CSILivenessProbeImage       = "quay.io/k8scsi/livenessprobe:v1.1.0"
 
-	ControllerTag = "1.0.0"
-	NodeTag       = "1.0.0"
+	ControllerTag = "1.1.0"
+	NodeTag       = "1.1.0"
 	NodeAgentTag  = "1.0.0"
 
 	DefaultNamespace = "kube-system"

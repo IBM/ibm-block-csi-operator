@@ -157,7 +157,7 @@ func (c *IBMBlockCSI) GenerateExternalAttacherClusterRole() *rbacv1.ClusterRole 
 			{
 				APIGroups: []string{""},
 				Resources: []string{"persistentvolumes"},
-				Verbs:     []string{"get", "list", "watch", "update"},
+				Verbs:     []string{"get", "list", "watch", "update", "patch"},
 			},
 			{
 				APIGroups: []string{c.GetCSIAPIGroup()},
@@ -172,7 +172,7 @@ func (c *IBMBlockCSI) GenerateExternalAttacherClusterRole() *rbacv1.ClusterRole 
 			{
 				APIGroups: []string{"storage.k8s.io"},
 				Resources: []string{"volumeattachments"},
-				Verbs:     []string{"get", "list", "watch", "update"},
+				Verbs:     []string{"get", "list", "watch", "update", "patch"},
 			},
 		},
 	}
@@ -268,6 +268,78 @@ func (c *IBMBlockCSI) GenerateExternalSnapshotterClusterRoleBinding() *rbacv1.Cl
 		RoleRef: rbacv1.RoleRef{
 			Kind:     "ClusterRole",
 			Name:     config.GetNameForResource(config.ExternalSnapshotterClusterRole, c.Name),
+			APIGroup: "rbac.authorization.k8s.io",
+		},
+	}
+}
+
+func (c *IBMBlockCSI) GenerateSCCForControllerClusterRole() *rbacv1.ClusterRole {
+	return &rbacv1.ClusterRole{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: config.GetNameForResource(config.CSIControllerSCCClusterRole, c.Name),
+		},
+		Rules: []rbacv1.PolicyRule{
+			{
+				APIGroups:     []string{"security.openshift.io"},
+				Resources:     []string{"securitycontextconstraints"},
+				ResourceNames: []string{"anyuid"},
+				Verbs:         []string{"use"},
+			},
+		},
+	}
+}
+
+func (c *IBMBlockCSI) GenerateSCCForControllerClusterRoleBinding() *rbacv1.ClusterRoleBinding {
+	return &rbacv1.ClusterRoleBinding{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: config.GetNameForResource(config.CSIControllerSCCClusterRoleBinding, c.Name),
+		},
+		Subjects: []rbacv1.Subject{
+			{
+				Kind:      "ServiceAccount",
+				Name:      config.GetNameForResource(config.CSIControllerServiceAccount, c.Name),
+				Namespace: c.Namespace,
+			},
+		},
+		RoleRef: rbacv1.RoleRef{
+			Kind:     "ClusterRole",
+			Name:     config.GetNameForResource(config.CSIControllerSCCClusterRole, c.Name),
+			APIGroup: "rbac.authorization.k8s.io",
+		},
+	}
+}
+
+func (c *IBMBlockCSI) GenerateSCCForNodeClusterRole() *rbacv1.ClusterRole {
+	return &rbacv1.ClusterRole{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: config.GetNameForResource(config.CSINodeSCCClusterRole, c.Name),
+		},
+		Rules: []rbacv1.PolicyRule{
+			{
+				APIGroups:     []string{"security.openshift.io"},
+				Resources:     []string{"securitycontextconstraints"},
+				ResourceNames: []string{"privileged"},
+				Verbs:         []string{"use"},
+			},
+		},
+	}
+}
+
+func (c *IBMBlockCSI) GenerateSCCForNodeClusterRoleBinding() *rbacv1.ClusterRoleBinding {
+	return &rbacv1.ClusterRoleBinding{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: config.GetNameForResource(config.CSINodeSCCClusterRoleBinding, c.Name),
+		},
+		Subjects: []rbacv1.Subject{
+			{
+				Kind:      "ServiceAccount",
+				Name:      config.GetNameForResource(config.CSINodeServiceAccount, c.Name),
+				Namespace: c.Namespace,
+			},
+		},
+		RoleRef: rbacv1.RoleRef{
+			Kind:     "ClusterRole",
+			Name:     config.GetNameForResource(config.CSINodeSCCClusterRole, c.Name),
 			APIGroup: "rbac.authorization.k8s.io",
 		},
 	}
