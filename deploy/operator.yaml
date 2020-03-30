@@ -37,7 +37,6 @@ spec:
                     operator: In
                     values:
                       - amd64
-                      - s390x
       containers:
       - name: ibm-block-csi-operator
         resources:
