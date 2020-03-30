@@ -35,7 +35,8 @@ metadata:
                             "key": "kubernetes.io/arch",
                             "operator": "In",
                             "values": [
-                              "amd64"
+                              "amd64",
+                              "s390x"
                             ]
                           }
                         ]
@@ -59,7 +60,8 @@ metadata:
                             "key": "kubernetes.io/arch",
                             "operator": "In",
                             "values": [
-                              "amd64"
+                              "amd64",
+                              "s390x"
                             ]
                           }
                         ]
@@ -72,26 +74,26 @@ metadata:
             "sidecars": [
               {
                 "name": "csi-node-driver-registrar",
-                "repository": "quay.io/k8scsi/csi-node-driver-registrar",
-                "tag": "v1.2.0",
+                "repository": "registry.redhat.io/openshift4/ose-csi-driver-registrar",
+                "tag": "latest",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-provisioner",
-                "repository": "quay.io/k8scsi/csi-provisioner",
-                "tag": "v1.3.0",
+                "repository": "registry.redhat.io/openshift4/ose-csi-external-provisioner-rhel7",
+                "tag": "latest",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-attacher",
-                "repository": "quay.io/k8scsi/csi-attacher",
-                "tag": "v1.2.1",
+                "repository": "registry.redhat.io/openshift4/ose-csi-external-attacher",
+                "tag": "latest",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "livenessprobe",
-                "repository": "quay.io/k8scsi/livenessprobe",
-                "tag": "v1.1.0",
+                "repository": "registry.redhat.io/openshift4/ose-csi-livenessprobe",
+                "tag": "latest",
                 "imagePullPolicy": "IfNotPresent"
               }
             ]
