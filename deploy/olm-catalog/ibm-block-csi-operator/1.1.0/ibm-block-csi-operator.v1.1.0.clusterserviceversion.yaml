@@ -617,7 +617,7 @@ spec:
                     capabilities:
                       drop:
                       - ALL
-                  image: ibmcom/ibm-block-csi-operator:1.1.0
+                  image: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.1.0
                   imagePullPolicy: IfNotPresent
                   command:
                   - ibm-block-csi-operator
