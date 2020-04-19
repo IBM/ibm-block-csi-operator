@@ -74,26 +74,26 @@ metadata:
             "sidecars": [
               {
                 "name": "csi-node-driver-registrar",
-                "repository": "registry.redhat.io/openshift4/ose-csi-driver-registrar",
-                "tag": "latest",
+                "repository": "quay.io/k8scsi/csi-node-driver-registrar",
+                "tag": "v1.2.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-provisioner",
-                "repository": "registry.redhat.io/openshift4/ose-csi-external-provisioner-rhel7",
-                "tag": "latest",
+                "repository": "quay.io/k8scsi/csi-provisioner",
+                "tag": "v1.4.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-attacher",
-                "repository": "registry.redhat.io/openshift4/ose-csi-external-attacher",
-                "tag": "latest",
+                "repository": "quay.io/k8scsi/csi-attacher",
+                "tag": "v1.2.1",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "livenessprobe",
-                "repository": "registry.redhat.io/openshift4/ose-csi-livenessprobe",
-                "tag": "latest",
+                "repository": "quay.io/k8scsi/livenessprobe",
+                "tag": "v1.1.0",
                 "imagePullPolicy": "IfNotPresent"
               }
             ]
@@ -232,7 +232,7 @@ spec:
     3.2. For Fibre Channel, configure the relevant zoning from the storage to the host.
 
     ## Configuring k8s secret and storage class
-    In order to use the driver, create the relevant storage classes and secrets, as needed. 
+    In order to use the driver, create the relevant storage classes and secrets, as needed.
     Note: This section can be done also after the operator installation.
 
     This section describes how to:
@@ -617,7 +617,7 @@ spec:
                     capabilities:
                       drop:
                       - ALL
-                  image: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.1.0
+                  image: ibmcom/ibm-block-csi-operator:1.1.0
                   imagePullPolicy: IfNotPresent
                   command:
                   - ibm-block-csi-operator
