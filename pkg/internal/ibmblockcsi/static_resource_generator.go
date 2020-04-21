@@ -265,7 +265,7 @@ func (c *IBMBlockCSI) GenerateExternalSnapshotterClusterRole() *rbacv1.ClusterRo
 			{
 				APIGroups: []string{snapshotStorageApiGroup},
 				Resources: []string{volumeSnapshotContentsStatusResource},
-				Verbs:     []string{"create", "get", "list", "watch", "update", "delete"},
+				Verbs:     []string{"update"},
 			},
 			{
 				APIGroups: []string{apiExtensionsApiGroup},
