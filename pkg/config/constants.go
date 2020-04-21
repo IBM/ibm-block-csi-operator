@@ -38,6 +38,7 @@ const (
 	CSINodeDriverRegistrar = "csi-node-driver-registrar"
 	CSIProvisioner         = "csi-provisioner"
 	CSIAttacher            = "csi-attacher"
+	CSISnapshotter		   = "csi-snapshotter"
 	LivenessProbe          = "livenessprobe"
 
 	ControllerSocketVolumeMountPath                       = "/var/lib/csi/sockets/pluginproxy/"
