@@ -26,25 +26,26 @@ import (
 )
 
 const (
-	snapshotStorageApiGroup            string = "snapshot.storage.k8s.io"
-	securityOpenshiftApiGroup          string = "security.openshift.io"
-	apiExtensionsApiGroup              string = "apiextensions.k8s.io"
-	storageApiGroup                    string = "storage.k8s.io"
-	rbacAuthorizationApiGroup          string = "rbac.authorization.k8s.io"
-	storageClassesResource             string = "storageclasses"
-	persistentVolumesResource          string = "persistentvolumes"
-	persistentVolumeClaimsResource     string = "persistentvolumeclaims"
-	volumeAttachmentsResource          string = "volumeattachments"
-	volumeSnapshotClassesResource      string = "volumesnapshotclasses"
-	volumeSnapshotsResource            string = "volumesnapshots"
-	volumeSnapshotsStatusResource      string = "volumesnapshots/status"
-	volumeSnapshotContentsResource     string = "volumesnapshotcontents"
-	eventsResource                     string = "events"
-	nodesResource                      string = "nodes"
-	csiNodesResource                   string = "csinodes"
-	secretsResource                    string = "secrets"
-	securityContextConstraintsResource string = "securitycontextconstraints"
-	customResourceDefinitionsResource  string = "customresourcedefinitions"
+	snapshotStorageApiGroup              string = "snapshot.storage.k8s.io"
+	securityOpenshiftApiGroup            string = "security.openshift.io"
+	apiExtensionsApiGroup                string = "apiextensions.k8s.io"
+	storageApiGroup                      string = "storage.k8s.io"
+	rbacAuthorizationApiGroup            string = "rbac.authorization.k8s.io"
+	storageClassesResource               string = "storageclasses"
+	persistentVolumesResource            string = "persistentvolumes"
+	persistentVolumeClaimsResource       string = "persistentvolumeclaims"
+	volumeAttachmentsResource            string = "volumeattachments"
+	volumeSnapshotClassesResource        string = "volumesnapshotclasses"
+	volumeSnapshotsResource              string = "volumesnapshots"
+	volumeSnapshotsStatusResource        string = "volumesnapshots/status"
+	volumeSnapshotContentsResource       string = "volumesnapshotcontents"
+	volumeSnapshotContentsStatusResource string = "volumesnapshotcontents/status"
+	eventsResource                       string = "events"
+	nodesResource                        string = "nodes"
+	csiNodesResource                     string = "csinodes"
+	secretsResource                      string = "secrets"
+	securityContextConstraintsResource   string = "securitycontextconstraints"
+	customResourceDefinitionsResource    string = "customresourcedefinitions"
 )
 
 func (c *IBMBlockCSI) GenerateCSIDriver() *storagev1beta1.CSIDriver {
@@ -255,6 +256,11 @@ func (c *IBMBlockCSI) GenerateExternalSnapshotterClusterRole() *rbacv1.ClusterRo
 				APIGroups: []string{snapshotStorageApiGroup},
 				Resources: []string{volumeSnapshotContentsResource},
 				Verbs:     []string{"create", "get", "list", "watch", "update", "delete"},
+			},
+			{
+				APIGroups: []string{snapshotStorageApiGroup},
+				Resources: []string{volumeSnapshotContentsStatusResource},
+				Verbs:     []string{"update"},
 			},
 			{
 				APIGroups: []string{apiExtensionsApiGroup},
