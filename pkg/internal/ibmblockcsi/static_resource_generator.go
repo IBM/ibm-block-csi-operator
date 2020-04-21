@@ -254,6 +254,11 @@ func (c *IBMBlockCSI) GenerateExternalSnapshotterClusterRole() *rbacv1.ClusterRo
 			},
 			{
 				APIGroups: []string{snapshotStorageApiGroup},
+				Resources: []string{volumeSnapshotsStatusResource},
+				Verbs:     []string{"update"},
+			},
+			{
+				APIGroups: []string{snapshotStorageApiGroup},
 				Resources: []string{volumeSnapshotContentsResource},
 				Verbs:     []string{"create", "get", "list", "watch", "update", "delete"},
 			},
@@ -302,11 +307,6 @@ func (c *IBMBlockCSI) GenerateSCCForControllerClusterRole() *rbacv1.ClusterRole 
 				Resources:     []string{securityContextConstraintsResource},
 				ResourceNames: []string{"anyuid"},
 				Verbs:         []string{"use"},
-			},
-			{
-				APIGroups: []string{snapshotStorageApiGroup},
-				Resources: []string{volumeSnapshotsStatusResource},
-				Verbs:     []string{"update"},
 			},
 		},
 	}
