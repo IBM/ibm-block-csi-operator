@@ -46,6 +46,13 @@ const (
 	secretsResource                      string = "secrets"
 	securityContextConstraintsResource   string = "securitycontextconstraints"
 	customResourceDefinitionsResource    string = "customresourcedefinitions"
+	verbGet                              string = "get"
+	verbList                             string = "list"
+	verbWatch                            string = "watch"
+	verbCreate                           string = "create"
+	verbUpdate                           string = "update"
+	verbPatch                            string = "patch"
+	verbDelete                           string = "delete"
 )
 
 func (c *IBMBlockCSI) GenerateCSIDriver() *storagev1beta1.CSIDriver {
@@ -105,37 +112,37 @@ func (c *IBMBlockCSI) GenerateExternalProvisionerClusterRole() *rbacv1.ClusterRo
 			{
 				APIGroups: []string{""},
 				Resources: []string{secretsResource},
-				Verbs:     []string{"get", "list"},
+				Verbs:     []string{verbGet, verbList},
 			},
 			{
 				APIGroups: []string{""},
 				Resources: []string{persistentVolumesResource},
-				Verbs:     []string{"get", "list", "watch", "create", "delete"},
+				Verbs:     []string{verbGet, verbList, verbWatch, verbCreate, verbDelete},
 			},
 			{
 				APIGroups: []string{""},
 				Resources: []string{persistentVolumeClaimsResource},
-				Verbs:     []string{"get", "list", "watch", "update"},
+				Verbs:     []string{verbGet, verbList, verbWatch, verbUpdate},
 			},
 			{
 				APIGroups: []string{storageApiGroup},
 				Resources: []string{storageClassesResource},
-				Verbs:     []string{"get", "list", "watch"},
+				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 			{
 				APIGroups: []string{""},
 				Resources: []string{eventsResource},
-				Verbs:     []string{"list", "watch", "create", "update", "patch"},
+				Verbs:     []string{verbList, verbWatch, verbCreate, verbUpdate, verbPatch},
 			},
 			{
 				APIGroups: []string{storageApiGroup},
 				Resources: []string{csiNodesResource},
-				Verbs:     []string{"get", "list", "watch"},
+				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 			{
 				APIGroups: []string{""},
 				Resources: []string{nodesResource},
-				Verbs:     []string{"get", "list", "watch"},
+				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 		},
 	}
@@ -170,22 +177,22 @@ func (c *IBMBlockCSI) GenerateExternalAttacherClusterRole() *rbacv1.ClusterRole 
 			{
 				APIGroups: []string{""},
 				Resources: []string{"persistentvolumes"},
-				Verbs:     []string{"get", "list", "watch", "update", "patch"},
+				Verbs:     []string{verbGet, verbList, verbWatch, verbUpdate, verbPatch},
 			},
 			{
 				APIGroups: []string{storageApiGroup},
 				Resources: []string{csiNodesResource},
-				Verbs:     []string{"get", "list", "watch"},
+				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 			{
 				APIGroups: []string{""},
 				Resources: []string{nodesResource},
-				Verbs:     []string{"get", "list", "watch"},
+				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 			{
 				APIGroups: []string{storageApiGroup},
 				Resources: []string{volumeAttachmentsResource},
-				Verbs:     []string{"get", "list", "watch", "update", "patch"},
+				Verbs:     []string{verbGet, verbList, verbWatch, verbUpdate, verbPatch},
 			},
 		},
 	}
@@ -220,57 +227,57 @@ func (c *IBMBlockCSI) GenerateExternalSnapshotterClusterRole() *rbacv1.ClusterRo
 			{
 				APIGroups: []string{""},
 				Resources: []string{persistentVolumesResource},
-				Verbs:     []string{"get", "list", "watch"},
+				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 			{
 				APIGroups: []string{""},
 				Resources: []string{persistentVolumeClaimsResource},
-				Verbs:     []string{"get", "list", "watch"},
+				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 			{
 				APIGroups: []string{storageApiGroup},
 				Resources: []string{storageClassesResource},
-				Verbs:     []string{"get", "list", "watch"},
+				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 			{
 				APIGroups: []string{""},
 				Resources: []string{"events"},
-				Verbs:     []string{"list", "watch", "create", "update", "patch"},
+				Verbs:     []string{verbList, verbWatch, verbCreate, verbUpdate, verbPatch},
 			},
 			{
 				APIGroups: []string{""},
 				Resources: []string{secretsResource},
-				Verbs:     []string{"get", "list"},
+				Verbs:     []string{verbGet, verbList},
 			},
 			{
 				APIGroups: []string{snapshotStorageApiGroup},
 				Resources: []string{volumeSnapshotClassesResource},
-				Verbs:     []string{"get", "list", "watch"},
+				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 			{
 				APIGroups: []string{snapshotStorageApiGroup},
 				Resources: []string{volumeSnapshotsResource},
-				Verbs:     []string{"get", "list", "watch", "update"},
+				Verbs:     []string{verbGet, verbList, verbWatch, verbUpdate},
 			},
 			{
 				APIGroups: []string{snapshotStorageApiGroup},
 				Resources: []string{volumeSnapshotsStatusResource},
-				Verbs:     []string{"update"},
+				Verbs:     []string{verbUpdate},
 			},
 			{
 				APIGroups: []string{snapshotStorageApiGroup},
 				Resources: []string{volumeSnapshotContentsResource},
-				Verbs:     []string{"create", "get", "list", "watch", "update", "delete"},
+				Verbs:     []string{verbCreate, verbGet, verbList, verbWatch, verbUpdate, verbDelete},
 			},
 			{
 				APIGroups: []string{snapshotStorageApiGroup},
 				Resources: []string{volumeSnapshotContentsStatusResource},
-				Verbs:     []string{"update"},
+				Verbs:     []string{verbUpdate},
 			},
 			{
 				APIGroups: []string{apiExtensionsApiGroup},
 				Resources: []string{customResourceDefinitionsResource},
-				Verbs:     []string{"create", "list", "watch", "delete"},
+				Verbs:     []string{verbCreate, verbList, verbWatch, verbDelete},
 			},
 		},
 	}
