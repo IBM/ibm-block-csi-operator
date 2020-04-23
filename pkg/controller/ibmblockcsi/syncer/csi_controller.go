@@ -148,6 +148,14 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	)
 	attacher.ImagePullPolicy = s.getCSIAttacherPullPolicy()
 
+	// csi snapshotter sidecar
+	snapshotter := s.ensureContainer(snapshotterContainerName,
+		s.getCSISnapshotterImage(),
+		// TODO: make timeout configurable
+		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s"},
+	)
+	snapshotter.ImagePullPolicy = s.getCSISnapshotterPullPolicy()
+
 	// liveness probe sidecar
 	livenessProbe := s.ensureContainer(controllerLivenessProbeContainerName,
 		s.getLivenessProbeImage(),
@@ -157,20 +165,12 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	)
 	livenessProbe.ImagePullPolicy = s.getLivenessProbePullPolicy()
 
-	// csi snapshotter sidecar
-	snapshotter := s.ensureContainer(snapshotterContainerName,
-		s.getCSISnapshotterImage(),
-		// TODO: make timeout configurable
-		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s"},
-	)
-	snapshotter.ImagePullPolicy = s.getCSISnapshotterPullPolicy()
-
 	return []corev1.Container{
 		controllerPlugin,
 		provisioner,
 		attacher,
-		livenessProbe,
 		snapshotter,
+		livenessProbe,
 	}
 }
 
