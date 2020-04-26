@@ -9,6 +9,11 @@ pipeline {
                 sh './build/ci/run_unittests.sh'
             }
         }
+        stage ('Run OLM verifications') {
+            steps {
+                sh './build/ci/run_olm_verification.sh'
+            }
+        }
         stage ('Build and push images') {
             steps {
                 sh './build/ci/build_push_image.sh build/_output/reports/images_url'
