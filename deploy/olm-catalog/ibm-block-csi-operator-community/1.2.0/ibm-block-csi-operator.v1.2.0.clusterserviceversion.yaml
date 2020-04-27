@@ -91,9 +91,9 @@ metadata:
                 "imagePullPolicy": "IfNotPresent"
               },
               {
-                "name": "livenessprobe",
-                "repository": "registry.redhat.io/openshift4/ose-csi-livenessprobe",
-                "tag": "latest",
+                "name": "csi-snapshotter",
+                "repository": "quay.io/k8scsi/csi-snapshotter",
+                "tag": "2.1.0",
                 "imagePullPolicy": "IfNotPresent"
               },              
               {

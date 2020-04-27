@@ -92,7 +92,7 @@ metadata:
               },
               {
                 "name": "csi-snapshotter",
-                "repository": "registry.access.redhat.com/openshift4/ose-csi-external-snapshotter-rhel7",
+                "repository": "registry.redhat.io/openshift4/ose-csi-external-snapshotter-rhel7",
                 "tag": "latest",
                 "imagePullPolicy": "IfNotPresent"
               },
