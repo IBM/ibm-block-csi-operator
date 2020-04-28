@@ -2,8 +2,8 @@
 
 # ----------------------------------------------------------------
 # This script is for internal use in CI
-# The script push all ubiquity images from internal registry to external registry.
-# Images for amd64, ppc64le and s390x for each ubiquity image : ubiquity, ubiquity-db, flex and provisioner.
+# The script push all csi images from internal registry to external registry.
+# Images for amd64, ppc64le and s390x for each csi image : operator, controller and node.
 # It also creates and pushes relevant manifests per architecture into the external repository.
 # The script validates the whole process. If something gets wrong the script will fail with error.
 # Pre-requisites:
