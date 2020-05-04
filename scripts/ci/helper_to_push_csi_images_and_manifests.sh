@@ -11,7 +11,7 @@
 #    2. The internal images should be exist in advance.
 #    3. The external images should NOT be exist (the script will creates them).
 #    4. Helper scripts should be accessible: ./helper_to_push_docker_image.sh and ./helper_to_push_docker_manifest.sh
-#    5. Scripts input comes from environment variables, see ubiquity_*_envs and optional TAG_LATEST
+#    5. Scripts input comes from environment variables
 # ----------------------------------------------------------------
 
 function push_arch_images_and_create_manifest_for_app() {
