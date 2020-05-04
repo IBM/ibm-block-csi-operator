@@ -73,7 +73,7 @@ echo "4. Remote manifest validation..."
 docker manifest inspect $MANIFEST_FLAG $manifest 	    ||   abort 3 "fail to inspect remote manifest."
 docker pull $manifest                   ||   abort 3 "fail pull remote manifest."
 expected_arch=`uname -m`
-docker run  --rm $manifest uname -m | grep $expected_arch || abort 3 "The manifest run did not bring the expected arch"
+docker image inspect --format='{{.Config.Labels.architecture}}' $manifest | grep $expected_arch || abort 3 "The manifest run did not bring the expected arch"
 docker rmi $manifest  # just remove the local manifest that was pulled for testing
 actual_manifest_arch_number=`docker manifest inspect $MANIFEST_FLAG $manifest | grep architecture | wc -l`
 [ $actual_manifest_arch_number -ne $expected_manifest_arch_number ] && abort 3 "Manifest pushed but its not contain [$expected_manifest_arch_number] architectures as expected."
