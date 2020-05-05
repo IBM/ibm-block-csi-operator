@@ -9,7 +9,7 @@
 # Pre-requisites:
 #    1. Run docker login to the external registry in advance.
 #    2. The internal images should be exist in advance.
-#    3. The external images should NOT be exist (the script will creates them).
+#    3. The external images should NOT exist (the script will create them).
 #    4. Helper scripts should be accessible: ./helper_to_push_docker_image.sh and ./helper_to_push_docker_manifest.sh
 #    5. Scripts input comes from environment variables
 # ----------------------------------------------------------------

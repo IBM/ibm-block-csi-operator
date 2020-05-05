@@ -7,7 +7,7 @@
 # Pre-requisites:
 #    1. Run docker login to the external registry in advance.
 #    2. The internal images should be exist in advance.
-#    3. The designated manifest should NOT be exist (the script will create it).
+#    3. The designated manifest should NOT exist (the script will create it).
 #    4. "docker manifest" is enabled.
 #    5. Optional: set environment MANIFEST_FLAG with dedicated flags for docker manifest commands.
 #       For example to push docker manifest for internal registry without certificates, one can use: export MANIFEST_FLAG="--insecure"
@@ -60,7 +60,7 @@ echo "3. Manifest creation and push..."
 docker manifest create $MANIFEST_FLAG $manifest ${image_amd64} ${image_ppc64le} ${image_s390x} || abort 2 "fail to create manifest."
 docker manifest inspect $MANIFEST_FLAG $manifest || abort 2 "fail to inspect local manifest."
 actual_manifest_arch_number=$(docker manifest inspect $MANIFEST_FLAG $manifest | grep architecture | wc -l)
-[ $actual_manifest_arch_number -ne $expected_manifest_arch_number ] && abort 3 "Manifest created but its not contain [$expected_manifest_arch_number] architectures as expected."
+[ $actual_manifest_arch_number -ne $expected_manifest_arch_number ] && abort 3 "Manifest created but does not contain [$expected_manifest_arch_number] architectures as expected."
 docker manifest push $MANIFEST_FLAG --purge $manifest || abort 2 "fail to push manifest to remote repo"
 ls -ld $specific_manifest_dirname $specific_manifest_dirname_with_prefix && abort 2 "Local manifest file should NOT exist after successful manifest push. Please check." || :
 
@@ -71,7 +71,7 @@ expected_arch=$(uname -m)
 docker image inspect --format='{{.Config.Labels.architecture}}' $manifest | grep $expected_arch || abort 3 "The manifest run did not bring the expected arch"
 docker rmi $manifest # just remove the local manifest that was pulled for testing
 actual_manifest_arch_number=$(docker manifest inspect $MANIFEST_FLAG $manifest | grep architecture | wc -l)
-[ $actual_manifest_arch_number -ne $expected_manifest_arch_number ] && abort 3 "Manifest pushed but its not contain [$expected_manifest_arch_number] architectures as expected."
+[ $actual_manifest_arch_number -ne $expected_manifest_arch_number ] && abort 3 "Manifest pushed but does not contain [$expected_manifest_arch_number] architectures as expected."
 
 set +x
 echo "================================================================================"
