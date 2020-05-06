@@ -27,14 +27,14 @@ echo "   external_image=[$external_image]"
 [ -n "$latest" ] && echo "   latest_image  =[$latest_external_image]"
 
 
-echo "1. Validate no external_image exist yet before pushing it."  # Note: no need to test latest tag since its already exist
-docker pull $external_image && { echo "Error : the $external_image exist in remote. Cannot overwrite it."; exit 1; } || { echo "$external_image is not exist on the remote."; }
+echo "1. Validate no external_image exists yet before pushing it."  # Note: no need to test latest tag since its already exists
+docker pull $external_image && { echo "Error : the $external_image exists in remote. Cannot overwrite it."; exit 1; } || { echo "$external_image is not exist on the remote."; }
 echo ""
 
 
-echo "2. Validate internal_image not exist yet on local."
+echo "2. Validate internal_image does not exist yet on local."
 docker images $internal_image
-docker rmi $internal_image && { echo "Remove the internal_image image to pull it again"; } || { echo "internal_image not exist on local. Continue."; }
+docker rmi $internal_image && { echo "Remove the internal_image image to pull it again"; } || { echo "internal_image does not exist on local. Continue."; }
 echo ""
 
 

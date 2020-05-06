@@ -6,7 +6,7 @@
 # The script validates the whole process. If something gets wrong the script will fail with error.
 # Pre-requisites:
 #    1. Run docker login to the external registry in advance.
-#    2. The internal images should be exist in advance.
+#    2. The internal images should exist in advance.
 #    3. The designated manifest should NOT exist (the script will create it).
 #    4. "docker manifest" is enabled.
 #    5. Optional: set environment MANIFEST_FLAG with dedicated flags for docker manifest commands.
@@ -30,7 +30,7 @@ image_amd64=$2
 image_ppc64le=$3
 image_s390x=$4
 
-fail_if_exist="${5:-true}" # by default fail if external manifest already exist
+fail_if_exist="${5:-true}" # by default fail if external manifest already exists
 
 echo "Preparing to create and push manifest for image_amd64, image_ppc64le and image_s390x:"
 echo "   manifest=[$manifest]"
@@ -43,7 +43,7 @@ dockerhub_prefix_manifest="docker.io_"
 convert_manifest_filename=$(echo "$manifest" | sed -e 's|/|_|g' -e 's|:|-|g')
 specific_manifest_dirname="$manifest_dirname/${convert_manifest_filename}"
 specific_manifest_dirname_with_prefix="$manifest_dirname/${dockerhub_prefix_manifest}${convert_manifest_filename}"
-echo "1. Make sure architecture images are not exist locally and if so remove them first for clean state..."
+echo "1. Make sure architecture images do not exist locally and if so remove them first for clean state..."
 [ -n "$(docker images -q $image_amd64)" ] && { docker rmi $image_amd64 || abort 1 "fail to clean image before creating manifest. [$image_amd64]"; } || :
 [ -n "$(docker images -q $image_ppc64le)" ] && { docker rmi $image_ppc64le || abort 1 "fail to clean image before creating manifest. [$image_ppc64le]"; } || :
 [ -n "$(docker images -q $image_s390x)" ] && { docker rmi $image_s390x || abort 1 "fail to clean image before creating manifest. [$image_s390x]"; } || :
