@@ -1,12 +1,17 @@
 pipeline {
     agent {
-        label 'docker-engine'
+        label "${env.AGENT_LABEL}"
     }
     stages {
         stage ('Run unit tests') {
             steps {
                 sh 'mkdir -p build/_output/reports && chmod 777 build/_output/reports'
                 sh './build/ci/run_unittests.sh'
+            }
+        }
+        stage ('Run OLM verifications') {
+            steps {
+                sh './build/ci/run_olm_verification.sh'
             }
         }
         stage ('Build and push images') {
