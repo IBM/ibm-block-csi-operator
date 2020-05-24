@@ -99,7 +99,7 @@ metadata:
               {
                 "name": "livenessprobe",
                 "repository": "registry.redhat.io/openshift4/ose-csi-livenessprobe",
-                "tag": "latest", 
+                "tag": "latest",
                 "imagePullPolicy": "IfNotPresent"
               }
             ]
