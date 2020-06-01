@@ -81,7 +81,7 @@ metadata:
               {
                 "name": "csi-provisioner",
                 "repository": "quay.io/k8scsi/csi-provisioner",
-                "tag": "v1.4.0",
+                "tag": "v1.5.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {

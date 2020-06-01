@@ -18,7 +18,7 @@ package config
 
 const (
 	NodeDriverRegistrarImage    = "quay.io/k8scsi/csi-node-driver-registrar:v1.2.0"
-	CSIProvisionerImage         = "quay.io/k8scsi/csi-provisioner:v1.3.0"
+	CSIProvisionerImage         = "quay.io/k8scsi/csi-provisioner:v1.5.0"
 	CSIAttacherImage            = "quay.io/k8scsi/csi-attacher:v1.2.1"
 	CSILivenessProbeImage       = "quay.io/k8scsi/livenessprobe:v1.1.0"
 	CSISnapshotterImage      	= "quay.io/k8scsi/csi-snapshotter:v2.1.0"
