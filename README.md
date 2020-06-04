@@ -6,8 +6,8 @@ This is the official operator to deploy and manage IBM block storage CSI driver.
 Supported container platforms:
   - OpenShift v4.2
   - OpenShift v4.3
-  - Kubernetes v1.14
   - Kubernetes v1.16
+  - Kubernetes v1.17
 
 Supported IBM storage systems:
   - IBM FlashSystem 9100
@@ -211,7 +211,7 @@ $ kubectl -n <namespace> apply -f csi.ibm.com_v1_ibmblockcsi_cr.yaml
 ```bash
 $ kubectl get all -n <namespace>  -l csi
 NAME                             READY   STATUS    RESTARTS   AGE
-pod/ibm-block-csi-controller-0   4/4     Running   0          9m36s
+pod/ibm-block-csi-controller-0   5/5     Running   0          9m36s
 pod/ibm-block-csi-node-jvmvh     3/3     Running   0          9m36s
 pod/ibm-block-csi-node-tsppw     3/3     Running   0          9m36s
 
@@ -265,7 +265,7 @@ kubectl create secret generic <NAME> --from-literal=username=<USER> --fromlitera
 
 #### 2. Create storage classes
 
-Create a storage class `storageclass-gold.yaml` file as follows, with the relevant capabilities, pool and, array secret.
+Create a storage class `demo-storageclass-gold-pvc.yaml` file as follows, with the relevant capabilities, pool and, array secret.
 
 Use the `SpaceEfficiency` parameters for each storage system. These values are not case sensitive:
 * IBM FlashSystem A9000 and A9000R
@@ -286,22 +286,22 @@ metadata:
   name: gold
 provisioner: block.csi.ibm.com
 parameters:
-  #SpaceEfficiency: <VALUE>    # Optional: Values applicable for Spectrum Virtualize Family are: thin, compressed, or deduplicated
-  pool: <VALUE_POOL_NAME>	   # DS8000 Family paramater is VALUE_POOL_ID
+  SpaceEfficiency: <VALUE>          # Optional: Values applicable for Spectrum Virtualize Family are: thin, compressed, or deduplicated
+  pool: <POOL_NAME>	                # DS8000 Family paramater is pool ID
 
-  csi.storage.k8s.io/provisioner-secret-name: <VALUE_ARRAY_SECRET>
-  csi.storage.k8s.io/provisioner-secret-namespace: <VALUE_ARRAY_SECRET_NAMESPACE>
-  csi.storage.k8s.io/controller-publish-secret-name: <VALUE_ARRAY_SECRET>
-  csi.storage.k8s.io/controller-publish-secret-namespace: <VALUE_ARRAY_SECRET_NAMESPACE>
+  csi.storage.k8s.io/provisioner-secret-name: <ARRAY_SECRET>
+  csi.storage.k8s.io/provisioner-secret-namespace: <ARRAY_SECRET_NAMESPACE>
+  csi.storage.k8s.io/controller-publish-secret-name: <ARRAY_SECRET>
+  csi.storage.k8s.io/controller-publish-secret-namespace: <ARRAY_SECRET_NAMESPACE>
 
-  csi.storage.k8s.io/fstype: xfs   # Optional: Values ext4/xfs. The default is ext4.
+  csi.storage.k8s.io/fstype: xfs    # Optional: Values ext4/xfs. The default is ext4.
   volume_name_prefix: <prefix_name> # Optional: DS8000 Family maximum prefix length is 5 characters. Maximum prefix length for other systems is 20 characters.
 ```
 
 #### 3. Apply the storage class:
 
 ```bash
-$ kubectl apply -f storageclass-gold.yaml
+$ kubectl apply -f demo-storageclass-gold.yaml
 storageclass.storage.k8s.io/gold created
 ```
 
