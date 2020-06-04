@@ -171,7 +171,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		provisioner,
 		attacher,
 		snapshotter,
-		livenessProbe,
+		// livenessProbe,
 	}
 }
 
