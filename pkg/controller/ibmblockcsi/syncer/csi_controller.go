@@ -161,7 +161,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		s.getLivenessProbeImage(),
 		[]string{
 			"--csi-address=/csi/csi.sock",
-			"--probe-timeout=30s",
+			"--probe-timeout=3m",
 		},
 	)
 	livenessProbe.ImagePullPolicy = s.getLivenessProbePullPolicy()
