@@ -136,7 +136,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	provisioner := s.ensureContainer(provisionerContainerName,
 		s.getCSIProvisionerImage(),
 		// TODO: make timeout configurable
-		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=3m"},
+		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s"},
 	)
 	provisioner.ImagePullPolicy = s.getCSIProvisionerPullPolicy()
 
