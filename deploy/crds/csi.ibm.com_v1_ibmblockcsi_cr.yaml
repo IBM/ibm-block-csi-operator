@@ -12,7 +12,7 @@ spec:
   # container and csi-provisioner, csi-attacher and livenessprobe sidecars.
   controller:
     repository: ibmcom/ibm-block-csi-driver-controller
-    tag: "1.1.0"
+    tag: "1.2.0"
     imagePullPolicy: IfNotPresent
     affinity:
       nodeAffinity:
@@ -28,7 +28,7 @@ spec:
   # and csi-node-driver-registrar and livenessprobe sidecars.
   node:
     repository: ibmcom/ibm-block-csi-driver-node
-    tag: "1.1.0"
+    tag: "1.2.0"
     imagePullPolicy: IfNotPresent
     affinity:
       nodeAffinity:
