@@ -75,31 +75,31 @@ metadata:
               {
                 "name": "csi-node-driver-registrar",
                 "repository": "registry.redhat.io/openshift4/ose-csi-driver-registrar",
-                "tag": "latest",
+                "tag": "v4.3",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-provisioner",
                 "repository": "registry.redhat.io/openshift4/ose-csi-external-provisioner-rhel7",
-                "tag": "latest",
+                "tag": "v4.3",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-attacher",
                 "repository": "registry.redhat.io/openshift4/ose-csi-external-attacher",
-                "tag": "latest",
+                "tag": "v4.3",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-snapshotter",
                 "repository": "registry.redhat.io/openshift4/ose-csi-external-snapshotter-rhel7",
-                "tag": "latest",
+                "tag": "v4.4",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "livenessprobe",
                 "repository": "registry.redhat.io/openshift4/ose-csi-livenessprobe",
-                "tag": "latest",
+                "tag": "v4.3",
                 "imagePullPolicy": "IfNotPresent"
               }
             ]
@@ -324,7 +324,7 @@ spec:
   maintainers:
     - name: Guang Jiong Lou
       email: luogj@cn.ibm.com
-  minKubeVersion: 1.14.1
+  minKubeVersion: 1.16.0
   provider:
     name: IBM
   links:

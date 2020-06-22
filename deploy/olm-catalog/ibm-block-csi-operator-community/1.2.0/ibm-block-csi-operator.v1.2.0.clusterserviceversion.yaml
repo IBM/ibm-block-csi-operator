@@ -81,7 +81,7 @@ metadata:
               {
                 "name": "csi-provisioner",
                 "repository": "quay.io/k8scsi/csi-provisioner",
-                "tag": "v1.4.0",
+                "tag": "v1.5.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
@@ -93,7 +93,7 @@ metadata:
               {
                 "name": "csi-snapshotter",
                 "repository": "quay.io/k8scsi/csi-snapshotter",
-                "tag": "2.1.0",
+                "tag": "v2.1.0",
                 "imagePullPolicy": "IfNotPresent"
               },              
               {
@@ -324,7 +324,7 @@ spec:
   maintainers:
     - name: Guang Jiong Lou
       email: luogj@cn.ibm.com
-  minKubeVersion: 1.14.1
+  minKubeVersion: 1.16.0
   provider:
     name: IBM
   links:
