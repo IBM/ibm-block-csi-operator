@@ -124,7 +124,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	})
 	controllerPlugin.ImagePullPolicy = s.driver.Spec.Controller.ImagePullPolicy
 
-	controllerPlugin.LivenessProbe = ensureProbe(10, 20, 2, corev1.Handler{
+	controllerPlugin.LivenessProbe = ensureProbe(10, 100, 2, corev1.Handler{
 		HTTPGet: &corev1.HTTPGetAction{
 			Path:   "/healthz",
 			Port:   controllerContainerHealthPort,
@@ -144,7 +144,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	attacher := s.ensureContainer(attacherContainerName,
 		s.getCSIAttacherImage(),
 		// TODO: make timeout configurable
-		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s"},
+		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=180s"},
 	)
 	attacher.ImagePullPolicy = s.getCSIAttacherPullPolicy()
 
@@ -360,7 +360,7 @@ func ensureProbe(delay, timeout, period int32, handler corev1.Handler) *corev1.P
 		TimeoutSeconds:      timeout,
 		PeriodSeconds:       period,
 		Handler:             handler,
-		FailureThreshold:    5,
+		FailureThreshold:    30,
 	}
 }
 
