@@ -341,16 +341,16 @@ func (r *ReconcileIBMBlockCSI) reconcileClusterRole(instance *ibmblockcsi.IBMBlo
 
 	externalProvisioner := instance.GenerateExternalProvisionerClusterRole()
 	externalAttacher := instance.GenerateExternalAttacherClusterRole()
+	externalSnapshotter := instance.GenerateExternalSnapshotterClusterRole()
 	controllerSCC := instance.GenerateSCCForControllerClusterRole()
 	nodeSCC := instance.GenerateSCCForNodeClusterRole()
-	//externalSnapshotter := instance.GenerateExternalSnapshotterClusterRole()
 
 	for _, cr := range []*rbacv1.ClusterRole{
 		externalProvisioner,
 		externalAttacher,
+		externalSnapshotter,
 		controllerSCC,
 		nodeSCC,
-		//externalSnapshotter,
 	} {
 		if err := controllerutil.SetControllerReference(instance.Unwrap(), cr, r.scheme); err != nil {
 			return err
@@ -383,16 +383,16 @@ func (r *ReconcileIBMBlockCSI) reconcileClusterRoleBinding(instance *ibmblockcsi
 
 	externalProvisioner := instance.GenerateExternalProvisionerClusterRoleBinding()
 	externalAttacher := instance.GenerateExternalAttacherClusterRoleBinding()
+	externalSnapshotter := instance.GenerateExternalSnapshotterClusterRoleBinding()
 	controllerSCC := instance.GenerateSCCForControllerClusterRoleBinding()
 	nodeSCC := instance.GenerateSCCForNodeClusterRoleBinding()
-	//externalSnapshotter := instance.GenerateExternalSnapshotterClusterRoleBinding()
 
 	for _, crb := range []*rbacv1.ClusterRoleBinding{
 		externalProvisioner,
 		externalAttacher,
+		externalSnapshotter,
 		controllerSCC,
 		nodeSCC,
-		//externalSnapshotter,
 	} {
 		if err := controllerutil.SetControllerReference(instance.Unwrap(), crb, r.scheme); err != nil {
 			return err

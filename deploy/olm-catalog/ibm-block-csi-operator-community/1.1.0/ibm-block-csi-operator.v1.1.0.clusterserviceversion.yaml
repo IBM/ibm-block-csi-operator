@@ -7,7 +7,7 @@ metadata:
     capabilities: "Basic Install"
     categories: "Storage,Cloud Provider"
     certified: "true"
-    containerImage: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.1.0
+    containerImage: ibmcom/ibm-block-csi-operator:1.1.0
     createdAt: "2020-02-19T13:14:00Z"
     description: "Run IBM block storage CSI driver on OpenShift."
     repository: https://github.com/IBM/ibm-block-csi-operator
@@ -35,7 +35,8 @@ metadata:
                             "key": "kubernetes.io/arch",
                             "operator": "In",
                             "values": [
-                              "amd64"
+                              "amd64",
+                              "s390x"
                             ]
                           }
                         ]
@@ -59,7 +60,8 @@ metadata:
                             "key": "kubernetes.io/arch",
                             "operator": "In",
                             "values": [
-                              "amd64"
+                              "amd64",
+                              "s390x"
                             ]
                           }
                         ]
@@ -79,7 +81,7 @@ metadata:
               {
                 "name": "csi-provisioner",
                 "repository": "quay.io/k8scsi/csi-provisioner",
-                "tag": "v1.3.0",
+                "tag": "v1.4.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
@@ -230,7 +232,7 @@ spec:
     3.2. For Fibre Channel, configure the relevant zoning from the storage to the host.
 
     ## Configuring k8s secret and storage class
-    In order to use the driver, create the relevant storage classes and secrets, as needed. 
+    In order to use the driver, create the relevant storage classes and secrets, as needed.
     Note: This section can be done also after the operator installation.
 
     This section describes how to:
@@ -615,7 +617,7 @@ spec:
                     capabilities:
                       drop:
                       - ALL
-                  image: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.1.0
+                  image: ibmcom/ibm-block-csi-operator:1.1.0
                   imagePullPolicy: IfNotPresent
                   command:
                   - ibm-block-csi-operator

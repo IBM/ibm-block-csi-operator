@@ -25,6 +25,36 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const (
+	snapshotStorageApiGroup              string = "snapshot.storage.k8s.io"
+	securityOpenshiftApiGroup            string = "security.openshift.io"
+	apiExtensionsApiGroup                string = "apiextensions.k8s.io"
+	storageApiGroup                      string = "storage.k8s.io"
+	rbacAuthorizationApiGroup            string = "rbac.authorization.k8s.io"
+	storageClassesResource               string = "storageclasses"
+	persistentVolumesResource            string = "persistentvolumes"
+	persistentVolumeClaimsResource       string = "persistentvolumeclaims"
+	volumeAttachmentsResource            string = "volumeattachments"
+	volumeSnapshotClassesResource        string = "volumesnapshotclasses"
+	volumeSnapshotsResource              string = "volumesnapshots"
+	volumeSnapshotsStatusResource        string = "volumesnapshots/status"
+	volumeSnapshotContentsResource       string = "volumesnapshotcontents"
+	volumeSnapshotContentsStatusResource string = "volumesnapshotcontents/status"
+	eventsResource                       string = "events"
+	nodesResource                        string = "nodes"
+	csiNodesResource                     string = "csinodes"
+	secretsResource                      string = "secrets"
+	securityContextConstraintsResource   string = "securitycontextconstraints"
+	customResourceDefinitionsResource    string = "customresourcedefinitions"
+	verbGet                              string = "get"
+	verbList                             string = "list"
+	verbWatch                            string = "watch"
+	verbCreate                           string = "create"
+	verbUpdate                           string = "update"
+	verbPatch                            string = "patch"
+	verbDelete                           string = "delete"
+)
+
 func (c *IBMBlockCSI) GenerateCSIDriver() *storagev1beta1.CSIDriver {
 	return &storagev1beta1.CSIDriver{
 		ObjectMeta: metav1.ObjectMeta{
@@ -81,48 +111,38 @@ func (c *IBMBlockCSI) GenerateExternalProvisionerClusterRole() *rbacv1.ClusterRo
 		Rules: []rbacv1.PolicyRule{
 			{
 				APIGroups: []string{""},
-				Resources: []string{"secrets"},
-				Verbs:     []string{"get", "list"},
+				Resources: []string{secretsResource},
+				Verbs:     []string{verbGet, verbList},
 			},
 			{
 				APIGroups: []string{""},
-				Resources: []string{"persistentvolumes"},
-				Verbs:     []string{"get", "list", "watch", "create", "delete"},
+				Resources: []string{persistentVolumesResource},
+				Verbs:     []string{verbGet, verbList, verbWatch, verbCreate, verbDelete},
 			},
 			{
 				APIGroups: []string{""},
-				Resources: []string{"persistentvolumeclaims"},
-				Verbs:     []string{"get", "list", "watch", "update"},
+				Resources: []string{persistentVolumeClaimsResource},
+				Verbs:     []string{verbGet, verbList, verbWatch, verbUpdate},
 			},
 			{
-				APIGroups: []string{"storage.k8s.io"},
-				Resources: []string{"storageclasses"},
-				Verbs:     []string{"get", "list", "watch"},
-			},
-			{
-				APIGroups: []string{""},
-				Resources: []string{"events"},
-				Verbs:     []string{"list", "watch", "create", "update", "patch"},
-			},
-			//			{
-			//				APIGroups: []string{"snapshot.storage.k8s.io"},
-			//				Resources: []string{"volumesnapshots"},
-			//				Verbs:     []string{"get", "list"},
-			//			},
-			//			{
-			//				APIGroups: []string{"snapshot.storage.k8s.io"},
-			//				Resources: []string{"volumesnapshotcontents"},
-			//				Verbs:     []string{"get", "list"},
-			//			},
-			{
-				APIGroups: []string{c.GetCSIAPIGroup()},
-				Resources: []string{c.GetCSINodeObject()},
-				Verbs:     []string{"get", "list", "watch"},
+				APIGroups: []string{storageApiGroup},
+				Resources: []string{storageClassesResource},
+				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 			{
 				APIGroups: []string{""},
-				Resources: []string{"nodes"},
-				Verbs:     []string{"get", "list", "watch"},
+				Resources: []string{eventsResource},
+				Verbs:     []string{verbList, verbWatch, verbCreate, verbUpdate, verbPatch},
+			},
+			{
+				APIGroups: []string{storageApiGroup},
+				Resources: []string{csiNodesResource},
+				Verbs:     []string{verbGet, verbList, verbWatch},
+			},
+			{
+				APIGroups: []string{""},
+				Resources: []string{nodesResource},
+				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 		},
 	}
@@ -143,7 +163,7 @@ func (c *IBMBlockCSI) GenerateExternalProvisionerClusterRoleBinding() *rbacv1.Cl
 		RoleRef: rbacv1.RoleRef{
 			Kind:     "ClusterRole",
 			Name:     config.GetNameForResource(config.ExternalProvisionerClusterRole, c.Name),
-			APIGroup: "rbac.authorization.k8s.io",
+			APIGroup: rbacAuthorizationApiGroup,
 		},
 	}
 }
@@ -157,22 +177,22 @@ func (c *IBMBlockCSI) GenerateExternalAttacherClusterRole() *rbacv1.ClusterRole 
 			{
 				APIGroups: []string{""},
 				Resources: []string{"persistentvolumes"},
-				Verbs:     []string{"get", "list", "watch", "update", "patch"},
+				Verbs:     []string{verbGet, verbList, verbWatch, verbUpdate, verbPatch},
 			},
 			{
-				APIGroups: []string{c.GetCSIAPIGroup()},
-				Resources: []string{c.GetCSINodeObject()},
-				Verbs:     []string{"get", "list", "watch"},
+				APIGroups: []string{storageApiGroup},
+				Resources: []string{csiNodesResource},
+				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 			{
 				APIGroups: []string{""},
-				Resources: []string{"nodes"},
-				Verbs:     []string{"get", "list", "watch"},
+				Resources: []string{nodesResource},
+				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 			{
-				APIGroups: []string{"storage.k8s.io"},
-				Resources: []string{"volumeattachments"},
-				Verbs:     []string{"get", "list", "watch", "update", "patch"},
+				APIGroups: []string{storageApiGroup},
+				Resources: []string{volumeAttachmentsResource},
+				Verbs:     []string{verbGet, verbList, verbWatch, verbUpdate, verbPatch},
 			},
 		},
 	}
@@ -193,7 +213,7 @@ func (c *IBMBlockCSI) GenerateExternalAttacherClusterRoleBinding() *rbacv1.Clust
 		RoleRef: rbacv1.RoleRef{
 			Kind:     "ClusterRole",
 			Name:     config.GetNameForResource(config.ExternalAttacherClusterRole, c.Name),
-			APIGroup: "rbac.authorization.k8s.io",
+			APIGroup: rbacAuthorizationApiGroup,
 		},
 	}
 }
@@ -206,48 +226,58 @@ func (c *IBMBlockCSI) GenerateExternalSnapshotterClusterRole() *rbacv1.ClusterRo
 		Rules: []rbacv1.PolicyRule{
 			{
 				APIGroups: []string{""},
-				Resources: []string{"persistentvolumes"},
-				Verbs:     []string{"get", "list", "watch"},
+				Resources: []string{persistentVolumesResource},
+				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 			{
 				APIGroups: []string{""},
-				Resources: []string{"persistentvolumeclaims"},
-				Verbs:     []string{"get", "list", "watch"},
+				Resources: []string{persistentVolumeClaimsResource},
+				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 			{
-				APIGroups: []string{"storage.k8s.io"},
-				Resources: []string{"storageclasses"},
-				Verbs:     []string{"get", "list", "watch"},
+				APIGroups: []string{storageApiGroup},
+				Resources: []string{storageClassesResource},
+				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 			{
 				APIGroups: []string{""},
 				Resources: []string{"events"},
-				Verbs:     []string{"list", "watch", "create", "update", "patch"},
+				Verbs:     []string{verbList, verbWatch, verbCreate, verbUpdate, verbPatch},
 			},
 			{
 				APIGroups: []string{""},
-				Resources: []string{"secrets"},
-				Verbs:     []string{"get", "list"},
+				Resources: []string{secretsResource},
+				Verbs:     []string{verbGet, verbList},
 			},
-			//			{
-			//				APIGroups: []string{"snapshot.storage.k8s.io"},
-			//				Resources: []string{"volumesnapshotclasses"},
-			//				Verbs:     []string{"get", "list", "watch"},
-			//			},
-			//			{
-			//				APIGroups: []string{"snapshot.storage.k8s.io"},
-			//				Resources: []string{"volumesnapshots"},
-			//				Verbs:     []string{"get", "list", "watch", "update"},
-			//			},
-			//			{
-			//				APIGroups: []string{"snapshot.storage.k8s.io"},
-			//				Resources: []string{"volumesnapshotcontents"},
-			//				Verbs:     []string{"create", "get", "list", "watch", "update", "delete"},
-			//			},
 			{
-				APIGroups: []string{"apiextensions.k8s.io"},
-				Resources: []string{"customresourcedefinitions"},
-				Verbs:     []string{"create", "list", "watch", "delete"},
+				APIGroups: []string{snapshotStorageApiGroup},
+				Resources: []string{volumeSnapshotClassesResource},
+				Verbs:     []string{verbGet, verbList, verbWatch},
+			},
+			{
+				APIGroups: []string{snapshotStorageApiGroup},
+				Resources: []string{volumeSnapshotsResource},
+				Verbs:     []string{verbGet, verbList, verbWatch, verbUpdate},
+			},
+			{
+				APIGroups: []string{snapshotStorageApiGroup},
+				Resources: []string{volumeSnapshotsStatusResource},
+				Verbs:     []string{verbUpdate},
+			},
+			{
+				APIGroups: []string{snapshotStorageApiGroup},
+				Resources: []string{volumeSnapshotContentsResource},
+				Verbs:     []string{verbCreate, verbGet, verbList, verbWatch, verbUpdate, verbDelete},
+			},
+			{
+				APIGroups: []string{snapshotStorageApiGroup},
+				Resources: []string{volumeSnapshotContentsStatusResource},
+				Verbs:     []string{verbUpdate},
+			},
+			{
+				APIGroups: []string{apiExtensionsApiGroup},
+				Resources: []string{customResourceDefinitionsResource},
+				Verbs:     []string{verbCreate, verbList, verbWatch, verbDelete},
 			},
 		},
 	}
@@ -268,7 +298,7 @@ func (c *IBMBlockCSI) GenerateExternalSnapshotterClusterRoleBinding() *rbacv1.Cl
 		RoleRef: rbacv1.RoleRef{
 			Kind:     "ClusterRole",
 			Name:     config.GetNameForResource(config.ExternalSnapshotterClusterRole, c.Name),
-			APIGroup: "rbac.authorization.k8s.io",
+			APIGroup: rbacAuthorizationApiGroup,
 		},
 	}
 }
@@ -280,8 +310,8 @@ func (c *IBMBlockCSI) GenerateSCCForControllerClusterRole() *rbacv1.ClusterRole 
 		},
 		Rules: []rbacv1.PolicyRule{
 			{
-				APIGroups:     []string{"security.openshift.io"},
-				Resources:     []string{"securitycontextconstraints"},
+				APIGroups:     []string{securityOpenshiftApiGroup},
+				Resources:     []string{securityContextConstraintsResource},
 				ResourceNames: []string{"anyuid"},
 				Verbs:         []string{"use"},
 			},
@@ -304,7 +334,7 @@ func (c *IBMBlockCSI) GenerateSCCForControllerClusterRoleBinding() *rbacv1.Clust
 		RoleRef: rbacv1.RoleRef{
 			Kind:     "ClusterRole",
 			Name:     config.GetNameForResource(config.CSIControllerSCCClusterRole, c.Name),
-			APIGroup: "rbac.authorization.k8s.io",
+			APIGroup: rbacAuthorizationApiGroup,
 		},
 	}
 }
@@ -316,8 +346,8 @@ func (c *IBMBlockCSI) GenerateSCCForNodeClusterRole() *rbacv1.ClusterRole {
 		},
 		Rules: []rbacv1.PolicyRule{
 			{
-				APIGroups:     []string{"security.openshift.io"},
-				Resources:     []string{"securitycontextconstraints"},
+				APIGroups:     []string{securityOpenshiftApiGroup},
+				Resources:     []string{securityContextConstraintsResource},
 				ResourceNames: []string{"privileged"},
 				Verbs:         []string{"use"},
 			},
@@ -340,21 +370,7 @@ func (c *IBMBlockCSI) GenerateSCCForNodeClusterRoleBinding() *rbacv1.ClusterRole
 		RoleRef: rbacv1.RoleRef{
 			Kind:     "ClusterRole",
 			Name:     config.GetNameForResource(config.CSINodeSCCClusterRole, c.Name),
-			APIGroup: "rbac.authorization.k8s.io",
+			APIGroup: rbacAuthorizationApiGroup,
 		},
 	}
-}
-
-func (c *IBMBlockCSI) GetCSIAPIGroup() string {
-	if c.ServerVersion == "1.13" {
-		return "csi.storage.k8s.io"
-	}
-	return "storage.k8s.io"
-}
-
-func (c *IBMBlockCSI) GetCSINodeObject() string {
-	if c.ServerVersion == "1.13" {
-		return "csinodeinfos"
-	}
-	return "csinodes"
 }

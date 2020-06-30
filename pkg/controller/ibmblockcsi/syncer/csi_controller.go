@@ -41,6 +41,7 @@ const (
 	controllerContainerName              = "ibm-block-csi-controller"
 	provisionerContainerName             = "csi-provisioner"
 	attacherContainerName                = "csi-attacher"
+	snapshotterContainerName             = "csi-snapshotter"
 	controllerLivenessProbeContainerName = "liveness-probe"
 
 	controllerContainerHealthPortName   = "healthz"
@@ -123,7 +124,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	})
 	controllerPlugin.ImagePullPolicy = s.driver.Spec.Controller.ImagePullPolicy
 
-	controllerPlugin.LivenessProbe = ensureProbe(10, 3, 2, corev1.Handler{
+	controllerPlugin.LivenessProbe = ensureProbe(10, 100, 2, corev1.Handler{
 		HTTPGet: &corev1.HTTPGetAction{
 			Path:   "/healthz",
 			Port:   controllerContainerHealthPort,
@@ -143,9 +144,17 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	attacher := s.ensureContainer(attacherContainerName,
 		s.getCSIAttacherImage(),
 		// TODO: make timeout configurable
-		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s"},
+		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=180s"},
 	)
 	attacher.ImagePullPolicy = s.getCSIAttacherPullPolicy()
+
+	// csi snapshotter sidecar
+	snapshotter := s.ensureContainer(snapshotterContainerName,
+		s.getCSISnapshotterImage(),
+		// TODO: make timeout configurable
+		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s"},
+	)
+	snapshotter.ImagePullPolicy = s.getCSISnapshotterPullPolicy()
 
 	// liveness probe sidecar
 	livenessProbe := s.ensureContainer(controllerLivenessProbeContainerName,
@@ -160,6 +169,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		controllerPlugin,
 		provisioner,
 		attacher,
+		snapshotter,
 		livenessProbe,
 	}
 }
@@ -248,7 +258,7 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 			},
 		}
 
-	case provisionerContainerName, attacherContainerName:
+	case provisionerContainerName, attacherContainerName, snapshotterContainerName:
 		return []corev1.EnvVar{
 			{
 				Name:  "ADDRESS",
@@ -261,7 +271,7 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 
 func (s *csiControllerSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 	switch name {
-	case controllerContainerName, provisionerContainerName, attacherContainerName:
+	case controllerContainerName, provisionerContainerName, attacherContainerName, snapshotterContainerName:
 		return []corev1.VolumeMount{
 			{
 				Name:      socketVolumeName,
@@ -292,52 +302,52 @@ func (s *csiControllerSyncer) getSidecarByName(name string) *csiv1.CSISidecar {
 	return getSidecarByName(s.driver, name)
 }
 
-func (s *csiControllerSyncer) getCSIAttacherImage() string {
-	sidecar := s.getSidecarByName(config.CSIAttacher)
+func (s *csiControllerSyncer) getSidecarImageByName(name string, image string) string {
+	sidecar := s.getSidecarByName(name)
 	if sidecar != nil {
 		return fmt.Sprintf("%s:%s", sidecar.Repository, sidecar.Tag)
 	}
-	return config.CSIAttacherImage
+	return image
+}
+
+func (s *csiControllerSyncer) getCSIAttacherImage() string {
+	return s.getSidecarImageByName(config.CSIAttacher, config.CSIAttacherImage)
 }
 
 func (s *csiControllerSyncer) getCSIProvisionerImage() string {
-	sidecar := s.getSidecarByName(config.CSIProvisioner)
-	if sidecar != nil {
-		return fmt.Sprintf("%s:%s", sidecar.Repository, sidecar.Tag)
-	}
-	return config.CSIProvisionerImage
+	return s.getSidecarImageByName(config.CSIProvisioner, config.CSIProvisionerImage)
 }
 
 func (s *csiControllerSyncer) getLivenessProbeImage() string {
-	sidecar := s.getSidecarByName(config.LivenessProbe)
-	if sidecar != nil {
-		return fmt.Sprintf("%s:%s", sidecar.Repository, sidecar.Tag)
+	return s.getSidecarImageByName(config.LivenessProbe, config.CSILivenessProbeImage)
+}
+
+func (s *csiControllerSyncer) getCSISnapshotterImage() string {
+	return s.getSidecarImageByName(config.CSISnapshotter, config.CSISnapshotterImage)
+}
+
+func (s *csiControllerSyncer) getSidecarPullPolicy(sidecarName string) corev1.PullPolicy {
+	sidecar := s.getSidecarByName(sidecarName)
+	if sidecar != nil && sidecar.ImagePullPolicy != "" {
+		return sidecar.ImagePullPolicy
 	}
-	return config.CSILivenessProbeImage
+	return corev1.PullIfNotPresent
 }
 
 func (s *csiControllerSyncer) getCSIAttacherPullPolicy() corev1.PullPolicy {
-	sidecar := s.getSidecarByName(config.CSIAttacher)
-	if sidecar != nil && sidecar.ImagePullPolicy != "" {
-		return sidecar.ImagePullPolicy
-	}
-	return corev1.PullIfNotPresent
+	return s.getSidecarPullPolicy(config.CSIAttacher)
 }
 
 func (s *csiControllerSyncer) getCSIProvisionerPullPolicy() corev1.PullPolicy {
-	sidecar := s.getSidecarByName(config.CSIProvisioner)
-	if sidecar != nil && sidecar.ImagePullPolicy != "" {
-		return sidecar.ImagePullPolicy
-	}
-	return corev1.PullIfNotPresent
+	return s.getSidecarPullPolicy(config.CSIProvisioner)
 }
 
 func (s *csiControllerSyncer) getLivenessProbePullPolicy() corev1.PullPolicy {
-	sidecar := s.getSidecarByName(config.LivenessProbe)
-	if sidecar != nil && sidecar.ImagePullPolicy != "" {
-		return sidecar.ImagePullPolicy
-	}
-	return corev1.PullIfNotPresent
+	return s.getSidecarPullPolicy(config.LivenessProbe)
+}
+
+func (s *csiControllerSyncer) getCSISnapshotterPullPolicy() corev1.PullPolicy {
+	return s.getSidecarPullPolicy(config.CSISnapshotter)
 }
 
 func ensurePorts(ports ...corev1.ContainerPort) []corev1.ContainerPort {
@@ -350,7 +360,7 @@ func ensureProbe(delay, timeout, period int32, handler corev1.Handler) *corev1.P
 		TimeoutSeconds:      timeout,
 		PeriodSeconds:       period,
 		Handler:             handler,
-		FailureThreshold:    5,
+		FailureThreshold:    30,
 	}
 }
 
