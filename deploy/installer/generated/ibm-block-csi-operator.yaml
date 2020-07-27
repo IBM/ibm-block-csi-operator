@@ -1438,14 +1438,15 @@ spec:
                     values:
                       - amd64
                       - s390x
+                      - ppc64le
       containers:
       - name: ibm-block-csi-operator
         resources:
           requests:
-            memory: 50Mi
+            memory: 100Mi
             cpu: 50m
           limits:
-            memory: 100Mi
+            memory: 200Mi
             cpu: 100m
         readinessProbe:
           exec:
