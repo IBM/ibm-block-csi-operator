@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ibm-block-csi-operator
-  namespace: kube-system
+  namespace: default
   labels:
     product: ibm-block-csi-driver
     csi: ibm

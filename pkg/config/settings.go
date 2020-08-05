@@ -27,7 +27,7 @@ const (
 	NodeTag       = "1.2.0"
 	NodeAgentTag  = "1.0.0"
 
-	DefaultNamespace = "kube-system"
+	DefaultNamespace = "default"
 	DefaultLogLevel  = "DEBUG"
 	ControllerUserID = int64(9999)
 
