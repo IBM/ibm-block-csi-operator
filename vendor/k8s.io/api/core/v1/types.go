@@ -4527,7 +4527,7 @@ type ServiceProxyOptions struct {
 	// Path is the part of URLs that include service endpoints, suffixes,
 	// and parameters to use for the current proxy request to service.
 	// For example, the whole request URL is
-	// http://localhost/api/v1/namespaces/default/services/elasticsearch-logging/_search?q=user:kimchy.
+	// http://localhost/api/v1/namespaces/kube-system/services/elasticsearch-logging/_search?q=user:kimchy.
 	// Path is _search?q=user:kimchy.
 	// +optional
 	Path string `json:"path,omitempty" protobuf:"bytes,1,opt,name=path"`

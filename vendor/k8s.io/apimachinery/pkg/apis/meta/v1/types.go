@@ -295,7 +295,7 @@ const (
 	// NamespaceNone is the argument for a context when there is no namespace.
 	NamespaceNone string = ""
 	// NamespaceSystem is the system namespace where we place system components.
-	NamespaceSystem string = "default"
+	NamespaceSystem string = "kube-system"
 	// NamespacePublic is the namespace where we place public info (ConfigMaps)
 	NamespacePublic string = "kube-public"
 )

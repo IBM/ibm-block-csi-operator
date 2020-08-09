@@ -2100,7 +2100,7 @@ func (ServicePort) SwaggerDoc() map[string]string {
 
 var map_ServiceProxyOptions = map[string]string{
 	"":     "ServiceProxyOptions is the query options to a Service's proxy call.",
-	"path": "Path is the part of URLs that include service endpoints, suffixes, and parameters to use for the current proxy request to service. For example, the whole request URL is http://localhost/api/v1/namespaces/default/services/elasticsearch-logging/_search?q=user:kimchy. Path is _search?q=user:kimchy.",
+	"path": "Path is the part of URLs that include service endpoints, suffixes, and parameters to use for the current proxy request to service. For example, the whole request URL is http://localhost/api/v1/namespaces/kube-system/services/elasticsearch-logging/_search?q=user:kimchy. Path is _search?q=user:kimchy.",
 }
 
 func (ServiceProxyOptions) SwaggerDoc() map[string]string {
