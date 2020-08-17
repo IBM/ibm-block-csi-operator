@@ -37,7 +37,7 @@ var _ = Describe("Controller", func() {
 	const timeout = time.Second * 30
 	const interval = time.Second * 1
 	var ibc *csiv1.IBMBlockCSI
-	var ns = "kube-system"
+	var ns = "default"
 	var ibcName = "test-ibc"
 
 	BeforeEach(func() {
