@@ -47,7 +47,7 @@ spec:
   sidecars:
   - name: csi-node-driver-registrar
     repository: registry.redhat.io/openshift4/ose-csi-driver-registrar
-    tag: v4.3
+    tag: v4.4
     imagePullPolicy: IfNotPresent
   - name: csi-provisioner
     repository: registry.redhat.io/openshift4/ose-csi-external-provisioner-rhel7
@@ -55,7 +55,7 @@ spec:
     imagePullPolicy: IfNotPresent
   - name: csi-attacher
     repository: registry.redhat.io/openshift4/ose-csi-external-attacher
-    tag: v4.3
+    tag: v4.4
     imagePullPolicy: IfNotPresent
   - name: csi-snapshotter
     repository: registry.redhat.io/openshift4/ose-csi-external-snapshotter-rhel7
@@ -63,5 +63,5 @@ spec:
     imagePullPolicy: IfNotPresent
   - name: livenessprobe
     repository: registry.redhat.io/openshift4/ose-csi-livenessprobe
-    tag: v4.3
+    tag: v4.4
     imagePullPolicy: IfNotPresent
