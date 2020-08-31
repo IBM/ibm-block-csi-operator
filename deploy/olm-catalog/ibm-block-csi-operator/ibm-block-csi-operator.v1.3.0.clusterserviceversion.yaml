@@ -75,7 +75,7 @@ metadata:
               {
                 "name": "csi-node-driver-registrar",
                 "repository": "registry.redhat.io/openshift4/ose-csi-driver-registrar",
-                "tag": "v4.4",
+                "tag": "v4.3",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
