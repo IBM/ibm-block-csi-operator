@@ -23,8 +23,8 @@ const (
 	CSILivenessProbeImage       = "quay.io/k8scsi/livenessprobe:v1.1.0"
 	CSISnapshotterImage      	= "quay.io/k8scsi/csi-snapshotter:v2.1.0"
 
-	ControllerTag = "1.2.0"
-	NodeTag       = "1.2.0"
+	ControllerTag = "1.3.0"
+	NodeTag       = "1.3.0"
 	NodeAgentTag  = "1.0.0"
 
 	DefaultNamespace = "default"
