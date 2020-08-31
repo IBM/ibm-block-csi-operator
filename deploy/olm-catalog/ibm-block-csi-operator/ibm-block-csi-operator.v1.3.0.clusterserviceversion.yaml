@@ -128,7 +128,7 @@ spec:
 
     Supported operating systems:
       - RHEL 7.x (x86 architecture)
-      - RHCOS (x86 and IBM Z architecture)
+      - RHCOS (x86, IBM Z, and IBM PowerPC architectures)
 
     Full documentation can be found on the [IBM Knowledge Center](https://www.ibm.com/support/knowledgecenter/SSRQ8T).
 
@@ -288,7 +288,7 @@ spec:
     ```bash
     $ kubectl get pod -l app.kubernetes.io/name=ibm-block-csi-operator -n <namespace>
     NAME                                    READY   STATUS    RESTARTS   AGE
-    ibm-block-csi-operator-5bb7996b86-xntss 2/2     Running   0          10m
+    ibm-block-csi-operator-5bb7996b86-xntss 1/1     Running   0          10m
     ```
 
     ### Create an IBMBlockCSI custom resource
