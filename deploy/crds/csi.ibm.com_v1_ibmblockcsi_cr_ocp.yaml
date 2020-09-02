@@ -55,7 +55,7 @@ spec:
     imagePullPolicy: IfNotPresent
   - name: csi-attacher
     repository: registry.redhat.io/openshift4/ose-csi-external-attacher
-    tag: v4.3
+    tag: v4.4
     imagePullPolicy: IfNotPresent
   - name: csi-snapshotter
     repository: registry.redhat.io/openshift4/ose-csi-external-snapshotter-rhel7
@@ -63,5 +63,5 @@ spec:
     imagePullPolicy: IfNotPresent
   - name: livenessprobe
     repository: registry.redhat.io/openshift4/ose-csi-livenessprobe
-    tag: v4.3
+    tag: v4.4
     imagePullPolicy: IfNotPresent
