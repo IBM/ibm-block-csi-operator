@@ -5,7 +5,7 @@ This file details additional third party software license agreements
 and third party notices and information that are required 
 to be reproduced for the following programs:
    
-Operator for IBM Block Storage CSI Driver version 1.2.0
+Operator for IBM Block Storage CSI Driver version 1.3.0
 
 
 
@@ -13,7 +13,7 @@ Operator for IBM Block Storage CSI Driver version 1.2.0
 Section 1 - TERMS AND CONDITIONS FOR SEPARATELY LICENSED CODE
 ===========================================================================
 
-The "Separately Licensed Code" identified in Section 1 of this 
+The "Separately Licensed Code" identified in Section 1 of this
 document is provided to Licensee under terms and conditions that
 are different from the license agreement for the Program.
 
@@ -31,15 +31,15 @@ Red Hat Universal Base Image Version 7
 
 @@@@@@@@@@@@
 ===========================================================================
-GNU LESSER GENERAL PUBLIC LICENSE VERSION 3.0: THE FOLLOWING TERMS AND 
-CONDITIONS APPLY to the listed components below which are licensed under 
+GNU LESSER GENERAL PUBLIC LICENSE VERSION 3.0: THE FOLLOWING TERMS AND
+CONDITIONS APPLY to the listed components below which are licensed under
 the GNU LESSER GENERAL PUBLIC LICENSE VERSION 3.0:
 
-Portions of prometheus version 1.8.2 
+Portions of prometheus version 1.8.2
 
 ---------------------------------------------------------------------------
 Start of GNU LGPL Version 3.0 License
---------------------------------------------------------------------------- 
+---------------------------------------------------------------------------
 
 		   GNU LESSER GENERAL PUBLIC LICENSE
                     Version 3, 29 June 2007
@@ -208,7 +208,7 @@ permanent authorization for you to choose that version for the
 Library.
 
 ---------------------------------------------------------------------------
-End of GNU LGPL Version 3.0 License 
+End of GNU LGPL Version 3.0 License
 ---------------------------------------------------------------------------
 
 
@@ -908,124 +908,124 @@ END USER LICENSE AGREEMENT
 
 RED HAT UNIVERSAL BASE IMAGE
 
-PLEASE READ THIS END USER LICENSE AGREEMENT CAREFULLY BEFORE USING 
-SOFTWARE FROM RED HAT. BY USING RED HAT SOFTWARE, YOU SIGNIFY YOUR 
-ASSENT TO AND ACCEPTANCE OF THIS END USER LICENSE AGREEMENT AND 
-ACKNOWLEDGE YOU HAVE READ AND UNDERSTAND THE TERMS. AN INDIVIDUAL ACTING 
-ON BEHALF OF AN ENTITY REPRESENTS THAT HE OR SHE HAS THE AUTHORITY TO 
-ENTER INTO THIS END USER LICENSE AGREEMENT ON BEHALF OF THAT ENTITY. IF 
-YOU DO NOT ACCEPT THE TERMS OF THIS AGREEMENT, THEN YOU MUST NOT USE THE 
-RED HAT SOFTWARE. THIS END USER LICENSE AGREEMENT DOES NOT PROVIDE ANY 
-RIGHTS TO RED HAT SERVICES SUCH AS SOFTWARE MAINTENANCE, UPGRADES OR 
-SUPPORT. PLEASE REVIEW YOUR SERVICE OR SUBSCRIPTION AGREEMENT(S) THAT 
-YOU MAY HAVE WITH RED HAT OR OTHER AUTHORIZED RED HAT SERVICE PROVIDERS 
-REGARDING SERVICES AND ASSOCIATED PAYMENTS. 
+PLEASE READ THIS END USER LICENSE AGREEMENT CAREFULLY BEFORE USING
+SOFTWARE FROM RED HAT. BY USING RED HAT SOFTWARE, YOU SIGNIFY YOUR
+ASSENT TO AND ACCEPTANCE OF THIS END USER LICENSE AGREEMENT AND
+ACKNOWLEDGE YOU HAVE READ AND UNDERSTAND THE TERMS. AN INDIVIDUAL ACTING
+ON BEHALF OF AN ENTITY REPRESENTS THAT HE OR SHE HAS THE AUTHORITY TO
+ENTER INTO THIS END USER LICENSE AGREEMENT ON BEHALF OF THAT ENTITY. IF
+YOU DO NOT ACCEPT THE TERMS OF THIS AGREEMENT, THEN YOU MUST NOT USE THE
+RED HAT SOFTWARE. THIS END USER LICENSE AGREEMENT DOES NOT PROVIDE ANY
+RIGHTS TO RED HAT SERVICES SUCH AS SOFTWARE MAINTENANCE, UPGRADES OR
+SUPPORT. PLEASE REVIEW YOUR SERVICE OR SUBSCRIPTION AGREEMENT(S) THAT
+YOU MAY HAVE WITH RED HAT OR OTHER AUTHORIZED RED HAT SERVICE PROVIDERS
+REGARDING SERVICES AND ASSOCIATED PAYMENTS.
 
-This end user license agreement (“EULA”) governs the use of Red Hat 
-Universal Base Image and associated software supporting such 
-container(s) and any related updates, source code, including the 
-appearance, structure and organization (the “Programs”), regardless 
-of the delivery mechanism. If a Red Hat Universal Base Image is included 
-in another Red Hat product, the EULA terms of such other Red Hat product 
-will apply and supersede this EULA. If a Red Hat Universal Base Image is 
-included in a third party work, the terms of this EULA will continue to 
-govern the Red Hat Universal Base Image. 
+This end user license agreement (“EULA”) governs the use of Red Hat
+Universal Base Image and associated software supporting such
+container(s) and any related updates, source code, including the
+appearance, structure and organization (the “Programs”), regardless
+of the delivery mechanism. If a Red Hat Universal Base Image is included
+in another Red Hat product, the EULA terms of such other Red Hat product
+will apply and supersede this EULA. If a Red Hat Universal Base Image is
+included in a third party work, the terms of this EULA will continue to
+govern the Red Hat Universal Base Image.
 
-1. License Grant. Subject to the terms of this EULA, Red Hat, Inc. 
-(“Red Hat”) grants to you a perpetual, worldwide license to the 
-Programs (each of which may include multiple software components). With 
-the exception of the Red Hat trademark identified in Section 2 below, 
-each software component is governed by a license that permits you to 
-run, copy, modify, and redistribute (subject to certain obligations in 
-some cases) the software components. This EULA pertains solely to the 
-Programs and does not limit your rights under, or grant you rights that 
-supersede, the license terms applicable to any particular component. The 
-license terms applicable to each software component are provided in the 
-source code of that component. 
+1. License Grant. Subject to the terms of this EULA, Red Hat, Inc.
+(“Red Hat”) grants to you a perpetual, worldwide license to the
+Programs (each of which may include multiple software components). With
+the exception of the Red Hat trademark identified in Section 2 below,
+each software component is governed by a license that permits you to
+run, copy, modify, and redistribute (subject to certain obligations in
+some cases) the software components. This EULA pertains solely to the
+Programs and does not limit your rights under, or grant you rights that
+supersede, the license terms applicable to any particular component. The
+license terms applicable to each software component are provided in the
+source code of that component.
 
-2. Intellectual Property Rights. The Programs and each of their 
-components are owned by Red Hat and other licensors and are protected 
-under copyright law and other laws as applicable. Title to the Programs 
-and any component shall remain with Red Hat and other licensors, subject 
-to the applicable license, excluding any independently developed and 
-licensed work. The “Red Hat” trademark is a registered trademark of 
-Red Hat and its affiliates in the U.S. and other countries. Subject to 
-Red Hat’s trademark usage guidelines (set forth at 
-http://www.redhat.com/about/corporate/trademark/), this EULA permits you 
-to distribute the Programs that include the Red Hat trademark, provided 
-you do not make any statements on behalf of Red Hat, including but not 
-limited to, stating or in any way suggesting (in any public, private 
-and/or confidential statement (whether written or verbal)) that Red Hat 
-supports or endorses software built and delivered with a Red Hat 
-Universal Base Image(s) (such derivative works referred to as a “Red 
-Hat Based Container Images”); provided if a Red Hat Based Container 
-Image is Red Hat Certified and deployed on a Red Hat supported 
-configuration as set forth at https://access.redhat.com/articles/2726611 
-then you may state that the Red Hat Universal Base Image is supported by 
-Red Hat. You agree to include this unmodified EULA in all distributions 
-of container images sourced, built or otherwise derived from the 
-Programs. If you modify the Red Hat Universal Base Image(s), you must 
-remove any Red Hat trademark(s) prior to any subsequent distribution. 
-Any breach of this Section 2 is a material breach of the EULA and you 
-may no longer use and/or distribute the Red Hat trademark(s). 
-Modifications to the software may corrupt the Programs. 
+2. Intellectual Property Rights. The Programs and each of their
+components are owned by Red Hat and other licensors and are protected
+under copyright law and other laws as applicable. Title to the Programs
+and any component shall remain with Red Hat and other licensors, subject
+to the applicable license, excluding any independently developed and
+licensed work. The “Red Hat” trademark is a registered trademark of
+Red Hat and its affiliates in the U.S. and other countries. Subject to
+Red Hat’s trademark usage guidelines (set forth at
+http://www.redhat.com/about/corporate/trademark/), this EULA permits you
+to distribute the Programs that include the Red Hat trademark, provided
+you do not make any statements on behalf of Red Hat, including but not
+limited to, stating or in any way suggesting (in any public, private
+and/or confidential statement (whether written or verbal)) that Red Hat
+supports or endorses software built and delivered with a Red Hat
+Universal Base Image(s) (such derivative works referred to as a “Red
+Hat Based Container Images”); provided if a Red Hat Based Container
+Image is Red Hat Certified and deployed on a Red Hat supported
+configuration as set forth at https://access.redhat.com/articles/2726611
+then you may state that the Red Hat Universal Base Image is supported by
+Red Hat. You agree to include this unmodified EULA in all distributions
+of container images sourced, built or otherwise derived from the
+Programs. If you modify the Red Hat Universal Base Image(s), you must
+remove any Red Hat trademark(s) prior to any subsequent distribution.
+Any breach of this Section 2 is a material breach of the EULA and you
+may no longer use and/or distribute the Red Hat trademark(s).
+Modifications to the software may corrupt the Programs.
 
-3. Limited Warranty. Except as specifically stated in this Section 3, a 
-separate agreement with Red Hat, or a license for a particular 
-component, to the maximum extent permitted under applicable law, the 
-Programs and the components are provided and licensed “as is” 
-without warranty of any kind, expressed or implied, including the 
-implied warranties of merchantability, non-infringement or fitness for a 
-particular purpose. Neither Red Hat nor its affiliates warrant that the 
-functions contained in the Programs will meet your requirements or that 
-the operation of the Programs will be entirely error free, appear or 
-perform precisely as described in the accompanying documentation, or 
-comply with regulatory requirements. Red Hat warrants that the media on 
-which the Programs and the components are provided will be free from 
-defects in materials and manufacture under normal use for a period of 30 
-days from the date of delivery to you. This warranty extends only to the 
-party that purchases subscription services for the supported 
-configurations from Red Hat and/or its affiliates or a Red Hat 
-authorized distributor. 
+3. Limited Warranty. Except as specifically stated in this Section 3, a
+separate agreement with Red Hat, or a license for a particular
+component, to the maximum extent permitted under applicable law, the
+Programs and the components are provided and licensed “as is”
+without warranty of any kind, expressed or implied, including the
+implied warranties of merchantability, non-infringement or fitness for a
+particular purpose. Neither Red Hat nor its affiliates warrant that the
+functions contained in the Programs will meet your requirements or that
+the operation of the Programs will be entirely error free, appear or
+perform precisely as described in the accompanying documentation, or
+comply with regulatory requirements. Red Hat warrants that the media on
+which the Programs and the components are provided will be free from
+defects in materials and manufacture under normal use for a period of 30
+days from the date of delivery to you. This warranty extends only to the
+party that purchases subscription services for the supported
+configurations from Red Hat and/or its affiliates or a Red Hat
+authorized distributor.
 
-4. Limitation of Remedies and Liability. To the maximum extent permitted 
-by applicable law, your exclusive remedy under this EULA is to return 
-any defective media within 30 days of delivery along with a copy of your 
-payment receipt and Red Hat, at its option, will replace it or refund 
-the money you paid for the media. To the maximum extent permitted under 
-applicable law, under no circumstances will Red Hat, its affiliates, any 
-Red Hat authorized distributor, or the licensor of any component 
-provided to you under this EULA be liable to you for any incidental or 
-consequential damages, including lost profits or lost savings arising 
-out of the use or inability to use the Programs or any component, even 
-if Red Hat, its affiliates, an authorized distributor, and/or licensor 
-has been advised of the possibility of such damages. In no event shall 
-Red Hat's or its affiliates’ liability, an authorized distributor’s 
-liability or the liability of the licensor of a component provided to 
-you under this EULA exceed the amount that you paid to Red Hat for the 
-media under this EULA. 
+4. Limitation of Remedies and Liability. To the maximum extent permitted
+by applicable law, your exclusive remedy under this EULA is to return
+any defective media within 30 days of delivery along with a copy of your
+payment receipt and Red Hat, at its option, will replace it or refund
+the money you paid for the media. To the maximum extent permitted under
+applicable law, under no circumstances will Red Hat, its affiliates, any
+Red Hat authorized distributor, or the licensor of any component
+provided to you under this EULA be liable to you for any incidental or
+consequential damages, including lost profits or lost savings arising
+out of the use or inability to use the Programs or any component, even
+if Red Hat, its affiliates, an authorized distributor, and/or licensor
+has been advised of the possibility of such damages. In no event shall
+Red Hat's or its affiliates’ liability, an authorized distributor’s
+liability or the liability of the licensor of a component provided to
+you under this EULA exceed the amount that you paid to Red Hat for the
+media under this EULA.
 
-5. Export Control. As required by the laws of the United States and 
-other countries, you represent and warrant that you: (a) understand that 
-the Programs and their components may be subject to export controls 
-under the U.S. Commerce Department’s Export Administration Regulations 
-(“EAR”); (b) are not located in a prohibited destination country 
-under the EAR or U.S. sanctions regulations (currently Cuba, Iran, North 
-Korea, Sudan, Syria, and the Crimea Region of Ukraine, subject to change 
-as posted by the United States government); (c) will not export, 
-re-export, or transfer the Programs to any prohibited destination, 
-persons or entities on the U.S. Bureau of Industry and Security Denied 
-Parties List or Entity List, or the U.S. Office of Foreign Assets 
-Control list of Specially Designated Nationals and Blocked Persons, or 
-any similar lists maintained by other countries, without the necessary 
-export license(s) or authorizations(s); (d) will not use or transfer the 
-Programs for use in connection with any nuclear, chemical or biological 
-weapons, missile technology, or military end-uses where prohibited by an 
-applicable arms embargo, unless authorized by the relevant government 
-agency by regulation or specific license; (e) understand and agree that 
-if you are in the United States and export or transfer the Programs to 
-eligible end users, you will, to the extent required by EAR Section 
-740.17(e), submit semi-annual reports to 
+5. Export Control. As required by the laws of the United States and
+other countries, you represent and warrant that you: (a) understand that
+the Programs and their components may be subject to export controls
+under the U.S. Commerce Department’s Export Administration Regulations
+(“EAR”); (b) are not located in a prohibited destination country
+under the EAR or U.S. sanctions regulations (currently Cuba, Iran, North
+Korea, Sudan, Syria, and the Crimea Region of Ukraine, subject to change
+as posted by the United States government); (c) will not export,
+re-export, or transfer the Programs to any prohibited destination,
+persons or entities on the U.S. Bureau of Industry and Security Denied
+Parties List or Entity List, or the U.S. Office of Foreign Assets
+Control list of Specially Designated Nationals and Blocked Persons, or
+any similar lists maintained by other countries, without the necessary
+export license(s) or authorizations(s); (d) will not use or transfer the
+Programs for use in connection with any nuclear, chemical or biological
+weapons, missile technology, or military end-uses where prohibited by an
+applicable arms embargo, unless authorized by the relevant government
+agency by regulation or specific license; (e) understand and agree that
+if you are in the United States and export or transfer the Programs to
+eligible end users, you will, to the extent required by EAR Section
+740.17(e), submit semi-annual reports to
 
 Red Hat Universal Base Image
 End User License Agreement
@@ -1039,8 +1039,8 @@ Version 7
 
 
 ===========================================================================
-END OF TERMS AND CONDITIONS FOR SEPARATELY LICENSED CODE for Operator for 
-IBM Block Storage CSI Driver version 1.2.0
+END OF TERMS AND CONDITIONS FOR SEPARATELY LICENSED CODE for Operator for
+IBM Block Storage CSI Driver version 1.3.0
 ===========================================================================
 
 
@@ -1051,7 +1051,7 @@ IBM Block Storage CSI Driver version 1.2.0
 
 GNU GPL and / or LGPL Source Code for:
 
-Operator for IBM Block Storage CSI Driver Version 1.2.0 Third Party
+Operator for IBM Block Storage CSI Driver Version 1.3.0 Third Party
 Licenses and Notices
 
 ===========================================================================
@@ -1070,9 +1070,9 @@ under the GNU Lesser General Public License 3.0.
     Prometheus version 1.8.2
 
 Source code to any of the above-listed packages distributed with
-Operator for IBM Block Storage CSI Driver Version 1.2.0 Third Party
+Operator for IBM Block Storage CSI Driver Version 1.3.0 Third Party
 Licenses and Notices is available at the website below, when a URL is
-provided, or by sending a request to the following address or email: 
+provided, or by sending a request to the following address or email:
 
     IBM Corporation
     Attn: Dept 4XNA / 9032-2, Storage Open Source Management
@@ -1090,11 +1090,11 @@ END of GNU LGPL Version 3.0 Notices and Information
 Section 2 - NOTICES and INFORMATION
 =========================================================================
 
-Notwithstanding the terms and conditions of any other agreement Licensee 
-may have with IBM or any of its related or affiliated entities 
-(collectively "IBM"), the third party code identified below is subject 
-to the terms and conditions of the license agreement for the 
-Program and not the license terms that may be contained in the notices 
+Notwithstanding the terms and conditions of any other agreement Licensee
+may have with IBM or any of its related or affiliated entities
+(collectively "IBM"), the third party code identified below is subject
+to the terms and conditions of the license agreement for the
+Program and not the license terms that may be contained in the notices
 below. The notices are provided for informational purposes.
 
 IMPORTANT: IBM does not represent or warrant that the information in this
@@ -1565,7 +1565,7 @@ Licensed under the MIT License
 Rickshaw
 https://github.com/shutterstock/rickshaw
 Copyright 2011-2014 by Shutterstock Images, LLC
-See https://github.com/shutterstock/rickshaw/blob/master/LICENSE for 
+See https://github.com/shutterstock/rickshaw/blob/master/LICENSE for
 license details
 
 mustache.js
@@ -1603,7 +1603,7 @@ See https://github.com/miekg/dns/blob/master/LICENSE for license details.
 LevelDB key/value database in Go
 https://github.com/syndtr/goleveldb
 Copyright 2012 Suryandaru Triandana
-See https://github.com/syndtr/goleveldb/blob/master/LICENSE for 
+See https://github.com/syndtr/goleveldb/blob/master/LICENSE for
 license details.
 
 gosnappy - a fork of code.google.com/p/snappy-go
@@ -1615,7 +1615,7 @@ icense details.
 go-zookeeper - Native ZooKeeper client for Go
 https://github.com/samuel/go-zookeeper
 Copyright (c) 2013, Samuel Stauffer <samuel@descolada.com>
-See https://github.com/samuel/go-zookeeper/blob/master/LICENSE for 
+See https://github.com/samuel/go-zookeeper/blob/master/LICENSE for
 license details.
 
 ---------------------------------------------------------------------------
@@ -1679,7 +1679,7 @@ Licensed under the MIT License
 Rickshaw
 https://github.com/shutterstock/rickshaw
 Copyright 2011-2014 by Shutterstock Images, LLC
-See https://github.com/shutterstock/rickshaw/blob/master/LICENSE for 
+See https://github.com/shutterstock/rickshaw/blob/master/LICENSE for
 license details
 
 mustache.js
@@ -1712,31 +1712,31 @@ Licensed under the Apache License, Version 2.0
 DNS library in Go
 http://miek.nl/posts/2014/Aug/16/go-dns-package/
 Copyright 2009 The Go Authors, 2011 Miek Gieben
-See https://github.com/miekg/dns/blob/master/LICENSE for 
+See https://github.com/miekg/dns/blob/master/LICENSE for
 license details.
 
 LevelDB key/value database in Go
 https://github.com/syndtr/goleveldb
 Copyright 2012 Suryandaru Triandana
-See https://github.com/syndtr/goleveldb/blob/master/LICENSE for 
+See https://github.com/syndtr/goleveldb/blob/master/LICENSE for
 license details.
 
 gosnappy - a fork of code.google.com/p/snappy-go
 https://github.com/syndtr/gosnappy
 Copyright 2011 The Snappy-Go Authors
-See https://github.com/syndtr/gosnappy/blob/master/LICENSE for 
+See https://github.com/syndtr/gosnappy/blob/master/LICENSE for
 license details.
 
 go-zookeeper - Native ZooKeeper client for Go
 https://github.com/samuel/go-zookeeper
 Copyright (c) 2013, Samuel Stauffer <samuel@descolada.com>
-See https://github.com/samuel/go-zookeeper/blob/master/LICENSE for license 
+See https://github.com/samuel/go-zookeeper/blob/master/LICENSE for license
 details.
 
 ---------------------------------------------------------------------------
 
 AWS SDK for Go
-Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved. 
+Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 Copyright 2014-2015 Stripe, Inc.
 
 ---------------------------------------------------------------------------
@@ -1805,9 +1805,9 @@ Copyright (C) 2006 - 2019, The Apache Software Foundation
 
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
- 
+
 ===========================================================================
-END OF APACHE 2.0 NOTICES AND INFORMATION 
+END OF APACHE 2.0 NOTICES AND INFORMATION
 ===========================================================================
 
 
@@ -2040,24 +2040,24 @@ The MIT License (MIT)
 
 Copyright (c) 2013 Ben Johnson
 
-Permission is hereby granted, free of charge, to any person obtaining a 
-copy of this software and associated documentation files (the 
-"Software"), to deal in the Software without restriction, including 
-without limitation the rights to use, copy, modify, merge, publish, 
-distribute, sublicense, and/or sell copies of the Software, and to 
-permit persons to whom the Software is furnished to do so, subject to 
-the following conditions: 
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
 
-The above copyright notice and this permission notice shall be included 
-in all copies or substantial portions of the Software. 
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
-OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ---------------------------------------------------------------------------
 
@@ -2286,48 +2286,48 @@ SOFTWARE.
 
 Copyright (c) 2012 Dave Grijalva
 
-Permission is hereby granted, free of charge, to any person obtaining a 
-copy of this software and associated documentation files (the 
-"Software"), to deal in the Software without restriction, including 
-without limitation the rights to use, copy, modify, merge, publish, 
-distribute, sublicense, and/or sell copies of the Software, and to 
-permit persons to whom the Software is furnished to do so, subject to 
-the following conditions: 
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
 
-The above copyright notice and this permission notice shall be included 
-in all copies or substantial portions of the Software. 
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
-OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ---------------------------------------------------------------------------
 MIT License
 
 Copyright (c) 2016 json-iterator
 
-Permission is hereby granted, free of charge, to any person obtaining a 
-copy of this software and associated documentation files (the 
-"Software"), to deal in the Software without restriction, including 
-without limitation the rights to use, copy, modify, merge, publish, 
-distribute, sublicense, and/or sell copies of the Software, and to 
-permit persons to whom the Software is furnished to do so, subject to 
-the following conditions: 
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
 
-The above copyright notice and this permission notice shall be included 
-in all copies or substantial portions of the Software. 
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
-OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ---------------------------------------------------------------------------
 
@@ -2728,7 +2728,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ===========================================================================
-END OF apiextensions-apiserver version 1.1.14 NOTICES AND INFORMATION 
+END OF apiextensions-apiserver version 1.1.14 NOTICES AND INFORMATION
 ===========================================================================
 
 
@@ -2811,7 +2811,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ===========================================================================
 END OF code-generator-kubernetes version 1.13.1 NOTICES AND
-INFORMATION 
+INFORMATION
 ===========================================================================
 
 
@@ -2844,7 +2844,7 @@ SOFTWARE.
 
 
 ===========================================================================
-END OF deep version 1.0.4 NOTICES AND INFORMATION 
+END OF deep version 1.0.4 NOTICES AND INFORMATION
 ===========================================================================
 
 
@@ -2881,7 +2881,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ===========================================================================
-END OF errors version 0.8.1 NOTICES AND INFORMATION 
+END OF errors version 0.8.1 NOTICES AND INFORMATION
 ===========================================================================
 
 
@@ -2919,24 +2919,24 @@ Copyright (c) Yasuhiro MATSUMOTO <mattn.jp@gmail.com>
 
 MIT License (Expat)
 
-Permission is hereby granted, free of charge, to any person obtaining a 
-copy of this software and associated documentation files (the 
-"Software"), to deal in the Software without restriction, including 
-without limitation the rights to use, copy, modify, merge, publish, 
-distribute, sublicense, and/or sell copies of the Software, and to 
-permit persons to whom the Software is furnished to do so, subject to 
-the following conditions: 
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
 
-The above copyright notice and this permission notice shall be included 
-in all copies or substantial portions of the Software. 
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
-OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ---------------------------------------------------------------------------
 
@@ -2944,28 +2944,28 @@ The MIT License (MIT)
 
 Copyright (c) 2016 Yasuhiro Matsumoto
 
-Permission is hereby granted, free of charge, to any person obtaining a 
-copy of this software and associated documentation files (the 
-"Software"), to deal in the Software without restriction, including 
-without limitation the rights to use, copy, modify, merge, publish, 
-distribute, sublicense, and/or sell copies of the Software, and to 
-permit persons to whom the Software is furnished to do so, subject to 
-the following conditions: 
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
 
-The above copyright notice and this permission notice shall be included 
-in all copies or substantial portions of the Software. 
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
-OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 ===========================================================================
-END OF ginkgo version 1.8.0 NOTICES AND INFORMATION 
+END OF ginkgo version 1.8.0 NOTICES AND INFORMATION
 ===========================================================================
 
 
@@ -3022,7 +3022,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 ===========================================================================
-END OF gomega version 1.5.0 NOTICES AND INFORMATION 
+END OF gomega version 1.5.0 NOTICES AND INFORMATION
 ===========================================================================
 
 
@@ -3110,7 +3110,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 ===========================================================================
-END OF grpc version 1.19.1 NOTICES AND INFORMATION 
+END OF grpc version 1.19.1 NOTICES AND INFORMATION
 ===========================================================================
 
 
@@ -3152,7 +3152,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ===========================================================================
-END OF mergo version 0.3.7 NOTICES AND INFORMATION 
+END OF mergo version 0.3.7 NOTICES AND INFORMATION
 ===========================================================================
 
 
@@ -3194,7 +3194,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ===========================================================================
-END OF pflag version 1.0.3 NOTICES AND INFORMATION 
+END OF pflag version 1.0.3 NOTICES AND INFORMATION
 ===========================================================================
 
 
@@ -3208,17 +3208,17 @@ MPL 2.0: The Program includes MPL 2.0 software. IBM obtained the MPL
 ===========================================================================
 Mozilla Public License, Version 2.0
 
-The Program includes some or all of the following that IBM obtained 
-under the Mozilla PuIblic License, Version 1.1 (source code available 
+The Program includes some or all of the following that IBM obtained
+under the Mozilla PuIblic License, Version 1.1 (source code available
 via the indicated URL):
 
 ---------------------------------------------------------------------------
 
-Portions of prometheus-operator 
- (https://github.com/coreos/prometheus-operator) 
+Portions of prometheus-operator
+ (https://github.com/coreos/prometheus-operator)
 
-Portions of prometheus 
- (https://github.com/prometheus/prometheus 
+Portions of prometheus
+ (https://github.com/prometheus/prometheus
 
 
 ===========================================================================
@@ -3227,7 +3227,7 @@ End of Mozilla Public License, Version 2.0
 
 
 ===========================================================================
-END OF MPL 2.0 NOTICES AND INFORMATION 
+END OF MPL 2.0 NOTICES AND INFORMATION
 ===========================================================================
 
 
@@ -4038,28 +4038,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Copyright (C) 2013 Keith Rarick, Blake Mizerany
 
-Permission is hereby granted, free of charge, to any person obtaining a 
-copy of this software and associated documentation files (the 
-"Software"), to deal in the Software without restriction, including 
-without limitation the rights to use, copy, modify, merge, publish, 
-distribute, sublicense, and/or sell copies of the Software, and to 
-permit persons to whom the Software is furnished to do so, subject to 
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
 the following conditions:
 
-The above copyright notice and this permission notice shall be included 
+The above copyright notice and this permission notice shall be included
 in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
-OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 ===========================================================================
-END OF prometheus-operator version 0.31.1 NOTICES AND INFORMATION 
+END OF prometheus-operator version 0.31.1 NOTICES AND INFORMATION
 ===========================================================================
 
 
@@ -4417,24 +4417,24 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 Copyright (c) 2016 Mail.Ru Group
 
-Permission is hereby granted, free of charge, to any person obtaining a 
-copy of this software and associated documentation files (the 
-"Software"), to deal in the Software without restriction, including 
-without limitation the rights to use, copy, modify, merge, publish, 
-distribute, sublicense, and/or sell copies of the Software, and to 
-permit persons to whom the Software is furnished to do so, subject to 
-the following conditions: 
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
 
-The above copyright notice and this permission notice shall be included 
-in all copies or substantial portions of the Software. 
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
-OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ---------------------------------------------------------------------------
 
@@ -4713,16 +4713,16 @@ and/or other materials provided with the distribution.
 contributors may be used to endorse or promote products derived from
 this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS 
-IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED 
-TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
-PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
-HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED 
-TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ---------------------------------------------------------------------------
@@ -4887,7 +4887,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 ===========================================================================
-END OF prometheus version 1.8.2 NOTICES AND INFORMATION 
+END OF prometheus version 1.8.2 NOTICES AND INFORMATION
 ===========================================================================
 
 
@@ -4928,7 +4928,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ===========================================================================
-END OF protobuf version 1.3.1 NOTICES AND INFORMATION 
+END OF protobuf version 1.3.1 NOTICES AND INFORMATION
 ===========================================================================
 
 
@@ -4941,24 +4941,24 @@ following license(s):
 
 Copyright (c) <2006> <Martin J. Logan, Erlware>
 
-Permission is hereby granted, free of charge, to any person obtaining a 
-copy of this software (OTP Base, fslib, G.A.S) and associated 
-documentation files (the "Software"), to deal in the Software without 
-restriction, including without limitation the rights to use, copy, 
-modify, merge, publish, distribute, sublicense, and/or sell copies of 
-the Software, and to permit persons to whom the Software is furnished to 
-do so, subject to the following conditions: 
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software (OTP Base, fslib, G.A.S) and associated
+documentation files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use, copy,
+modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to
+do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included 
-in all copies or substantial portions of the Software. 
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
-OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ---------------------------------------------------------------------------
 
@@ -4983,20 +4983,20 @@ MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
 EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
 SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ===========================================================================
-END OF thrift NOTICES AND INFORMATION 
+END OF thrift NOTICES AND INFORMATION
 ===========================================================================
 
 
 ===========================================================================
 END OF NOTICES AND INFORMATION FOR Operator for IBM Block
-Storage CSI Driver Version 1.2.0 Third Party Licenses and
+Storage CSI Driver Version 1.3.0 Third Party Licenses and
 Notices 
 ===========================================================================
 
