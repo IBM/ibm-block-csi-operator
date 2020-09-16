@@ -11,7 +11,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: ibm-block-csi-operator
-  namespace: kube-system
+  namespace: default
 roleRef:
   kind: ClusterRole
   name: ibm-block-csi-operator

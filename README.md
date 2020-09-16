@@ -4,13 +4,12 @@ The Container Storage Interface (CSI) Driver for IBM block storage systems enabl
 This is the official operator to deploy and manage IBM block storage CSI driver.
 
 Supported container platforms:
-  - OpenShift v4.3
   - OpenShift v4.4
-  - Kubernetes v1.16
+  - OpenShift v4.5
   - Kubernetes v1.17
+  - Kubernetes v1.18
 
 Supported IBM storage systems:
-  - IBM FlashSystem 9100
   - IBM Spectrum Virtualize Family (including IBM Flash family members built with IBM Spectrum Virtualize (FlashSystem 5010, 5030, 5100, 7200, 9100, 9200, 9200R) and IBM SAN Volume Controller (SVC) models SV2, SA2)
   - IBM FlashSystem A9000/R
   - IBM DS8880
@@ -18,9 +17,9 @@ Supported IBM storage systems:
 
 Supported operating systems:
   - RHEL 7.x (x86 architecture)
-  - RHCOS (x86 and IBM Z architecture)
+  - RHCOS (x86, IBM Z, and IBM PowerPC architectures)
 
-Full documentation can be found on the [IBM Knowledge Center](https://www.ibm.com/support/knowledgecenter/SSRQ8T).
+Full documentation can be found on the [IBM Knowledge Center] (https://www.ibm.com/support/knowledgecenter/SSRQ8T).
 
 <br/>
 <br/>
@@ -146,7 +145,7 @@ multipath -ll
 ```
 
 #### 3. Configure storage system connectivity
-3.1. Define the hostname of each Kubernetes node on the relevant storage systems with the valid WWPN(for Fibre Channel) or IQN(for iSCSI) of the node.
+3.1. Define the hostname of each Kubernetes node on the relevant storage systems with the valid WWPN (for Fibre Channel) or IQN (for iSCSI) of the node.
 
 3.2. For Fibre Channel, configure the relevant zoning from the storage to the host.
 
@@ -168,6 +167,7 @@ curl https://raw.githubusercontent.com/IBM/ibm-block-csi-operator/master/deploy/
 ```
 
 #### 2. (Optional): If required, update the image fields in the ibm-block-csi-operator.yaml.
+**Note**: Updating the namespace to a user-defined namespace may be necessary in order to ensure consistency and avoid trouble installing the operator.
 
 
 #### 3. Create a namespace.
@@ -187,7 +187,7 @@ $ kubectl -n <namespace> apply -f ibm-block-csi-operator.yaml
 ```bash
 $ kubectl get pod -l app.kubernetes.io/name=ibm-block-csi-operator -n <namespace>
 NAME                                    READY   STATUS    RESTARTS   AGE
-ibm-block-csi-operator-5bb7996b86-xntss 2/2     Running   0          10m
+ibm-block-csi-operator-5bb7996b86-xntss 1/1     Running   0          10m
 ```
 
 ### Create an IBMBlockCSI custom resource
@@ -323,7 +323,7 @@ storageclass.storage.k8s.io/gold created
 
 ## Upgrading
 
-In order to upgrade the CSI operator and driver from a previous version, uninstall the existing driver and then install the newer version.
+In order to upgrade the CSI operator and driver from a previous version, uninstall the existing operator and driver, and then install the newer version.
 
 ## Uninstalling
 
