@@ -11,7 +11,7 @@ Supported container platforms (and architectures):
   - Kubernetes v1.18 (x86)
 
 Supported IBM storage systems:
-  - IBM Spectrum Virtualize Family (including IBM Flash family members built with IBM Spectrum Virtualize (FlashSystem 5010, 5030, 5100, 7200, 9100, 9200, 9200R) and IBM SAN Volume Controller (SVC) models SV2, SA2)
+  - IBM Spectrum Virtualize Family including IBM SAN Volume Controller (SVC) and IBM FlashSystem® family members built with IBM Spectrum® Virtualize (FlashSystem 5010, 5030, 5100, 7200, 9100, 9200, 9200R)
   - IBM FlashSystem A9000/R
   - IBM DS8880
   - IBM DS8900
