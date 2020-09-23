@@ -12,7 +12,7 @@ latest_jobs_name = {}
 jobs_status = {}
 last_builds = {}
 
-
+# Get all the jobs in the jenkins
 def get_all_jenkins_jobs_names():
     all_jenkins_jobs_rest_api_url = '{0}/api/json?tree=jobs[name]'.format(
         jenkins_url)
@@ -22,7 +22,7 @@ def get_all_jenkins_jobs_names():
     message = json.loads(message.text)
     return message['jobs']
 
-
+# determain if the current job is the current latest
 def get_list_of_latest_jobs(
         latest_job,
         latest_major_version,
@@ -37,7 +37,7 @@ def get_list_of_latest_jobs(
             latest_minor_version[0] = int(job_name_splited[1])
             latest_jobs_name[latest_job] = job_name
 
-
+# Get all the jobs in the jenkins and return only the latest jobs
 def get_the_desired_jobs(jobs):
     latest_k8s_major_version = [0]
     latest_k8s_minor_version = [0]
@@ -88,7 +88,7 @@ def get_the_desired_jobs(jobs):
 
     return latest_jobs_name
 
-
+# This function gets all the latests jobs and execute them with the desired parameters
 def execute_latest_jobs(latest_jobs_name, server):
 
     for key in latest_jobs_name:
@@ -111,7 +111,7 @@ def execute_latest_jobs(latest_jobs_name, server):
                               'CSI_NODE_IMAGE': '',
                               'INSTALLATION_METHOD': 'UNMANAGED'})
 
-
+# This function gets all the latests Jenkins jobs and wait until all of them are finish
 def wait_until_all_jobs_finish_running(latest_jobs_name, server):
     time.sleep(5)
 
@@ -128,7 +128,7 @@ def wait_until_all_jobs_finish_running(latest_jobs_name, server):
     if None in jobs_status.values() or 'FAILURE' in jobs_status.values():
         raise Exception("There are jobs that didn't succeded")
 
-
+# Function that waits for one job
 def wait_for_jobs_to_finish(
         last_job_number,
         job_name,
@@ -158,7 +158,7 @@ def wait_for_jobs_to_finish(
         jobs_status["{0}_OLM".format(job_name)] = server.get_build_info(
             job_name, last_job_number)['result']
 
-
+# connect to the jenkins for execution use
 def connect_to_jenkins():
     server = jenkins.Jenkins(
         jenkins_url,
