@@ -44,10 +44,14 @@ def get_the_desired_jobs(jobs):
         if 'production_z' in job['name'].lower() and  'svc' in job['name'].lower() and 'deprecated' not in job['name'].lower():
             get_list_of_latest_jobs(latest_z_ocp_job, latest_z_ocp_major_version, latest_z_ocp_minor_version, job['name'])
     
-    print(latest_k8s_job[0])
-    print(latest_x86_ocp_job[0])
-    print(latest_z_ocp_job[0])
+    latest_jobs = [latest_k8s_job[0], latest_x86_ocp_job[0], latest_z_ocp_job[0]]
+    return latest_jobs
+
+def write_each_job_as_environment_variable(jobs_array):
+    f = open("/root/git/ibm-block-csi-operator/publish/env.propert", "w")
+    f.write("x86_k8s_svc_jenkins_job={0}\nx86_ocp_svc_jenkins_job={1}\nz_ocp_svc_jenkins_job={2}".format(jobs_array[0], jobs_array[1], jobs_array[2]))
 
 if __name__ == "__main__":
     jobs = get_all_jenkins_jobs_names()
-    get_the_desired_jobs(jobs)
+    jobs_array = get_the_desired_jobs(jobs)
+    write_each_job_as_environment_variable(jobs_array)
