@@ -8,4 +8,4 @@ do
     else
     	echo z_ocp_svc_jenkins_job=$job >> $WORKSPACE/env.propert
     fi
-don
+done
