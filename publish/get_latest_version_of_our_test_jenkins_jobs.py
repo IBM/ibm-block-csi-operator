@@ -48,7 +48,7 @@ def get_the_desired_jobs(jobs):
     return latest_jobs
 
 def write_each_job_as_environment_variable(jobs_array):
-    f = open("/root/git/ibm-block-csi-operator/publish/env.propert", "w")
+    f = open("{}/env.propert".format(os.getenv('WORKSPACE')), "w")
     f.write("x86_k8s_svc_jenkins_job={0}\nx86_ocp_svc_jenkins_job={1}\nz_ocp_svc_jenkins_job={2}".format(jobs_array[0], jobs_array[1], jobs_array[2]))
 
 if __name__ == "__main__":
