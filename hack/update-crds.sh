@@ -23,6 +23,6 @@ if ! [ -x "$(command -v operator-sdk)" ]; then
   exit 1
 fi
 
-operator-sdk generate k8s
+#operator-sdk generate k8s
 
-operator-sdk generate openapi
+#operator-sdk generate openapi
