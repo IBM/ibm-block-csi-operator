@@ -2,7 +2,7 @@ pipeline {
     environment {
         registryCredential = 'csi_w3_user'
         artifactory_path = 'build/_output/reports/images_url'
-        registryUrl = 'https://stg-artifactory.haifa.ibm.com:5030'
+        registry_protocol = 'https'
         Dockerfile_operator = 'build/Dockerfile.operator'
         Dockerfile_node = 'build/Dockerfile.nodeagent'
         NODE_IMAGE = 'ibm-node-agent'
@@ -49,6 +49,7 @@ pipeline {
         stage ('push docker images') {
             steps {
                 script {
+                    registryUrl = "${registry_protocol}://${DOCKER_REGISTRY}"
                     if (GIT_BRANCH == 'develop' || GIT_BRANCH == 'origin/develop' || GIT_BRANCH == 'master') {
                         docker.withRegistry(registryUrl, registryCredential ) {
                             operator_image_latest.push()
