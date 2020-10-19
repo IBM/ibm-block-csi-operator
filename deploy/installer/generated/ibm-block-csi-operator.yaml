@@ -1430,9 +1430,10 @@ spec:
         product: ibm-block-csi-driver
         csi: ibm
       annotations:
-        productName: ibm-block-csi-operator
-        productID: ibm-block-csi-operator
+        productName: "IBM Block CSI Driver"
+        productID: "5027566ef6c54de49028be7df25119e1"
         productVersion: "1.4.0"
+        productMetric: "FREE"
     spec:
       serviceAccountName: ibm-block-csi-operator
       affinity:
@@ -1735,4 +1736,4 @@ metadata:
     app.kubernetes.io/name: ibm-block-csi-operator
     app.kubernetes.io/instance: ibm-block-csi-operator
     app.kubernetes.io/managed-by: ibm-block-csi-operator
-    release: ibm-block-csi-operator
+    release: v1.4.0
