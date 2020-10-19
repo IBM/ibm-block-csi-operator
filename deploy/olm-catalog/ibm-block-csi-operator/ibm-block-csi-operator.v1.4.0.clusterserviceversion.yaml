@@ -97,6 +97,12 @@ metadata:
                 "imagePullPolicy": "IfNotPresent"
               },
               {
+                "name": "csi-resizer",
+                "repository": "registry.redhat.io/openshift4/ose-csi-external-resizer-rhel7",
+                "tag": "v4.4",
+                "imagePullPolicy": "IfNotPresent"
+              },
+              {
                 "name": "livenessprobe",
                 "repository": "registry.redhat.io/openshift4/ose-csi-livenessprobe",
                 "tag": "v4.4",

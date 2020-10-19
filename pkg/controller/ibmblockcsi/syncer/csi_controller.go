@@ -42,6 +42,7 @@ const (
 	provisionerContainerName             = "csi-provisioner"
 	attacherContainerName                = "csi-attacher"
 	snapshotterContainerName             = "csi-snapshotter"
+	resizerContainerName                 = "csi-resizer"
 	controllerLivenessProbeContainerName = "liveness-probe"
 
 	controllerContainerHealthPortName   = "healthz"
@@ -156,6 +157,14 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	)
 	snapshotter.ImagePullPolicy = s.getCSISnapshotterPullPolicy()
 
+	// csi resizer sidecar
+	resizer := s.ensureContainer(resizerContainerName,
+		s.getCSIResizerImage(),
+		// TODO: make timeout configurable
+		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s"},
+	)
+	resizer.ImagePullPolicy = s.getCSIResizerPullPolicy()
+
 	// liveness probe sidecar
 	livenessProbe := s.ensureContainer(controllerLivenessProbeContainerName,
 		s.getLivenessProbeImage(),
@@ -170,6 +179,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		provisioner,
 		attacher,
 		snapshotter,
+		resizer,
 		livenessProbe,
 	}
 }
@@ -326,6 +336,10 @@ func (s *csiControllerSyncer) getCSISnapshotterImage() string {
 	return s.getSidecarImageByName(config.CSISnapshotter, config.CSISnapshotterImage)
 }
 
+func (s *csiControllerSyncer) getCSIResizerImage() string {
+	return s.getSidecarImageByName(config.CSIResizer, config.CSIResizerImage)
+}
+
 func (s *csiControllerSyncer) getSidecarPullPolicy(sidecarName string) corev1.PullPolicy {
 	sidecar := s.getSidecarByName(sidecarName)
 	if sidecar != nil && sidecar.ImagePullPolicy != "" {
@@ -348,6 +362,10 @@ func (s *csiControllerSyncer) getLivenessProbePullPolicy() corev1.PullPolicy {
 
 func (s *csiControllerSyncer) getCSISnapshotterPullPolicy() corev1.PullPolicy {
 	return s.getSidecarPullPolicy(config.CSISnapshotter)
+}
+
+func (s *csiControllerSyncer) getCSIResizerPullPolicy() corev1.PullPolicy {
+	return s.getSidecarPullPolicy(config.CSIResizer)
 }
 
 func ensurePorts(ports ...corev1.ContainerPort) []corev1.ContainerPort {

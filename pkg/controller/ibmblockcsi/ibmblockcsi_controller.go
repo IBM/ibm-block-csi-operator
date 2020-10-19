@@ -342,6 +342,7 @@ func (r *ReconcileIBMBlockCSI) reconcileClusterRole(instance *ibmblockcsi.IBMBlo
 	externalProvisioner := instance.GenerateExternalProvisionerClusterRole()
 	externalAttacher := instance.GenerateExternalAttacherClusterRole()
 	externalSnapshotter := instance.GenerateExternalSnapshotterClusterRole()
+	externalResizer := instance.GenerateExternalResizerClusterRole()
 	controllerSCC := instance.GenerateSCCForControllerClusterRole()
 	nodeSCC := instance.GenerateSCCForNodeClusterRole()
 
@@ -349,6 +350,7 @@ func (r *ReconcileIBMBlockCSI) reconcileClusterRole(instance *ibmblockcsi.IBMBlo
 		externalProvisioner,
 		externalAttacher,
 		externalSnapshotter,
+		externalResizer,
 		controllerSCC,
 		nodeSCC,
 	} {
@@ -384,6 +386,7 @@ func (r *ReconcileIBMBlockCSI) reconcileClusterRoleBinding(instance *ibmblockcsi
 	externalProvisioner := instance.GenerateExternalProvisionerClusterRoleBinding()
 	externalAttacher := instance.GenerateExternalAttacherClusterRoleBinding()
 	externalSnapshotter := instance.GenerateExternalSnapshotterClusterRoleBinding()
+	externalResizer := instance.GenerateExternalResizerClusterRoleBinding()
 	controllerSCC := instance.GenerateSCCForControllerClusterRoleBinding()
 	nodeSCC := instance.GenerateSCCForNodeClusterRoleBinding()
 
@@ -391,6 +394,7 @@ func (r *ReconcileIBMBlockCSI) reconcileClusterRoleBinding(instance *ibmblockcsi
 		externalProvisioner,
 		externalAttacher,
 		externalSnapshotter,
+		externalResizer,
 		controllerSCC,
 		nodeSCC,
 	} {
