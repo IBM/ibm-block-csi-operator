@@ -19,7 +19,7 @@ pipeline {
         }
         stage ('Run OLM verifications') {
             steps {
-                sh 'bash ./build/ci/run_olm_verification.sh'
+                sh './build/ci/run_olm_verification.sh'
             }
         }
         stage ('Build docker images') {
