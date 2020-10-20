@@ -99,7 +99,7 @@ metadata:
               {
                 "name": "csi-resizer",
                 "repository": "registry.redhat.io/openshift4/ose-csi-external-resizer-rhel7",
-                "tag": "v4.4",
+                "tag": "v4.5",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
