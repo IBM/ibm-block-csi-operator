@@ -6,6 +6,7 @@ pipeline {
         Dockerfile_operator = 'build/Dockerfile.operator'
         Dockerfile_node = 'build/Dockerfile.nodeagent'
         NODE_IMAGE = 'ibm-node-agent'
+        latest_tag = "develop origin/develop master"
     }
     agent {
         label "${env.AGENT_LABEL}"
@@ -25,10 +26,10 @@ pipeline {
         stage ('Build docker images') {
             steps {
                 script {
-                    sh './build/ci/run_variables_verification.sh'
+                    sh 'bash ./build/ci/run_variables_verification.sh'
                     branch = sh(script:"echo $GIT_BRANCH | sed 's|/|.|g'",returnStdout:true).trim()
                     specific_tag = "${IMAGE_VERSION}_b${BUILD_NUMBER}_${branch}"
-                    if (GIT_BRANCH == 'develop' || GIT_BRANCH == 'origin/develop' || GIT_BRANCH == 'master') {
+                    if (latest_tag.contains(GIT_BRANCH)) {
                         operator_image_latest = docker.build("${OPERATOR_IMAGE}", "--build-arg VERSION=${IMAGE_VERSION} --build-arg BUILD_NUMBER=${BUILD_NUMBER} -f ${Dockerfile_operator} .")
                         node_image_latest = docker.build("${DOCKER_REGISTRY}/${NODE_IMAGE}", "--build-arg VERSION=${IMAGE_VERSION} --build-arg BUILD_NUMBER=${BUILD_NUMBER} -f ${Dockerfile_node} .")
                     }
@@ -42,7 +43,7 @@ pipeline {
                 script {
                     registryUrl = "${registry_protocol}://${DOCKER_REGISTRY}"
                     docker.withRegistry(registryUrl, registryCredential ) {
-                        if (GIT_BRANCH == 'develop' || GIT_BRANCH == 'origin/develop' || GIT_BRANCH == 'master') {
+                        if (latest_tag.contains(GIT_BRANCH)) {
                             operator_image_latest.push()
                             node_image_latest.push()
                         }
@@ -58,7 +59,8 @@ pipeline {
                     sh 'dirname ${artifactory_path} | xargs mkdir -p'
                     sh "echo ${DOCKER_REGISTRY}/${OPERATOR_IMAGE}:$specific_tag > ${artifactory_path}"
                     sh "echo ${DOCKER_REGISTRY}/${NODE_IMAGE}:$specific_tag >> ${artifactory_path}"
-                    if (GIT_BRANCH == 'develop' || GIT_BRANCH == 'origin/develop' || GIT_BRANCH == 'master') {
+                    sh 'echo ${GIT_BRANCH}'
+                    if (latest_tag.contains(GIT_BRANCH)) {
                         sh "echo ${DOCKER_REGISTRY}/${OPERATOR_IMAGE}:latest >> ${artifactory_path}"
                         sh "echo ${DOCKER_REGISTRY}/${NODE_IMAGE}:latest >> ${artifactory_path}"
                     }
