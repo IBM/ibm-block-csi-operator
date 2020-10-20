@@ -539,6 +539,13 @@ spec:
             - apiGroups:
               - ""
               resources:
+              - persistentvolumeclaims/status
+              verbs:
+              - update
+              - patch
+            - apiGroups:
+              - ""
+              resources:
               - persistentvolumes
               verbs:
               - get
