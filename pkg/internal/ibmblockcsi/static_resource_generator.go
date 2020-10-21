@@ -35,6 +35,7 @@ const (
 	persistentVolumesResource            string = "persistentvolumes"
 	persistentVolumeClaimsResource       string = "persistentvolumeclaims"
 	persistentVolumeClaimsStatusResource string = "persistentvolumeclaims/status"
+	podsResource                         string = "pods"
 	volumeAttachmentsResource            string = "volumeattachments"
 	volumeSnapshotClassesResource        string = "volumesnapshotclasses"
 	volumeSnapshotsResource              string = "volumesnapshots"
@@ -313,7 +314,7 @@ func (c *IBMBlockCSI) GenerateExternalResizerClusterRole() *rbacv1.ClusterRole {
 			{
 				APIGroups: []string{""},
 				Resources: []string{persistentVolumesResource},
-				Verbs:     []string{verbGet, verbList, verbWatch, verbUpdate, verbPatch},
+				Verbs:     []string{verbGet, verbList, verbWatch, verbPatch},
 			},
 			{
 				APIGroups: []string{""},
@@ -322,8 +323,13 @@ func (c *IBMBlockCSI) GenerateExternalResizerClusterRole() *rbacv1.ClusterRole {
 			},
 			{
 				APIGroups: []string{""},
+				Resources: []string{podsResource},
+				Verbs:     []string{verbGet, verbList, verbWatch},
+			},
+			{
+				APIGroups: []string{""},
 				Resources: []string{persistentVolumeClaimsStatusResource},
-				Verbs:     []string{verbUpdate, verbPatch},
+				Verbs:     []string{verbPatch},
 			},
 			{
 				APIGroups: []string{""},
