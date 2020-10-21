@@ -31,10 +31,10 @@ pipeline {
                     specific_tag = "${IMAGE_VERSION}_b${BUILD_NUMBER}_${branch}"
                     if (latest_tag.contains(GIT_BRANCH)) {
                         operator_image_latest = docker.build("${OPERATOR_IMAGE}", "--build-arg VERSION=${IMAGE_VERSION} --build-arg BUILD_NUMBER=${BUILD_NUMBER} -f ${Dockerfile_operator} .")
-                        node_image_latest = docker.build("${DOCKER_REGISTRY}/${NODE_IMAGE}", "--build-arg VERSION=${IMAGE_VERSION} --build-arg BUILD_NUMBER=${BUILD_NUMBER} -f ${Dockerfile_node} .")
+                        node_image_latest = docker.build("${NODE_IMAGE}", "--build-arg VERSION=${IMAGE_VERSION} --build-arg BUILD_NUMBER=${BUILD_NUMBER} -f ${Dockerfile_node} .")
                     }
-                    operator_image_with_generated_tag = docker.build("${DOCKER_REGISTRY}/${OPERATOR_IMAGE}:$specific_tag", "--build-arg VERSION=${IMAGE_VERSION} --build-arg BUILD_NUMBER=${BUILD_NUMBER} -f ${Dockerfile_operator} .")
-                    node_image_with_generated_tag = docker.build("${DOCKER_REGISTRY}/${NODE_IMAGE}:$specific_tag", "--build-arg VERSION=${IMAGE_VERSION} --build-arg BUILD_NUMBER=${BUILD_NUMBER} -f ${Dockerfile_node} .")
+                    operator_image_with_generated_tag = docker.build("${OPERATOR_IMAGE}:$specific_tag", "--build-arg VERSION=${IMAGE_VERSION} --build-arg BUILD_NUMBER=${BUILD_NUMBER} -f ${Dockerfile_operator} .")
+                    node_image_with_generated_tag = docker.build("${NODE_IMAGE}:$specific_tag", "--build-arg VERSION=${IMAGE_VERSION} --build-arg BUILD_NUMBER=${BUILD_NUMBER} -f ${Dockerfile_node} .")
                 }
             }
         }
@@ -42,7 +42,7 @@ pipeline {
             steps {
                 script {
                     registryUrl = "${registry_protocol}://${DOCKER_REGISTRY}"
-                    docker.withRegistry(registryUrl, registryCredential ) {
+                    docker.withRegistry(registryUrl, registryCredential) {
                         if (latest_tag.contains(GIT_BRANCH)) {
                             operator_image_latest.push()
                             node_image_latest.push()
@@ -56,13 +56,15 @@ pipeline {
         stage ('Save Artifacts') {
             steps {
                 script {
+                    operator_registry = "${DOCKER_REGISTRY}/${OPERATOR_IMAGE}"
+                    node_registry = "${DOCKER_REGISTRY}/${NODE_IMAGE}"
                     sh 'dirname ${artifactory_path} | xargs mkdir -p'
-                    sh "echo ${DOCKER_REGISTRY}/${OPERATOR_IMAGE}:$specific_tag > ${artifactory_path}"
-                    sh "echo ${DOCKER_REGISTRY}/${NODE_IMAGE}:$specific_tag >> ${artifactory_path}"
+                    sh "echo ${operator_registry}:$specific_tag > ${artifactory_path}"
+                    sh "echo ${node_registry}:$specific_tag >> ${artifactory_path}"
                     sh 'echo ${GIT_BRANCH}'
                     if (latest_tag.contains(GIT_BRANCH)) {
-                        sh "echo ${DOCKER_REGISTRY}/${OPERATOR_IMAGE}:latest >> ${artifactory_path}"
-                        sh "echo ${DOCKER_REGISTRY}/${NODE_IMAGE}:latest >> ${artifactory_path}"
+                        sh "echo ${operator_registry}:latest >> ${artifactory_path}"
+                        sh "echo $node_registry}:latest >> ${artifactory_path}"
                     }
                 }
             }
