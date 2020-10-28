@@ -3,11 +3,11 @@ kind: CustomResourceDefinition
 metadata:
   name: ibmblockcsis.csi.ibm.com
   labels:
-    app.kubernetes.io/name: ibm-block-csi-operator
-    app.kubernetes.io/instance: ibm-block-csi-operator
+    app.kubernetes.io/name: ibmblockcsis
+    app.kubernetes.io/instance: ibmblockcsis
     app.kubernetes.io/managed-by: ibm-block-csi-operator
     product: ibm-block-csi-driver
-    release: v1.3.0
+    release: v1.4.0
     csi: ibm
 spec:
   group: csi.ibm.com

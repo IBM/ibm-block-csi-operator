@@ -3,8 +3,8 @@ kind: CustomResourceDefinition
 metadata:
   name: nodeinfos.csi.ibm.com
   labels:
-    app.kubernetes.io/name: ibm-block-csi-operator
-    app.kubernetes.io/instance: ibm-block-csi-operator
+    app.kubernetes.io/name: nodeinfos
+    app.kubernetes.io/instance: nodeinfos
     app.kubernetes.io/managed-by: ibm-block-csi-operator
 spec:
   group: csi.ibm.com

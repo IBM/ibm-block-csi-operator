@@ -4,8 +4,8 @@ metadata:
   name: ibm-block-csi
   namespace: default
   labels:
-    app.kubernetes.io/name: ibm-block-csi-operator
-    app.kubernetes.io/instance: ibm-block-csi-operator
+    app.kubernetes.io/name: ibm-block-csi
+    app.kubernetes.io/instance: ibm-block-csi
     app.kubernetes.io/managed-by: ibm-block-csi-operator
 spec:
   # controller is a statefulSet with ibm-block-csi-driver-controller
