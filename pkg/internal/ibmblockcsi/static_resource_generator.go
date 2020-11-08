@@ -35,6 +35,7 @@ const (
 	persistentVolumesResource            string = "persistentvolumes"
 	persistentVolumeClaimsResource       string = "persistentvolumeclaims"
 	volumeAttachmentsResource            string = "volumeattachments"
+	volumeAttachmentsStatusResource      string = "volumeattachments/status"
 	volumeSnapshotClassesResource        string = "volumesnapshotclasses"
 	volumeSnapshotsResource              string = "volumesnapshots"
 	volumeSnapshotsStatusResource        string = "volumesnapshots/status"
@@ -176,8 +177,8 @@ func (c *IBMBlockCSI) GenerateExternalAttacherClusterRole() *rbacv1.ClusterRole 
 		Rules: []rbacv1.PolicyRule{
 			{
 				APIGroups: []string{""},
-				Resources: []string{"persistentvolumes"},
-				Verbs:     []string{verbGet, verbList, verbWatch, verbUpdate, verbPatch},
+				Resources: []string{persistentVolumesResource},
+				Verbs:     []string{verbGet, verbList, verbWatch, verbPatch},
 			},
 			{
 				APIGroups: []string{storageApiGroup},
@@ -185,14 +186,14 @@ func (c *IBMBlockCSI) GenerateExternalAttacherClusterRole() *rbacv1.ClusterRole 
 				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 			{
-				APIGroups: []string{""},
-				Resources: []string{nodesResource},
-				Verbs:     []string{verbGet, verbList, verbWatch},
+				APIGroups: []string{storageApiGroup},
+				Resources: []string{volumeAttachmentsResource},
+				Verbs:     []string{verbGet, verbList, verbWatch, verbPatch},
 			},
 			{
 				APIGroups: []string{storageApiGroup},
-				Resources: []string{volumeAttachmentsResource},
-				Verbs:     []string{verbGet, verbList, verbWatch, verbUpdate, verbPatch},
+				Resources: []string{volumeAttachmentsStatusResource},
+				Verbs:     []string{verbPatch},
 			},
 		},
 	}
