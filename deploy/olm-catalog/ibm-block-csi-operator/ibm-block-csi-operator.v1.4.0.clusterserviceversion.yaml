@@ -603,6 +603,12 @@ spec:
             - apiGroups:
               - storage.k8s.io
               resources:
+              - volumeattachments/status
+              verbs:
+              - patch
+            - apiGroups:
+              - storage.k8s.io
+              resources:
               - storageclasses
               verbs:
               - get
