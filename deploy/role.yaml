@@ -215,9 +215,3 @@ rules:
   - watch
   - list
   - update
-- apiGroups:
-  - snapshot.storage.k8s.io
-  resources:
-  - volumesnapshots/status
-  verbs:
-  - update
