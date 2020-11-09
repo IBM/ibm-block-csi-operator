@@ -136,6 +136,16 @@ func (c *IBMBlockCSI) GenerateExternalProvisionerClusterRole() *rbacv1.ClusterRo
 				Verbs:     []string{verbList, verbWatch, verbCreate, verbUpdate, verbPatch},
 			},
 			{
+				APIGroups: []string{snapshotStorageApiGroup},
+				Resources: []string{volumeSnapshotsResource},
+				Verbs:     []string{verbGet, verbList},
+			},
+			{
+				APIGroups: []string{snapshotStorageApiGroup},
+				Resources: []string{volumeSnapshotContentsResource},
+				Verbs:     []string{verbGet, verbList},
+			},
+			{
 				APIGroups: []string{storageApiGroup},
 				Resources: []string{csiNodesResource},
 				Verbs:     []string{verbGet, verbList, verbWatch},
@@ -143,6 +153,11 @@ func (c *IBMBlockCSI) GenerateExternalProvisionerClusterRole() *rbacv1.ClusterRo
 			{
 				APIGroups: []string{""},
 				Resources: []string{nodesResource},
+				Verbs:     []string{verbGet, verbList, verbWatch},
+			},
+			{
+				APIGroups: []string{storageApiGroup},
+				Resources: []string{volumeAttachmentsResource},
 				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 		},
