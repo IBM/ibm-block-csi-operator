@@ -339,7 +339,7 @@ func (c *IBMBlockCSI) GenerateExternalResizerClusterRole() *rbacv1.ClusterRole {
 			{
 				APIGroups: []string{""},
 				Resources: []string{secretsResource},
-				Verbs:     []string{verbGet, verbList},
+				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 		},
 	}
