@@ -22,7 +22,7 @@ const (
 	CSIAttacherImage            = "quay.io/k8scsi/csi-attacher:v1.2.1"
 	CSILivenessProbeImage       = "quay.io/k8scsi/livenessprobe:v1.1.0"
 	CSISnapshotterImage      	= "quay.io/k8scsi/csi-snapshotter:v2.1.0"
-	CSIResizerImage             = "quay.io/k8scsi/csi-resizer:v0.5.0"
+	CSIResizerImage             = "k8s.gcr.io/sig-storage/csi-resizer:v1.0.0"
 
 	ControllerTag = "1.4.0"
 	NodeTag       = "1.4.0"
