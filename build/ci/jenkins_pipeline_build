@@ -23,48 +23,12 @@ pipeline {
                 sh './build/ci/run_olm_verification.sh'
             }
         }
-        stage ('Build docker images') {
-            steps {
-                script {
-                    sh 'bash ./build/ci/run_variables_verification.sh'
-                    branch = sh(script:"echo $GIT_BRANCH | sed 's|/|.|g'",returnStdout:true).trim()
-                    specific_tag = "${IMAGE_VERSION}_b${BUILD_NUMBER}_${branch}"
-                    if (latest_tag.contains(GIT_BRANCH)) {
-                        operator_image_latest = docker.build("${OPERATOR_IMAGE}", "--build-arg VERSION=${IMAGE_VERSION} --build-arg BUILD_NUMBER=${BUILD_NUMBER} -f ${Dockerfile_operator} .")
-                        node_image_latest = docker.build("${NODE_IMAGE}", "--build-arg VERSION=${IMAGE_VERSION} --build-arg BUILD_NUMBER=${BUILD_NUMBER} -f ${Dockerfile_node} .")
-                    }
-                    operator_image_with_generated_tag = docker.build("${OPERATOR_IMAGE}:$specific_tag", "--build-arg VERSION=${IMAGE_VERSION} --build-arg BUILD_NUMBER=${BUILD_NUMBER} -f ${Dockerfile_operator} .")
-                    node_image_with_generated_tag = docker.build("${NODE_IMAGE}:$specific_tag", "--build-arg VERSION=${IMAGE_VERSION} --build-arg BUILD_NUMBER=${BUILD_NUMBER} -f ${Dockerfile_node} .")
-                }
-            }
-        }
-        stage ('push docker images') {
+        stage ('Build and push images') {
             steps {
                 script {
                     registryUrl = "${registry_protocol}://${DOCKER_REGISTRY}"
                     docker.withRegistry(registryUrl, registryCredential) {
-                        if (latest_tag.contains(GIT_BRANCH)) {
-                            operator_image_latest.push()
-                            node_image_latest.push()
-                        }
-                        operator_image_with_generated_tag.push()
-                        node_image_with_generated_tag.push()
-                    }
-                }
-            }
-        }
-        stage ('Save Artifacts') {
-            steps {
-                script {
-                    operator_registry = "${DOCKER_REGISTRY}/${OPERATOR_IMAGE}"
-                    node_registry = "${DOCKER_REGISTRY}/${NODE_IMAGE}"
-                    sh 'dirname ${artifactory_path} | xargs mkdir -p'
-                    sh "echo ${operator_registry}:$specific_tag > ${artifactory_path}"
-                    sh "echo ${node_registry}:$specific_tag >> ${artifactory_path}"
-                    sh 'echo ${GIT_BRANCH}'
-                    if (latest_tag.contains(GIT_BRANCH)) {
-                        sh "echo ${operator_registry}:latest >> ${artifactory_path}"
-                        sh "echo $node_registry}:latest >> ${artifactory_path}"
+                        sh './build/ci/build_push_image.sh build/_output/reports/images_url'
                     }
                 }
             }
@@ -96,5 +60,6 @@ pipeline {
                     to: "${env.EMAIL_TO}",
                     subject: 'Jenkins build is back to normal: $PROJECT_NAME - #$BUILD_NUMBER'
         }
+
     }
 }
