@@ -1601,6 +1601,12 @@ rules:
 - apiGroups:
   - storage.k8s.io
   resources:
+  - volumeattachments/status
+  verbs:
+  - patch
+- apiGroups:
+  - storage.k8s.io
+  resources:
   - storageclasses
   verbs:
   - get
@@ -1696,12 +1702,6 @@ rules:
   - get
   - watch
   - list
-  - update
-- apiGroups:
-  - snapshot.storage.k8s.io
-  resources:
-  - volumesnapshots/status
-  verbs:
   - update
 
 ---
