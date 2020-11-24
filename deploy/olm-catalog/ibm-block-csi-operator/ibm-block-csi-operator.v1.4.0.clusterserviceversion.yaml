@@ -74,32 +74,32 @@ metadata:
             "sidecars": [
               {
                 "name": "csi-node-driver-registrar",
-                "repository": "registry.redhat.io/openshift4/ose-csi-driver-registrar",
-                "tag": "v4.3",
+                "repository": "k8s.gcr.io/sig-storage/csi-node-driver-registrar",
+                "tag": "v2.0.1",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-provisioner",
-                "repository": "registry.redhat.io/openshift4/ose-csi-external-provisioner-rhel7",
-                "tag": "v4.4",
+                "repository": "k8s.gcr.io/sig-storage/csi-provisioner",
+                "tag": "v2.0.2",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-attacher",
-                "repository": "registry.redhat.io/openshift4/ose-csi-external-attacher",
-                "tag": "v4.4",
+                "repository": "k8s.gcr.io/sig-storage/csi-attacher",
+                "tag": "v3.0.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-snapshotter",
-                "repository": "registry.redhat.io/openshift4/ose-csi-external-snapshotter-rhel7",
-                "tag": "v4.4",
+                "repository": "k8s.gcr.io/sig-storage/csi-snapshotter",
+                "tag": "v3.0.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "livenessprobe",
-                "repository": "registry.redhat.io/openshift4/ose-csi-livenessprobe",
-                "tag": "v4.4",
+                "repository": "k8s.gcr.io/sig-storage/livenessprobe",
+                "tag": "v2.1.0",
                 "imagePullPolicy": "IfNotPresent"
               }
             ]
@@ -603,6 +603,12 @@ spec:
             - apiGroups:
               - storage.k8s.io
               resources:
+              - volumeattachments/status
+              verbs:
+              - patch
+            - apiGroups:
+              - storage.k8s.io
+              resources:
               - storageclasses
               verbs:
               - get
@@ -698,12 +704,6 @@ spec:
               - get
               - watch
               - list
-              - update
-            - apiGroups:
-              - snapshot.storage.k8s.io
-              resources:
-              - volumesnapshots/status
-              verbs:
               - update
               
       deployments:
