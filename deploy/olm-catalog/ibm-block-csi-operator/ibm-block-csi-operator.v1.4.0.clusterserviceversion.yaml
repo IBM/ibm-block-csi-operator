@@ -544,7 +544,6 @@ spec:
               resources:
               - persistentvolumeclaims/status
               verbs:
-              - update
               - patch
             - apiGroups:
               - ""
