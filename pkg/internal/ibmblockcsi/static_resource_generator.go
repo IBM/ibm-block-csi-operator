@@ -28,7 +28,6 @@ import (
 const (
 	snapshotStorageApiGroup              string = "snapshot.storage.k8s.io"
 	securityOpenshiftApiGroup            string = "security.openshift.io"
-	apiExtensionsApiGroup                string = "apiextensions.k8s.io"
 	storageApiGroup                      string = "storage.k8s.io"
 	rbacAuthorizationApiGroup            string = "rbac.authorization.k8s.io"
 	storageClassesResource               string = "storageclasses"
@@ -37,9 +36,9 @@ const (
 	persistentVolumeClaimsStatusResource string = "persistentvolumeclaims/status"
 	podsResource                         string = "pods"
 	volumeAttachmentsResource            string = "volumeattachments"
+	volumeAttachmentsStatusResource      string = "volumeattachments/status"
 	volumeSnapshotClassesResource        string = "volumesnapshotclasses"
 	volumeSnapshotsResource              string = "volumesnapshots"
-	volumeSnapshotsStatusResource        string = "volumesnapshots/status"
 	volumeSnapshotContentsResource       string = "volumesnapshotcontents"
 	volumeSnapshotContentsStatusResource string = "volumesnapshotcontents/status"
 	eventsResource                       string = "events"
@@ -47,7 +46,6 @@ const (
 	csiNodesResource                     string = "csinodes"
 	secretsResource                      string = "secrets"
 	securityContextConstraintsResource   string = "securitycontextconstraints"
-	customResourceDefinitionsResource    string = "customresourcedefinitions"
 	verbGet                              string = "get"
 	verbList                             string = "list"
 	verbWatch                            string = "watch"
@@ -137,6 +135,16 @@ func (c *IBMBlockCSI) GenerateExternalProvisionerClusterRole() *rbacv1.ClusterRo
 				Verbs:     []string{verbList, verbWatch, verbCreate, verbUpdate, verbPatch},
 			},
 			{
+				APIGroups: []string{snapshotStorageApiGroup},
+				Resources: []string{volumeSnapshotsResource},
+				Verbs:     []string{verbGet, verbList},
+			},
+			{
+				APIGroups: []string{snapshotStorageApiGroup},
+				Resources: []string{volumeSnapshotContentsResource},
+				Verbs:     []string{verbGet, verbList},
+			},
+			{
 				APIGroups: []string{storageApiGroup},
 				Resources: []string{csiNodesResource},
 				Verbs:     []string{verbGet, verbList, verbWatch},
@@ -144,6 +152,11 @@ func (c *IBMBlockCSI) GenerateExternalProvisionerClusterRole() *rbacv1.ClusterRo
 			{
 				APIGroups: []string{""},
 				Resources: []string{nodesResource},
+				Verbs:     []string{verbGet, verbList, verbWatch},
+			},
+			{
+				APIGroups: []string{storageApiGroup},
+				Resources: []string{volumeAttachmentsResource},
 				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 		},
@@ -178,8 +191,8 @@ func (c *IBMBlockCSI) GenerateExternalAttacherClusterRole() *rbacv1.ClusterRole 
 		Rules: []rbacv1.PolicyRule{
 			{
 				APIGroups: []string{""},
-				Resources: []string{"persistentvolumes"},
-				Verbs:     []string{verbGet, verbList, verbWatch, verbUpdate, verbPatch},
+				Resources: []string{persistentVolumesResource},
+				Verbs:     []string{verbGet, verbList, verbWatch, verbPatch},
 			},
 			{
 				APIGroups: []string{storageApiGroup},
@@ -187,14 +200,14 @@ func (c *IBMBlockCSI) GenerateExternalAttacherClusterRole() *rbacv1.ClusterRole 
 				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 			{
-				APIGroups: []string{""},
-				Resources: []string{nodesResource},
-				Verbs:     []string{verbGet, verbList, verbWatch},
+				APIGroups: []string{storageApiGroup},
+				Resources: []string{volumeAttachmentsResource},
+				Verbs:     []string{verbGet, verbList, verbWatch, verbPatch},
 			},
 			{
 				APIGroups: []string{storageApiGroup},
-				Resources: []string{volumeAttachmentsResource},
-				Verbs:     []string{verbGet, verbList, verbWatch, verbUpdate, verbPatch},
+				Resources: []string{volumeAttachmentsStatusResource},
+				Verbs:     []string{verbPatch},
 			},
 		},
 	}
@@ -228,21 +241,6 @@ func (c *IBMBlockCSI) GenerateExternalSnapshotterClusterRole() *rbacv1.ClusterRo
 		Rules: []rbacv1.PolicyRule{
 			{
 				APIGroups: []string{""},
-				Resources: []string{persistentVolumesResource},
-				Verbs:     []string{verbGet, verbList, verbWatch},
-			},
-			{
-				APIGroups: []string{""},
-				Resources: []string{persistentVolumeClaimsResource},
-				Verbs:     []string{verbGet, verbList, verbWatch},
-			},
-			{
-				APIGroups: []string{storageApiGroup},
-				Resources: []string{storageClassesResource},
-				Verbs:     []string{verbGet, verbList, verbWatch},
-			},
-			{
-				APIGroups: []string{""},
 				Resources: []string{"events"},
 				Verbs:     []string{verbList, verbWatch, verbCreate, verbUpdate, verbPatch},
 			},
@@ -258,16 +256,6 @@ func (c *IBMBlockCSI) GenerateExternalSnapshotterClusterRole() *rbacv1.ClusterRo
 			},
 			{
 				APIGroups: []string{snapshotStorageApiGroup},
-				Resources: []string{volumeSnapshotsResource},
-				Verbs:     []string{verbGet, verbList, verbWatch, verbUpdate},
-			},
-			{
-				APIGroups: []string{snapshotStorageApiGroup},
-				Resources: []string{volumeSnapshotsStatusResource},
-				Verbs:     []string{verbUpdate},
-			},
-			{
-				APIGroups: []string{snapshotStorageApiGroup},
 				Resources: []string{volumeSnapshotContentsResource},
 				Verbs:     []string{verbCreate, verbGet, verbList, verbWatch, verbUpdate, verbDelete},
 			},
@@ -275,11 +263,6 @@ func (c *IBMBlockCSI) GenerateExternalSnapshotterClusterRole() *rbacv1.ClusterRo
 				APIGroups: []string{snapshotStorageApiGroup},
 				Resources: []string{volumeSnapshotContentsStatusResource},
 				Verbs:     []string{verbUpdate},
-			},
-			{
-				APIGroups: []string{apiExtensionsApiGroup},
-				Resources: []string{customResourceDefinitionsResource},
-				Verbs:     []string{verbCreate, verbList, verbWatch, verbDelete},
 			},
 		},
 	}
