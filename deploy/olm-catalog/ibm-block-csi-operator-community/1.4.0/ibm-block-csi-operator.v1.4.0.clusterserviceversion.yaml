@@ -97,7 +97,13 @@ metadata:
                 "repository": "k8s.gcr.io/sig-storage/csi-snapshotter",
                 "tag": "v3.0.0",
                 "imagePullPolicy": "IfNotPresent"
-              },              
+              },
+              {
+                "name": "csi-resizer",
+                "repository": "k8s.gcr.io/sig-storage/csi-resizer",
+                "tag": "v1.0.0",
+                "imagePullPolicy": "IfNotPresent"
+              },
               {
                 "name": "livenessprobe",
                 "repository": "k8s.gcr.io/sig-storage/livenessprobe",
@@ -508,6 +514,8 @@ spec:
               - pods
               verbs:
               - get
+              - list
+              - watch
             - apiGroups:
               - ""
               resources:
@@ -523,6 +531,7 @@ spec:
               verbs:
               - get
               - list
+              - watch
             - apiGroups:
               - ""
               resources:
@@ -532,6 +541,12 @@ spec:
               - list
               - watch
               - update
+            - apiGroups:
+              - ""
+              resources:
+              - persistentvolumeclaims/status
+              verbs:
+              - patch
             - apiGroups:
               - ""
               resources:

@@ -33,6 +33,8 @@ const (
 	storageClassesResource               string = "storageclasses"
 	persistentVolumesResource            string = "persistentvolumes"
 	persistentVolumeClaimsResource       string = "persistentvolumeclaims"
+	persistentVolumeClaimsStatusResource string = "persistentvolumeclaims/status"
+	podsResource                         string = "pods"
 	volumeAttachmentsResource            string = "volumeattachments"
 	volumeAttachmentsStatusResource      string = "volumeattachments/status"
 	volumeSnapshotClassesResource        string = "volumesnapshotclasses"
@@ -281,6 +283,66 @@ func (c *IBMBlockCSI) GenerateExternalSnapshotterClusterRoleBinding() *rbacv1.Cl
 		RoleRef: rbacv1.RoleRef{
 			Kind:     "ClusterRole",
 			Name:     config.GetNameForResource(config.ExternalSnapshotterClusterRole, c.Name),
+			APIGroup: rbacAuthorizationApiGroup,
+		},
+	}
+}
+
+func (c *IBMBlockCSI) GenerateExternalResizerClusterRole() *rbacv1.ClusterRole {
+	return &rbacv1.ClusterRole{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: config.GetNameForResource(config.ExternalResizerClusterRole, c.Name),
+		},
+		Rules: []rbacv1.PolicyRule{
+			{
+				APIGroups: []string{""},
+				Resources: []string{persistentVolumesResource},
+				Verbs:     []string{verbGet, verbList, verbWatch, verbPatch},
+			},
+			{
+				APIGroups: []string{""},
+				Resources: []string{persistentVolumeClaimsResource},
+				Verbs:     []string{verbGet, verbList, verbWatch},
+			},
+			{
+				APIGroups: []string{""},
+				Resources: []string{podsResource},
+				Verbs:     []string{verbGet, verbList, verbWatch},
+			},
+			{
+				APIGroups: []string{""},
+				Resources: []string{persistentVolumeClaimsStatusResource},
+				Verbs:     []string{verbPatch},
+			},
+			{
+				APIGroups: []string{""},
+				Resources: []string{eventsResource},
+				Verbs:     []string{verbList, verbWatch, verbCreate, verbUpdate, verbPatch},
+			},
+			{
+				APIGroups: []string{""},
+				Resources: []string{secretsResource},
+				Verbs:     []string{verbGet, verbList, verbWatch},
+			},
+		},
+	}
+}
+
+func (c *IBMBlockCSI) GenerateExternalResizerClusterRoleBinding() *rbacv1.ClusterRoleBinding {
+	return &rbacv1.ClusterRoleBinding{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: config.GetNameForResource(config.ExternalResizerClusterRoleBinding, c.Name),
+		},
+		Subjects: []rbacv1.Subject{
+			{
+				Kind:      "ServiceAccount",
+				Name:      config.GetNameForResource(config.CSIControllerServiceAccount, c.Name),
+				Namespace: c.Namespace,
+			},
+		},
+		RoleRef: rbacv1.RoleRef{
+			Kind:     "ClusterRole",
+			Name:     config.GetNameForResource(config.ExternalResizerClusterRole, c.Name),
 			APIGroup: rbacAuthorizationApiGroup,
 		},
 	}

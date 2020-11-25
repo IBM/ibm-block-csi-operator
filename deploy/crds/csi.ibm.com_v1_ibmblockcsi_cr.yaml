@@ -67,6 +67,10 @@ spec:
     repository: k8s.gcr.io/sig-storage/csi-snapshotter
     tag: "v3.0.0"
     imagePullPolicy: IfNotPresent
+  - name: csi-resizer
+    repository: k8s.gcr.io/sig-storage/csi-resizer
+    tag: "v1.0.0"
+    imagePullPolicy: IfNotPresent
   - name: livenessprobe
     repository: k8s.gcr.io/sig-storage/livenessprobe
     tag: "v2.1.0"
