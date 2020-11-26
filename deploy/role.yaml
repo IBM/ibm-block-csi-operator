@@ -182,7 +182,7 @@ rules:
   verbs:
   - get
   - watch
- - list
+  - list
 - apiGroups:
   - snapshot.storage.k8s.io
   resources:
