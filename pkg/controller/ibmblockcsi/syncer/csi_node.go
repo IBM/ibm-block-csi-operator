@@ -135,6 +135,8 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 
 	nodePlugin.SecurityContext = &corev1.SecurityContext{
 		Privileged:               boolptr.True(),
+		RunAsNonRoot: boolptr.False(),
+		ReadOnlyRootFilesystem: boolptr.True(),
 		AllowPrivilegeEscalation: boolptr.True(),
 	}
 	fillSecurityContextCapabilities(
