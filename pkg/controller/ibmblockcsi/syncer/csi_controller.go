@@ -224,9 +224,9 @@ func ensureNodeAffinity() *corev1.NodeAffinity {
 
 func (s *csiControllerSyncer) ensureContainer(name, image string, args []string) corev1.Container {
 	sc := &corev1.SecurityContext{
-		Privileged: boolptr.False(),
-		RunAsNonRoot: boolptr.True(),
-		ReadOnlyRootFilesystem: boolptr.True(),
+		Privileged:               boolptr.False(),
+		RunAsNonRoot:             boolptr.True(),
+		ReadOnlyRootFilesystem:   boolptr.True(),
 		AllowPrivilegeEscalation: boolptr.False(),
 	}
 	fillSecurityContextCapabilities(sc)
