@@ -99,6 +99,7 @@ func (s *csiNodeSyncer) ensurePodSpec() corev1.PodSpec {
 		HostIPC:            true,
 		HostNetwork: 		true,
 		ServiceAccountName: config.GetNameForResource(config.CSINodeServiceAccount, s.driver.Name),
+		SecurityContext:    &corev1.PodSecurityContext{RunAsNonRoot: boolptr.True()},
 		Affinity:           s.driver.Spec.Node.Affinity,
 		Tolerations:        s.driver.Spec.Node.Tolerations,
 	}

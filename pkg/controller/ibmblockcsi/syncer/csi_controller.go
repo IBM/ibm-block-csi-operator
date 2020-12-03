@@ -101,8 +101,9 @@ func (s *csiControllerSyncer) ensurePodSpec() corev1.PodSpec {
 		Containers: s.ensureContainersSpec(),
 		Volumes:    s.ensureVolumes(),
 		SecurityContext: &corev1.PodSecurityContext{
-			FSGroup:   &fsGroup,
-			RunAsUser: &fsGroup,
+			RunAsUser:    &fsGroup,
+			RunAsNonRoot: boolptr.True(),
+			FSGroup:      &fsGroup,
 		},
 		Affinity:           s.driver.Spec.Controller.Affinity,
 		Tolerations:        s.driver.Spec.Controller.Tolerations,
