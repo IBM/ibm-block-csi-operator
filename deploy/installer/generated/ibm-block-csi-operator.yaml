@@ -1447,6 +1447,9 @@ spec:
                       - amd64
                       - s390x
                       - ppc64le
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
       containers:
       - name: ibm-block-csi-operator
         resources:
