@@ -165,8 +165,12 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 			},
 		},
 	}
+
+	nonRootUserID := config.NonRootUserID
+
 	registrar.SecurityContext = &corev1.SecurityContext{
 		Privileged:               boolptr.False(),
+		RunAsUser:                &nonRootUserID,
 		RunAsNonRoot:             boolptr.True(),
 		ReadOnlyRootFilesystem:   boolptr.True(),
 		AllowPrivilegeEscalation: boolptr.False(),
@@ -183,6 +187,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	)
 	livenessProbe.SecurityContext = &corev1.SecurityContext{
 		Privileged:               boolptr.False(),
+		RunAsUser:                &nonRootUserID,
 		RunAsNonRoot:             boolptr.True(),
 		ReadOnlyRootFilesystem:   boolptr.True(),
 		AllowPrivilegeEscalation: boolptr.False(),
