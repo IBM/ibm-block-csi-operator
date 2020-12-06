@@ -154,8 +154,18 @@ multipath -ll
 <br/>
 <br/>
 
-# SecurityContextConstraints RequirementsThe operator uses the restricted and privileged SCC for deployments. ### Custom SecurityContextConstraints definition:<details>
-  <summary>ibm-block-csi-anyuid</summary>```yaml
+## Installation
+
+# SecurityContextConstraints Requirements
+
+The operator uses the restricted and privileged SCC for deployments. 
+
+### Custom SecurityContextConstraints definition:
+
+<details>
+  <summary>ibm-block-csi-anyuid</summary>
+
+```yaml
 apiVersion: security.openshift.io/v1
 kind: SecurityContextConstraints
 metadata:
@@ -196,8 +206,12 @@ volumes:
 - projected
 - secret
 ```
-</details><details>
-  <summary>ibm-block-csi-privileged</summary>```yaml
+</details>
+
+<details>
+  <summary>ibm-block-csi-privileged</summary>
+
+```yaml
 apiVersion: security.openshift.io/v1
 kind: SecurityContextConstraints
 metadata:
@@ -239,13 +253,6 @@ volumes:
 - '*'
 ```
 </details>
-
-<br/>
-<br/>
-<br/>
-
-
-## Installation
 
 ### Install the operator
 
