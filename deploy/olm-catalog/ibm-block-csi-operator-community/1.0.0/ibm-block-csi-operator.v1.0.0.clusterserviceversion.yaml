@@ -4,7 +4,7 @@ metadata:
   name: ibm-block-csi-operator.v1.0.0
   namespace: placeholder
   annotations:
-    capabilities: "Seamless Upgrades"
+    capabilities: "Basic Install"
     categories: "Storage,Cloud Provider"
     certified: "true"
     containerImage: ibmcom/ibm-block-csi-operator:1.0.0
