@@ -173,7 +173,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 		Privileged:               boolptr.False(),
 		RunAsUser:                &nonRootUserID,
 		RunAsNonRoot:             boolptr.True(),
-		ReadOnlyRootFilesystem:   boolptr.True(),
+		ReadOnlyRootFilesystem:   boolptr.False(),
 		AllowPrivilegeEscalation: boolptr.False(),
 	}
 	fillSecurityContextCapabilities(registrar.SecurityContext)
