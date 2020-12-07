@@ -37,6 +37,8 @@ const (
 	ExternalAttacherClusterRoleBinding    ResourceName = "external-attacher-clusterrolebinding"
 	ExternalSnapshotterClusterRole        ResourceName = "external-snapshotter-clusterrole"
 	ExternalSnapshotterClusterRoleBinding ResourceName = "external-snapshotter-clusterrolebinding"
+	ExternalResizerClusterRole            ResourceName = "external-resizer-clusterrole"
+	ExternalResizerClusterRoleBinding     ResourceName = "external-resizer-clusterrolebinding"
 	CSIControllerSCCClusterRole           ResourceName = "csi-controller-scc-clusterrole"
 	CSIControllerSCCClusterRoleBinding    ResourceName = "csi-controller-scc-clusterrolebinding"
 	CSINodeSCCClusterRole                 ResourceName = "csi-node-scc-clusterrole"

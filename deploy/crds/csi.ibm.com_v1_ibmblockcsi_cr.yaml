@@ -9,8 +9,8 @@ metadata:
     app.kubernetes.io/managed-by: ibm-block-csi-operator
     release: v1.4.0
 spec:
-  # controller is a statefulSet with ibm-block-csi-driver-controller
-  # container and csi-provisioner, csi-attacher and livenessprobe sidecars.
+  # controller is a statefulSet with ibm-block-csi-controller container
+  # and csi-provisioner, csi-attacher, csi-snapshotter and livenessprobe sidecars.
   controller:
     repository: ibmcom/ibm-block-csi-driver-controller
     tag: "1.4.0"
@@ -24,8 +24,10 @@ spec:
                   operator: In
                   values:
                     - amd64
+                    - s390x
+                    - ppc64le
 
-  # node is a daemonSet with ibm-block-csi-driver-node container
+  # node is a daemonSet with ibm-block-csi-node container
   # and csi-node-driver-registrar and livenessprobe sidecars.
   node:
     repository: ibmcom/ibm-block-csi-driver-node
@@ -40,6 +42,8 @@ spec:
                   operator: In
                   values:
                     - amd64
+                    - s390x
+                    - ppc64le
 
 #    tolerations:
 #    - effect: NoSchedule
@@ -48,24 +52,28 @@ spec:
 
   sidecars:
   - name: csi-node-driver-registrar
-    repository: quay.io/k8scsi/csi-node-driver-registrar
-    tag: "v1.2.0"
+    repository: k8s.gcr.io/sig-storage/csi-node-driver-registrar
+    tag: "v2.0.1"
     imagePullPolicy: IfNotPresent
   - name: csi-provisioner
-    repository: quay.io/k8scsi/csi-provisioner
-    tag: "v1.6.0"
+    repository: k8s.gcr.io/sig-storage/csi-provisioner
+    tag: "v2.0.2"
     imagePullPolicy: IfNotPresent
   - name: csi-attacher
-    repository: quay.io/k8scsi/csi-attacher
-    tag: "v2.2.0"
+    repository: k8s.gcr.io/sig-storage/csi-attacher
+    tag: "v3.0.0"
     imagePullPolicy: IfNotPresent
   - name: csi-snapshotter
-    repository: quay.io/k8scsi/csi-snapshotter
-    tag: "v2.1.0"
+    repository: k8s.gcr.io/sig-storage/csi-snapshotter
+    tag: "v3.0.0"
+    imagePullPolicy: IfNotPresent
+  - name: csi-resizer
+    repository: k8s.gcr.io/sig-storage/csi-resizer
+    tag: "v1.0.0"
     imagePullPolicy: IfNotPresent
   - name: livenessprobe
-    repository: quay.io/k8scsi/livenessprobe
-    tag: "v2.0.0"
+    repository: k8s.gcr.io/sig-storage/livenessprobe
+    tag: "v2.1.0"
     imagePullPolicy: IfNotPresent
 
 #  imagePullSecrets:
