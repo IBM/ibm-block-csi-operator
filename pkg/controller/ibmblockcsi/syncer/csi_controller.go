@@ -101,8 +101,9 @@ func (s *csiControllerSyncer) ensurePodSpec() corev1.PodSpec {
 		Containers: s.ensureContainersSpec(),
 		Volumes:    s.ensureVolumes(),
 		SecurityContext: &corev1.PodSecurityContext{
-			FSGroup:   &fsGroup,
-			RunAsUser: &fsGroup,
+			RunAsUser:    &fsGroup,
+			RunAsNonRoot: boolptr.True(),
+			FSGroup:      &fsGroup,
 		},
 		Affinity:           s.driver.Spec.Controller.Affinity,
 		Tolerations:        s.driver.Spec.Controller.Tolerations,
@@ -223,7 +224,12 @@ func ensureNodeAffinity() *corev1.NodeAffinity {
 }
 
 func (s *csiControllerSyncer) ensureContainer(name, image string, args []string) corev1.Container {
-	sc := &corev1.SecurityContext{AllowPrivilegeEscalation: boolptr.False()}
+	sc := &corev1.SecurityContext{
+		Privileged:               boolptr.False(),
+		RunAsNonRoot:             boolptr.True(),
+		ReadOnlyRootFilesystem:   boolptr.True(),
+		AllowPrivilegeEscalation: boolptr.False(),
+	}
 	fillSecurityContextCapabilities(sc)
 	return corev1.Container{
 		Name:  name,

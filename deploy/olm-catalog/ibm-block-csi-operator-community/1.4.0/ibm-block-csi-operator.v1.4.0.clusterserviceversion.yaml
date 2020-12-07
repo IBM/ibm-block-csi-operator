@@ -748,6 +748,9 @@ spec:
                               operator: In
                               values:
                                 - amd64
+                hostIPC: false
+                hostNetwork: false
+                hostPID: false
                 containers:
                 - name: ibm-block-csi-operator
                   resources:
@@ -768,9 +771,14 @@ spec:
                     initialDelaySeconds: 10
                     periodSeconds: 30
                   securityContext:
+                    allowPrivilegeEscalation: false
                     capabilities:
                       drop:
                       - ALL
+                    privileged: false
+                    readOnlyRootFilesystem: true
+                    runAsNonRoot: true
+                    runAsUser: 1001
                   image: ibmcom/ibm-block-csi-operator:1.4.0
                   imagePullPolicy: IfNotPresent
                   command:

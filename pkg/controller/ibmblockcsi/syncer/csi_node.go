@@ -99,6 +99,7 @@ func (s *csiNodeSyncer) ensurePodSpec() corev1.PodSpec {
 		HostIPC:            true,
 		HostNetwork: 		true,
 		ServiceAccountName: config.GetNameForResource(config.CSINodeServiceAccount, s.driver.Name),
+		SecurityContext:    &corev1.PodSecurityContext{RunAsNonRoot: boolptr.True()},
 		Affinity:           s.driver.Spec.Node.Affinity,
 		Tolerations:        s.driver.Spec.Node.Tolerations,
 	}
@@ -135,6 +136,8 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 
 	nodePlugin.SecurityContext = &corev1.SecurityContext{
 		Privileged:               boolptr.True(),
+		RunAsNonRoot:             boolptr.False(),
+		ReadOnlyRootFilesystem:   boolptr.True(),
 		AllowPrivilegeEscalation: boolptr.True(),
 	}
 	fillSecurityContextCapabilities(
@@ -163,7 +166,16 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 			},
 		},
 	}
-	registrar.SecurityContext = &corev1.SecurityContext{AllowPrivilegeEscalation: boolptr.False()}
+
+	nonRootUserID := config.NonRootUserID
+
+	registrar.SecurityContext = &corev1.SecurityContext{
+		Privileged:               boolptr.False(),
+		RunAsUser:                &nonRootUserID,
+		RunAsNonRoot:             boolptr.True(),
+		ReadOnlyRootFilesystem:   boolptr.False(),
+		AllowPrivilegeEscalation: boolptr.False(),
+	}
 	fillSecurityContextCapabilities(registrar.SecurityContext)
 	registrar.ImagePullPolicy = s.getCSINodeDriverRegistrarPullPolicy()
 
@@ -174,7 +186,13 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 			"--csi-address=/csi/csi.sock",
 		},
 	)
-	livenessProbe.SecurityContext = &corev1.SecurityContext{AllowPrivilegeEscalation: boolptr.False()}
+	livenessProbe.SecurityContext = &corev1.SecurityContext{
+		Privileged:               boolptr.False(),
+		RunAsUser:                &nonRootUserID,
+		RunAsNonRoot:             boolptr.True(),
+		ReadOnlyRootFilesystem:   boolptr.True(),
+		AllowPrivilegeEscalation: boolptr.False(),
+	}
 	fillSecurityContextCapabilities(livenessProbe.SecurityContext)
 	livenessProbe.ImagePullPolicy = s.getCSINodeDriverRegistrarPullPolicy()
 
