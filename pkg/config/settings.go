@@ -31,7 +31,6 @@ const (
 	DefaultNamespace = "default"
 	DefaultLogLevel  = "DEBUG"
 	ControllerUserID = int64(9999)
-	NonRootUserID    = int64(1001)
 
 	NodeAgentPort = "10086"
 )
