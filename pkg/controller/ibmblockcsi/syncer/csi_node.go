@@ -167,6 +167,8 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 		},
 	}
 
+	registrar.SecurityContext = &corev1.SecurityContext{AllowPrivilegeEscalation: boolptr.False()}
+
 	fillSecurityContextCapabilities(registrar.SecurityContext)
 	registrar.ImagePullPolicy = s.getCSINodeDriverRegistrarPullPolicy()
 
@@ -177,6 +179,8 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 			"--csi-address=/csi/csi.sock",
 		},
 	)
+
+	livenessProbe.SecurityContext = &corev1.SecurityContext{AllowPrivilegeEscalation: boolptr.False()}
 
 	fillSecurityContextCapabilities(livenessProbe.SecurityContext)
 	livenessProbe.ImagePullPolicy = s.getCSINodeDriverRegistrarPullPolicy()
