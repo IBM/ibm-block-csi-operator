@@ -268,10 +268,6 @@ func (s *csiNodeSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 				MountPropagation: &mountPropagationB,
 			},
 			{
-				Name:      "lib-modules",
-				MountPath: "/lib/modules",
-			},
-			{
 				Name:      "iscsi",
 				MountPath: "/etc/iscsi",
 			},
@@ -308,7 +304,6 @@ func (s *csiNodeSyncer) ensureVolumes() []corev1.Volume {
 		ensureVolume("device-dir", ensureHostPathVolumeSource("/dev", "Directory")),
 		ensureVolume("sys-dir", ensureHostPathVolumeSource("/sys", "Directory")),
 		ensureVolume("host-dir", ensureHostPathVolumeSource("/", "Directory")),
-		ensureVolume("lib-modules", ensureHostPathVolumeSource("/lib/modules", "Directory")),
 		ensureVolume("iscsi", ensureHostPathVolumeSource("/etc/iscsi", "Directory")),
 	}
 }

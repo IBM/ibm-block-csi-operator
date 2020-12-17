@@ -16,6 +16,8 @@ rules:
   - pods
   verbs:
   - get
+  - list
+  - watch
 - apiGroups:
   - ""
   resources:
@@ -31,6 +33,7 @@ rules:
   verbs:
   - get
   - list
+  - watch
 - apiGroups:
   - ""
   resources:
@@ -40,6 +43,12 @@ rules:
   - list
   - watch
   - update
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims/status
+  verbs:
+  - patch
 - apiGroups:
   - ""
   resources:
@@ -113,6 +122,12 @@ rules:
 - apiGroups:
   - storage.k8s.io
   resources:
+  - volumeattachments/status
+  verbs:
+  - patch
+- apiGroups:
+  - storage.k8s.io
+  resources:
   - storageclasses
   verbs:
   - get
@@ -182,7 +197,7 @@ rules:
   verbs:
   - get
   - watch
- - list
+  - list
 - apiGroups:
   - snapshot.storage.k8s.io
   resources:
@@ -208,10 +223,4 @@ rules:
   - get
   - watch
   - list
-  - update
-- apiGroups:
-  - snapshot.storage.k8s.io
-  resources:
-  - volumesnapshots/status
-  verbs:
   - update

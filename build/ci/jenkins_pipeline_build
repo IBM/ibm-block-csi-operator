@@ -1,4 +1,10 @@
 pipeline {
+    environment {
+        registryCredentialsID = 'csi_w3_user'
+    }
+    options {
+        ansiColor('xterm')
+    }
     agent {
         label "${env.AGENT_LABEL}"
     }
@@ -16,7 +22,12 @@ pipeline {
         }
         stage ('Build and push images') {
             steps {
-                sh './build/ci/build_push_image.sh build/_output/reports/images_url'
+                script {
+                    registryUrl = "https://${DOCKER_REGISTRY}"
+                    docker.withRegistry(registryUrl, registryCredentialsID) {
+                        sh './build/ci/build_push_image.sh build/_output/reports/images_url'
+                    }
+                }
             }
         }
     }
