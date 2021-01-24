@@ -27,7 +27,7 @@ RUN CGO_ENABLED=1 GOOS=linux go build \
 FROM registry.access.redhat.com/ubi7/ubi-minimal:7.9-224
 MAINTAINER IBM Storage
 
-ARG VERSION=1.4.0
+ARG VERSION=1.5.0
 ARG BUILD_NUMBER=0
 
 ###Required Labels

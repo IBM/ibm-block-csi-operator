@@ -24,8 +24,8 @@ const (
 	CSISnapshotterImage      	= "quay.io/k8scsi/csi-snapshotter:v2.1.0"
 	CSIResizerImage             = "k8s.gcr.io/sig-storage/csi-resizer:v1.0.0"
 
-	ControllerTag = "1.4.0"
-	NodeTag       = "1.4.0"
+	ControllerTag = "1.5.0"
+	NodeTag       = "1.5.0"
 	NodeAgentTag  = "1.0.0"
 
 	DefaultNamespace = "default"
