@@ -402,7 +402,7 @@ spec:
   maintainers:
     - name: Guang Jiong Lou
       email: luogj@cn.ibm.com
-  minKubeVersion: 1.19.0
+  minKubeVersion: 1.18.0
   provider:
     name: IBM
   links:
