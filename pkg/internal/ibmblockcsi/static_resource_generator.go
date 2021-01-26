@@ -209,6 +209,11 @@ func (c *IBMBlockCSI) GenerateExternalAttacherClusterRole() *rbacv1.ClusterRole 
 				Resources: []string{volumeAttachmentsStatusResource},
 				Verbs:     []string{verbPatch},
 			},
+			{
+				APIGroups: []string{""},
+				Resources: []string{secretsResource},
+				Verbs:     []string{verbGet, verbList},
+			},
 		},
 	}
 }
