@@ -751,7 +751,7 @@ spec:
                     capabilities:
                       drop:
                       - ALL
-                  image: ibmcom/ibm-block-csi-operator:1.4.0
+                  image: ibmcom/ibm-block-csi-operator:1.5.0
                   imagePullPolicy: IfNotPresent
                   command:
                   - ibm-block-csi-operator
