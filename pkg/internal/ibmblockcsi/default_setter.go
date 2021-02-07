@@ -18,31 +18,107 @@ package ibmblockcsi
 
 import (
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
+	corev1 "k8s.io/api/core/v1"
+	"path"
 )
 
 // SetDefaults set defaults if omitted in spec, returns true means CR should be updated on cluster.
 // Replace it with kubernetes native default setter when it is available.
 // https://kubernetes.io/docs/tasks/access-kubernetes-api/custom-resources/custom-resource-definitions/#defaulting
 func (c *IBMBlockCSI) SetDefaults() bool {
-	// repository is mandatory, tag is optional, but if repository is not set
-	// and tag is set, the tag will be overrided to the default one.
-	changed := false
+	if c.isAnyNonOfficialRepo() {
+		return false
+	}
+	return c.setDefaults()
+}
 
-	// if controller is empty
-	if c.Spec.Controller.Repository == "" {
-		c.Spec.Controller.Repository = config.ControllerRepository
-		c.Spec.Controller.Tag = config.ControllerTag
+func (c *IBMBlockCSI) isAnyNonOfficialRepo() bool {
+
+	if c.isNonOfficialRepo(c.Spec.Controller.Repository) {
+		return true
+	}
+
+	if c.isNonOfficialRepo(c.Spec.Node.Repository) {
+		return true
+	}
+
+	for _, sidecar := range c.Spec.Sidecars {
+		if c.isNonOfficialRepo(sidecar.Repository) {
+			return true
+		}
+	}
+	return false
+}
+
+func (c *IBMBlockCSI) isNonOfficialRepo(repo string) bool {
+	if repo != "" {
+		var registryUsername = path.Dir(repo)
+		if !config.OfficialRegistriesUsernames.Has(registryUsername) {
+			return true
+		}
+	}
+	return false
+}
+
+func (c *IBMBlockCSI) setDefaults() bool {
+	var changed = false
+
+	if c.Spec.Controller.Repository != config.DefaultCr.Spec.Controller.Repository ||
+		c.Spec.Controller.Tag != config.DefaultCr.Spec.Controller.Tag {
+		c.Spec.Controller.Repository = config.DefaultCr.Spec.Controller.Repository
+		c.Spec.Controller.Tag = config.DefaultCr.Spec.Controller.Tag
 
 		changed = true
 	}
 
-	// if node is empty
-	if c.Spec.Node.Repository == "" {
-		c.Spec.Node.Repository = config.NodeRepository
-		c.Spec.Node.Tag = config.NodeTag
+	if c.Spec.Node.Repository != config.DefaultCr.Spec.Node.Repository ||
+		c.Spec.Node.Tag != config.DefaultCr.Spec.Node.Tag {
+		c.Spec.Node.Repository = config.DefaultCr.Spec.Node.Repository
+		c.Spec.Node.Tag = config.DefaultCr.Spec.Node.Tag
 
 		changed = true
 	}
+
+	changed = c.setDefaultSidecars() || changed
+
+	c.setDefaultForEmptySliceFields()
 
 	return changed
+}
+
+func (c *IBMBlockCSI) setDefaultForEmptySliceFields() {
+	if c.Spec.ImagePullSecrets == nil {
+		c.Spec.ImagePullSecrets = []string{}
+	}
+	if c.Spec.Controller.Tolerations == nil {
+		c.Spec.Controller.Tolerations = []corev1.Toleration{}
+	}
+	if c.Spec.Node.Tolerations == nil {
+		c.Spec.Node.Tolerations = []corev1.Toleration{}
+	}
+}
+
+func (c *IBMBlockCSI) setDefaultSidecars() bool {
+	var change = false
+	var defaultSidecars = config.DefaultCr.Spec.Sidecars
+
+	if len(defaultSidecars) == len(c.Spec.Sidecars) {
+		for _, sidecar := range c.Spec.Sidecars {
+			if defaultSidecar, found := config.DefaultSidecarsByName[sidecar.Name]; found {
+				if sidecar != defaultSidecar {
+					change = true
+				}
+			} else {
+				change = true
+			}
+		}
+	} else {
+		change = true
+	}
+
+	if change {
+		c.Spec.Sidecars = defaultSidecars
+	}
+
+	return change
 }

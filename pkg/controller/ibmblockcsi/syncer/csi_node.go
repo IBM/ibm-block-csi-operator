@@ -201,7 +201,8 @@ func envVarFromField(name, fieldPath string) corev1.EnvVar {
 		Name: name,
 		ValueFrom: &corev1.EnvVarSource{
 			FieldRef: &corev1.ObjectFieldSelector{
-				FieldPath: fieldPath,
+				APIVersion: config.APIVersion,
+				FieldPath:  fieldPath,
 			},
 		},
 	}
@@ -317,7 +318,7 @@ func (s *csiNodeSyncer) getCSINodeDriverRegistrarImage() string {
 	if sidecar != nil {
 		return fmt.Sprintf("%s:%s", sidecar.Repository, sidecar.Tag)
 	}
-	return config.NodeDriverRegistrarImage
+	return s.driver.GetDefaultSidecarImageByName(config.CSINodeDriverRegistrar)
 }
 
 func (s *csiNodeSyncer) getLivenessProbeImage() string {
@@ -325,7 +326,7 @@ func (s *csiNodeSyncer) getLivenessProbeImage() string {
 	if sidecar != nil {
 		return fmt.Sprintf("%s:%s", sidecar.Repository, sidecar.Tag)
 	}
-	return config.CSILivenessProbeImage
+	return s.driver.GetDefaultSidecarImageByName(config.LivenessProbe)
 }
 
 func (s *csiNodeSyncer) getCSINodeDriverRegistrarPullPolicy() corev1.PullPolicy {

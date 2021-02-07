@@ -16,21 +16,54 @@
 
 package config
 
-const (
-	NodeDriverRegistrarImage    = "quay.io/k8scsi/csi-node-driver-registrar:v1.2.0"
-	CSIProvisionerImage         = "quay.io/k8scsi/csi-provisioner:v1.5.0"
-	CSIAttacherImage            = "quay.io/k8scsi/csi-attacher:v1.2.1"
-	CSILivenessProbeImage       = "quay.io/k8scsi/livenessprobe:v1.1.0"
-	CSISnapshotterImage      	= "quay.io/k8scsi/csi-snapshotter:v2.1.0"
-	CSIResizerImage             = "k8s.gcr.io/sig-storage/csi-resizer:v1.0.0"
+import (
+	"fmt"
+	v1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
+	"io/ioutil"
+	"k8s.io/apimachinery/pkg/util/sets"
+	"os"
+	"sigs.k8s.io/yaml"
+)
 
-	ControllerTag = "1.4.0"
-	NodeTag       = "1.4.0"
+const (
+	EnvNameCrYaml string = "CR_YAML"
 	NodeAgentTag  = "1.0.0"
 
-	DefaultNamespace = "default"
 	DefaultLogLevel  = "DEBUG"
 	ControllerUserID = int64(9999)
 
 	NodeAgentPort = "10086"
 )
+
+var DefaultCr v1.IBMBlockCSI
+
+var DefaultSidecarsByName map[string]v1.CSISidecar
+
+var OfficialRegistriesUsernames = sets.NewString("ibmcom", "k8s.gcr.io/sig-storage",
+                                                 "quay.io/k8scsi", "registry.redhat.io/openshift4")
+
+func LoadDefaultsOfIBMBlockCSI() error {
+	crYamlPath := os.Getenv(EnvNameCrYaml)
+
+	if crYamlPath == "" {
+		return fmt.Errorf("environment variable %q was not set", EnvNameCrYaml)
+	}
+
+	yamlFile, err := ioutil.ReadFile(crYamlPath)
+	if err != nil {
+		return fmt.Errorf("failed to read file %q: %v", yamlFile, err)
+	}
+
+	err = yaml.Unmarshal(yamlFile, &DefaultCr)
+	if err != nil {
+		return fmt.Errorf("error unmarshaling yaml: %v", err)
+	}
+
+	DefaultSidecarsByName = make(map[string]v1.CSISidecar)
+
+	for _, sidecar := range DefaultCr.Spec.Sidecars {
+		DefaultSidecarsByName[sidecar.Name] = sidecar
+	}
+
+	return nil
+}
