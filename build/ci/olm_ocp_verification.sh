@@ -1,4 +1,4 @@
-#!/bin/bash -xe
+#!/bin/bash -e
 
 #
 # Copyright 2020 IBM Corp.
@@ -14,7 +14,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
 
-docker build -f build/ci/Dockerfile.olm-verification -t operator-olm-verification .
-docker run --rm -t operator-olm-verification
+for olm_ocp_dict in deploy/olm-catalog/ibm-block-csi-operator/*/ ; do
+  echo "Validating ${olm_ocp_dict}"
+  operator-sdk bundle --verbose validate "${olm_ocp_dict}"
+done

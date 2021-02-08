@@ -17,6 +17,7 @@ FROM python:3
 WORKDIR /usr/src/app
 
 RUN pip3 install operator-courier
+RUN pip3 install operator-sdk
 
 COPY . .
-CMD ["make", "courier"]
+CMD ["make", "olm-verification"]
