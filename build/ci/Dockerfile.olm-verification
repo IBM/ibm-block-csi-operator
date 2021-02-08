@@ -17,7 +17,14 @@ FROM python:3
 WORKDIR /usr/src/app
 
 RUN pip3 install operator-courier
-RUN pip3 install operator-sdk
+RUN RELEASE_VERSION=v0.16.0 \
+    && ARCH=$(uname -m) \
+    && SDK_ASSET=operator-sdk-${RELEASE_VERSION}-${ARCH}-linux-gnu \
+    && curl -LO https://github.com/operator-framework/operator-sdk/releases/download/${RELEASE_VERSION}/${SDK_ASSET} \
+	&& chmod +x ${SDK_ASSET} \
+	&& mkdir -p /usr/local/bin/ \
+	&& cp ${SDK_ASSET} /usr/local/bin/operator-sdk \
+	&& rm ${SDK_ASSET}
 
 COPY . .
 CMD ["make", "olm-verification"]
