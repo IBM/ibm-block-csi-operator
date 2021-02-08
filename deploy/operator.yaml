@@ -66,10 +66,10 @@ spec:
         image: ibmcom/ibm-block-csi-operator:1.5.0
         imagePullPolicy: IfNotPresent
         command:
-          - ibm-block-csi-operator
+        - ibm-block-csi-operator
         args:
-          - --zap-encoder
-          - console
+        - --zap-encoder
+        - console
         env:
         - name: WATCH_NAMESPACE
           value: ""
