@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -xe
 
 #
 # Copyright 2020 IBM Corp.
@@ -18,9 +18,9 @@
 ARCH=$(uname -m)
 
 if [ "${ARCH}" !=  "ppc64le" ]; then
-  for olm_ocp_dict in deploy/olm-catalog/ibm-block-csi-operator/*/ ; do
-    echo "Validating ${olm_ocp_dict}"
-    operator-sdk bundle --verbose validate "${olm_ocp_dict}"
+  for olm_ocp_bundle_dir in deploy/olm-catalog/ibm-block-csi-operator/*/ ; do
+    echo "Validating ${olm_ocp_bundle_dir}"
+    operator-sdk bundle --verbose validate "${olm_ocp_bundle_dir}"
   done
 else
   echo "Skipping OLM OCP validation on ${ARCH} arch"
