@@ -52,7 +52,7 @@ var _ = Describe("DefaultSetter", func() {
 			})
 		})
 
-		Context("only controller repository is non-official", func() {
+		Context("only controller repository is unofficial", func() {
 
 			BeforeEach(func() {
 				ibc = &csiv1.IBMBlockCSI{
@@ -98,7 +98,7 @@ var _ = Describe("DefaultSetter", func() {
 			})
 		})
 
-		Context("only node repository is non-official", func() {
+		Context("only node repository is unofficial", func() {
 
 			BeforeEach(func() {
 				ibc = &csiv1.IBMBlockCSI{

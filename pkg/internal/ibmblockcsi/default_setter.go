@@ -26,31 +26,31 @@ import (
 // Replace it with kubernetes native default setter when it is available.
 // https://kubernetes.io/docs/tasks/access-kubernetes-api/custom-resources/custom-resource-definitions/#defaulting
 func (c *IBMBlockCSI) SetDefaults() bool {
-	if c.isAnyNonOfficialRepo() {
+	if c.isAnyUnofficialRepo() {
 		return false
 	}
 	return c.setDefaults()
 }
 
-func (c *IBMBlockCSI) isAnyNonOfficialRepo() bool {
+func (c *IBMBlockCSI) isAnyUnofficialRepo() bool {
 
-	if c.isNonOfficialRepo(c.Spec.Controller.Repository) {
+	if c.isUnofficialRepo(c.Spec.Controller.Repository) {
 		return true
 	}
 
-	if c.isNonOfficialRepo(c.Spec.Node.Repository) {
+	if c.isUnofficialRepo(c.Spec.Node.Repository) {
 		return true
 	}
 
 	for _, sidecar := range c.Spec.Sidecars {
-		if c.isNonOfficialRepo(sidecar.Repository) {
+		if c.isUnofficialRepo(sidecar.Repository) {
 			return true
 		}
 	}
 	return false
 }
 
-func (c *IBMBlockCSI) isNonOfficialRepo(repo string) bool {
+func (c *IBMBlockCSI) isUnofficialRepo(repo string) bool {
 	if repo != "" {
 		var registryUsername = path.Dir(repo)
 		if !config.OfficialRegistriesUsernames.Has(registryUsername) {
@@ -81,12 +81,12 @@ func (c *IBMBlockCSI) setDefaults() bool {
 
 	changed = c.setDefaultSidecars() || changed
 
-	c.setDefaultForEmptySliceFields()
+	c.setDefaultForNilSliceFields()
 
 	return changed
 }
 
-func (c *IBMBlockCSI) setDefaultForEmptySliceFields() {
+func (c *IBMBlockCSI) setDefaultForNilSliceFields() {
 	if c.Spec.ImagePullSecrets == nil {
 		c.Spec.ImagePullSecrets = []string{}
 	}

@@ -27,20 +27,25 @@ import (
 
 const (
 	EnvNameCrYaml string = "CR_YAML"
-	NodeAgentTag  = "1.0.0"
+	NodeAgentTag         = "1.0.0"
 
 	DefaultLogLevel  = "DEBUG"
 	ControllerUserID = int64(9999)
 
 	NodeAgentPort = "10086"
+
+	IBMRegistryUsername    = "ibmcom"
+	K8SRegistryUsername    = "k8s.gcr.io/sig-storage"
+	QuayRegistryUsername   = "quay.io/k8scsi"
+	RedHatRegistryUsername = "registry.redhat.io/openshift4"
 )
 
 var DefaultCr v1.IBMBlockCSI
 
 var DefaultSidecarsByName map[string]v1.CSISidecar
 
-var OfficialRegistriesUsernames = sets.NewString("ibmcom", "k8s.gcr.io/sig-storage",
-                                                 "quay.io/k8scsi", "registry.redhat.io/openshift4")
+var OfficialRegistriesUsernames = sets.NewString(IBMRegistryUsername, K8SRegistryUsername,
+	                                             QuayRegistryUsername, RedHatRegistryUsername)
 
 func LoadDefaultsOfIBMBlockCSI() error {
 	crYamlPath := os.Getenv(EnvNameCrYaml)
