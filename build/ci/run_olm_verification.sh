@@ -16,6 +16,13 @@
 # limitations under the License.
 #
 
-DOCKER_PATH=$(which docker)
 docker build -f build/ci/Dockerfile.olm-verification -t operator-olm-verification .
-docker run --rm -t -v /var/run/docker.sock:/var/run/docker.sock -v "${DOCKER_PATH}":/usr/bin/docker operator-olm-verification
+
+ARCH=$(uname -m)
+DOCKER_PATH=$(which docker)
+
+if [ "${ARCH}" != "ppc64le" ]; then
+  docker run --rm -t -v /var/run/docker.sock:/var/run/docker.sock -v "${DOCKER_PATH}":/usr/bin/docker operator-olm-verification
+else
+  docker run --rm -t operator-olm-verification
+fi
