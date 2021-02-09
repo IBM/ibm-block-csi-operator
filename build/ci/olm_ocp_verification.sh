@@ -15,7 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-for olm_ocp_dict in deploy/olm-catalog/ibm-block-csi-operator/*/ ; do
-  echo "Validating ${olm_ocp_dict}"
-  operator-sdk bundle --verbose validate "${olm_ocp_dict}"
-done
+ARCH=$(uname -m)
+
+if [ "${ARCH}" !=  "ppc64le" ]; then
+  for olm_ocp_dict in deploy/olm-catalog/ibm-block-csi-operator/*/ ; do
+    echo "Validating ${olm_ocp_dict}"
+    operator-sdk bundle --verbose validate "${olm_ocp_dict}"
+  done
+else
+  echo "Skipping OLM OCP validation on ${ARCH} arch"
+fi
