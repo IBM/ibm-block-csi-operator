@@ -26,5 +26,7 @@ RUN RELEASE_VERSION=v1.4.0 \
     && cp ${SDK_ASSET} /usr/local/bin/operator-sdk \
     && rm ${SDK_ASSET}
 
+COPY Makefile Makefile
+COPY build/ build/
 COPY deploy/olm-catalog deploy/olm-catalog
 CMD ["make", "olm-verification"]
