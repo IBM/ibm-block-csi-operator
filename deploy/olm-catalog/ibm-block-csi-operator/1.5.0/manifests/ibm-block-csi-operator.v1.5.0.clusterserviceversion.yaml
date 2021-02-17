@@ -336,8 +336,8 @@ spec:
   replaces: ibm-block-csi-operator.v1.4.0
   maturity: stable
   maintainers:
-    - name: Guang Jiong Lou
-      email: luogj@cn.ibm.com
+    - name: IBM Block CSI Team
+      email: csi.block1@il.ibm.com
   minKubeVersion: 1.18.0
   provider:
     name: IBM
