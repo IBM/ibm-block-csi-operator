@@ -3,6 +3,10 @@ kind: ClusterServiceVersion
 metadata:
   name: ibm-block-csi-operator.v1.5.0
   namespace: placeholder
+  labels:
+    operatorframework.io/arch.amd64: supported
+    operatorframework.io/arch.s390x: supported
+    operatorframework.io/arch.ppc64le: supported
   annotations:
     capabilities: "Basic Install"
     categories: "Storage,Cloud Provider"
