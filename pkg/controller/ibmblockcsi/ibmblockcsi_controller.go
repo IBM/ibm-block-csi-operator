@@ -259,16 +259,14 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 	if instance.Status.ControllerReady && instance.Status.NodeReady {
 		phase = csiv1.DriverPhaseRunning
 	} else {
-		if originalStatus.Phase == csiv1.DriverPhaseRunning {
-			key, value := r.getRolloutRestartAnnotation()
-			if !instance.Status.ControllerReady {
-				controller.Spec.Template.ObjectMeta.Annotations[key] = value
-				controllerRolloutRestart = true
-			}
-			if !instance.Status.NodeReady {
-				node.Spec.Template.ObjectMeta.Annotations[key] = value
-				nodeRolloutRestart = true
-			}
+		key, value := r.getRolloutRestartAnnotation()
+		if originalStatus.ControllerReady && !instance.Status.ControllerReady {
+			controller.Spec.Template.ObjectMeta.Annotations[key] = value
+			controllerRolloutRestart = true
+		}
+		if originalStatus.NodeReady && !instance.Status.NodeReady {
+			node.Spec.Template.ObjectMeta.Annotations[key] = value
+			nodeRolloutRestart = true
 		}
 		phase = csiv1.DriverPhaseCreating
 	}
