@@ -230,7 +230,7 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 
 func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, originalStatus csiv1.IBMBlockCSIStatus) error {
 	reqLogger := log.WithValues()
-	controllerRolloutRestart := false
+	controllerRestart := false
 	nodeRolloutRestart := false
 
 	controller := &appsv1.StatefulSet{}
@@ -259,13 +259,10 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 	if instance.Status.ControllerReady && instance.Status.NodeReady {
 		phase = csiv1.DriverPhaseRunning
 	} else {
-		restartedAt, timestamp := r.getRolloutRestartAnnotation()
 		if originalStatus.ControllerReady && !instance.Status.ControllerReady {
-			controller.Spec.Template.ObjectMeta.Annotations[restartedAt] = timestamp
-			controllerRolloutRestart = true
+			controllerRestart = true
 		}
 		if originalStatus.NodeReady && !instance.Status.NodeReady {
-			node.Spec.Template.ObjectMeta.Annotations[restartedAt] = timestamp
 			nodeRolloutRestart = true
 		}
 		phase = csiv1.DriverPhaseCreating
@@ -281,9 +278,10 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 		}
 	}
 
-	if controllerRolloutRestart {
+	if controllerRestart {
 		reqLogger.Info("restarting controller")
-		rErr := r.client.Update(context.TODO(), controller)
+		rErr := r.restartControllerPod(instance.Name, instance.Namespace)
+
 		if rErr != nil {
 			return rErr
 		}
@@ -291,7 +289,8 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 
 	if nodeRolloutRestart {
 		reqLogger.Info("restarting node")
-		rErr := r.client.Update(context.TODO(), node)
+		rErr := r.rolloutRestartNode(node)
+
 		if rErr != nil {
 			return rErr
 		}
@@ -300,10 +299,27 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 	return nil
 }
 
-func (r *ReconcileIBMBlockCSI) getRolloutRestartAnnotation() (string, string) {
+func (r *ReconcileIBMBlockCSI) restartControllerPod(name string, namespace string) error {
+	pod := &corev1.Pod{}
+	statefulSetName := oconfig.GetNameForResource(oconfig.CSIController, name)
+	controllerPodName := fmt.Sprintf("%s-0", statefulSetName)
+	err := r.client.Get(context.TODO(), types.NamespacedName{
+		Name:      controllerPodName,
+		Namespace: namespace,
+	}, pod)
+
+	if err != nil {
+		return err
+	}
+
+	return r.client.Delete(context.TODO(), pod)
+}
+
+func (r *ReconcileIBMBlockCSI) rolloutRestartNode(node *appsv1.DaemonSet) error {
 	restartedAt := fmt.Sprintf("%s/restartedAt", oconfig.APIGroup)
 	timestamp := time.Now().String()
-	return restartedAt, timestamp
+	node.Spec.Template.ObjectMeta.Annotations[restartedAt] = timestamp
+	return r.client.Update(context.TODO(), node)
 }
 
 func (r *ReconcileIBMBlockCSI) reconcileCSIDriver(instance *ibmblockcsi.IBMBlockCSI) error {
