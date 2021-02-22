@@ -259,13 +259,13 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 	if instance.Status.ControllerReady && instance.Status.NodeReady {
 		phase = csiv1.DriverPhaseRunning
 	} else {
-		key, value := r.getRolloutRestartAnnotation()
+		restartedAt, timestamp := r.getRolloutRestartAnnotation()
 		if originalStatus.ControllerReady && !instance.Status.ControllerReady {
-			controller.Spec.Template.ObjectMeta.Annotations[key] = value
+			controller.Spec.Template.ObjectMeta.Annotations[restartedAt] = timestamp
 			controllerRolloutRestart = true
 		}
 		if originalStatus.NodeReady && !instance.Status.NodeReady {
-			node.Spec.Template.ObjectMeta.Annotations[key] = value
+			node.Spec.Template.ObjectMeta.Annotations[restartedAt] = timestamp
 			nodeRolloutRestart = true
 		}
 		phase = csiv1.DriverPhaseCreating
@@ -301,9 +301,9 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 }
 
 func (r *ReconcileIBMBlockCSI) getRolloutRestartAnnotation() (string, string) {
-	key := fmt.Sprintf("%s/restartedAt", oconfig.APIGroup)
-	value := time.Now().String()
-	return key, value
+	restartedAt := fmt.Sprintf("%s/restartedAt", oconfig.APIGroup)
+	timestamp := time.Now().String()
+	return restartedAt, timestamp
 }
 
 func (r *ReconcileIBMBlockCSI) reconcileCSIDriver(instance *ibmblockcsi.IBMBlockCSI) error {
