@@ -194,16 +194,8 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 		}
 	}
 
-	status := *instance.Status.DeepCopy()
-	defer func() {
-		if !reflect.DeepEqual(status, instance.Status) {
-			reqLogger.Info("updating IBMBlockCSI status", "name", instance.Name)
-			sErr := r.client.Status().Update(context.TODO(), instance.Unwrap())
-			if sErr != nil {
-				reqLogger.Error(sErr, "failed to update IBMBlockCSI status", "name", instance.Name)
-			}
-		}
-	}()
+
+	originalStatus := *instance.Status.DeepCopy()
 
 	// create the resources which never change if not exist
 	for _, rec := range []reconciler{
@@ -228,7 +220,7 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 		return reconcile.Result{}, err
 	}
 
-	if err := r.updateStatus(instance); err != nil {
+	if err := r.updateStatus(instance, originalStatus); err != nil {
 		return reconcile.Result{}, err
 	}
 
@@ -236,7 +228,11 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 	return reconcile.Result{}, nil
 }
 
-func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI) error {
+func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, originalStatus csiv1.IBMBlockCSIStatus) error {
+	reqLogger := log.WithValues()
+	controllerRestart := false
+	nodeRolloutRestart := false
+
 	controller := &appsv1.StatefulSet{}
 	err := r.client.Get(context.TODO(), types.NamespacedName{
 		Name:      oconfig.GetNameForResource(oconfig.CSIController, instance.Name),
@@ -263,13 +259,67 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI) e
 	if instance.Status.ControllerReady && instance.Status.NodeReady {
 		phase = csiv1.DriverPhaseRunning
 	} else {
+		if originalStatus.ControllerReady && !instance.Status.ControllerReady {
+			controllerRestart = true
+		}
+		if originalStatus.NodeReady && !instance.Status.NodeReady {
+			nodeRolloutRestart = true
+		}
 		phase = csiv1.DriverPhaseCreating
 	}
 	instance.Status.Phase = phase
 	instance.Status.Version = oversion.DriverVersion
 
-	// no need to push to status to API Server here.
+	if !reflect.DeepEqual(originalStatus, instance.Status) {
+		reqLogger.Info("updating IBMBlockCSI status", "name", instance.Name, "from", originalStatus, "to", instance.Status)
+		sErr := r.client.Status().Update(context.TODO(), instance.Unwrap())
+		if sErr != nil {
+			return sErr
+		}
+	}
+
+	if controllerRestart {
+		reqLogger.Info("csi controller stopped being ready - restarting it")
+		rErr := r.restartControllerPod(instance.Name, instance.Namespace)
+
+		if rErr != nil {
+			return rErr
+		}
+	}
+
+	if nodeRolloutRestart {
+		reqLogger.Info("csi node stopped being ready - restarting it")
+		rErr := r.rolloutRestartNode(node)
+
+		if rErr != nil {
+			return rErr
+		}
+	}
+
 	return nil
+}
+
+func (r *ReconcileIBMBlockCSI) restartControllerPod(name string, namespace string) error {
+	pod := &corev1.Pod{}
+	statefulSetName := oconfig.GetNameForResource(oconfig.CSIController, name)
+	controllerPodName := fmt.Sprintf("%s-0", statefulSetName)
+	err := r.client.Get(context.TODO(), types.NamespacedName{
+		Name:      controllerPodName,
+		Namespace: namespace,
+	}, pod)
+
+	if err != nil {
+		return err
+	}
+
+	return r.client.Delete(context.TODO(), pod)
+}
+
+func (r *ReconcileIBMBlockCSI) rolloutRestartNode(node *appsv1.DaemonSet) error {
+	restartedAt := fmt.Sprintf("%s/restartedAt", oconfig.APIGroup)
+	timestamp := time.Now().String()
+	node.Spec.Template.ObjectMeta.Annotations[restartedAt] = timestamp
+	return r.client.Update(context.TODO(), node)
 }
 
 func (r *ReconcileIBMBlockCSI) reconcileCSIDriver(instance *ibmblockcsi.IBMBlockCSI) error {

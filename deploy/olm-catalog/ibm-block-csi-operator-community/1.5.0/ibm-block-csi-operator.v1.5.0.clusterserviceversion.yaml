@@ -497,6 +497,7 @@ spec:
               - pods
               verbs:
               - get
+              - delete
               - list
               - watch
             - apiGroups:
