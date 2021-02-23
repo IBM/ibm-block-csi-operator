@@ -279,7 +279,7 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 	}
 
 	if controllerRestart {
-		reqLogger.Info("restarting controller")
+		reqLogger.Info("csi controller stopped being ready - restarting it")
 		rErr := r.restartControllerPod(instance.Name, instance.Namespace)
 
 		if rErr != nil {
@@ -288,7 +288,7 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 	}
 
 	if nodeRolloutRestart {
-		reqLogger.Info("restarting node")
+		reqLogger.Info("csi node stopped being ready - restarting it")
 		rErr := r.rolloutRestartNode(node)
 
 		if rErr != nil {
