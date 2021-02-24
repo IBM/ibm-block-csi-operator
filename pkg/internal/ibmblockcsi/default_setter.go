@@ -18,6 +18,7 @@ package ibmblockcsi
 
 import (
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
+	corev1 "k8s.io/api/core/v1"
 )
 
 // SetDefaults set defaults if omitted in spec, returns true means CR should be updated on cluster.
@@ -44,5 +45,19 @@ func (c *IBMBlockCSI) SetDefaults() bool {
 		changed = true
 	}
 
+	c.setDefaultForNilSliceFields()
+
 	return changed
+}
+
+func (c *IBMBlockCSI) setDefaultForNilSliceFields() {
+	if c.Spec.ImagePullSecrets == nil {
+		c.Spec.ImagePullSecrets = []string{}
+	}
+	if c.Spec.Controller.Tolerations == nil {
+		c.Spec.Controller.Tolerations = []corev1.Toleration{}
+	}
+	if c.Spec.Node.Tolerations == nil {
+		c.Spec.Node.Tolerations = []corev1.Toleration{}
+	}
 }

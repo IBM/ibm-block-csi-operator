@@ -52,3 +52,21 @@ func IsNodeAgentReady(c client.Client) bool {
 	}
 	return conf.Status.NodeAgent.Phase == csiv1.NodeAgentPhaseRunning
 }
+
+func Contains(list []string, s string) bool {
+	for _, v := range list {
+		if v == s {
+			return true
+		}
+	}
+	return false
+}
+
+func Remove(list []string, s string) []string {
+	for i, v := range list {
+		if v == s {
+			list = append(list[:i], list[i+1:]...)
+		}
+	}
+	return list
+}
