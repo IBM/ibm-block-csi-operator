@@ -52,6 +52,7 @@ func (c *IBMBlockCSI) GetLabels() labels.Set {
 		"app.kubernetes.io/managed-by": config.Name,
 		"csi":                          "ibm",
 		"product":                      config.ProductName,
+		"release":                      fmt.Sprintf("v%s", csiversion.Version),
 	}
 
 	if c.Labels != nil {
