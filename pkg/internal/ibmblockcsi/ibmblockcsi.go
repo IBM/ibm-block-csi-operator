@@ -17,6 +17,7 @@
 package ibmblockcsi
 
 import (
+	"fmt"
 	csiv1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	csiversion "github.com/IBM/ibm-block-csi-operator/version"
@@ -51,6 +52,7 @@ func (c *IBMBlockCSI) GetLabels() labels.Set {
 		"app.kubernetes.io/managed-by": config.Name,
 		"csi":                          "ibm",
 		"product":                      config.ProductName,
+		"release":                      fmt.Sprintf("v%s", csiversion.Version),
 	}
 
 	if c.Labels != nil {
@@ -118,4 +120,11 @@ func (c *IBMBlockCSI) GetCSINodeImage() string {
 		return c.Spec.Node.Repository
 	}
 	return c.Spec.Node.Repository + ":" + c.Spec.Node.Tag
+}
+
+func (c *IBMBlockCSI) GetDefaultSidecarImageByName(name string) string {
+	if sidecar, found := config.DefaultSidecarsByName[name]; found {
+		return fmt.Sprintf("%s:%s", sidecar.Repository, sidecar.Tag)
+	}
+	return ""
 }

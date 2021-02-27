@@ -26,9 +26,14 @@ import (
 )
 
 var _ = Describe("DefaultSetter", func() {
-	var ibc *csiv1.IBMBlockCSI = &csiv1.IBMBlockCSI{}
+	var ibc = &csiv1.IBMBlockCSI{}
 	var ibcWrapper = New(ibc, "1.13")
 	var changed bool
+
+	It("should have a cr yaml configured", func () {
+		err := config.LoadDefaultsOfIBMBlockCSI()
+		Expect(err).To(BeNil())
+	})
 
 	Context("test SetDefaults", func() {
 
@@ -40,14 +45,14 @@ var _ = Describe("DefaultSetter", func() {
 
 			It("should set right defaults", func() {
 				Expect(changed).To(BeTrue())
-				Expect(ibc.Spec.Controller.Repository).To(Equal(config.ControllerRepository))
-				Expect(ibc.Spec.Controller.Tag).To(Equal(config.ControllerTag))
-				Expect(ibc.Spec.Node.Repository).To(Equal(config.NodeRepository))
-				Expect(ibc.Spec.Node.Tag).To(Equal(config.NodeTag))
+				Expect(ibc.Spec.Controller.Repository).To(Equal(config.DefaultCr.Spec.Controller.Repository))
+				Expect(ibc.Spec.Controller.Tag).To(Equal(config.DefaultCr.Spec.Controller.Tag))
+				Expect(ibc.Spec.Node.Repository).To(Equal(config.DefaultCr.Spec.Node.Repository))
+				Expect(ibc.Spec.Node.Tag).To(Equal(config.DefaultCr.Spec.Node.Tag))
 			})
 		})
 
-		Context("only controller repository is set", func() {
+		Context("only controller repository is unofficial", func() {
 
 			BeforeEach(func() {
 				ibc = &csiv1.IBMBlockCSI{
@@ -55,16 +60,20 @@ var _ = Describe("DefaultSetter", func() {
 						Controller: csiv1.IBMBlockCSIControllerSpec{
 							Repository: "test",
 						},
+						Node: csiv1.IBMBlockCSINodeSpec{
+							Repository: config.DefaultCr.Spec.Node.Repository,
+							Tag: config.DefaultCr.Spec.Node.Tag,
+						},
 					}}
 				ibcWrapper.IBMBlockCSI = ibc
 			})
 
-			It("should set right defaults", func() {
-				Expect(changed).To(BeTrue())
+			It("should not set any defaults", func() {
+				Expect(changed).To(BeFalse())
 				Expect(ibc.Spec.Controller.Repository).To(Equal("test"))
 				Expect(ibc.Spec.Controller.Tag).To(Equal(""))
-				Expect(ibc.Spec.Node.Repository).To(Equal(config.NodeRepository))
-				Expect(ibc.Spec.Node.Tag).To(Equal(config.NodeTag))
+				Expect(ibc.Spec.Node.Repository).To(Equal(config.DefaultCr.Spec.Node.Repository))
+				Expect(ibc.Spec.Node.Tag).To(Equal(config.DefaultCr.Spec.Node.Tag))
 			})
 		})
 
@@ -82,18 +91,22 @@ var _ = Describe("DefaultSetter", func() {
 
 			It("should set right defaults", func() {
 				Expect(changed).To(BeTrue())
-				Expect(ibc.Spec.Controller.Repository).To(Equal(config.ControllerRepository))
+				Expect(ibc.Spec.Controller.Repository).To(Equal(config.DefaultCr.Spec.Controller.Repository))
 				Expect(ibc.Spec.Controller.Tag).NotTo(Equal("test"))
-				Expect(ibc.Spec.Node.Repository).To(Equal(config.NodeRepository))
-				Expect(ibc.Spec.Node.Tag).To(Equal(config.NodeTag))
+				Expect(ibc.Spec.Node.Repository).To(Equal(config.DefaultCr.Spec.Node.Repository))
+				Expect(ibc.Spec.Node.Tag).To(Equal(config.DefaultCr.Spec.Node.Tag))
 			})
 		})
 
-		Context("only node repository is set", func() {
+		Context("only node repository is unofficial", func() {
 
 			BeforeEach(func() {
 				ibc = &csiv1.IBMBlockCSI{
 					Spec: csiv1.IBMBlockCSISpec{
+						Controller: csiv1.IBMBlockCSIControllerSpec{
+							Repository: config.DefaultCr.Spec.Controller.Repository,
+							Tag: config.DefaultCr.Spec.Controller.Tag,
+						},
 						Node: csiv1.IBMBlockCSINodeSpec{
 							Repository: "test",
 						},
@@ -101,10 +114,10 @@ var _ = Describe("DefaultSetter", func() {
 				ibcWrapper.IBMBlockCSI = ibc
 			})
 
-			It("should set right defaults", func() {
-				Expect(changed).To(BeTrue())
-				Expect(ibc.Spec.Controller.Repository).To(Equal(config.ControllerRepository))
-				Expect(ibc.Spec.Controller.Tag).To(Equal(config.ControllerTag))
+			It("should not set any defaults", func() {
+				Expect(changed).To(BeFalse())
+				Expect(ibc.Spec.Controller.Repository).To(Equal(config.DefaultCr.Spec.Controller.Repository))
+				Expect(ibc.Spec.Controller.Tag).To(Equal(config.DefaultCr.Spec.Controller.Tag))
 				Expect(ibc.Spec.Node.Repository).To(Equal("test"))
 				Expect(ibc.Spec.Node.Tag).To(Equal(""))
 			})
@@ -124,9 +137,9 @@ var _ = Describe("DefaultSetter", func() {
 
 			It("should set right defaults", func() {
 				Expect(changed).To(BeTrue())
-				Expect(ibc.Spec.Controller.Repository).To(Equal(config.ControllerRepository))
-				Expect(ibc.Spec.Controller.Tag).To(Equal(config.ControllerTag))
-				Expect(ibc.Spec.Node.Repository).To(Equal(config.NodeRepository))
+				Expect(ibc.Spec.Controller.Repository).To(Equal(config.DefaultCr.Spec.Controller.Repository))
+				Expect(ibc.Spec.Controller.Tag).To(Equal(config.DefaultCr.Spec.Controller.Tag))
+				Expect(ibc.Spec.Node.Repository).To(Equal(config.DefaultCr.Spec.Node.Repository))
 				Expect(ibc.Spec.Node.Tag).NotTo(Equal("test"))
 			})
 		})
@@ -139,10 +152,10 @@ var _ = Describe("DefaultSetter", func() {
 
 			It("should do nothing", func() {
 				Expect(changed).To(BeFalse())
-				Expect(ibc.Spec.Controller.Repository).To(Equal(config.ControllerRepository))
-				Expect(ibc.Spec.Controller.Tag).To(Equal(config.ControllerTag))
-				Expect(ibc.Spec.Node.Repository).To(Equal(config.NodeRepository))
-				Expect(ibc.Spec.Node.Tag).NotTo(Equal("test"))
+				Expect(ibc.Spec.Controller.Repository).To(Equal(config.DefaultCr.Spec.Controller.Repository))
+				Expect(ibc.Spec.Controller.Tag).To(Equal(config.DefaultCr.Spec.Controller.Tag))
+				Expect(ibc.Spec.Node.Repository).To(Equal(config.DefaultCr.Spec.Node.Repository))
+				Expect(ibc.Spec.Node.Tag).To(Equal(config.DefaultCr.Spec.Node.Tag))
 			})
 		})
 

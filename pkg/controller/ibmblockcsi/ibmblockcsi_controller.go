@@ -192,6 +192,7 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 			err = fmt.Errorf("failed to update IBMBlockCSI CR: %v", err)
 			return reconcile.Result{}, err
 		}
+		return reconcile.Result{}, nil
 	}
 
 

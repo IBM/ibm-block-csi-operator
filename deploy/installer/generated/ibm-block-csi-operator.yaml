@@ -1472,6 +1472,9 @@ spec:
         imagePullPolicy: IfNotPresent
         command:
         - ibm-block-csi-operator
+        args:
+        - --zap-encoder
+        - console
         env:
         - name: WATCH_NAMESPACE
           value: ""
