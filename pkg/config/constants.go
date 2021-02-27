@@ -18,6 +18,7 @@ package config
 
 // Add a field here if it never changes, if it changes over time, put it to settings.go
 const (
+	APIGroup    = "csi.ibm.com"
 	APIVersion  = "v1"
 	Name        = "ibm-block-csi-operator"
 	DriverName  = "block.csi.ibm.com"
