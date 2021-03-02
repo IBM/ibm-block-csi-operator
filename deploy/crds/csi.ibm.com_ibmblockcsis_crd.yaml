@@ -1382,7 +1382,8 @@ spec:
           required:
           - controller
           - node
-        type: object
+          - license
+          type: object
         status:
           description: IBMBlockCSIStatus defines the observed state of IBMBlockCSI
           properties:
