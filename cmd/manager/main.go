@@ -27,6 +27,7 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
 	"github.com/IBM/ibm-block-csi-operator/pkg/apis"
+	operatorConfig "github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/controller"
 
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
@@ -81,6 +82,12 @@ func main() {
 	logf.SetLogger(zap.Logger())
 
 	printVersion()
+
+	err := operatorConfig.LoadDefaultsOfIBMBlockCSI()
+	if err != nil {
+		log.Error(err, "Failed to load default custom resource config")
+		os.Exit(1)
+	}
 
 	namespace, err := k8sutil.GetWatchNamespace()
 	if err != nil {

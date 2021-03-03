@@ -312,32 +312,32 @@ func (s *csiControllerSyncer) getSidecarByName(name string) *csiv1.CSISidecar {
 	return getSidecarByName(s.driver, name)
 }
 
-func (s *csiControllerSyncer) getSidecarImageByName(name string, image string) string {
+func (s *csiControllerSyncer) getSidecarImageByName(name string) string {
 	sidecar := s.getSidecarByName(name)
 	if sidecar != nil {
 		return fmt.Sprintf("%s:%s", sidecar.Repository, sidecar.Tag)
 	}
-	return image
+	return s.driver.GetDefaultSidecarImageByName(name)
 }
 
 func (s *csiControllerSyncer) getCSIAttacherImage() string {
-	return s.getSidecarImageByName(config.CSIAttacher, config.CSIAttacherImage)
+	return s.getSidecarImageByName(config.CSIAttacher)
 }
 
 func (s *csiControllerSyncer) getCSIProvisionerImage() string {
-	return s.getSidecarImageByName(config.CSIProvisioner, config.CSIProvisionerImage)
+	return s.getSidecarImageByName(config.CSIProvisioner)
 }
 
 func (s *csiControllerSyncer) getLivenessProbeImage() string {
-	return s.getSidecarImageByName(config.LivenessProbe, config.CSILivenessProbeImage)
+	return s.getSidecarImageByName(config.LivenessProbe)
 }
 
 func (s *csiControllerSyncer) getCSISnapshotterImage() string {
-	return s.getSidecarImageByName(config.CSISnapshotter, config.CSISnapshotterImage)
+	return s.getSidecarImageByName(config.CSISnapshotter)
 }
 
 func (s *csiControllerSyncer) getCSIResizerImage() string {
-	return s.getSidecarImageByName(config.CSIResizer, config.CSIResizerImage)
+	return s.getSidecarImageByName(config.CSIResizer)
 }
 
 func (s *csiControllerSyncer) getSidecarPullPolicy(sidecarName string) corev1.PullPolicy {
@@ -378,6 +378,7 @@ func ensureProbe(delay, timeout, period int32, handler corev1.Handler) *corev1.P
 		TimeoutSeconds:      timeout,
 		PeriodSeconds:       period,
 		Handler:             handler,
+		SuccessThreshold:    1,
 		FailureThreshold:    30,
 	}
 }

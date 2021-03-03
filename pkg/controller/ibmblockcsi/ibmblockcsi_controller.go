@@ -207,7 +207,7 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 		if err != nil {
 			return reconcile.Result{}, err
 		}
-		
+
 		if !isFinalizerExists {
 			return reconcile.Result{}, nil
 		}

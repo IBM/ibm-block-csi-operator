@@ -14,9 +14,11 @@
 
 FROM golang:1.13.1
 
-WORKDIR /go/src/github.com/IBM/ibm-block-csi-operator
 ENV GO111MODULE=on \
-    GOROOT=/usr/local/go
+    GOROOT=/usr/local/go \
+    WORKDIR=/go/src/github.com/IBM/ibm-block-csi-operator
+ENV CR_YAML=$WORKDIR/deploy/crds/csi.ibm.com_v1_ibmblockcsi_cr.yaml
+WORKDIR $WORKDIR
 
 RUN go get github.com/onsi/ginkgo/ginkgo
 RUN RELEASE_VERSION=v0.16.0 \
