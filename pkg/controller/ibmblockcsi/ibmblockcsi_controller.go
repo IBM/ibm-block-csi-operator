@@ -256,7 +256,7 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 }
 
 func (r *ReconcileIBMBlockCSI) addFinalizerIfNotPresent(instance *ibmblockcsi.IBMBlockCSI) error {
-	logger := log.WithName("addFinalizer")
+	logger := log.WithName("addFinalizerIfNotPresent")
 
 	accessor, finalizerName, err := r.getAccessorAndFinalizerName(instance)
 	if err != nil {
@@ -411,7 +411,7 @@ func (r *ReconcileIBMBlockCSI) rolloutRestartNode(node *appsv1.DaemonSet) error 
 }
 
 func (r *ReconcileIBMBlockCSI) reconcileCSIDriver(instance *ibmblockcsi.IBMBlockCSI) error {
-	recLogger := log.WithValues("Resource Type", "CSIDriver")
+	logger := log.WithValues("Resource Type", "CSIDriver")
 
 	cd := instance.GenerateCSIDriver()
 	if err := controllerutil.SetControllerReference(instance.Unwrap(), cd, r.scheme); err != nil {
@@ -423,13 +423,13 @@ func (r *ReconcileIBMBlockCSI) reconcileCSIDriver(instance *ibmblockcsi.IBMBlock
 		Namespace: "",
 	}, found)
 	if err != nil && errors.IsNotFound(err) {
-		recLogger.Info("Creating a new CSIDriver", "Name", cd.GetName())
+		logger.Info("Creating a new CSIDriver", "Name", cd.GetName())
 		err = r.client.Create(context.TODO(), cd)
 		if err != nil {
 			return err
 		}
 	} else if err != nil {
-		recLogger.Error(err, "Failed to get CSIDriver", "Name", cd.GetName())
+		logger.Error(err, "Failed to get CSIDriver", "Name", cd.GetName())
 		return err
 	} else {
 		// Resource already exists - don't requeue
@@ -560,7 +560,7 @@ func (r *ReconcileIBMBlockCSI) getClusterRoles(instance *ibmblockcsi.IBMBlockCSI
 }
 
 func (r *ReconcileIBMBlockCSI) reconcileClusterRoleBinding(instance *ibmblockcsi.IBMBlockCSI) error {
-	recLogger := log.WithValues("Resource Type", "ClusterRoleBinding")
+	logger := log.WithValues("Resource Type", "ClusterRoleBinding")
 
 	clusterRoleBindings := r.getClusterRoleBindings(instance)
 
@@ -571,17 +571,17 @@ func (r *ReconcileIBMBlockCSI) reconcileClusterRoleBinding(instance *ibmblockcsi
 			Namespace: crb.Namespace,
 		}, found)
 		if err != nil && errors.IsNotFound(err) {
-			recLogger.Info("Creating a new ClusterRoleBinding", "Name", crb.GetName())
+			logger.Info("Creating a new ClusterRoleBinding", "Name", crb.GetName())
 			err = r.client.Create(context.TODO(), crb)
 			if err != nil {
 				return err
 			}
 		} else if err != nil {
-			recLogger.Error(err, "Failed to get ClusterRole", "Name", crb.GetName())
+			logger.Error(err, "Failed to get ClusterRole", "Name", crb.GetName())
 			return err
 		} else {
 			// Resource already exists - don't requeue
-			//recLogger.Info("Skip reconcile: ClusterRoleBinding already exists", "Name", crb.GetName())
+			//logger.Info("Skip reconcile: ClusterRoleBinding already exists", "Name", crb.GetName())
 		}
 	}
 	return nil
