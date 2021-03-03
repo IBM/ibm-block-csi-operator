@@ -9,8 +9,8 @@ metadata:
     app.kubernetes.io/managed-by: ibm-block-csi-operator
     release: v1.5.0
 spec:
-   license:
-     accept: true
+  license:
+    accept: true
   # controller is a statefulSet with ibm-block-csi-controller container
   # and csi-provisioner, csi-attacher, csi-snapshotter and livenessprobe sidecars.
   controller:
