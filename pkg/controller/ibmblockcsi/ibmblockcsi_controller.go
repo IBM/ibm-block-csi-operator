@@ -281,10 +281,7 @@ func (r *ReconcileIBMBlockCSI) hasFinalizer(instance *ibmblockcsi.IBMBlockCSI) (
 		return false, err
 	}
 
-	if util.Contains(accessor.GetFinalizers(), finalizerName) {
-		return true, nil
-	}
-	return false, nil
+	return util.Contains(accessor.GetFinalizers(), finalizerName), nil
 }
 
 func (r *ReconcileIBMBlockCSI) removeFinalizer(instance *ibmblockcsi.IBMBlockCSI) error {
