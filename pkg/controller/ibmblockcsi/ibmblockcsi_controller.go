@@ -24,12 +24,13 @@ import (
 	"strings"
 	"time"
 
-	csiv1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	storagev1beta1 "k8s.io/api/storage/v1beta1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
@@ -44,8 +45,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
+	csiv1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
 	oconfig "github.com/IBM/ibm-block-csi-operator/pkg/config"
 	clustersyncer "github.com/IBM/ibm-block-csi-operator/pkg/controller/ibmblockcsi/syncer"
+	"github.com/IBM/ibm-block-csi-operator/pkg/controller/util"
 	"github.com/IBM/ibm-block-csi-operator/pkg/internal/ibmblockcsi"
 	kubeutil "github.com/IBM/ibm-block-csi-operator/pkg/util/kubernetes"
 	oversion "github.com/IBM/ibm-block-csi-operator/version"
@@ -195,6 +198,29 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 		return reconcile.Result{}, nil
 	}
 
+	if err := r.addFinalizerIfNotPresent(instance); err != nil {
+		return reconcile.Result{}, err
+	}
+
+	if !instance.GetDeletionTimestamp().IsZero() {
+		isFinalizerExists, err := r.hasFinalizer(instance)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+
+		if !isFinalizerExists {
+			return reconcile.Result{}, nil
+		}
+
+		if err := r.deleteClusterRolesAndBindings(instance); err != nil {
+			return reconcile.Result{}, err
+		}
+
+		if err := r.removeFinalizer(instance); err != nil {
+			return reconcile.Result{}, err
+		}
+		return reconcile.Result{}, nil
+	}
 
 	originalStatus := *instance.Status.DeepCopy()
 
@@ -229,8 +255,66 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 	return reconcile.Result{}, nil
 }
 
+func (r *ReconcileIBMBlockCSI) addFinalizerIfNotPresent(instance *ibmblockcsi.IBMBlockCSI) error {
+	logger := log.WithName("addFinalizerIfNotPresent")
+
+	accessor, finalizerName, err := r.getAccessorAndFinalizerName(instance)
+	if err != nil {
+		return err
+	}
+
+	if !util.Contains(accessor.GetFinalizers(), finalizerName) {
+		logger.Info("adding", "finalizer", finalizerName, "on", accessor.GetName())
+		accessor.SetFinalizers(append(accessor.GetFinalizers(), finalizerName))
+
+		if err := r.client.Update(context.TODO(), instance.Unwrap()); err != nil {
+			logger.Error(err, "failed to add", "finalizer", finalizerName, "on", accessor.GetName())
+			return err
+		}
+	}
+	return nil
+}
+
+func (r *ReconcileIBMBlockCSI) hasFinalizer(instance *ibmblockcsi.IBMBlockCSI) (bool, error) {
+	accessor, finalizerName, err := r.getAccessorAndFinalizerName(instance)
+	if err != nil {
+		return false, err
+	}
+
+	return util.Contains(accessor.GetFinalizers(), finalizerName), nil
+}
+
+func (r *ReconcileIBMBlockCSI) removeFinalizer(instance *ibmblockcsi.IBMBlockCSI) error {
+	logger := log.WithName("removeFinalizer")
+
+	accessor, finalizerName, err := r.getAccessorAndFinalizerName(instance)
+	if err != nil {
+		return err
+	}
+
+	accessor.SetFinalizers(util.Remove(accessor.GetFinalizers(), finalizerName))
+	if err := r.client.Update(context.TODO(), instance.Unwrap()); err != nil {
+		logger.Error(err, "failed to remove", "finalizer", finalizerName, "from", accessor.GetName())
+		return err
+	}
+	return nil
+}
+
+func (r *ReconcileIBMBlockCSI) getAccessorAndFinalizerName(instance *ibmblockcsi.IBMBlockCSI) (metav1.Object, string, error) {
+	logger := log.WithName("getAccessorAndFinalizerName")
+	lowercaseKind := strings.ToLower(instance.GetObjectKind().GroupVersionKind().Kind)
+	finalizerName := fmt.Sprintf("%s.%s", lowercaseKind, oconfig.APIGroup)
+
+	accessor, err := meta.Accessor(instance)
+	if err != nil {
+		logger.Error(err, "failed to get meta information of instance")
+		return nil, "", err
+	}
+	return accessor, finalizerName, nil
+}
+
 func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, originalStatus csiv1.IBMBlockCSIStatus) error {
-	reqLogger := log.WithValues()
+	logger := log.WithName("updateStatus")
 	controllerRestart := false
 	nodeRolloutRestart := false
 
@@ -272,7 +356,7 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 	instance.Status.Version = oversion.DriverVersion
 
 	if !reflect.DeepEqual(originalStatus, instance.Status) {
-		reqLogger.Info("updating IBMBlockCSI status", "name", instance.Name, "from", originalStatus, "to", instance.Status)
+		logger.Info("updating IBMBlockCSI status", "name", instance.Name, "from", originalStatus, "to", instance.Status)
 		sErr := r.client.Status().Update(context.TODO(), instance.Unwrap())
 		if sErr != nil {
 			return sErr
@@ -280,7 +364,7 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 	}
 
 	if controllerRestart {
-		reqLogger.Info("csi controller stopped being ready - restarting it")
+		logger.Info("csi controller stopped being ready - restarting it")
 		rErr := r.restartControllerPod(instance.Name, instance.Namespace)
 
 		if rErr != nil {
@@ -289,7 +373,7 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 	}
 
 	if nodeRolloutRestart {
-		reqLogger.Info("csi node stopped being ready - restarting it")
+		logger.Info("csi node stopped being ready - restarting it")
 		rErr := r.rolloutRestartNode(node)
 
 		if rErr != nil {
@@ -324,7 +408,7 @@ func (r *ReconcileIBMBlockCSI) rolloutRestartNode(node *appsv1.DaemonSet) error 
 }
 
 func (r *ReconcileIBMBlockCSI) reconcileCSIDriver(instance *ibmblockcsi.IBMBlockCSI) error {
-	recLogger := log.WithValues("Resource Type", "CSIDriver")
+	logger := log.WithValues("Resource Type", "CSIDriver")
 
 	cd := instance.GenerateCSIDriver()
 	if err := controllerutil.SetControllerReference(instance.Unwrap(), cd, r.scheme); err != nil {
@@ -336,13 +420,13 @@ func (r *ReconcileIBMBlockCSI) reconcileCSIDriver(instance *ibmblockcsi.IBMBlock
 		Namespace: "",
 	}, found)
 	if err != nil && errors.IsNotFound(err) {
-		recLogger.Info("Creating a new CSIDriver", "Name", cd.GetName())
+		logger.Info("Creating a new CSIDriver", "Name", cd.GetName())
 		err = r.client.Create(context.TODO(), cd)
 		if err != nil {
 			return err
 		}
 	} else if err != nil {
-		recLogger.Error(err, "Failed to get CSIDriver", "Name", cd.GetName())
+		logger.Error(err, "Failed to get CSIDriver", "Name", cd.GetName())
 		return err
 	} else {
 		// Resource already exists - don't requeue
@@ -352,7 +436,7 @@ func (r *ReconcileIBMBlockCSI) reconcileCSIDriver(instance *ibmblockcsi.IBMBlock
 }
 
 func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBMBlockCSI) error {
-	recLogger := log.WithValues("Resource Type", "ServiceAccount")
+	logger := log.WithValues("Resource Type", "ServiceAccount")
 
 	controller := instance.GenerateControllerServiceAccount()
 	node := instance.GenerateNodeServiceAccount()
@@ -370,17 +454,17 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 			Namespace: sa.Namespace,
 		}, found)
 		if err != nil && errors.IsNotFound(err) {
-			recLogger.Info("Creating a new ServiceAccount", "Namespace", sa.GetNamespace(), "Name", sa.GetName())
+			logger.Info("Creating a new ServiceAccount", "Namespace", sa.GetNamespace(), "Name", sa.GetName())
 			err = r.client.Create(context.TODO(), sa)
 			if err != nil {
 				return err
 			}
 		} else if err != nil {
-			recLogger.Error(err, "Failed to get ServiceAccount", "Name", sa.GetName())
+			logger.Error(err, "Failed to get ServiceAccount", "Name", sa.GetName())
 			return err
 		} else {
 			// Resource already exists - don't requeue
-			//recLogger.Info("Skip reconcile: ServiceAccount already exists", "Namespace", sa.GetNamespace(), "Name", sa.GetName())
+			//logger.Info("Skip reconcile: ServiceAccount already exists", "Namespace", sa.GetNamespace(), "Name", sa.GetName())
 		}
 	}
 
@@ -388,8 +472,73 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 }
 
 func (r *ReconcileIBMBlockCSI) reconcileClusterRole(instance *ibmblockcsi.IBMBlockCSI) error {
-	recLogger := log.WithValues("Resource Type", "ClusterRole")
+	logger := log.WithValues("Resource Type", "ClusterRole")
 
+	clusterRoles := r.getClusterRoles(instance)
+
+	for _, cr := range clusterRoles {
+		found := &rbacv1.ClusterRole{}
+		err := r.client.Get(context.TODO(), types.NamespacedName{
+			Name:      cr.Name,
+			Namespace: cr.Namespace,
+		}, found)
+		if err != nil && errors.IsNotFound(err) {
+			logger.Info("Creating a new ClusterRole", "Name", cr.GetName())
+			err = r.client.Create(context.TODO(), cr)
+			if err != nil {
+				return err
+			}
+		} else if err != nil {
+			logger.Error(err, "Failed to get ClusterRole", "Name", cr.GetName())
+			return err
+		} else {
+			// Resource already exists - don't requeue
+			//logger.Info("Skip reconcile: ClusterRole already exists", "Name", cr.GetName())
+		}
+	}
+
+	return nil
+}
+
+func (r *ReconcileIBMBlockCSI) deleteClusterRolesAndBindings(instance *ibmblockcsi.IBMBlockCSI) error {
+	if err := r.deleteClusterRoleBindings(instance); err != nil {
+		return err
+	}
+
+	if err := r.deleteClusterRoles(instance); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *ReconcileIBMBlockCSI) deleteClusterRoles(instance *ibmblockcsi.IBMBlockCSI) error {
+	logger := log.WithName("deleteClusterRoles")
+
+	clusterRoles := r.getClusterRoles(instance)
+
+	for _, cr := range clusterRoles {
+		found := &rbacv1.ClusterRole{}
+		err := r.client.Get(context.TODO(), types.NamespacedName{
+			Name:      cr.Name,
+			Namespace: cr.Namespace,
+		}, found)
+		if err != nil && errors.IsNotFound(err) {
+			continue
+		} else if err != nil {
+			logger.Error(err, "failed to get ClusterRole", "Name", cr.GetName())
+			return err
+		} else {
+			logger.Info("deleting ClusterRole", "Name", cr.GetName())
+			if err := r.client.Delete(context.TODO(), found); err != nil {
+				logger.Error(err, "failed to delete ClusterRole", "Name", cr.GetName())
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (r *ReconcileIBMBlockCSI) getClusterRoles(instance *ibmblockcsi.IBMBlockCSI) []*rbacv1.ClusterRole {
 	externalProvisioner := instance.GenerateExternalProvisionerClusterRole()
 	externalAttacher := instance.GenerateExternalAttacherClusterRole()
 	externalSnapshotter := instance.GenerateExternalSnapshotterClusterRole()
@@ -397,43 +546,72 @@ func (r *ReconcileIBMBlockCSI) reconcileClusterRole(instance *ibmblockcsi.IBMBlo
 	controllerSCC := instance.GenerateSCCForControllerClusterRole()
 	nodeSCC := instance.GenerateSCCForNodeClusterRole()
 
-	for _, cr := range []*rbacv1.ClusterRole{
+	return []*rbacv1.ClusterRole{
 		externalProvisioner,
 		externalAttacher,
 		externalSnapshotter,
 		externalResizer,
 		controllerSCC,
 		nodeSCC,
-	} {
-		if err := controllerutil.SetControllerReference(instance.Unwrap(), cr, r.scheme); err != nil {
-			return err
-		}
-		found := &rbacv1.ClusterRole{}
+	}
+}
+
+func (r *ReconcileIBMBlockCSI) reconcileClusterRoleBinding(instance *ibmblockcsi.IBMBlockCSI) error {
+	logger := log.WithValues("Resource Type", "ClusterRoleBinding")
+
+	clusterRoleBindings := r.getClusterRoleBindings(instance)
+
+	for _, crb := range clusterRoleBindings {
+		found := &rbacv1.ClusterRoleBinding{}
 		err := r.client.Get(context.TODO(), types.NamespacedName{
-			Name:      cr.Name,
-			Namespace: cr.Namespace,
+			Name:      crb.Name,
+			Namespace: crb.Namespace,
 		}, found)
 		if err != nil && errors.IsNotFound(err) {
-			recLogger.Info("Creating a new ClusterRole", "Name", cr.GetName())
-			err = r.client.Create(context.TODO(), cr)
+			logger.Info("Creating a new ClusterRoleBinding", "Name", crb.GetName())
+			err = r.client.Create(context.TODO(), crb)
 			if err != nil {
 				return err
 			}
 		} else if err != nil {
-			recLogger.Error(err, "Failed to get ClusterRole", "Name", cr.GetName())
+			logger.Error(err, "Failed to get ClusterRole", "Name", crb.GetName())
 			return err
 		} else {
 			// Resource already exists - don't requeue
-			//recLogger.Info("Skip reconcile: ClusterRole already exists", "Name", cr.GetName())
+			//logger.Info("Skip reconcile: ClusterRoleBinding already exists", "Name", crb.GetName())
 		}
 	}
-
 	return nil
 }
 
-func (r *ReconcileIBMBlockCSI) reconcileClusterRoleBinding(instance *ibmblockcsi.IBMBlockCSI) error {
-	recLogger := log.WithValues("Resource Type", "ClusterRoleBinding")
+func (r *ReconcileIBMBlockCSI) deleteClusterRoleBindings(instance *ibmblockcsi.IBMBlockCSI) error {
+	logger := log.WithName("deleteClusterRoleBindings")
 
+	clusterRoleBindings := r.getClusterRoleBindings(instance)
+
+	for _, crb := range clusterRoleBindings {
+		found := &rbacv1.ClusterRoleBinding{}
+		err := r.client.Get(context.TODO(), types.NamespacedName{
+			Name:      crb.Name,
+			Namespace: crb.Namespace,
+		}, found)
+		if err != nil && errors.IsNotFound(err) {
+			continue
+		} else if err != nil {
+			logger.Error(err, "failed to get ClusterRoleBinding", "Name", crb.GetName())
+			return err
+		} else {
+			logger.Info("deleting ClusterRoleBinding", "Name", crb.GetName())
+			if err := r.client.Delete(context.TODO(), found); err != nil {
+				logger.Error(err, "failed to delete ClusterRoleBinding", "Name", crb.GetName())
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (r *ReconcileIBMBlockCSI) getClusterRoleBindings(instance *ibmblockcsi.IBMBlockCSI) []*rbacv1.ClusterRoleBinding {
 	externalProvisioner := instance.GenerateExternalProvisionerClusterRoleBinding()
 	externalAttacher := instance.GenerateExternalAttacherClusterRoleBinding()
 	externalSnapshotter := instance.GenerateExternalSnapshotterClusterRoleBinding()
@@ -441,35 +619,12 @@ func (r *ReconcileIBMBlockCSI) reconcileClusterRoleBinding(instance *ibmblockcsi
 	controllerSCC := instance.GenerateSCCForControllerClusterRoleBinding()
 	nodeSCC := instance.GenerateSCCForNodeClusterRoleBinding()
 
-	for _, crb := range []*rbacv1.ClusterRoleBinding{
+	return []*rbacv1.ClusterRoleBinding{
 		externalProvisioner,
 		externalAttacher,
 		externalSnapshotter,
 		externalResizer,
 		controllerSCC,
 		nodeSCC,
-	} {
-		if err := controllerutil.SetControllerReference(instance.Unwrap(), crb, r.scheme); err != nil {
-			return err
-		}
-		found := &rbacv1.ClusterRoleBinding{}
-		err := r.client.Get(context.TODO(), types.NamespacedName{
-			Name:      crb.Name,
-			Namespace: crb.Namespace,
-		}, found)
-		if err != nil && errors.IsNotFound(err) {
-			recLogger.Info("Creating a new ClusterRoleBinding", "Name", crb.GetName())
-			err = r.client.Create(context.TODO(), crb)
-			if err != nil {
-				return err
-			}
-		} else if err != nil {
-			recLogger.Error(err, "Failed to get ClusterRole", "Name", crb.GetName())
-			return err
-		} else {
-			// Resource already exists - don't requeue
-			//recLogger.Info("Skip reconcile: ClusterRoleBinding already exists", "Name", crb.GetName())
-		}
 	}
-	return nil
 }
