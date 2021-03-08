@@ -342,7 +342,7 @@ storageclass.storage.k8s.io/gold created
 
 ## Upgrading
 
-In order to upgrade the CSI operator and driver from a previous version, uninstall the existing operator and driver, and then install the newer version.
+In order to upgrade the CSI operator and driver from a previous version, perform [step 1](#1-download-the-manifest-from-github) and [step 4](#4-install-the-operator-while-using-a-user-defined-namespace) from [Installation](#Installation).
 
 ## Uninstalling
 
