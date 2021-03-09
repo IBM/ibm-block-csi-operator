@@ -20,10 +20,10 @@
 build:
 	CGO_ENABLED=1 GOOS=linux go build     -o build/_output/bin/ibm-block-csi-operator     -gcflags all=-trimpath=${GOPATH} -asmflags all=-trimpath=${GOPATH} -mod=vendor cmd/manager/main.go
 
-.PHONY: courier
-courier:
+.PHONY: olm-verification
+olm-verification:
 	operator-courier --verbose verify deploy/olm-catalog/ibm-block-csi-operator-community
-	operator-courier --verbose verify deploy/olm-catalog/ibm-block-csi-operator
+	build/ci/olm_ocp_verification.sh
 
 .PHONY: test
 test: update

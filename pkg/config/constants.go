@@ -23,11 +23,8 @@ const (
 	Name        = "ibm-block-csi-operator"
 	DriverName  = "block.csi.ibm.com"
 	ProductName = "ibm-block-csi-driver"
-	DeployPath  = "/deploy"
 	Masterlabel = "node-role.kubernetes.io/master"
 
-	ControllerRepository = "ibmcom/ibm-block-csi-controller-driver"
-	NodeRepository       = "ibmcom/ibm-block-csi-node-driver"
 	NodeAgentRepository  = "ibmcom/ibm-node-agent"
 
 	ENVIscsiAgentPort = "ISCSI_AGENT_PORT"
