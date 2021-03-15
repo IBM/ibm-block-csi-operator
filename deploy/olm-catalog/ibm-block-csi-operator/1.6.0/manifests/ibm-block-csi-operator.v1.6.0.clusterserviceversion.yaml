@@ -75,37 +75,37 @@ metadata:
               {
                 "name": "csi-node-driver-registrar",
                 "repository": "k8s.gcr.io/sig-storage/csi-node-driver-registrar",
-                "tag": "v2.0.1",
+                "tag": "v2.1.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-provisioner",
                 "repository": "k8s.gcr.io/sig-storage/csi-provisioner",
-                "tag": "v2.0.4",
+                "tag": "v2.1.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-attacher",
                 "repository": "k8s.gcr.io/sig-storage/csi-attacher",
-                "tag": "v3.0.2",
+                "tag": "v3.1.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-snapshotter",
                 "repository": "k8s.gcr.io/sig-storage/csi-snapshotter",
-                "tag": "v3.0.2",
+                "tag": "v4.0.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-resizer",
                 "repository": "k8s.gcr.io/sig-storage/csi-resizer",
-                "tag": "v1.0.1",
+                "tag": "v1.1.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "livenessprobe",
                 "repository": "k8s.gcr.io/sig-storage/livenessprobe",
-                "tag": "v2.1.0",
+                "tag": "v2.2.0",
                 "imagePullPolicy": "IfNotPresent"
               }
             ]
