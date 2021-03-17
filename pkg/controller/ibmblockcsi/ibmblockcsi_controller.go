@@ -351,7 +351,7 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 				logger.Error(err, "failed to get controller pod")
 				return err
 			}
-			if originalStatus.ControllerReady || !r.isAllPodImagesSynced(controllerStatefulset, controllerPod) {
+			if originalStatus.ControllerReady || !r.areAllPodImagesSynced(controllerStatefulset, controllerPod) {
 				logger.Info("controller requires restart",
 							"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
 							"Replicas", controllerStatefulset.Status.Replicas)
@@ -400,8 +400,8 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 	return nil
 }
 
-func (r *ReconcileIBMBlockCSI) isAllPodImagesSynced(controllerStatefulset *appsv1.StatefulSet, controllerPod *corev1.Pod) bool {
-	logger := log.WithName("isAllPodImagesSynced")
+func (r *ReconcileIBMBlockCSI) areAllPodImagesSynced(controllerStatefulset *appsv1.StatefulSet, controllerPod *corev1.Pod) bool {
+	logger := log.WithName("areAllPodImagesSynced")
 	statefulSetContainers := controllerStatefulset.Spec.Template.Spec.Containers
 	podContainers := controllerPod.Spec.Containers
 	if len(statefulSetContainers) != len(podContainers) {
