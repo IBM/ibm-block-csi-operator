@@ -315,14 +315,15 @@ func (r *ReconcileIBMBlockCSI) getAccessorAndFinalizerName(instance *ibmblockcsi
 
 func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, originalStatus csiv1.IBMBlockCSIStatus) error {
 	logger := log.WithName("updateStatus")
+	controllerPod := &corev1.Pod{}
 	controllerRestart := false
 	nodeRolloutRestart := false
 
-	controller := &appsv1.StatefulSet{}
+	controllerStatefulset := &appsv1.StatefulSet{}
 	err := r.client.Get(context.TODO(), types.NamespacedName{
 		Name:      oconfig.GetNameForResource(oconfig.CSIController, instance.Name),
 		Namespace: instance.Namespace,
-	}, controller)
+	}, controllerStatefulset)
 
 	if err != nil {
 		return err
@@ -338,16 +339,31 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 		return err
 	}
 
-	instance.Status.ControllerReady = controller.Status.ReadyReplicas == controller.Status.Replicas
+	instance.Status.ControllerReady = controllerStatefulset.Status.ReadyReplicas == controllerStatefulset.Status.Replicas
 	instance.Status.NodeReady = node.Status.DesiredNumberScheduled == node.Status.NumberAvailable
 	phase := csiv1.DriverPhaseNone
 	if instance.Status.ControllerReady && instance.Status.NodeReady {
 		phase = csiv1.DriverPhaseRunning
 	} else {
-		if originalStatus.ControllerReady && !instance.Status.ControllerReady {
-			controllerRestart = true
+		if !instance.Status.ControllerReady {
+			err := r.getControllerPod(controllerStatefulset, controllerPod)
+			if err != nil {
+				logger.Error(err, "failed to get controller pod")
+				return err
+			}
+			if originalStatus.ControllerReady || !r.areAllPodImagesSynced(controllerStatefulset, controllerPod) {
+				logger.Info("controller requires restart",
+							"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
+							"Replicas", controllerStatefulset.Status.Replicas)
+				controllerRestart = true
+			}
 		}
+
+
 		if originalStatus.NodeReady && !instance.Status.NodeReady {
+			logger.Info("node rollout requires restart",
+				"DesiredNumberScheduled", node.Status.DesiredNumberScheduled,
+				"NumberAvailable", node.Status.NumberAvailable)
 			nodeRolloutRestart = true
 		}
 		phase = csiv1.DriverPhaseCreating
@@ -364,8 +380,8 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 	}
 
 	if controllerRestart {
-		logger.Info("csi controller stopped being ready - restarting it")
-		rErr := r.restartControllerPod(instance.Name, instance.Namespace)
+		logger.Info("restarting csi controller")
+		rErr := r.restartControllerPod(controllerPod)
 
 		if rErr != nil {
 			return rErr
@@ -384,20 +400,37 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 	return nil
 }
 
-func (r *ReconcileIBMBlockCSI) restartControllerPod(name string, namespace string) error {
-	pod := &corev1.Pod{}
-	statefulSetName := oconfig.GetNameForResource(oconfig.CSIController, name)
-	controllerPodName := fmt.Sprintf("%s-0", statefulSetName)
+func (r *ReconcileIBMBlockCSI) areAllPodImagesSynced(controllerStatefulset *appsv1.StatefulSet, controllerPod *corev1.Pod) bool {
+	logger := log.WithName("areAllPodImagesSynced")
+	statefulSetContainers := controllerStatefulset.Spec.Template.Spec.Containers
+	podContainers := controllerPod.Spec.Containers
+	if len(statefulSetContainers) != len(podContainers) {
+		return false
+	}
+	for i := 0; i < len(statefulSetContainers); i++ {
+		statefulSetImage := statefulSetContainers[i].Image
+		podImage := podContainers[i].Image
+
+		if statefulSetImage != podImage {
+			logger.Info("csi controller image not in sync",
+				"statefulSetImage", statefulSetImage, "podImage", podImage)
+			return false
+		}
+	}
+	return true
+}
+
+func (r *ReconcileIBMBlockCSI) restartControllerPod(controllerPod *corev1.Pod) error {
+	return r.client.Delete(context.TODO(), controllerPod)
+}
+
+func (r *ReconcileIBMBlockCSI) getControllerPod(controllerStatefulset *appsv1.StatefulSet, controllerPod *corev1.Pod) error {
+	controllerPodName := fmt.Sprintf("%s-0", controllerStatefulset.Name)
 	err := r.client.Get(context.TODO(), types.NamespacedName{
 		Name:      controllerPodName,
-		Namespace: namespace,
-	}, pod)
-
-	if err != nil {
-		return err
-	}
-
-	return r.client.Delete(context.TODO(), pod)
+		Namespace: controllerStatefulset.Namespace,
+	}, controllerPod)
+	return err
 }
 
 func (r *ReconcileIBMBlockCSI) rolloutRestartNode(node *appsv1.DaemonSet) error {
