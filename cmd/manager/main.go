@@ -28,6 +28,7 @@ import (
 
 	"github.com/IBM/ibm-block-csi-operator/pkg/apis"
 	operatorConfig "github.com/IBM/ibm-block-csi-operator/pkg/config"
+	operatorVersion "github.com/IBM/ibm-block-csi-operator/version"
 	"github.com/IBM/ibm-block-csi-operator/pkg/controller"
 
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
@@ -58,6 +59,7 @@ func printVersion() {
 	log.Info(fmt.Sprintf("Go Version: %s", runtime.Version()))
 	log.Info(fmt.Sprintf("Go OS/Arch: %s/%s", runtime.GOOS, runtime.GOARCH))
 	log.Info(fmt.Sprintf("Version of operator-sdk: %v", sdkVersion.Version))
+	log.Info(fmt.Sprintf("Operator version: %v", operatorVersion.Version))
 }
 
 func main() {
