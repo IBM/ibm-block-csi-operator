@@ -19,6 +19,7 @@ spec:
     - ibc
     singular: ibmblockcsi
   scope: Namespaced
+  version: v1
   versions:
   - name: v1
     served: true
@@ -1384,7 +1385,7 @@ spec:
             required:
             - controller
             - node
-            type: object
+          type: object
           status:
             description: IBMBlockCSIStatus defines the observed state of IBMBlockCSI
             properties:
