@@ -90,7 +90,7 @@ var _ = BeforeSuite(func(done Done) {
 	// Create a new Cmd to provide shared dependencies and start components
 	k8sManager, err = manager.New(cfg, manager.Options{
 		Namespace:      "",
-		MapperProvider: apiutil.NewDynamicRESTMapper(cfg),
+		MapperProvider: apiutil.NewDynamicRESTMapper,
 	})
 	Ω(err).ShouldNot(HaveOccurred())
 
