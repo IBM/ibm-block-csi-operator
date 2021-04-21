@@ -28,7 +28,6 @@ import (
 
 	"github.com/IBM/ibm-block-csi-operator/pkg/apis"
 	operatorConfig "github.com/IBM/ibm-block-csi-operator/pkg/config"
-	operatorVersion "github.com/IBM/ibm-block-csi-operator/version"
 	"github.com/IBM/ibm-block-csi-operator/pkg/controller"
 	operatorVersion "github.com/IBM/ibm-block-csi-operator/version"
 
