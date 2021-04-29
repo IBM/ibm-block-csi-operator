@@ -30,11 +30,11 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
 	"github.com/operator-framework/operator-sdk/pkg/log/zap"
+	"github.com/operator-framework/operator-sdk/pkg/restmapper"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
@@ -90,7 +90,7 @@ var _ = BeforeSuite(func(done Done) {
 	// Create a new Cmd to provide shared dependencies and start components
 	k8sManager, err = manager.New(cfg, manager.Options{
 		Namespace:      "",
-		MapperProvider: apiutil.NewDiscoveryRESTMapper,
+		MapperProvider: restmapper.NewDynamicRESTMapper,
 	})
 	Ω(err).ShouldNot(HaveOccurred())
 
