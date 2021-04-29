@@ -28,17 +28,19 @@ import (
 
 	"github.com/IBM/ibm-block-csi-operator/pkg/apis"
 	operatorConfig "github.com/IBM/ibm-block-csi-operator/pkg/config"
-	operatorVersion "github.com/IBM/ibm-block-csi-operator/version"
 	"github.com/IBM/ibm-block-csi-operator/pkg/controller"
+	operatorVersion "github.com/IBM/ibm-block-csi-operator/version"
 
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
 	// kubemetrics "github.com/operator-framework/operator-sdk/pkg/kube-metrics"
 	"github.com/operator-framework/operator-sdk/pkg/leader"
 	"github.com/operator-framework/operator-sdk/pkg/log/zap"
+
 	//"github.com/operator-framework/operator-sdk/pkg/metrics"
-	"github.com/operator-framework/operator-sdk/pkg/restmapper"
 	sdkVersion "github.com/operator-framework/operator-sdk/version"
 	"github.com/spf13/pflag"
+	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
+
 	//v1 "k8s.io/api/core/v1"
 	//"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
@@ -115,7 +117,7 @@ func main() {
 	// Create a new Cmd to provide shared dependencies and start components
 	mgr, err := manager.New(cfg, manager.Options{
 		Namespace:          namespace,
-		MapperProvider:     restmapper.NewDynamicRESTMapper,
+		MapperProvider:     apiutil.NewDiscoveryRESTMapper,
 		MetricsBindAddress: fmt.Sprintf("%s:%d", metricsHost, metricsPort),
 	})
 	if err != nil {
@@ -142,7 +144,6 @@ func main() {
 	if err = serveCRMetrics(cfg); err != nil {
 		log.Info("Could not generate and serve custom resource metrics", "error", err.Error())
 	}
-
 	// Add to the below struct any other metrics ports you want to expose.
 	servicePorts := []v1.ServicePort{
 		{Port: metricsPort, Name: metrics.OperatorPortName, Protocol: v1.ProtocolTCP, TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: metricsPort}},
@@ -153,7 +154,6 @@ func main() {
 	if err != nil {
 		log.Info("Could not create metrics Service", "error", err.Error())
 	}
-
 	// CreateServiceMonitors will automatically create the prometheus-operator ServiceMonitor resources
 	// necessary to configure Prometheus to scrape metrics from this operator.
 	services := []*v1.Service{service}
