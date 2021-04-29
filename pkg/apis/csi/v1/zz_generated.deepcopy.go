@@ -73,7 +73,7 @@ func (in *Config) DeepCopyObject() runtime.Object {
 func (in *ConfigList) DeepCopyInto(out *ConfigList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	in.ListMeta.DeepCopyInto(&out.ListMeta)
+	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]Config, len(*in))
@@ -196,7 +196,7 @@ func (in *IBMBlockCSIControllerSpec) DeepCopy() *IBMBlockCSIControllerSpec {
 func (in *IBMBlockCSIList) DeepCopyInto(out *IBMBlockCSIList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	in.ListMeta.DeepCopyInto(&out.ListMeta)
+	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]IBMBlockCSI, len(*in))
@@ -361,7 +361,7 @@ func (in *NodeInfo) DeepCopyObject() runtime.Object {
 func (in *NodeInfoList) DeepCopyInto(out *NodeInfoList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	in.ListMeta.DeepCopyInto(&out.ListMeta)
+	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]NodeInfo, len(*in))
