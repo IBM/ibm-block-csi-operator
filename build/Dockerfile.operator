@@ -17,7 +17,7 @@ FROM golang:1.13.1
 WORKDIR /go/src/github.com/IBM/ibm-block-csi-operator/
 COPY . .
 RUN go mod download
-#RUN go mod vendor
+RUN go mod vendor
 RUN CGO_ENABLED=1 GOOS=linux go build \
     -o build/_output/bin/ibm-block-csi-operator \
     -gcflags all=-trimpath=${GOPATH} \

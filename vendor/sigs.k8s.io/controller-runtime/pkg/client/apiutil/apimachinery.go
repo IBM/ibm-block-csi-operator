@@ -35,10 +35,7 @@ import (
 // information fetched by a new client with the given config.
 func NewDiscoveryRESTMapper(c *rest.Config) (meta.RESTMapper, error) {
 	// Get a mapper
-	dc, err := discovery.NewDiscoveryClientForConfig(c)
-	if err != nil {
-		return nil, err
-	}
+	dc := discovery.NewDiscoveryClientForConfigOrDie(c)
 	gr, err := restmapper.GetAPIGroupResources(dc)
 	if err != nil {
 		return nil, err
@@ -53,7 +50,7 @@ func GVKForObject(obj runtime.Object, scheme *runtime.Scheme) (schema.GroupVersi
 		return schema.GroupVersionKind{}, err
 	}
 	if isUnversioned {
-		return schema.GroupVersionKind{}, fmt.Errorf("cannot create group-version-kind for unversioned type %T", obj)
+		return schema.GroupVersionKind{}, fmt.Errorf("cannot create a new informer for the unversioned type %T", obj)
 	}
 
 	if len(gvks) < 1 {
@@ -74,7 +71,7 @@ func GVKForObject(obj runtime.Object, scheme *runtime.Scheme) (schema.GroupVersi
 func RESTClientForGVK(gvk schema.GroupVersionKind, baseConfig *rest.Config, codecs serializer.CodecFactory) (rest.Interface, error) {
 	cfg := createRestConfig(gvk, baseConfig)
 	if cfg.NegotiatedSerializer == nil {
-		cfg.NegotiatedSerializer = serializer.WithoutConversionCodecFactory{CodecFactory: codecs}
+		cfg.NegotiatedSerializer = serializer.DirectCodecFactory{CodecFactory: codecs}
 	}
 	return rest.RESTClientFor(cfg)
 }
