@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/instance: ibmblockcsis
     app.kubernetes.io/managed-by: ibm-block-csi-operator
     product: ibm-block-csi-driver
-    release: v1.5.0
+    release: v1.6.0
     csi: ibm
 spec:
   group: csi.ibm.com
@@ -1430,7 +1430,7 @@ spec:
       annotations:
         productName: "IBM Block CSI Driver"
         productID: "5027566ef6c54de49028be7df25119e1"
-        productVersion: "1.5.0"
+        productVersion: "1.6.0"
         productMetric: "FREE"
     spec:
       serviceAccountName: ibm-block-csi-operator
@@ -1468,7 +1468,7 @@ spec:
           capabilities:
             drop:
             - ALL
-        image: ibmcom/ibm-block-csi-operator:1.5.0
+        image: ibmcom/ibm-block-csi-operator:1.6.0
         imagePullPolicy: IfNotPresent
         command:
         - ibm-block-csi-operator
