@@ -444,9 +444,6 @@ func (r *ReconcileIBMBlockCSI) reconcileCSIDriver(instance *ibmblockcsi.IBMBlock
 	logger := log.WithValues("Resource Type", "CSIDriver")
 
 	cd := instance.GenerateCSIDriver()
-	if err := controllerutil.SetControllerReference(instance.Unwrap(), cd, r.scheme); err != nil {
-		return err
-	}
 	found := &storagev1beta1.CSIDriver{}
 	err := r.client.Get(context.TODO(), types.NamespacedName{
 		Name:      cd.Name,
