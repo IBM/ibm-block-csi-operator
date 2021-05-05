@@ -673,7 +673,7 @@ func (r *ReconcileIBMBlockCSI) deleteCSIDriver(instance *ibmblockcsi.IBMBlockCSI
 		Namespace: csiDriver.Namespace,
 	}, found)
 	if err != nil && errors.IsNotFound(err) {
-		continue
+		return nil
 	} else if err != nil {
 		logger.Error(err, "failed to get CSIDriver", "Name", csiDriver.GetName())
 		return err
