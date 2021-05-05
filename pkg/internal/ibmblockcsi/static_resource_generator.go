@@ -21,7 +21,7 @@ import (
 	"github.com/IBM/ibm-block-csi-operator/pkg/util/boolptr"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
-	storagev1beta1 "k8s.io/api/storage/v1beta1"
+	storagev1 "k8s.io/api/storage/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -55,12 +55,12 @@ const (
 	verbDelete                           string = "delete"
 )
 
-func (c *IBMBlockCSI) GenerateCSIDriver() *storagev1beta1.CSIDriver {
-	return &storagev1beta1.CSIDriver{
+func (c *IBMBlockCSI) GenerateCSIDriver() *storagev1.CSIDriver {
+	return &storagev1.CSIDriver{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: config.DriverName,
 		},
-		Spec: storagev1beta1.CSIDriverSpec{
+		Spec: storagev1.CSIDriverSpec{
 			AttachRequired: boolptr.True(),
 			PodInfoOnMount: boolptr.False(),
 		},

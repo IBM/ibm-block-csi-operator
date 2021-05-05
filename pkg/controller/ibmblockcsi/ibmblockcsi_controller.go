@@ -27,7 +27,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
-	storagev1beta1 "k8s.io/api/storage/v1beta1"
+	storagev1 "k8s.io/api/storage/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -213,6 +213,10 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 		}
 
 		if err := r.deleteClusterRolesAndBindings(instance); err != nil {
+			return reconcile.Result{}, err
+		}
+
+		if err := r.deleteCSIDriver(instance); err != nil {
 			return reconcile.Result{}, err
 		}
 
@@ -444,7 +448,7 @@ func (r *ReconcileIBMBlockCSI) reconcileCSIDriver(instance *ibmblockcsi.IBMBlock
 	logger := log.WithValues("Resource Type", "CSIDriver")
 
 	cd := instance.GenerateCSIDriver()
-	found := &storagev1beta1.CSIDriver{}
+	found := &storagev1.CSIDriver{}
 	err := r.client.Get(context.TODO(), types.NamespacedName{
 		Name:      cd.Name,
 		Namespace: "",
@@ -657,4 +661,34 @@ func (r *ReconcileIBMBlockCSI) getClusterRoleBindings(instance *ibmblockcsi.IBMB
 		controllerSCC,
 		nodeSCC,
 	}
+}
+
+func (r *ReconcileIBMBlockCSI) deleteCSIDriver(instance *ibmblockcsi.IBMBlockCSI) error {
+	logger := log.WithName("deleteCSIDriver")
+
+	csiDriver := r.getCSIDriver(instance)
+	found := &storagev1.CSIDriver{}
+	err := r.client.Get(context.TODO(), types.NamespacedName{
+		Name:      csiDriver.Name,
+		Namespace: csiDriver.Namespace,
+	}, found)
+	if err != nil && errors.IsNotFound(err) {
+		continue
+	} else if err != nil {
+		logger.Error(err, "failed to get CSIDriver", "Name", csiDriver.GetName())
+		return err
+	} else {
+		logger.Info("deleting CSIDriver", "Name", csiDriver.GetName())
+		if err := r.client.Delete(context.TODO(), found); err != nil {
+			logger.Error(err, "failed to delete CSIDriver", "Name", csiDriver.GetName())
+			return err
+		}
+	}
+	return nil
+}
+
+func (r *ReconcileIBMBlockCSI) getCSIDriver(instance *ibmblockcsi.IBMBlockCSI) *storagev1.CSIDriver {
+	csiDriver := instance.GenerateCSIDriver()
+
+	return csiDriver
 }
