@@ -5,5 +5,4 @@ OP_TEST_SCRIPT_URL=${OP_TEST_SCRIPT_URL-"https://raw.githubusercontent.com/opera
 
 bash <(curl -sL $OP_TEST_SCRIPT_URL) $*
 rc=$?
-echo "rc=$rc"
-[[ $rc -eq 0 ]] || { echo "Error: rc=$rc"; exit $rc; }
+[[ $rc -eq 0 ]] && echo "rc=$rc"  || { echo "Error: rc=$rc"; exit $rc; }

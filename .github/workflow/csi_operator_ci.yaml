@@ -7,6 +7,7 @@ on:
   push:
     pull_request:
       - develop
+      - master
 jobs:
   operator_image_build:
    name: "set env"
@@ -52,6 +53,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      # reduce code repetition in CSI-2992 ticket
       - name: update_csv
         run: |
           build/ci/update_csv.sh
