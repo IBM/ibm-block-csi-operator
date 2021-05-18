@@ -4,10 +4,10 @@ env:
   OP_TEST_DEBUG: 1
   OP_TEST_CONTAINER_OPT: "-t"
 on:
-  push:
-    pull_request:
-      - develop
-      - master
+  pull_request:
+    branches:
+    - develop
+    - master
 jobs:
   operator_image_build:
    name: "set env"
