@@ -666,7 +666,7 @@ func (r *ReconcileIBMBlockCSI) getClusterRoleBindings(instance *ibmblockcsi.IBMB
 func (r *ReconcileIBMBlockCSI) deleteCSIDriver(instance *ibmblockcsi.IBMBlockCSI) error {
 	logger := log.WithName("deleteCSIDriver")
 
-	csiDriver := r.getCSIDriver(instance)
+	csiDriver := instance.GenerateCSIDriver()
 	found := &storagev1.CSIDriver{}
 	err := r.client.Get(context.TODO(), types.NamespacedName{
 		Name:      csiDriver.Name,
@@ -687,8 +687,3 @@ func (r *ReconcileIBMBlockCSI) deleteCSIDriver(instance *ibmblockcsi.IBMBlockCSI
 	return nil
 }
 
-func (r *ReconcileIBMBlockCSI) getCSIDriver(instance *ibmblockcsi.IBMBlockCSI) *storagev1.CSIDriver {
-	csiDriver := instance.GenerateCSIDriver()
-
-	return csiDriver
-}
