@@ -686,4 +686,3 @@ func (r *ReconcileIBMBlockCSI) deleteCSIDriver(instance *ibmblockcsi.IBMBlockCSI
 	}
 	return nil
 }
-
