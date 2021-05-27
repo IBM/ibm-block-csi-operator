@@ -155,7 +155,7 @@ func main() {
 	if err != nil {
 		log.Info("Could not create metrics Service", "error", err.Error())
 	}
-	
+
 	// CreateServiceMonitors will automatically create the prometheus-operator ServiceMonitor resources
 	// necessary to configure Prometheus to scrape metrics from this operator.
 	services := []*v1.Service{service}
