@@ -338,6 +338,9 @@ spec:
     - IBM
     - BlockStorage
     - CSI
+  relatedImages:
+    - name: ibm-block-csi-operator
+      image: ibmcom/ibm-block-csi-operator:1.6.0
   version: 1.6.0
   replaces: ibm-block-csi-operator.v1.5.0
   maturity: stable
