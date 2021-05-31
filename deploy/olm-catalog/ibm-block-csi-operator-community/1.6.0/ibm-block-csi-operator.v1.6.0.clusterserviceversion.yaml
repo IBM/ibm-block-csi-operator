@@ -409,10 +409,10 @@ spec:
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:text'
           - description: License Acceptance.
-              displayName: License Acceptance
-              path: license.accept
-              x-descriptors:
-                - 'urn:alm:descriptor:com.tectonic.ui:booleanSwitch'
+            displayName: License Acceptance
+            path: license.accept
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:booleanSwitch'
         statusDescriptors:
           - description: The current status of the driver.
             displayName: Status
