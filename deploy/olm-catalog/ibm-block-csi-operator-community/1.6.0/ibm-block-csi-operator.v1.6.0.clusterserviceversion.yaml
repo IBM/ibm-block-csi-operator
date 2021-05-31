@@ -536,6 +536,7 @@ spec:
               - get
               - watch
               - list
+              - update
             - apiGroups:
               - storage.k8s.io
               resources:

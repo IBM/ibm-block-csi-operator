@@ -525,8 +525,11 @@ func (r *ReconcileIBMBlockCSI) reconcileClusterRole(instance *ibmblockcsi.IBMBlo
 			logger.Error(err, "Failed to get ClusterRole", "Name", cr.GetName())
 			return err
 		} else {
-			// Resource already exists - don't requeue
-			//logger.Info("Skip reconcile: ClusterRole already exists", "Name", cr.GetName())
+			err = r.client.Update(context.TODO(), cr)
+			if err != nil {
+				logger.Error(err, "Failed to update ClusterRole", "Name", cr.GetName())
+				return err
+			}
 		}
 	}
 
