@@ -672,17 +672,17 @@ func (r *ReconcileIBMBlockCSI) deleteCSIDriver(instance *ibmblockcsi.IBMBlockCSI
 		Name:      csiDriver.Name,
 		Namespace: csiDriver.Namespace,
 	}, found)
-	if err != nil && errors.IsNotFound(err) {
-		return nil
-	} else if err != nil {
-		logger.Error(err, "failed to get CSIDriver", "Name", csiDriver.GetName())
-		return err
-	} else {
+	if err == nil {
 		logger.Info("deleting CSIDriver", "Name", csiDriver.GetName())
 		if err := r.client.Delete(context.TODO(), found); err != nil {
 			logger.Error(err, "failed to delete CSIDriver", "Name", csiDriver.GetName())
 			return err
 		}
+	} else if errors.IsNotFound(err) {
+		return nil
+	} else {
+		logger.Error(err, "failed to get CSIDriver", "Name", csiDriver.GetName())
+		return err
 	}
 	return nil
 }
