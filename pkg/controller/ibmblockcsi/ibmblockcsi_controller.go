@@ -56,7 +56,11 @@ import (
 )
 
 // ReconcileTime is the delay between reconciliations
-const ReconcileTime = 30 * time.Second
+const (
+	ReconcileTime = 30 * time.Second
+	Node = "node"
+	Controller = "controller"
+)
 
 var log = logf.Log.WithName("ibmblockcsi_controller")
 
@@ -319,57 +323,22 @@ func (r *ReconcileIBMBlockCSI) getAccessorAndFinalizerName(instance *ibmblockcsi
 
 func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, originalStatus csiv1.IBMBlockCSIStatus) error {
 	logger := log.WithName("updateStatus")
-	controllerPod := &corev1.Pod{}
-	controllerRestart := false
-	nodeRolloutRestart := false
-
-	controllerStatefulset := &appsv1.StatefulSet{}
-	err := r.client.Get(context.TODO(), types.NamespacedName{
-		Name:      oconfig.GetNameForResource(oconfig.CSIController, instance.Name),
-		Namespace: instance.Namespace,
-	}, controllerStatefulset)
-
+	err, controllerStatefulset := r.getControllerK8sObject(instance)
 	if err != nil {
 		return err
 	}
 
-	node := &appsv1.DaemonSet{}
-	err = r.client.Get(context.TODO(), types.NamespacedName{
-		Name:      oconfig.GetNameForResource(oconfig.CSINode, instance.Name),
-		Namespace: instance.Namespace,
-	}, node)
-
+	err, nodeDaemonSet := r.getNodeK8sObject(instance)
 	if err != nil {
 		return err
 	}
 
-	instance.Status.ControllerReady = controllerStatefulset.Status.ReadyReplicas == controllerStatefulset.Status.Replicas
-	instance.Status.NodeReady = node.Status.DesiredNumberScheduled == node.Status.NumberAvailable
+	instance.Status.ControllerReady, instance.Status.NodeReady = r.getDriverPodsStatus(instance, 
+		controllerStatefulset, nodeDaemonSet)
 	phase := csiv1.DriverPhaseNone
 	if instance.Status.ControllerReady && instance.Status.NodeReady {
 		phase = csiv1.DriverPhaseRunning
 	} else {
-		if !instance.Status.ControllerReady {
-			err := r.getControllerPod(controllerStatefulset, controllerPod)
-			if err != nil {
-				logger.Error(err, "failed to get controller pod")
-				return err
-			}
-			if originalStatus.ControllerReady || !r.areAllPodImagesSynced(controllerStatefulset, controllerPod) {
-				logger.Info("controller requires restart",
-							"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
-							"Replicas", controllerStatefulset.Status.Replicas)
-				controllerRestart = true
-			}
-		}
-
-
-		if originalStatus.NodeReady && !instance.Status.NodeReady {
-			logger.Info("node rollout requires restart",
-				"DesiredNumberScheduled", node.Status.DesiredNumberScheduled,
-				"NumberAvailable", node.Status.NumberAvailable)
-			nodeRolloutRestart = true
-		}
 		phase = csiv1.DriverPhaseCreating
 	}
 	instance.Status.Phase = phase
@@ -380,24 +349,6 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 		sErr := r.client.Status().Update(context.TODO(), instance.Unwrap())
 		if sErr != nil {
 			return sErr
-		}
-	}
-
-	if controllerRestart {
-		logger.Info("restarting csi controller")
-		rErr := r.restartControllerPod(controllerPod)
-
-		if rErr != nil {
-			return rErr
-		}
-	}
-
-	if nodeRolloutRestart {
-		logger.Info("csi node stopped being ready - restarting it")
-		rErr := r.rolloutRestartNode(node)
-
-		if rErr != nil {
-			return rErr
 		}
 	}
 
@@ -493,6 +444,48 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 			if err != nil {
 				return err
 			}
+
+			err, controllerStatefulset := r.getControllerK8sObject(instance)
+			if err != nil {
+				return err
+			}
+
+			err, nodeDaemonSet := r.getNodeK8sObject(instance)
+			if err != nil {
+				return err
+			}
+
+			instance.Status.ControllerReady, instance.Status.NodeReady = r.getDriverPodsStatus(instance, 
+				controllerStatefulset, nodeDaemonSet)
+			if strings.Contains(sa.Name, Controller) || !instance.Status.ControllerReady {
+				controllerPod := &corev1.Pod{}
+				err := r.getControllerPod(controllerStatefulset, controllerPod)
+				if err != nil {
+					logger.Error(err, "failed to get controller pod")
+					return err
+				}
+
+				logger.Info("controller requires restart",
+							"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
+							"Replicas", controllerStatefulset.Status.Replicas)
+				logger.Info("restarting csi controller")
+				rErr := r.restartControllerPod(controllerPod)
+				
+				if rErr != nil {
+					return rErr
+				}
+			}
+			if strings.Contains(sa.Name, Node) || !instance.Status.NodeReady {
+				logger.Info("node rollout requires restart",
+				"DesiredNumberScheduled", nodeDaemonSet.Status.DesiredNumberScheduled,
+				"NumberAvailable", nodeDaemonSet.Status.NumberAvailable)
+				logger.Info("csi node stopped being ready - restarting it")
+				rErr := r.rolloutRestartNode(nodeDaemonSet)
+
+				if rErr != nil {
+					return rErr
+				}
+			}
 		} else if err != nil {
 			logger.Error(err, "Failed to get ServiceAccount", "Name", sa.GetName())
 			return err
@@ -503,6 +496,48 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 	}
 
 	return nil
+}
+
+func (r *ReconcileIBMBlockCSI) getControllerK8sObject(instance *ibmblockcsi.IBMBlockCSI) (error, *appsv1.StatefulSet) {
+			controllerStatefulset := &appsv1.StatefulSet{}
+			err := r.client.Get(context.TODO(), types.NamespacedName{
+				Name:      oconfig.GetNameForResource(oconfig.CSIController, instance.Name),
+				Namespace: instance.Namespace,
+			}, controllerStatefulset)
+		
+			if err != nil {
+				return err, controllerStatefulset
+			}
+			return err, controllerStatefulset
+}
+
+func (r *ReconcileIBMBlockCSI) getNodeK8sObject(instance *ibmblockcsi.IBMBlockCSI) (error, *appsv1.DaemonSet) {
+	node := &appsv1.DaemonSet{}
+	err := r.client.Get(context.TODO(), types.NamespacedName{
+		Name:      oconfig.GetNameForResource(oconfig.CSINode, instance.Name),
+		Namespace: instance.Namespace,
+	}, node)
+
+	if err != nil {
+		return err, node
+	}
+	return err, node
+}
+
+func (r *ReconcileIBMBlockCSI) getDriverPodsStatus(instance *ibmblockcsi.IBMBlockCSI, 
+	controller *appsv1.StatefulSet, node *appsv1.DaemonSet) (bool, bool) {
+	ControllerReady := false
+	NodeReady := false
+
+	instance.Status.ControllerReady = controller.Status.ReadyReplicas == controller.Status.Replicas
+	instance.Status.NodeReady = node.Status.DesiredNumberScheduled == node.Status.NumberAvailable
+	if instance.Status.ControllerReady {
+		ControllerReady = true
+	}
+	if instance.Status.NodeReady {
+		NodeReady = true
+	}
+	return ControllerReady, NodeReady
 }
 
 func (r *ReconcileIBMBlockCSI) reconcileClusterRole(instance *ibmblockcsi.IBMBlockCSI) error {
