@@ -455,9 +455,10 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 				return err
 			}
 
-			instance.Status.ControllerReady, instance.Status.NodeReady = r.getDriverPodsStatus(instance, 
-				controllerStatefulset, nodeDaemonSet)
-			if strings.Contains(sa.Name, Controller) || !instance.Status.ControllerReady {
+//			instance.Status.ControllerReady, instance.Status.NodeReady = r.getDriverPodsStatus(instance, 
+//				controllerStatefulset, nodeDaemonSet)
+//			if strings.Contains(sa.Name, Controller) || !instance.Status.ControllerReady {
+			if strings.Contains(sa.Name, Controller) {
 				controllerPod := &corev1.Pod{}
 				err := r.getControllerPod(controllerStatefulset, controllerPod)
 				if err != nil {
@@ -475,9 +476,21 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 					return rErr
 				}
 			}
-			if strings.Contains(sa.Name, Node) || !instance.Status.NodeReady {
+			if strings.Contains(sa.Name, Node) {
+				nodePod := &corev1.Pod{}
+				nodePodName := fmt.Sprintf("%s-0", nodeDaemonSet.Name)
+				err := r.client.Get(context.TODO(), types.NamespacedName{
+					Name:      nodePodName,
+					Namespace: nodeDaemonSet.Namespace,
+				}, nodePod)
+
+				if err != nil {
+					return err
+				}
+
 				logger.Info("node rollout requires restart",
-				"DesiredNumberScheduled", nodeDaemonSet.Status.DesiredNumberScheduled,
+//				"DesiredNumberScheduled", nodeDaemonSet.Status.DesiredNumberScheduled,
+				"DesiredNumberScheduled", nodePod,				
 				"NumberAvailable", nodeDaemonSet.Status.NumberAvailable)
 				logger.Info("csi node stopped being ready - restarting it")
 				rErr := r.rolloutRestartNode(nodeDaemonSet)
