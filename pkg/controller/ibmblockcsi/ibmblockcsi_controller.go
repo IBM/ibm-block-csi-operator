@@ -132,6 +132,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	subresources := []runtime.Object{
 		&appsv1.StatefulSet{},
 		&appsv1.DaemonSet{},
+		&corev1.ServiceAccount{},
 	}
 
 	for _, subresource := range subresources {
@@ -477,20 +478,8 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 				}
 			}
 			if strings.Contains(sa.Name, Node) {
-				nodePod := &corev1.Pod{}
-				nodePodName := fmt.Sprintf("%s-0", nodeDaemonSet.Name)
-				err := r.client.Get(context.TODO(), types.NamespacedName{
-					Name:      nodePodName,
-					Namespace: nodeDaemonSet.Namespace,
-				}, nodePod)
-
-				if err != nil {
-					return err
-				}
-
 				logger.Info("node rollout requires restart",
-//				"DesiredNumberScheduled", nodeDaemonSet.Status.DesiredNumberScheduled,
-				"DesiredNumberScheduled", nodePod,				
+				"DesiredNumberScheduled", nodeDaemonSet.Status.DesiredNumberScheduled,				
 				"NumberAvailable", nodeDaemonSet.Status.NumberAvailable)
 				logger.Info("csi node stopped being ready - restarting it")
 				rErr := r.rolloutRestartNode(nodeDaemonSet)
