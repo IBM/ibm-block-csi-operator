@@ -78,11 +78,11 @@ func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockc
 	logger.Info("sync node ds")
 
 	return syncer.NewObjectSyncer(config.CSINode.String(), driver.Unwrap(), obj, c, scheme, func() error {
-		return sync.SyncFn()
+		return sync.SyncFn(ds_restarted_key, ds_restarted_value)
 	})
 }
 
-func (s *csiNodeSyncer) SyncFn() error {
+func (s *csiNodeSyncer) SyncFn(ds_restarted_key string , ds_restarted_value string) error {
 	out := s.obj.(*appsv1.DaemonSet)
 
 	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCSINodeSelectorLabels())
