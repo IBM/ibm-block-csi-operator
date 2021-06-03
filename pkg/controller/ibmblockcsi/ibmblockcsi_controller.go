@@ -322,7 +322,7 @@ func (r *ReconcileIBMBlockCSI) getAccessorAndFinalizerName(instance *ibmblockcsi
 }
 
 func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, originalStatus csiv1.IBMBlockCSIStatus) error {
-	//logger := log.WithName("updateStatus")
+	logger := log.WithName("updateStatus")
 	err, controllerStatefulset := r.getControllerK8sObject(instance)
 	if err != nil {
 		return err
@@ -343,6 +343,7 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 	}
 	instance.Status.Phase = phase
 	instance.Status.Version = oversion.DriverVersion
+	logger.Info("updating IBMBlockCSI status")
 
 	//if !reflect.DeepEqual(originalStatus, instance.Status) {
 	//	logger.Info("updating IBMBlockCSI status", "name", instance.Name, "from", originalStatus, "to", instance.Status)
