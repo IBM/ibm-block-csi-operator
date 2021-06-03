@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"reflect"
 	"strings"
 	"time"
 
@@ -345,13 +344,13 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 	instance.Status.Phase = phase
 	instance.Status.Version = oversion.DriverVersion
 
-	if !reflect.DeepEqual(originalStatus, instance.Status) {
-		logger.Info("updating IBMBlockCSI status", "name", instance.Name, "from", originalStatus, "to", instance.Status)
-		sErr := r.client.Status().Update(context.TODO(), instance.Unwrap())
-		if sErr != nil {
-			return sErr
-		}
-	}
+	//if !reflect.DeepEqual(originalStatus, instance.Status) {
+	//	logger.Info("updating IBMBlockCSI status", "name", instance.Name, "from", originalStatus, "to", instance.Status)
+	//	sErr := r.client.Status().Update(context.TODO(), instance.Unwrap())
+	//	if sErr != nil {
+	//		return sErr
+	//	}
+	//}
 
 	return nil
 }
