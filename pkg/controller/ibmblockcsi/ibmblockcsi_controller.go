@@ -322,7 +322,7 @@ func (r *ReconcileIBMBlockCSI) getAccessorAndFinalizerName(instance *ibmblockcsi
 }
 
 func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, originalStatus csiv1.IBMBlockCSIStatus) error {
-	logger := log.WithName("updateStatus")
+	//logger := log.WithName("updateStatus")
 	err, controllerStatefulset := r.getControllerK8sObject(instance)
 	if err != nil {
 		return err
