@@ -26,6 +26,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	logf "sigs.k8s.io/controller-runtime/pkg/log"
 
 	csiv1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
@@ -47,6 +48,8 @@ const (
 	registrationVolumeMountPath = "/registration"
 )
 
+var log = logf.Log.WithName("ibmblockcsi_controller")
+
 var nodeContainerHealthPort = intstr.FromInt(nodeContainerHealthPortNumber)
 
 type csiNodeSyncer struct {
@@ -56,6 +59,7 @@ type csiNodeSyncer struct {
 
 // NewCSINodeSyncer returns a syncer for CSI node
 func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockcsi.IBMBlockCSI) syncer.Interface {
+	logger := log.WithName("update_csi_node")
 	obj := &appsv1.DaemonSet{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        config.GetNameForResource(config.CSINode, driver.Name),
@@ -69,6 +73,8 @@ func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockc
 		driver: driver,
 		obj:    obj,
 	}
+
+	logger.Info("sync node ds")
 
 	return syncer.NewObjectSyncer(config.CSINode.String(), driver.Unwrap(), obj, c, scheme, func() error {
 		return sync.SyncFn()
