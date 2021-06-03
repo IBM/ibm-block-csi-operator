@@ -58,13 +58,14 @@ type csiNodeSyncer struct {
 }
 
 // NewCSINodeSyncer returns a syncer for CSI node
-func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockcsi.IBMBlockCSI) syncer.Interface {
+func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockcsi.IBMBlockCSI, 
+	ds_restarted_key string , ds_restarted_value string) syncer.Interface {
 	logger := log.WithName("update_csi_node")
 	obj := &appsv1.DaemonSet{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        config.GetNameForResource(config.CSINode, driver.Name),
 			Namespace:   driver.Namespace,
-			Annotations: driver.GetAnnotations(),
+			Annotations: driver.GetAnnotations(ds_restarted_key, ds_restarted_value),
 			Labels:      driver.GetLabels(),
 		},
 	}
@@ -88,7 +89,7 @@ func (s *csiNodeSyncer) SyncFn() error {
 
 	// ensure template
 	out.Spec.Template.ObjectMeta.Labels = s.driver.GetCSINodePodLabels()
-	out.Spec.Template.ObjectMeta.Annotations = s.driver.GetAnnotations()
+	out.Spec.Template.ObjectMeta.Annotations = s.driver.GetAnnotations(ds_restarted_key, ds_restarted_value)
 
 	err := mergo.Merge(&out.Spec.Template.Spec, s.ensurePodSpec(), mergo.WithTransformers(transformers.PodSpec))
 	if err != nil {

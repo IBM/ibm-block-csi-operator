@@ -61,6 +61,9 @@ const (
 	Controller = "controller"
 )
 
+var ds_restarted_key = ""
+var ds_restarted_value = ""
+
 var log = logf.Log.WithName("ibmblockcsi_controller")
 
 type reconciler func(instance *ibmblockcsi.IBMBlockCSI) error
@@ -250,7 +253,7 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 		return reconcile.Result{}, err
 	}
 
-	csiNodeSyncer := clustersyncer.NewCSINodeSyncer(r.client, r.scheme, instance)
+	csiNodeSyncer := clustersyncer.NewCSINodeSyncer(r.client, r.scheme, instance, ds_restarted_key, ds_restarted_value)
 	if err := syncer.Sync(context.TODO(), csiNodeSyncer, r.recorder); err != nil {
 		return reconcile.Result{}, err
 	}
@@ -487,12 +490,8 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 				if rErr != nil {
 					return rErr
 				}
-				sum := 1
-				for sum < 10 {
-					logger.Info("waiting for restart to finish")
-					time.Sleep(4 * time.Second)
-					sum += sum
-				}
+
+				ds_restarted_key, ds_restarted_value := r.getRestartedAtAnnotation(daemonsets.Spec.Template.ObjectMeta.Annotations)
 			}
 		} else if err != nil {
 			logger.Error(err, "Failed to get ServiceAccount", "Name", sa.GetName())
@@ -504,6 +503,16 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 	}
 
 	return nil
+}
+
+func (r *ReconcileIBMBlockCSI) getRestartedAtAnnotation(Annotations map[string]string) (string, string){
+	restartedAt := fmt.Sprintf("%s/restartedAt", oconfig.APIGroup)
+	for key, element := range Annotations {
+		if key == restartedAt {
+			return key, element
+		}
+	}
+	return "", ""
 }
 
 func (r *ReconcileIBMBlockCSI) getControllerK8sObject(instance *ibmblockcsi.IBMBlockCSI) (error, *appsv1.StatefulSet) {
