@@ -327,6 +327,7 @@ func (r *ReconcileIBMBlockCSI) getAccessorAndFinalizerName(instance *ibmblockcsi
 
 func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, originalStatus csiv1.IBMBlockCSIStatus) error {
 	logger := log.WithName("updateStatus")
+	controllerPod := &corev1.Pod{}
 	err, controllerStatefulset := r.getControllerK8sObject(instance)
 	if err != nil {
 		return err
@@ -335,6 +336,25 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 	err, nodeDaemonSet := r.getNodeK8sObject(instance)
 	if err != nil {
 		return err
+	}
+
+	if !instance.Status.ControllerReady {
+		err := r.getControllerPod(controllerStatefulset, controllerPod)
+		if err != nil {
+			logger.Error(err, "failed to get controller pod")
+			return err
+		}
+
+		for _, containerstatus := range controllerPod.Status.ContainerStatuses {
+			if containerstatus.State.Waiting != nil {
+				if containerstatus.State.Waiting.Reason == "ImagePullBackOff" {
+					logger.Info("controller requires restart",
+											"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
+											"Replicas", controllerStatefulset.Status.Replicas)
+					r.restartControllerPod(controllerPod)
+				}
+			}
+		}
 	}
 
 	instance.Status.ControllerReady, instance.Status.NodeReady = r.getDriverPodsStatus(instance, 
@@ -460,21 +480,19 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 				return err
 			}
 
-//			instance.Status.ControllerReady, instance.Status.NodeReady = r.getDriverPodsStatus(instance, 
-//				controllerStatefulset, nodeDaemonSet)
-//			if strings.Contains(sa.Name, Controller) || !instance.Status.ControllerReady {
 			if strings.Contains(sa.Name, Controller) {
+				controllerlogger := log.WithValues("Resource Type", "Controller")
 				controllerPod := &corev1.Pod{}
 				err := r.getControllerPod(controllerStatefulset, controllerPod)
 				if err != nil {
-					logger.Error(err, "failed to get controller pod")
+					controllerlogger.Error(err, "failed to get controller pod")
 					return err
 				}
 
-				logger.Info("controller requires restart",
+				controllerlogger.Info("controller requires restart",
 							"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
 							"Replicas", controllerStatefulset.Status.Replicas)
-				logger.Info("restarting csi controller")
+				controllerlogger.Info("restarting csi controller")
 				rErr := r.restartControllerPod(controllerPod)
 				
 				if rErr != nil {
@@ -482,10 +500,11 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 				}
 			}
 			if strings.Contains(sa.Name, Node) {
-				logger.Info("node rollout requires restart",
+				nodelogger := log.WithValues("Resource Type", "Node DaemonSet")
+				nodelogger.Info("node rollout requires restart",
 				"DesiredNumberScheduled", nodeDaemonSet.Status.DesiredNumberScheduled,				
 				"NumberAvailable", nodeDaemonSet.Status.NumberAvailable)
-				logger.Info("csi node stopped being ready - restarting it")
+				nodelogger.Info("csi node stopped being ready - restarting it")
 				rErr := r.rolloutRestartNode(nodeDaemonSet)
 
 				if rErr != nil {
