@@ -83,15 +83,10 @@ func (c *IBMBlockCSI) GetAnnotations(daemonSet_restarted_key string , daemonSet_
 		}
 	}
 
-	labels = c.verifyThatDaemonSetHaveRestartedAtAnnotationsIfNeeded(labels, daemonSet_restarted_key, daemonSet_restarted_value)
-	return labels
-}
-
-func (c *IBMBlockCSI) verifyThatDaemonSetHaveRestartedAtAnnotationsIfNeeded(labels labels.Set, 
-		daemonSet_restarted_key string , daemonSet_restarted_value string) labels.Set {
 	if !labels.Has(daemonSet_restarted_key) && daemonSet_restarted_key != ""{
 		labels[daemonSet_restarted_key] = daemonSet_restarted_value
 	}
+
 	return labels
 }
 
