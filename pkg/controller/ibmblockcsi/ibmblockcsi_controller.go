@@ -58,7 +58,7 @@ import (
 // ReconcileTime is the delay between reconciliations
 const ReconcileTime = 30 * time.Second
 
-// ticket to redundant those vars - CSI-3071
+// ticket to remove those vars - CSI-3071
 var daemonSetRestartedKey = ""
 var daemonSetRestartedValue = ""
 
@@ -343,18 +343,13 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 	} else {
 		if !instance.Status.ControllerReady {
 			err := r.getControllerPod(controllerStatefulset, controllerPod)
-			if errors.IsNotFound(err) {
-				return nil
-			} else if err != nil {
+			if err != nil {
 				logger.Error(err, "failed to get controller pod")
 				return err
 			}
 
 			if !r.areAllPodImagesSynced(controllerStatefulset, controllerPod) {
-				logger.Info("controller requires restart",
-					"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
-					"Replicas", controllerStatefulset.Status.Replicas)
-				r.restartControllerPod(controllerPod)
+				r.restartControllerPodfromStatefulSet(logger, instance, controllerStatefulset, controllerPod)
 			}
 		}
 		phase = csiv1.DriverPhaseCreating
@@ -393,7 +388,36 @@ func (r *ReconcileIBMBlockCSI) areAllPodImagesSynced(controllerStatefulset *apps
 	return true
 }
 
-func (r *ReconcileIBMBlockCSI) restartControllerPod(controllerPod *corev1.Pod) error {
+func (r *ReconcileIBMBlockCSI) restartControllerPod(logger *log.DelegatingLogger, instance *ibmblockcsi.IBMBlockCSI) error {
+	controllerPod := &corev1.Pod{}
+	controllerStatefulset, err := r.getControllerStatefulSet(instance)
+	if err != nil {
+		return err
+	}
+
+	logger.Info("controller requires restart",
+	"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
+	"Replicas", controllerStatefulset.Status.Replicas)
+	logger.Info("restarting csi controller")
+
+	err = r.getControllerPod(controllerStatefulset, controllerPod)
+	if errors.IsNotFound(err) {
+		return nil
+	} else if err != nil {
+		logger.Error(err, "failed to get controller pod")
+		return err
+	}
+
+	return r.restartControllerPodfromStatefulSet(logger, instance, controllerStatefulset, controllerPod)
+}
+
+func (r *ReconcileIBMBlockCSI) restartControllerPodfromStatefulSet(logger *log.DelegatingLogger, instance *ibmblockcsi.IBMBlockCSI, 
+	controllerStatefulset *appsv1.StatefulSet, controllerPod *corev1.Pod) error {
+	logger.Info("controller requires restart",
+	"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
+	"Replicas", controllerStatefulset.Status.Replicas)
+	logger.Info("restarting csi controller")
+	
 	return r.client.Delete(context.TODO(), controllerPod)
 }
 
@@ -403,6 +427,9 @@ func (r *ReconcileIBMBlockCSI) getControllerPod(controllerStatefulset *appsv1.St
 		Name:      controllerPodName,
 		Namespace: controllerStatefulset.Namespace,
 	}, controllerPod)
+	if errors.IsNotFound(err) {
+		return nil
+	}
 	return err
 }
 
@@ -466,31 +493,13 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 				return err
 			}
 
-			controllerStatefulset, err := r.getControllerStatefulSet(instance)
-			if err != nil {
-				return err
-			}
-
 			nodeDaemonSet, err := r.getNodeDaemonSet(instance)
 			if err != nil {
 				return err
 			}
 
 			if controllerServiceAccountName == sa.Name {
-				controllerPod := &corev1.Pod{}
-				err := r.getControllerPod(controllerStatefulset, controllerPod)
-				if errors.IsNotFound(err) {
-					return nil
-				} else if err != nil {
-					logger.Error(err, "failed to get controller pod")
-					return err
-				}
-
-				logger.Info("controller requires restart",
-					"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
-					"Replicas", controllerStatefulset.Status.Replicas)
-				logger.Info("restarting csi controller")
-				rErr := r.restartControllerPod(controllerPod)
+				rErr := r.restartControllerPod(logger, instance)
 
 				if rErr != nil {
 					return rErr
