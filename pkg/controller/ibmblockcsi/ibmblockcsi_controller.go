@@ -62,8 +62,8 @@ const (
 	Controller = "controller"
 )
 
-var ds_restarted_key = ""
-var ds_restarted_value = ""
+var daemonSet_restarted_key = ""
+var daemonSet_restarted_value = ""
 
 var log = logf.Log.WithName("ibmblockcsi_controller")
 
@@ -254,7 +254,7 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 		return reconcile.Result{}, err
 	}
 
-	csiNodeSyncer := clustersyncer.NewCSINodeSyncer(r.client, r.scheme, instance, ds_restarted_key, ds_restarted_value)
+	csiNodeSyncer := clustersyncer.NewCSINodeSyncer(r.client, r.scheme, instance, daemonSet_restarted_key, daemonSet_restarted_value)
 	if err := syncer.Sync(context.TODO(), csiNodeSyncer, r.recorder); err != nil {
 		return reconcile.Result{}, err
 	}
@@ -338,8 +338,8 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 		return err
 	}
 
-	instance.Status.ControllerReady = r.getControllerPodsStatus(instance, controllerStatefulset)
-	instance.Status.NodeReady = r.getNodePodsStatus(instance, nodeDaemonSet)
+	instance.Status.ControllerReady = r.doesControllerPodsRunning(instance, controllerStatefulset)
+	instance.Status.NodeReady = r.doesNodePodsRunning(instance, nodeDaemonSet)
 	phase := csiv1.DriverPhaseNone
 	if instance.Status.ControllerReady && instance.Status.NodeReady {
 		phase = csiv1.DriverPhaseRunning
@@ -510,7 +510,7 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 					return rErr
 				}
 
-				ds_restarted_key, ds_restarted_value = r.getRestartedAtAnnotation(nodeDaemonSet.Spec.Template.ObjectMeta.Annotations)
+				daemonSet_restarted_key, daemonSet_restarted_value = r.getRestartedAtAnnotation(nodeDaemonSet.Spec.Template.ObjectMeta.Annotations)
 			}
 		} else if err != nil {
 			logger.Error(err, "Failed to get ServiceAccount", "Name", sa.GetName())
@@ -554,18 +554,12 @@ func (r *ReconcileIBMBlockCSI) getNodeK8sObject(instance *ibmblockcsi.IBMBlockCS
 	return node, err
 }
 
-func (r *ReconcileIBMBlockCSI) getControllerPodsStatus(instance *ibmblockcsi.IBMBlockCSI, controller *appsv1.StatefulSet) bool {
-	ControllerReady := false
-
-	ControllerReady = controller.Status.ReadyReplicas == controller.Status.Replicas
-	return ControllerReady
+func (r *ReconcileIBMBlockCSI) doesControllerPodsRunning(instance *ibmblockcsi.IBMBlockCSI, controller *appsv1.StatefulSet) bool {
+	return controller.Status.ReadyReplicas == controller.Status.Replicas
 }
 
-func (r *ReconcileIBMBlockCSI) getNodePodsStatus(instance *ibmblockcsi.IBMBlockCSI, node *appsv1.DaemonSet) bool {
-	NodeReady := false
-
-	NodeReady = node.Status.DesiredNumberScheduled == node.Status.NumberAvailable
-	return NodeReady
+func (r *ReconcileIBMBlockCSI) doesNodePodsRunning(instance *ibmblockcsi.IBMBlockCSI, node *appsv1.DaemonSet) bool {
+	return node.Status.DesiredNumberScheduled == node.Status.NumberAvailable
 }
 
 func (r *ReconcileIBMBlockCSI) reconcileClusterRole(instance *ibmblockcsi.IBMBlockCSI) error {
