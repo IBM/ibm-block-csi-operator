@@ -39,6 +39,7 @@ replace (
 	// Locking to a specific version (from 'go mod graph'):
 	git.apache.org/thrift.git => github.com/apache/thrift v0.0.0-20180902110319-2566ecd5d999
 	github.com/coreos/prometheus-operator => github.com/coreos/prometheus-operator v0.31.1
+	github.com/imdario/mergo => github.com/imdario/mergo v0.3.7
 	// Pinned to v2.10.0 (kubernetes-1.14.1) so https://proxy.golang.org can
 	// resolve it correctly.
 	github.com/prometheus/prometheus => github.com/prometheus/prometheus v1.8.2-0.20190525122359-d20e84d0fb64
