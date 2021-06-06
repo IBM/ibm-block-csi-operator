@@ -56,12 +56,10 @@ import (
 )
 
 // ReconcileTime is the delay between reconciliations
-const (
-	ReconcileTime = 30 * time.Second
-)
+const ReconcileTime = 30 * time.Second
 
-var daemonSet_restarted_key = ""
-var daemonSet_restarted_value = ""
+var daemonSetRestartedKey = ""
+var daemonSetRestartedValue = ""
 
 var log = logf.Log.WithName("ibmblockcsi_controller")
 
@@ -252,7 +250,7 @@ func (r *ReconcileIBMBlockCSI) Reconcile(request reconcile.Request) (reconcile.R
 		return reconcile.Result{}, err
 	}
 
-	csiNodeSyncer := clustersyncer.NewCSINodeSyncer(r.client, r.scheme, instance, daemonSet_restarted_key, daemonSet_restarted_value)
+	csiNodeSyncer := clustersyncer.NewCSINodeSyncer(r.client, r.scheme, instance, daemonSetRestartedKey, daemonSetRestartedValue)
 	if err := syncer.Sync(context.TODO(), csiNodeSyncer, r.recorder); err != nil {
 		return reconcile.Result{}, err
 	}
@@ -471,7 +469,7 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 				return err
 			}
 
-			if config.GetNameForResource(config.CSIControllerServiceAccount, instance.Name) == sa.Name {
+			if oconfig.GetNameForResource(oconfig.CSIControllerServiceAccount, instance.Name) == sa.Name {
 				controllerlogger := log.WithValues("Resource Type", "Controller")
 				controllerPod := &corev1.Pod{}
 				err := r.getControllerPod(controllerStatefulset, controllerPod)
@@ -490,7 +488,7 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 					return rErr
 				}
 			}
-			if config.GetNameForResource(config.CSINodeServiceAccount, instance.Name) == sa.Name {
+			if oconfig.GetNameForResource(oconfig.CSINodeServiceAccount, instance.Name) == sa.Name {
 				nodelogger := log.WithValues("Resource Type", "Node DaemonSet")
 				nodelogger.Info("node rollout requires restart",
 								"DesiredNumberScheduled", nodeDaemonSet.Status.DesiredNumberScheduled,				
@@ -502,7 +500,7 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 					return rErr
 				}
 
-				daemonSet_restarted_key, daemonSet_restarted_value = r.getRestartedAtAnnotation(nodeDaemonSet.Spec.Template.ObjectMeta.Annotations)
+				daemonSetRestartedKey, daemonSetRestartedValue = r.getRestartedAtAnnotation(nodeDaemonSet.Spec.Template.ObjectMeta.Annotations)
 			}
 		} else if err != nil {
 			logger.Error(err, "Failed to get ServiceAccount", "Name", sa.GetName())
