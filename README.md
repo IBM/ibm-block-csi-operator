@@ -164,7 +164,6 @@ volumes:
 - '*'
 ```
 
-
 ### Install the operator
 
 
