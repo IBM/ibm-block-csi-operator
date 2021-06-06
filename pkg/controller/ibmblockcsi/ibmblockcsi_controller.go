@@ -440,6 +440,9 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 	controller := instance.GenerateControllerServiceAccount()
 	node := instance.GenerateNodeServiceAccount()
 
+	controllerServiceAccountName := oconfig.GetNameForResource(oconfig.CSIControllerServiceAccount, instance.Name)
+	nodeServiceAccountName := oconfig.GetNameForResource(oconfig.CSINodeServiceAccount, instance.Name)
+
 	for _, sa := range []*corev1.ServiceAccount{
 		controller,
 		node,
@@ -469,7 +472,7 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 				return err
 			}
 
-			if oconfig.GetNameForResource(oconfig.CSIControllerServiceAccount, instance.Name) == sa.Name {
+			if controllerServiceAccountName == sa.Name {
 				controllerlogger := log.WithValues("Resource Type", "Controller")
 				controllerPod := &corev1.Pod{}
 				err := r.getControllerPod(controllerStatefulset, controllerPod)
@@ -488,7 +491,7 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 					return rErr
 				}
 			}
-			if oconfig.GetNameForResource(oconfig.CSINodeServiceAccount, instance.Name) == sa.Name {
+			if nodeServiceAccountName == sa.Name {
 				nodelogger := log.WithValues("Resource Type", "Node DaemonSet")
 				nodelogger.Info("node rollout requires restart",
 								"DesiredNumberScheduled", nodeDaemonSet.Status.DesiredNumberScheduled,				
