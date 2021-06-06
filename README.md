@@ -80,16 +80,13 @@ The operator uses the restricted and privileged SCC for deployments.
 
 ### Custom SecurityContextConstraints definition:
 
-<details>
-  <summary>ibm-block-csi-anyuid</summary>
-
 ```yaml
 apiVersion: security.openshift.io/v1
 kind: SecurityContextConstraints
 metadata:
   annotations:
-    kubernetes.io/description: anyuid provides all features of the restricted SCC
-      but allows users to run with any UID and any GID.
+    kubernetes.io/description: 'anyuid provides all features of the restricted SCC
+      but allows users to run with any UID and any GID.'
   name: ibm-block-csi-anyuid
 allowHostDirVolumePlugin: false
 allowHostIPC: false
@@ -124,10 +121,6 @@ volumes:
 - projected
 - secret
 ```
-</details>
-
-<details>
-  <summary>ibm-block-csi-privileged</summary>
 
 ```yaml
 apiVersion: security.openshift.io/v1
@@ -170,7 +163,6 @@ users:
 volumes:
 - '*'
 ```
-</details>
 
 ### Install the operator
 
