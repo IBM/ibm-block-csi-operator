@@ -26,12 +26,3 @@ fi
 operator-sdk generate k8s
 
 operator-sdk generate crds
-
-go build -o ./bin/openapi-gen k8s.io/kube-openapi/cmd/openapi-gen
-
-./bin/openapi-gen -i ./pkg/apis/csi/v1 \
-                  -o "" \
-                  -O zz_generated.openapi \
-                  -p ./pkg/apis/csi/v1 \
-                  -h ./hack/boilerplate.go.txt \
-                  -r "-"

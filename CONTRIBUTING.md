@@ -16,7 +16,7 @@
 - If `role.yaml`, `role_binding.yaml`, or `operator.yaml` in `deploy` are updated, the ClusterServiceVersion(CSV) file in `deploy/olm-catalog/ibm-block-csi-operator` must be updated accordingly.
 - If `README.md` is updated, ClusterServiceVersion(CSV) file in `deploy/olm-catalog/ibm-block-csi-operator` must be updated accordingly.
 - Run `operator-sdk add` to add a new API or controller, for more details, please refer to https://github.com/operator-framework/operator-sdk.
-- Run `operator-sdk generate k8s` and `operator-sdk generate openapi` after you change something in `pkg/apis`.
+- Run `operator-sdk generate k8s` and `operator-sdk generate crds` after you change something in `pkg/apis`.
 
 ## Package the Operator
 This repository makes use of the [Operator Framework](https://github.com/operator-framework) and its packaging concept for Operators. Make sure you read the following guides before packaging the operator and uploading to OperatorHub.
