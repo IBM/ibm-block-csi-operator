@@ -34,11 +34,8 @@ type NodeInfoSpec struct {
 // NodeInfoStatus defines the observed state of NodeInfo
 // +k8s:openapi-gen=true
 type NodeInfoStatus struct {
-	// +listType=set
-	Iqns []string `json:"iqns"`
-	// +listType=set
-	Wwpns []string `json:"wwpns"`
-	// +listType=set
+	Iqns              []string `json:"iqns"`
+	Wwpns             []string `json:"wwpns"`
 	DefinedOnStorages []string `json:"definedOnStorages"`
 }
 
