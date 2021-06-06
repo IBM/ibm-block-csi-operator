@@ -58,8 +58,6 @@ import (
 // ReconcileTime is the delay between reconciliations
 const (
 	ReconcileTime = 30 * time.Second
-	Node = "node"
-	Controller = "controller"
 )
 
 var daemonSet_restarted_key = ""
@@ -350,16 +348,11 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 				logger.Error(err, "failed to get controller pod")
 				return err
 			}
-	
-			for _, containerStatus := range controllerPod.Status.ContainerStatuses {
-				if containerStatus.State.Waiting != nil {
-					if containerStatus.State.Waiting.Reason == "ImagePullBackOff" && !r.areAllPodImagesSynced(controllerStatefulset, controllerPod) {
-						logger.Info("controller requires restart",
-												"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
-												"Replicas", controllerStatefulset.Status.Replicas)
-						r.restartControllerPod(controllerPod)
-					}
-				}
+			if !r.areAllPodImagesSynced(controllerStatefulset, controllerPod) {
+				logger.Info("controller requires restart",
+							"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
+							"Replicas", controllerStatefulset.Status.Replicas)
+				r.restartControllerPod(controllerPod)
 			}
 		}
 		phase = csiv1.DriverPhaseCreating
@@ -478,7 +471,7 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 				return err
 			}
 
-			if strings.Contains(sa.Name, Controller) {
+			if config.GetNameForResource(config.CSIControllerServiceAccount, instance.Name) == sa.Name {
 				controllerlogger := log.WithValues("Resource Type", "Controller")
 				controllerPod := &corev1.Pod{}
 				err := r.getControllerPod(controllerStatefulset, controllerPod)
@@ -497,11 +490,11 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 					return rErr
 				}
 			}
-			if strings.Contains(sa.Name, Node) {
+			if config.GetNameForResource(config.CSINodeServiceAccount, instance.Name) == sa.Name {
 				nodelogger := log.WithValues("Resource Type", "Node DaemonSet")
 				nodelogger.Info("node rollout requires restart",
-				"DesiredNumberScheduled", nodeDaemonSet.Status.DesiredNumberScheduled,				
-				"NumberAvailable", nodeDaemonSet.Status.NumberAvailable)
+								"DesiredNumberScheduled", nodeDaemonSet.Status.DesiredNumberScheduled,				
+								"NumberAvailable", nodeDaemonSet.Status.NumberAvailable)
 				nodelogger.Info("csi node stopped being ready - restarting it")
 				rErr := r.rolloutRestartNode(nodeDaemonSet)
 
