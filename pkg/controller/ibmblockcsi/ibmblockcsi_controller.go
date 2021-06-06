@@ -58,6 +58,7 @@ import (
 // ReconcileTime is the delay between reconciliations
 const ReconcileTime = 30 * time.Second
 
+// ticket to redundant those vars - CSI-3071
 var daemonSetRestartedKey = ""
 var daemonSetRestartedValue = ""
 
@@ -476,20 +477,19 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 			}
 
 			if controllerServiceAccountName == sa.Name {
-				controllerlogger := log.WithValues("Resource Type", "Controller")
 				controllerPod := &corev1.Pod{}
 				err := r.getControllerPod(controllerStatefulset, controllerPod)
 				if errors.IsNotFound(err) {
 					return nil
 				} else if err != nil {
-					controllerlogger.Error(err, "failed to get controller pod")
+					logger.Error(err, "failed to get controller pod")
 					return err
 				}
 
-				controllerlogger.Info("controller requires restart",
+				logger.Info("controller requires restart",
 					"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
 					"Replicas", controllerStatefulset.Status.Replicas)
-				controllerlogger.Info("restarting csi controller")
+				logger.Info("restarting csi controller")
 				rErr := r.restartControllerPod(controllerPod)
 
 				if rErr != nil {
@@ -497,11 +497,10 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 				}
 			}
 			if nodeServiceAccountName == sa.Name {
-				nodelogger := log.WithValues("Resource Type", "Node DaemonSet")
-				nodelogger.Info("node rollout requires restart",
+				logger.Info("node rollout requires restart",
 					"DesiredNumberScheduled", nodeDaemonSet.Status.DesiredNumberScheduled,				
 					"NumberAvailable", nodeDaemonSet.Status.NumberAvailable)
-				nodelogger.Info("csi node stopped being ready - restarting it")
+				logger.Info("csi node stopped being ready - restarting it")
 				rErr := r.rolloutRestartNode(nodeDaemonSet)
 
 				if rErr != nil {
