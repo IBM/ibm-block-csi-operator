@@ -342,10 +342,13 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 	} else {
 		if !instance.Status.ControllerReady {
 			err := r.getControllerPod(controllerStatefulset, controllerPod)
-			if err != nil {
+			if errors.IsNotFound(err) {
+				return nil
+			}else if err != nil {
 				logger.Error(err, "failed to get controller pod")
 				return err
 			}
+
 			if !r.areAllPodImagesSynced(controllerStatefulset, controllerPod) {
 				logger.Info("controller requires restart",
 							"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
@@ -476,7 +479,9 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 				controllerlogger := log.WithValues("Resource Type", "Controller")
 				controllerPod := &corev1.Pod{}
 				err := r.getControllerPod(controllerStatefulset, controllerPod)
-				if err != nil {
+				if errors.IsNotFound(err) {
+					return nil
+				}else if err != nil {
 					controllerlogger.Error(err, "failed to get controller pod")
 					return err
 				}
