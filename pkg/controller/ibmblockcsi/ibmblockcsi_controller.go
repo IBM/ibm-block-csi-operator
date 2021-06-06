@@ -344,15 +344,15 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 			err := r.getControllerPod(controllerStatefulset, controllerPod)
 			if errors.IsNotFound(err) {
 				return nil
-			}else if err != nil {
+			} else if err != nil {
 				logger.Error(err, "failed to get controller pod")
 				return err
 			}
 
 			if !r.areAllPodImagesSynced(controllerStatefulset, controllerPod) {
 				logger.Info("controller requires restart",
-							"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
-							"Replicas", controllerStatefulset.Status.Replicas)
+					"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
+					"Replicas", controllerStatefulset.Status.Replicas)
 				r.restartControllerPod(controllerPod)
 			}
 		}
@@ -481,17 +481,17 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 				err := r.getControllerPod(controllerStatefulset, controllerPod)
 				if errors.IsNotFound(err) {
 					return nil
-				}else if err != nil {
+				} else if err != nil {
 					controllerlogger.Error(err, "failed to get controller pod")
 					return err
 				}
 
 				controllerlogger.Info("controller requires restart",
-							"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
-							"Replicas", controllerStatefulset.Status.Replicas)
+					"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
+					"Replicas", controllerStatefulset.Status.Replicas)
 				controllerlogger.Info("restarting csi controller")
 				rErr := r.restartControllerPod(controllerPod)
-				
+
 				if rErr != nil {
 					return rErr
 				}
@@ -499,8 +499,8 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 			if nodeServiceAccountName == sa.Name {
 				nodelogger := log.WithValues("Resource Type", "Node DaemonSet")
 				nodelogger.Info("node rollout requires restart",
-								"DesiredNumberScheduled", nodeDaemonSet.Status.DesiredNumberScheduled,				
-								"NumberAvailable", nodeDaemonSet.Status.NumberAvailable)
+					"DesiredNumberScheduled", nodeDaemonSet.Status.DesiredNumberScheduled,				
+					"NumberAvailable", nodeDaemonSet.Status.NumberAvailable)
 				nodelogger.Info("csi node stopped being ready - restarting it")
 				rErr := r.rolloutRestartNode(nodeDaemonSet)
 
@@ -522,7 +522,7 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 	return nil
 }
 
-func (r *ReconcileIBMBlockCSI) getRestartedAtAnnotation(Annotations map[string]string) (string, string){
+func (r *ReconcileIBMBlockCSI) getRestartedAtAnnotation(Annotations map[string]string) (string, string) {
 	restartedAt := fmt.Sprintf("%s/restartedAt", oconfig.APIGroup)
 	for key, element := range Annotations {
 		if key == restartedAt {
@@ -533,13 +533,13 @@ func (r *ReconcileIBMBlockCSI) getRestartedAtAnnotation(Annotations map[string]s
 }
 
 func (r *ReconcileIBMBlockCSI) getControllerStatefulSet(instance *ibmblockcsi.IBMBlockCSI) (*appsv1.StatefulSet, error) {
-			controllerStatefulset := &appsv1.StatefulSet{}
-			err := r.client.Get(context.TODO(), types.NamespacedName{
-				Name:      oconfig.GetNameForResource(oconfig.CSIController, instance.Name),
-				Namespace: instance.Namespace,
-			}, controllerStatefulset)
+	controllerStatefulset := &appsv1.StatefulSet{}
+	err := r.client.Get(context.TODO(), types.NamespacedName{
+		Name:      oconfig.GetNameForResource(oconfig.CSIController, instance.Name),
+		Namespace: instance.Namespace,
+	}, controllerStatefulset)
 
-			return controllerStatefulset, err
+	return controllerStatefulset, err
 }
 
 func (r *ReconcileIBMBlockCSI) getNodeDaemonSet(instance *ibmblockcsi.IBMBlockCSI) (*appsv1.DaemonSet, error) {
@@ -556,7 +556,7 @@ func (r *ReconcileIBMBlockCSI) isControllerReady(controller *appsv1.StatefulSet)
 	return controller.Status.ReadyReplicas == controller.Status.Replicas
 }
 
-func (r *ReconcileIBMBlockCSI) isNodeReady( node *appsv1.DaemonSet) bool {
+func (r *ReconcileIBMBlockCSI) isNodeReady(node *appsv1.DaemonSet) bool {
 	return node.Status.DesiredNumberScheduled == node.Status.NumberAvailable
 }
 
