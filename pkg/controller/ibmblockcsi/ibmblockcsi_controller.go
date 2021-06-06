@@ -328,18 +328,18 @@ func (r *ReconcileIBMBlockCSI) getAccessorAndFinalizerName(instance *ibmblockcsi
 func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, originalStatus csiv1.IBMBlockCSIStatus) error {
 	logger := log.WithName("updateStatus")
 	controllerPod := &corev1.Pod{}
-	controllerStatefulset, err := r.getControllerStatefulSetObject(instance)
+	controllerStatefulset, err := r.getControllerStatefulSet(instance)
 	if err != nil {
 		return err
 	}
 
-	nodeDaemonSet, err := r.getNodeDaemonSetObject(instance)
+	nodeDaemonSet, err := r.getNodeDaemonSet(instance)
 	if err != nil {
 		return err
 	}
 
-	instance.Status.ControllerReady = r.areControllerPodsRunning(controllerStatefulset)
-	instance.Status.NodeReady = r.areNodePodsRunning(nodeDaemonSet)
+	instance.Status.ControllerReady = r.isControllerReady(controllerStatefulset)
+	instance.Status.NodeReady = r.isNodeReady(nodeDaemonSet)
 	phase := csiv1.DriverPhaseNone
 	if instance.Status.ControllerReady && instance.Status.NodeReady {
 		phase = csiv1.DriverPhaseRunning
@@ -366,7 +366,6 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 	}
 	instance.Status.Phase = phase
 	instance.Status.Version = oversion.DriverVersion
-	logger.Info("updating IBMBlockCSI status")
 
 	if !reflect.DeepEqual(originalStatus, instance.Status) {
 		logger.Info("updating IBMBlockCSI status", "name", instance.Name, "from", originalStatus, "to", instance.Status)
@@ -469,12 +468,12 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 				return err
 			}
 
-			controllerStatefulset, err := r.getControllerStatefulSetObject(instance)
+			controllerStatefulset, err := r.getControllerStatefulSet(instance)
 			if err != nil {
 				return err
 			}
 
-			nodeDaemonSet, err := r.getNodeDaemonSetObject(instance)
+			nodeDaemonSet, err := r.getNodeDaemonSet(instance)
 			if err != nil {
 				return err
 			}
@@ -534,7 +533,7 @@ func (r *ReconcileIBMBlockCSI) getRestartedAtAnnotation(Annotations map[string]s
 	return "", ""
 }
 
-func (r *ReconcileIBMBlockCSI) getControllerStatefulSetObject(instance *ibmblockcsi.IBMBlockCSI) (*appsv1.StatefulSet, error) {
+func (r *ReconcileIBMBlockCSI) getControllerStatefulSet(instance *ibmblockcsi.IBMBlockCSI) (*appsv1.StatefulSet, error) {
 			controllerStatefulset := &appsv1.StatefulSet{}
 			err := r.client.Get(context.TODO(), types.NamespacedName{
 				Name:      oconfig.GetNameForResource(oconfig.CSIController, instance.Name),
@@ -544,7 +543,7 @@ func (r *ReconcileIBMBlockCSI) getControllerStatefulSetObject(instance *ibmblock
 			return controllerStatefulset, err
 }
 
-func (r *ReconcileIBMBlockCSI) getNodeDaemonSetObject(instance *ibmblockcsi.IBMBlockCSI) (*appsv1.DaemonSet, error) {
+func (r *ReconcileIBMBlockCSI) getNodeDaemonSet(instance *ibmblockcsi.IBMBlockCSI) (*appsv1.DaemonSet, error) {
 	node := &appsv1.DaemonSet{}
 	err := r.client.Get(context.TODO(), types.NamespacedName{
 		Name:      oconfig.GetNameForResource(oconfig.CSINode, instance.Name),
@@ -554,11 +553,11 @@ func (r *ReconcileIBMBlockCSI) getNodeDaemonSetObject(instance *ibmblockcsi.IBMB
 	return node, err
 }
 
-func (r *ReconcileIBMBlockCSI) areControllerPodsRunning(controller *appsv1.StatefulSet) bool {
+func (r *ReconcileIBMBlockCSI) isControllerReady(controller *appsv1.StatefulSet) bool {
 	return controller.Status.ReadyReplicas == controller.Status.Replicas
 }
 
-func (r *ReconcileIBMBlockCSI) areNodePodsRunning( node *appsv1.DaemonSet) bool {
+func (r *ReconcileIBMBlockCSI) isNodeReady( node *appsv1.DaemonSet) bool {
 	return node.Status.DesiredNumberScheduled == node.Status.NumberAvailable
 }
 
