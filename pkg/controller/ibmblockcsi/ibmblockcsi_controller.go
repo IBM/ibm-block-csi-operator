@@ -52,6 +52,7 @@ import (
 	"github.com/IBM/ibm-block-csi-operator/pkg/internal/ibmblockcsi"
 	kubeutil "github.com/IBM/ibm-block-csi-operator/pkg/util/kubernetes"
 	oversion "github.com/IBM/ibm-block-csi-operator/version"
+	"github.com/go-logr/logr"
 	"github.com/presslabs/controller-util/syncer"
 )
 
@@ -388,7 +389,7 @@ func (r *ReconcileIBMBlockCSI) areAllPodImagesSynced(controllerStatefulset *apps
 	return true
 }
 
-func (r *ReconcileIBMBlockCSI) restartControllerPod(logger *logf.DelegatingLogger, instance *ibmblockcsi.IBMBlockCSI) error {
+func (r *ReconcileIBMBlockCSI) restartControllerPod(logger logr.Logger, instance *ibmblockcsi.IBMBlockCSI) error {
 	controllerPod := &corev1.Pod{}
 	controllerStatefulset, err := r.getControllerStatefulSet(instance)
 	if err != nil {
@@ -411,7 +412,7 @@ func (r *ReconcileIBMBlockCSI) restartControllerPod(logger *logf.DelegatingLogge
 	return r.restartControllerPodfromStatefulSet(logger, instance, controllerStatefulset, controllerPod)
 }
 
-func (r *ReconcileIBMBlockCSI) restartControllerPodfromStatefulSet(logger *logf.DelegatingLogger, instance *ibmblockcsi.IBMBlockCSI, 
+func (r *ReconcileIBMBlockCSI) restartControllerPodfromStatefulSet(logger logr.Logger, instance *ibmblockcsi.IBMBlockCSI, 
 	controllerStatefulset *appsv1.StatefulSet, controllerPod *corev1.Pod) error {
 	logger.Info("controller requires restart",
 	"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
