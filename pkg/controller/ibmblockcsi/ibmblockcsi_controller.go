@@ -328,41 +328,40 @@ func (r *ReconcileIBMBlockCSI) getAccessorAndFinalizerName(instance *ibmblockcsi
 func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, originalStatus csiv1.IBMBlockCSIStatus) error {
 	logger := log.WithName("updateStatus")
 	controllerPod := &corev1.Pod{}
-	err, controllerStatefulset := r.getControllerK8sObject(instance)
+	controllerStatefulset, err := r.getControllerK8sObject(instance)
 	if err != nil {
 		return err
 	}
 
-	err, nodeDaemonSet := r.getNodeK8sObject(instance)
+	nodeDaemonSet, err := r.getNodeK8sObject(instance)
 	if err != nil {
 		return err
 	}
 
-	if !instance.Status.ControllerReady {
-		err := r.getControllerPod(controllerStatefulset, controllerPod)
-		if err != nil {
-			logger.Error(err, "failed to get controller pod")
-			return err
-		}
-
-		for _, containerstatus := range controllerPod.Status.ContainerStatuses {
-			if containerstatus.State.Waiting != nil {
-				if containerstatus.State.Waiting.Reason == "ImagePullBackOff" {
-					logger.Info("controller requires restart",
-											"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
-											"Replicas", controllerStatefulset.Status.Replicas)
-					r.restartControllerPod(controllerPod)
-				}
-			}
-		}
-	}
-
-	instance.Status.ControllerReady, instance.Status.NodeReady = r.getDriverPodsStatus(instance, 
-		controllerStatefulset, nodeDaemonSet)
+	instance.Status.ControllerReady = r.getControllerPodsStatus(instance, controllerStatefulset)
+	instance.Status.NodeReady = r.getNodePodsStatus(instance, nodeDaemonSet)
 	phase := csiv1.DriverPhaseNone
 	if instance.Status.ControllerReady && instance.Status.NodeReady {
 		phase = csiv1.DriverPhaseRunning
 	} else {
+		if !instance.Status.ControllerReady {
+			err := r.getControllerPod(controllerStatefulset, controllerPod)
+			if err != nil {
+				logger.Error(err, "failed to get controller pod")
+				return err
+			}
+	
+			for _, containerStatus := range controllerPod.Status.ContainerStatuses {
+				if containerStatus.State.Waiting != nil {
+					if containerStatus.State.Waiting.Reason == "ImagePullBackOff" {
+						logger.Info("controller requires restart",
+												"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
+												"Replicas", controllerStatefulset.Status.Replicas)
+						r.restartControllerPod(controllerPod)
+					}
+				}
+			}
+		}
 		phase = csiv1.DriverPhaseCreating
 	}
 	instance.Status.Phase = phase
@@ -470,12 +469,12 @@ func (r *ReconcileIBMBlockCSI) reconcileServiceAccount(instance *ibmblockcsi.IBM
 				return err
 			}
 
-			err, controllerStatefulset := r.getControllerK8sObject(instance)
+			controllerStatefulset, err := r.getControllerK8sObject(instance)
 			if err != nil {
 				return err
 			}
 
-			err, nodeDaemonSet := r.getNodeK8sObject(instance)
+			nodeDaemonSet, err := r.getNodeK8sObject(instance)
 			if err != nil {
 				return err
 			}
@@ -535,46 +534,38 @@ func (r *ReconcileIBMBlockCSI) getRestartedAtAnnotation(Annotations map[string]s
 	return "", ""
 }
 
-func (r *ReconcileIBMBlockCSI) getControllerK8sObject(instance *ibmblockcsi.IBMBlockCSI) (error, *appsv1.StatefulSet) {
+func (r *ReconcileIBMBlockCSI) getControllerK8sObject(instance *ibmblockcsi.IBMBlockCSI) (*appsv1.StatefulSet, error) {
 			controllerStatefulset := &appsv1.StatefulSet{}
 			err := r.client.Get(context.TODO(), types.NamespacedName{
 				Name:      oconfig.GetNameForResource(oconfig.CSIController, instance.Name),
 				Namespace: instance.Namespace,
 			}, controllerStatefulset)
-		
-			if err != nil {
-				return err, controllerStatefulset
-			}
-			return err, controllerStatefulset
+
+			return controllerStatefulset, err
 }
 
-func (r *ReconcileIBMBlockCSI) getNodeK8sObject(instance *ibmblockcsi.IBMBlockCSI) (error, *appsv1.DaemonSet) {
+func (r *ReconcileIBMBlockCSI) getNodeK8sObject(instance *ibmblockcsi.IBMBlockCSI) (*appsv1.DaemonSet, error) {
 	node := &appsv1.DaemonSet{}
 	err := r.client.Get(context.TODO(), types.NamespacedName{
 		Name:      oconfig.GetNameForResource(oconfig.CSINode, instance.Name),
 		Namespace: instance.Namespace,
 	}, node)
 
-	if err != nil {
-		return err, node
-	}
-	return err, node
+	return node, err
 }
 
-func (r *ReconcileIBMBlockCSI) getDriverPodsStatus(instance *ibmblockcsi.IBMBlockCSI, 
-	controller *appsv1.StatefulSet, node *appsv1.DaemonSet) (bool, bool) {
+func (r *ReconcileIBMBlockCSI) getControllerPodsStatus(instance *ibmblockcsi.IBMBlockCSI, controller *appsv1.StatefulSet) bool {
 	ControllerReady := false
+
+	ControllerReady = controller.Status.ReadyReplicas == controller.Status.Replicas
+	return ControllerReady
+}
+
+func (r *ReconcileIBMBlockCSI) getNodePodsStatus(instance *ibmblockcsi.IBMBlockCSI, node *appsv1.DaemonSet) bool {
 	NodeReady := false
 
-	instance.Status.ControllerReady = controller.Status.ReadyReplicas == controller.Status.Replicas
-	instance.Status.NodeReady = node.Status.DesiredNumberScheduled == node.Status.NumberAvailable
-	if instance.Status.ControllerReady {
-		ControllerReady = true
-	}
-	if instance.Status.NodeReady {
-		NodeReady = true
-	}
-	return ControllerReady, NodeReady
+	NodeReady = node.Status.DesiredNumberScheduled == node.Status.NumberAvailable
+	return NodeReady
 }
 
 func (r *ReconcileIBMBlockCSI) reconcileClusterRole(instance *ibmblockcsi.IBMBlockCSI) error {
