@@ -457,6 +457,7 @@ spec:
               metadata:
                 labels:
                   app.kubernetes.io/name: ibm-block-csi-operator
+                  csi: ibm
               spec:
                 serviceAccountName: ibm-block-csi-operator
                 affinity:
