@@ -27,7 +27,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
-	storagev1beta1 "k8s.io/api/storage/v1beta1"
+	storagev1 "k8s.io/api/storage/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 )
@@ -81,12 +81,12 @@ var _ = Describe("Controller", func() {
 				}, timeout, interval).ShouldNot(BeNil())
 
 				By("Getting CSIDriver")
-				cd := &storagev1beta1.CSIDriver{}
+				cd := &storagev1.CSIDriver{}
 				cdKey := types.NamespacedName{
 					Name:      config.DriverName,
 					Namespace: "",
 				}
-				Eventually(func() (*storagev1beta1.CSIDriver, error) {
+				Eventually(func() (*storagev1.CSIDriver, error) {
 					err := k8sClient.Get(context.Background(), cdKey, cd)
 					return cd, err
 				}, timeout, interval).ShouldNot(BeNil())
