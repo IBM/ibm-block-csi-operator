@@ -350,7 +350,7 @@ func (r *ReconcileIBMBlockCSI) updateStatus(instance *ibmblockcsi.IBMBlockCSI, o
 			}
 
 			if !r.areAllPodImagesSynced(controllerStatefulset, controllerPod) {
-				r.restartControllerPodfromStatefulSet(logger, instance, controllerStatefulset, controllerPod)
+				r.restartControllerPodfromStatefulSet(logger, controllerStatefulset, controllerPod)
 			}
 		}
 		phase = csiv1.DriverPhaseCreating
@@ -409,10 +409,10 @@ func (r *ReconcileIBMBlockCSI) restartControllerPod(logger logr.Logger, instance
 		return err
 	}
 
-	return r.restartControllerPodfromStatefulSet(logger, instance, controllerStatefulset, controllerPod)
+	return r.restartControllerPodfromStatefulSet(logger, controllerStatefulset, controllerPod)
 }
 
-func (r *ReconcileIBMBlockCSI) restartControllerPodfromStatefulSet(logger logr.Logger, instance *ibmblockcsi.IBMBlockCSI, 
+func (r *ReconcileIBMBlockCSI) restartControllerPodfromStatefulSet(logger logr.Logger, 
 	controllerStatefulset *appsv1.StatefulSet, controllerPod *corev1.Pod) error {
 	logger.Info("controller requires restart",
 	"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
