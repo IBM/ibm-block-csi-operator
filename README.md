@@ -18,7 +18,7 @@ Supported operating systems (and architectures):
   - RHEL 7.x (x86)
   - RHCOS (x86, IBM Z, and IBM Power Systems)
 
-Full documentation can be found on the [IBM Knowledge Center](https://www.ibm.com/docs/en/stg-block-csi-driver).
+For full product information, see [IBM block storage CSI driver documentation](https://www.ibm.com/docs/en/stg-block-csi-driver).
 
 <br/>
 <br/>
@@ -42,7 +42,7 @@ yum -y install xfsprogs                # Only if XFS file system is required
 #### 2. Configure Linux® multipath devices on the host.
 
 **Important:** Be sure to configure each worker with storage connectivity according to your storage system instructions. 
-For more information, find your storage system documentation on [IBM Knowledge Center](https://www.ibm.com/docs/en).
+For more information, find your storage system product information in [IBM Documentation](https://www.ibm.com/docs/en).
 
 ##### 2.1 Additional configuration steps for OpenShift® Container Platform users (RHEL and RHCOS). Other users can continue to step 3.
 
@@ -328,7 +328,7 @@ storageclass.storage.k8s.io/gold created
 
 ## Driver Usage
 > **Note**: For further usage details, refer to https://github.com/IBM/ibm-block-csi-driver. 
->          In addition, full documentation can be found on the [IBM knowledge center](https://www.ibm.com/docs/en/stg-block-csi-driver).
+>          In addition, for full product information, see [IBM block storage CSI driver documentation](https://www.ibm.com/docs/en/stg-block-csi-driver).
 
 <br/>
 <br/>
