@@ -325,7 +325,7 @@ storageclass.storage.k8s.io/gold created
 
 ## Upgrading
 
-To manually upgrade the CSI (Container Storage Interface) driver from a previous version with GitHub, perform [step 2](#2-install-the-operator) of the installation procedure for the latest version.
+To manually upgrade the CSI (Container Storage Interface) driver from a previous version with GitHub, perform [step 2](#2--install-the-operator) of the installation procedure for the latest version.
 
 ## Uninstalling
 
