@@ -1,6 +1,14 @@
 # Operator for IBM block storage CSI driver
 The Container Storage Interface (CSI) Driver for IBM block storage systems enables container orchestrators such as Kubernetes to manage the life cycle of persistent storage.
 
+{{CONTRIBUTING.md}}
+
+```
+{{CONTRIBUTING.md}}
+```
+
+multimarkdown -t mmd CONTRIBUTING.md
+
 This is the official operator to deploy and manage IBM block storage CSI driver.
 
 Supported container platforms (and architectures):
