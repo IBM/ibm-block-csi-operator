@@ -1,13 +1,8 @@
-name: Operator test
-
-env:
-  OP_TEST_DEBUG: 1
-  OP_TEST_CONTAINER_OPT: "-t"
+name: Community Operators test
 on:
-  pull_request:
+  push:
     branches:
-    - develop
-    - master
+      - task/CSI-2892_cert_community_operator_hub
 jobs:
   operator_image_build:
    name: "set env"
@@ -46,183 +41,31 @@ jobs:
      upstream_community_operators_path: "${{ steps.environment_setup.outputs.upstream_community_operators_path }}"
      repository_path: "${{ steps.environment_setup.outputs.repository_path }}"
 
-  CI-csi-kiwi:
-    name: "kiwi / Full operator test"
+  CI-csi-demo-pr:
+    name: "create demo pr in forked community-operators repo"
     needs: prepare_env
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      # reduce code repetition in CSI-2992 ticket
-      - name: update_csv
+      - name: create demo PR
         run: |
-          build/ci/update_csv.sh
+          build/ci/create_demo_pr.sh
         env:
+          github_csiblock_community_operators_repository: "csiblock/community-operators"
+          community_operators_kubernetes_branch: "ibm-block-csi-update-kubernetes-${{ github.run_number }}"
+          community_operators_openshift_branch: "ibm-block-csi-update-openshift-${{ github.run_number }}"
+          github_token: ${{ secrets.CSIBLOCK_GITHUB_TOKEN }}
           current_operator_image: ${{ needs.prepare_env.outputs.current_operator_image }}
           wanted_operator_image: ${{ needs.prepare_env.outputs.wanted_operator_image }}
           csv_file: ${{ needs.prepare_env.outputs.csv_file }}
           repository_path: ${{ needs.prepare_env.outputs.repository_path }}
-      - name: Operator test
+      - name: clean demo pr
+        if: always()
         run: |
-          echo "kiwi ${{ needs.prepare_env.outputs.upstream_community_operators_path }}"
-          build/ci/op-test.sh kiwi "${{ needs.prepare_env.outputs.upstream_community_operators_path }}"
-
-  CI-csi-lemon:
-    name: "lemon / Deploy from scratch"
-    needs: prepare_env
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: update_csv
-        run: |
-          build/ci/update_csv.sh
+          bash build/ci/clean_demo_pr.sh
         env:
-          current_operator_image: ${{ needs.prepare_env.outputs.current_operator_image }}
-          wanted_operator_image: ${{ needs.prepare_env.outputs.wanted_operator_image }}
-          csv_file: ${{ needs.prepare_env.outputs.csv_file }}
-          repository_path: ${{ needs.prepare_env.outputs.repository_path }}
-      - name: Operator test
-        run: |
-          echo "lemon ${{ needs.prepare_env.outputs.upstream_community_operators_path }}"
-          build/ci/op-test.sh lemon "${{ needs.prepare_env.outputs.upstream_community_operators_path }}"
-
-  CI-csi-lemon-openshift_4_6:
-    name: "lemon / Deploy from scratch (v4.6)"
-    needs: prepare_env
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: update_csv
-        run: |
-          build/ci/update_csv.sh
-        env:
-          current_operator_image: ${{ needs.prepare_env.outputs.current_operator_image }}
-          wanted_operator_image: ${{ needs.prepare_env.outputs.wanted_operator_image }}
-          csv_file: ${{ needs.prepare_env.outputs.csv_file }}
-          repository_path: ${{ needs.prepare_env.outputs.repository_path }}
-      - name: Operator test
-        run: |
-          echo "lemon_v4.6 ${{ needs.prepare_env.outputs.community_operators_path }}"
-          build/ci/op-test.sh lemon_v4.6 "${{ needs.prepare_env.outputs.community_operators_path }}"
-
-  CI-csi-lemon-openshift_4_7:
-    name: "lemon / Deploy from scratch (v4.7)"
-    needs: prepare_env
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: update_csv
-        run: |
-          build/ci/update_csv.sh
-        env:
-          current_operator_image: ${{ needs.prepare_env.outputs.current_operator_image }}
-          wanted_operator_image: ${{ needs.prepare_env.outputs.wanted_operator_image }}
-          csv_file: ${{ needs.prepare_env.outputs.csv_file }}
-          repository_path: ${{ needs.prepare_env.outputs.repository_path }}
-      - name: Operator test
-        run: |
-          echo "lemon_v4.7 ${{ needs.prepare_env.outputs.community_operators_path }}"
-          build/ci/op-test.sh lemon_v4.7 "${{ needs.prepare_env.outputs.community_operators_path }}"
-
-  CI-csi-lemon-openshift_4_8:
-    name: "lemon / Deploy from scratch (v4.8)"
-    needs: prepare_env
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: update_csv
-        run: |
-          build/ci/update_csv.sh
-        env:
-          current_operator_image: ${{ needs.prepare_env.outputs.current_operator_image }}
-          wanted_operator_image: ${{ needs.prepare_env.outputs.wanted_operator_image }}
-          csv_file: ${{ needs.prepare_env.outputs.csv_file }}
-          repository_path: ${{ needs.prepare_env.outputs.repository_path }}
-      - name: Operator test
-        run: |
-          echo "lemon_v4.8 ${{ needs.prepare_env.outputs.community_operators_path }}"
-          build/ci/op-test.sh lemon_v4.8 "${{ needs.prepare_env.outputs.community_operators_path }}"
-
-  CI-csi-orange-k8s:
-    name: "orange / Deploy k8s latest"
-    needs: prepare_env
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: update_csv
-        run: |
-          build/ci/update_csv.sh
-        env:
-          current_operator_image: ${{ needs.prepare_env.outputs.current_operator_image }}
-          wanted_operator_image: ${{ needs.prepare_env.outputs.wanted_operator_image }}
-          csv_file: ${{ needs.prepare_env.outputs.csv_file }}
-          repository_path: ${{ needs.prepare_env.outputs.repository_path }}
-      - name: Operator test
-        run: |
-          echo "orange ${{ needs.prepare_env.outputs.upstream_community_operators_path }}"
-          build/ci/op-test.sh orange "${{ needs.prepare_env.outputs.upstream_community_operators_path }}"
-
-  CI-csi-orange-openshift_4_6:
-    name: "orange / Deploy openshift v4.6"
-    needs: prepare_env
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: update_csv
-        run: |
-          build/ci/update_csv.sh
-        env:
-          current_operator_image: ${{ needs.prepare_env.outputs.current_operator_image }}
-          wanted_operator_image: ${{ needs.prepare_env.outputs.wanted_operator_image }}
-          csv_file: ${{ needs.prepare_env.outputs.csv_file }}
-          repository_path: ${{ needs.prepare_env.outputs.repository_path }}
-      - name: Operator test
-        run: |
-          echo "orange_v4.6 ${{ needs.prepare_env.outputs.community_operators_path }}"
-          build/ci/op-test.sh orange_v4.6 "${{ needs.prepare_env.outputs.community_operators_path }}"
-
-  CI-csi-orange-openshift_4_7:
-    name: "orange / Deploy openshift v4.7"
-    needs: prepare_env
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: update_csv
-        run: |
-          build/ci/update_csv.sh
-        env:
-          current_operator_image: ${{ needs.prepare_env.outputs.current_operator_image }}
-          wanted_operator_image: ${{ needs.prepare_env.outputs.wanted_operator_image }}
-          csv_file: ${{ needs.prepare_env.outputs.csv_file }}
-          repository_path: ${{ needs.prepare_env.outputs.repository_path }}
-      - name: Operator test
-        run: |
-          echo "orange_v4.7 ${{ needs.prepare_env.outputs.community_operators_path }}"
-          build/ci/op-test.sh orange_v4.7 "${{ needs.prepare_env.outputs.community_operators_path }}"
-
-  CI-csi-orange-openshift_4_8:
-    name: "orange / Deploy openshift v4.8"
-    needs: prepare_env
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: update_csv
-        run: |
-          build/ci/update_csv.sh
-        env:
-          current_operator_image: ${{ needs.prepare_env.outputs.current_operator_image }}
-          wanted_operator_image: ${{ needs.prepare_env.outputs.wanted_operator_image }}
-          csv_file: ${{ needs.prepare_env.outputs.csv_file }}
-          repository_path: ${{ needs.prepare_env.outputs.repository_path }}
-      - name: Operator test
-        run: |
-          echo "orange_v4.8 ${{ needs.prepare_env.outputs.community_operators_path }}"
-          build/ci/op-test.sh orange_v4.8 "${{ needs.prepare_env.outputs.community_operators_path }}"
+          github_csiblock_community_operators_repository: "csiblock/community-operators"
+          community_operators_kubernetes_branch: "ibm-block-csi-update-kubernetes-${{ github.run_number }}"
+          community_operators_openshift_branch: "ibm-block-csi-update-openshift-${{ github.run_number }}"
