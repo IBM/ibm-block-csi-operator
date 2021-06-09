@@ -116,18 +116,18 @@ spec:
     The Container Storage Interface (CSI) Driver for IBM block storage systems enables container orchestrators such as Kubernetes to manage the life cycle of persistent storage.
     This is the official operator to deploy and manage IBM block storage CSI driver.
     Supported container platforms (and architectures):
-      - OpenShift v4.6 (x86, IBM Z, and IBM Power Systems)
       - OpenShift v4.7 (x86, IBM Z, and IBM Power Systems)
-      - Kubernetes v1.19 (x86)
+      - OpenShift v4.8 (x86, IBM Z, and IBM Power Systems)
       - Kubernetes v1.20 (x86)
+      - Kubernetes v1.21 (x86)
     Supported IBM storage systems:
-      - IBM Spectrum Virtualize Family including IBM SAN Volume Controller (SVC) and IBM FlashSystem® family members built with IBM Spectrum® Virtualize (FlashSystem 5010, 5030, 5100, 5200, 7200, 9100, 9200, 9200R)
+      - IBM Spectrum Virtualize Family including IBM SAN Volume Controller (SVC) and IBM FlashSystem® family members built with IBM Spectrum® Virtualize (FlashSystem 5xxx, 7200, 9100, 9200, 9200R)
       - IBM FlashSystem A9000 and A9000R
       - IBM DS8000 Family
     Supported operating systems (and architectures):
       - RHEL 7.x (x86)
       - RHCOS (x86, IBM Z, and IBM Power Systems)
-    Full documentation can be found on the [IBM Knowledge Center](https://www.ibm.com/support/knowledgecenter/SSRQ8T).
+    For full product information, see [IBM block storage CSI driver documentation](https://www.ibm.com/docs/en/stg-block-csi-driver).
     ## Prerequisites
     > **Note**: The operator can be installed directly from the RedHat OpenShift web console, through the OperatorHub. The prerequisites below also mentioned and can be viewed via OpenShift.
     ### Preparing worker nodes
@@ -141,7 +141,7 @@ spec:
     ```
     #### 2. Configure Linux® multipath devices on the host.
     **Important:** Be sure to configure each worker with storage connectivity according to your storage system instructions.
-    For more information, find your storage system documentation on [IBM Knowledge Center](https://www.ibm.com/support/knowledgecenter).
+    For more information, find your storage system product information in [IBM Documentation](https://www.ibm.com/docs/en).
     ##### 2.1 Additional configuration steps for OpenShift® Container Platform users (RHEL and RHCOS). Other users can continue to step 3.
     Download and save the following yaml file:
     ```bash
@@ -161,47 +161,44 @@ spec:
     ##### 4.1. Define the hostname of each Kubernetes node on the relevant storage systems with the valid WWPN(for Fibre Channel) or IQN(for iSCSI) of the node.
     ##### 4.2. For Fibre Channel, configure the relevant zoning from the storage to the host.
     ## Installation
-    ### Install the operator
-    #### 1. Download the manifest from GitHub.
+    ### Installing the driver with GitHub
+    The operator for IBM® block storage CSI driver can be installed directly with GitHub. Installing the CSI (Container Storage Interface) driver is part of the operator installation process.
+    Use the following steps to install the operator and driver, with [GitHub](https://github.com/IBM/ibm-block-csi-operator).
+    #### 1.  Create a project namespace, using the `kubectl create ns <namespace>` command.
+    #### 2.  Install the operator.
+    ##### 1. Download the manifest from GitHub.
     ```bash
-    curl https://raw.githubusercontent.com/IBM/ibm-block-csi-operator/master/deploy/installer/generated/ibm-block-csi-operator.yaml > ibm-block-csi-operator.yaml
+    curl https://raw.githubusercontent.com/IBM/ibm-block-csi-operator/v1.6.0/deploy/installer/generated/ibm-block-csi-operator.yaml > ibm-block-csi-operator.yaml
     ```
-    #### 2. (Optional): If required, update the image fields in the ibm-block-csi-operator.yaml.
-    #### 3. Create a namespace.
-    ```bash
-    $ kubectl create ns <namespace>
-    ```
-    #### 4. Install the operator, while using a user-defined namespace.
+    ##### 2.  (Optional): Update the image fields in the ibm-block-csi-operator.yaml.
+    ##### 3. Install the operator, using a user-defined namespace.
     ```bash
     $ kubectl -n <namespace> apply -f ibm-block-csi-operator.yaml
     ```
-    ### Verify the operator is running:
+    ##### 4. Verify that the operator is running. (Make sure that the Status is _Running_.)
     ```bash
     $ kubectl get pod -l app.kubernetes.io/name=ibm-block-csi-operator -n <namespace>
     NAME                                    READY   STATUS    RESTARTS   AGE
     ibm-block-csi-operator-5bb7996b86-xntss 1/1     Running   0          10m
     ```
-    ### Create an IBMBlockCSI custom resource
-    #### 1. Download the manifest from GitHub.
+    #### 3.  Install the IBM block storage CSI driver by creating an IBMBlockCSI custom resource.
+    ##### 1.  Download the manifest from GitHub.
     ```bash
-    curl https://raw.githubusercontent.com/IBM/ibm-block-csi-operator/master/deploy/crds/csi.ibm.com_v1_ibmblockcsi_cr.yaml > csi.ibm.com_v1_ibmblockcsi_cr.yaml
+    curl https://raw.githubusercontent.com/IBM/ibm-block-csi-operator/v1.6.0/deploy/crds/csi.ibm.com_v1_ibmblockcsi_cr.yaml > csi.ibm.com_v1_ibmblockcsi_cr.yaml
     ```
-    #### 2. (Optional): If required, update the image fields in the csi.ibm.com_v1_ibmblockcsi_cr.yaml.
-    #### 3. Install the csi.ibm.com_v1_ibmblockcsi_cr.yaml.
+    ##### 2.  (Optional): Update the image repository field, tag field, or both in the csi.ibm.com_v1_ibmblockcsi_cr.yaml.
+    ##### 3.  Install the csi.ibm.com_v1_ibmblockcsi_cr.yaml.
     ```bash
     $ kubectl -n <namespace> apply -f csi.ibm.com_v1_ibmblockcsi_cr.yaml
     ```
-    ### Verify the driver is running:
+    ##### 4. Verify the driver is running:
     ```bash
-    $ kubectl get all -n <namespace>  -l csi
-    NAME                             READY   STATUS    RESTARTS   AGE
-    pod/ibm-block-csi-controller-0   6/6     Running   0          9m36s
-    pod/ibm-block-csi-node-jvmvh     3/3     Running   0          9m36s
-    pod/ibm-block-csi-node-tsppw     3/3     Running   0          9m36s
-    NAME                                DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
-    daemonset.apps/ibm-block-csi-node   2         2         2       2            2           <none>          9m36s
-    NAME                                        READY   AGE
-    statefulset.apps/ibm-block-csi-controller   1/1     9m36s
+    $ kubectl get pods -n <namespace> -l csi
+    NAME                                        READY   STATUS    RESTARTS   AGE
+    ibm-block-csi-controller-0                  6/6     Running   0          9m36s
+    ibm-block-csi-node-jvmvh                    3/3     Running   0          9m36s
+    ibm-block-csi-node-tsppw                    3/3     Running   0          9m36s
+    ibm-block-csi-operator-5bb7996b86-xntss     1/1     Running   0          10m
     ```
     ## Configuring k8s secret and storage class
     In order to use the driver, create the relevant storage classes and secrets, as needed.

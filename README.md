@@ -218,7 +218,7 @@ Use the following steps to install the operator and driver, with [GitHub](https:
 
 ```bash
 $ kubectl get pods -n <namespace> -l csi
-NAME                                            READY   STATUS    RESTARTS   AGE
+NAME                                        READY   STATUS    RESTARTS   AGE
 ibm-block-csi-controller-0                  6/6     Running   0          9m36s
 ibm-block-csi-node-jvmvh                    3/3     Running   0          9m36s
 ibm-block-csi-node-tsppw                    3/3     Running   0          9m36s
