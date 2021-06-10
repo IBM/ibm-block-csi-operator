@@ -1,8 +1,9 @@
 name: Community Operators test
 on:
-  push:
+  pull_request:
     branches:
-      - task/CSI-2892_cert_community_operator_hub
+      - develop
+      - master
 jobs:
   operator_image_build:
    name: "set env"
@@ -11,7 +12,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
    outputs:
-     operator_image: "csiblock1/ibm-block-csi-operator-amd64:new"
+     operator_image: "ibmcom/ibm-block-csi-operator:latest"
 
   prepare_env:
    name: "prepare_env"
@@ -27,29 +28,26 @@ jobs:
       - name: Install dependencies
         run: python -m pip install --upgrade pip yq
       - uses: FranzDiebold/github-env-vars-action@v2
-      - name: prepare_env
+      - name: Prepare_env
         id: environment_setup
         env:
-          operator_image: ${{ needs.operator_image_build.outputs.operator_image }}
+          operator_image_for_test: ${{ needs.operator_image_build.outputs.operator_image }}
         run: |
           build/ci/prepare_env.sh
    outputs:
-     current_operator_image: "${{ steps.environment_setup.outputs.current_operator_image }}"
-     wanted_operator_image: "${{ steps.environment_setup.outputs.wanted_operator_image }}"
-     csv_file: "${{ steps.environment_setup.outputs.csv_file }}"
      community_operators_path: "${{ steps.environment_setup.outputs.community_operators_path }}"
      upstream_community_operators_path: "${{ steps.environment_setup.outputs.upstream_community_operators_path }}"
      repository_path: "${{ steps.environment_setup.outputs.repository_path }}"
 
   CI-csi-demo-pr:
-    name: "create demo pr in forked community-operators repo"
+    name: "community-operators fork checks"
     needs: prepare_env
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: create demo PR
+      - name: Create demo PR
         run: |
           build/ci/create_demo_pr.sh
         env:
@@ -57,11 +55,8 @@ jobs:
           community_operators_kubernetes_branch: "ibm-block-csi-update-kubernetes-${{ github.run_number }}"
           community_operators_openshift_branch: "ibm-block-csi-update-openshift-${{ github.run_number }}"
           github_token: ${{ secrets.CSIBLOCK_GITHUB_TOKEN }}
-          current_operator_image: ${{ needs.prepare_env.outputs.current_operator_image }}
-          wanted_operator_image: ${{ needs.prepare_env.outputs.wanted_operator_image }}
-          csv_file: ${{ needs.prepare_env.outputs.csv_file }}
           repository_path: ${{ needs.prepare_env.outputs.repository_path }}
-      - name: clean demo pr
+      - name: Clean demo PR
         if: always()
         run: |
           bash build/ci/clean_demo_pr.sh
