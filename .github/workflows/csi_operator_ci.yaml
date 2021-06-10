@@ -38,6 +38,7 @@ jobs:
      repository_path: "${{ steps.environment_setup.outputs.repository_path }}"
      operator_image_in_branch: "${{ steps.environment_setup.outputs.operator_image_in_branch }}"
      operator_image_for_test: ${{ needs.operator_image_build.outputs.operator_image }}
+     csv_file:  ${{ needs.operator_image_build.outputs.csv_file }}
 
   CI-csi-demo-pr:
     name: "community-operators fork checks"
@@ -58,6 +59,7 @@ jobs:
           repository_path: ${{ needs.prepare_env.outputs.repository_path }}
           operator_image_in_branch: ${{ needs.prepare_env.outputs.operator_image_in_branch }}
           operator_image_for_test: ${{ needs.prepare_env.outputs.operator_image_for_test }}
+          csv_file: ${{ needs.prepare_env.outputs.csv_file }}
       - name: Clean demo PR
         if: always()
         run: |
