@@ -30,8 +30,6 @@ jobs:
       - uses: FranzDiebold/github-env-vars-action@v2
       - name: Prepare_env
         id: environment_setup
-        env:
-          operator_image_for_test: ${{ needs.operator_image_build.outputs.operator_image }}
         run: |
           build/ci/prepare_env.sh
    outputs:
@@ -39,6 +37,7 @@ jobs:
      upstream_community_operators_path: "${{ steps.environment_setup.outputs.upstream_community_operators_path }}"
      repository_path: "${{ steps.environment_setup.outputs.repository_path }}"
      operator_image_in_branch: "${{ steps.environment_setup.outputs.operator_image_in_branch }}"
+     operator_image_for_test: ${{ needs.operator_image_build.outputs.operator_image }}
 
   CI-csi-demo-pr:
     name: "community-operators fork checks"
@@ -58,6 +57,7 @@ jobs:
           github_token: ${{ secrets.CSIBLOCK_GITHUB_TOKEN }}
           repository_path: ${{ needs.prepare_env.outputs.repository_path }}
           operator_image_in_branch: ${{ needs.prepare_env.outputs.operator_image_in_branch }}
+          operator_image_for_test: ${{ needs.prepare_env.outputs.operator_image_for_test }}
       - name: Clean demo PR
         if: always()
         run: |
