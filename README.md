@@ -210,7 +210,7 @@ Use the following steps to install the operator and driver, with [GitHub](https:
 	```
 	kubectl -n <namespace> apply -f csi.ibm.com_v1_ibmblockcsi_cr.yaml
 	```
-##### 4. Verify the driver is _Running_:
+##### 4. Verify the driver is running:
 
 ```bash
 $ kubectl get pods -n <namespace> -l csi
