@@ -38,6 +38,7 @@ jobs:
      community_operators_path: "${{ steps.environment_setup.outputs.community_operators_path }}"
      upstream_community_operators_path: "${{ steps.environment_setup.outputs.upstream_community_operators_path }}"
      repository_path: "${{ steps.environment_setup.outputs.repository_path }}"
+     operator_image_in_branch: "${{ steps.environment_setup.outputs.operator_image_in_branch }}"
 
   CI-csi-demo-pr:
     name: "community-operators fork checks"
@@ -56,6 +57,7 @@ jobs:
           community_operators_openshift_branch: "ibm-block-csi-update-openshift-${{ github.run_number }}"
           github_token: ${{ secrets.CSIBLOCK_GITHUB_TOKEN }}
           repository_path: ${{ needs.prepare_env.outputs.repository_path }}
+          operator_image_in_branch: ${{ needs.prepare_env.outputs.operator_image_in_branch }}
       - name: Clean demo PR
         if: always()
         run: |

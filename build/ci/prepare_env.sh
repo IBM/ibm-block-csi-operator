@@ -11,6 +11,7 @@ export operator_image_in_branch=`echo ${operator_image_in_branch//\"}`
 export upstream_community_operators_path=upstream-community-operators/ibm-block-csi-operator-community/$csv_version
 export community_operators_path=community-operators/ibm-block-csi-operator-community/$csv_version
 
+echo "::set-output name=operator_image_in_branch::${operator_image_in_branch}"
 echo "::set-output name=upstream_community_operators_path::${upstream_community_operators_path}"
 echo "::set-output name=community_operators_path::${community_operators_path}"
 echo "::set-output name=repository_path::${repository_path}"
