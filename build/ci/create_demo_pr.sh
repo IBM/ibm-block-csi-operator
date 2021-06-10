@@ -1,7 +1,7 @@
 #!/bin/bash -xe
 set +o pipefail
 
-sed -i "s+$operator_image_for_test+$operator_image_in_branch+g" $csv_file
+sed -i "s+$operator_image_in_branch+$operator_image_for_test+g" $csv_file
 
 # install gh command
 curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg

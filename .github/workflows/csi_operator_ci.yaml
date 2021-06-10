@@ -12,7 +12,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
    outputs:
-     operator_image: "ibmcom/ibm-block-csi-operator:latest"
+     operator_image_for_test: "ibmcom/ibm-block-csi-operator:latest"
 
   prepare_env:
    name: "prepare_env"
@@ -38,7 +38,7 @@ jobs:
      repository_path: "${{ steps.environment_setup.outputs.repository_path }}"
      operator_image_in_branch: "${{ steps.environment_setup.outputs.operator_image_in_branch }}"
      operator_image_for_test: ${{ needs.operator_image_build.outputs.operator_image }}
-     csv_file:  ${{ needs.operator_image_build.outputs.csv_file }}
+     csv_file:  ${{ steps.environment_setup.outputs.csv_file }}
 
   CI-csi-demo-pr:
     name: "community-operators fork checks"
@@ -60,10 +60,17 @@ jobs:
           operator_image_in_branch: ${{ needs.prepare_env.outputs.operator_image_in_branch }}
           operator_image_for_test: ${{ needs.prepare_env.outputs.operator_image_for_test }}
           csv_file: ${{ needs.prepare_env.outputs.csv_file }}
+      - name: Check if all the demo PR checks were passed
+        run: |
+          build/ci/check_all_demo_pr_checks_were_passed.sh
+        env:
+          github_csiblock_community_operators_repository: "csiblock/community-operators"
+          community_operators_kubernetes_branch: "ibm-block-csi-update-kubernetes-${{ github.run_number }}"
+          community_operators_openshift_branch: "ibm-block-csi-update-openshift-${{ github.run_number }}"
       - name: Clean demo PR
         if: always()
         run: |
-          bash build/ci/clean_demo_pr.sh
+          build/ci/clean_demo_pr.sh
         env:
           github_csiblock_community_operators_repository: "csiblock/community-operators"
           community_operators_kubernetes_branch: "ibm-block-csi-update-kubernetes-${{ github.run_number }}"
