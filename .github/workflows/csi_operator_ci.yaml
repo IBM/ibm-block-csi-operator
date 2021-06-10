@@ -1,5 +1,9 @@
 name: Community Operators test
 on:
+  push:
+    branches:
+      - develop
+      - master
   pull_request:
     branches:
       - develop
@@ -37,7 +41,7 @@ jobs:
      upstream_community_operators_path: "${{ steps.environment_setup.outputs.upstream_community_operators_path }}"
      repository_path: "${{ steps.environment_setup.outputs.repository_path }}"
      operator_image_in_branch: "${{ steps.environment_setup.outputs.operator_image_in_branch }}"
-     operator_image_for_test: ${{ needs.operator_image_build.outputs.operator_image }}
+     operator_image_for_test: ${{ needs.operator_image_build.outputs.operator_image_for_test }}
      csv_file:  ${{ steps.environment_setup.outputs.csv_file }}
 
   CI-csi-demo-pr:
@@ -62,7 +66,7 @@ jobs:
           csv_file: ${{ needs.prepare_env.outputs.csv_file }}
       - name: Check if all the demo PR checks were passed
         run: |
-          build/ci/check_all_demo_pr_checks_were_passed.sh
+          build/ci/check_demo_pr_checks.sh
         env:
           github_csiblock_community_operators_repository: "csiblock/community-operators"
           community_operators_kubernetes_branch: "ibm-block-csi-update-kubernetes-${{ github.run_number }}"
