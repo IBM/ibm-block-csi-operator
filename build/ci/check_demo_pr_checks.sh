@@ -11,7 +11,7 @@ wait_for_checks_to_complete(){
   if [[ "$repo_pr" == *"$community_operators_branch"* ]]; then
     sleep 5
     while [ "$(gh pr checks $community_operators_branch --repo $github_csiblock_community_operators_repository | grep -i pending | wc -l)" -gt 0 ]; do
-      sleep 5
+      sleep 15
     done
     if [ "$(gh pr checks $community_operators_branch --repo $github_csiblock_community_operators_repository | grep -i fail | wc -l)" -gt 0 ]
     then
