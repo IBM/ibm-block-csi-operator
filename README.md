@@ -62,7 +62,6 @@ oc apply -f 99-ibm-attach.yaml
 #### 3. If needed, enable support for volume snapshots (FlashCopy® function) on your Kubernetes cluster.
 For more information and instructions, see the Kubernetes blog post, [Kubernetes 1.17 Feature: Kubernetes Volume Snapshot Moves to Beta](https://kubernetes.io/blog/2019/12/09/kubernetes-1-17-feature-cis-volume-snapshot-beta/).
 
-
 #### 4. Configure storage system connectivity
 ##### 4.1. Define the hostname of each Kubernetes node on the relevant storage systems with the valid WWPN (for Fibre Channel) or IQN (for iSCSI) of the node.
 
@@ -211,7 +210,7 @@ Use the following steps to install the operator and driver, with [GitHub](https:
 	```
 	kubectl -n <namespace> apply -f csi.ibm.com_v1_ibmblockcsi_cr.yaml
 	```
-##### 4. Verify the driver is running:
+##### 4. Verify the driver is _Running_:
 
 ```bash
 $ kubectl get pods -n <namespace> -l csi
@@ -311,8 +310,7 @@ storageclass.storage.k8s.io/gold created
 <br/>
 <br/>
 
-
-## Driver Usage
+## Driver usage
 > **Note**: For further usage details, refer to https://github.com/IBM/ibm-block-csi-driver. 
 >          In addition, for full product information, see [IBM block storage CSI driver documentation](https://www.ibm.com/docs/en/stg-block-csi-driver).
 
@@ -322,7 +320,7 @@ storageclass.storage.k8s.io/gold created
 
 ## Upgrading
 
-To manually upgrade the CSI (Container Storage Interface) driver from a previous version with GitHub, perform [step 2](#2--install-the-operator) of the installation procedure for the latest version.
+To manually upgrade the CSI (Container Storage Interface) driver from a previous version with GitHub, perform [step 2](#1--install-the-operator) of the installation procedure for the latest version.
 
 ## Uninstalling
 
