@@ -3,12 +3,6 @@ set +o pipefail
 
 sed -i "s+$operator_image_in_branch+$operator_image_for_test+g" $csv_file
 
-# install gh command
-curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-sudo apt-get update
-sudo apt-get install gh
-
 echo $github_token > github_token.txt
 gh auth login --with-token < github_token.txt
 gh repo fork operator-framework/community-operators --clone community-operators-fork
