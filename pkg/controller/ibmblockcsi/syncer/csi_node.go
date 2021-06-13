@@ -40,6 +40,7 @@ const (
 	nodeContainerName                = "ibm-block-csi-node"
 	nodeDriverRegistrarContainerName = "node-driver-registrar"
 	nodeLivenessProbeContainerName   = "liveness-probe"
+	nodeReadinessProbeContainerName  = "readiness-probe"
 
 	nodeContainerHealthPortName   = "healthz"
 	nodeContainerHealthPortNumber = 9808
@@ -55,8 +56,8 @@ type csiNodeSyncer struct {
 }
 
 // NewCSINodeSyncer returns a syncer for CSI node
-func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockcsi.IBMBlockCSI, 
-	daemonSetRestartedKey string , daemonSetRestartedValue string) syncer.Interface {
+func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockcsi.IBMBlockCSI,
+	daemonSetRestartedKey string, daemonSetRestartedValue string) syncer.Interface {
 	obj := &appsv1.DaemonSet{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        config.GetNameForResource(config.CSINode, driver.Name),
@@ -76,7 +77,7 @@ func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockc
 	})
 }
 
-func (s *csiNodeSyncer) SyncFn(daemonSetRestartedKey string , daemonSetRestartedValue string) error {
+func (s *csiNodeSyncer) SyncFn(daemonSetRestartedKey string, daemonSetRestartedValue string) error {
 	out := s.obj.(*appsv1.DaemonSet)
 
 	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCSINodeSelectorLabels())
@@ -98,7 +99,7 @@ func (s *csiNodeSyncer) ensurePodSpec() corev1.PodSpec {
 		Containers:         s.ensureContainersSpec(),
 		Volumes:            s.ensureVolumes(),
 		HostIPC:            true,
-		HostNetwork: 		true,
+		HostNetwork:        true,
 		ServiceAccountName: config.GetNameForResource(config.CSINodeServiceAccount, s.driver.Name),
 		Affinity:           s.driver.Spec.Node.Affinity,
 		Tolerations:        s.driver.Spec.Node.Tolerations,
@@ -129,6 +130,14 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	nodePlugin.LivenessProbe = ensureProbe(10, 3, 10, corev1.Handler{
 		HTTPGet: &corev1.HTTPGetAction{
 			Path:   "/healthz",
+			Port:   nodeContainerHealthPort,
+			Scheme: corev1.URISchemeHTTP,
+		},
+	})
+
+	nodePlugin.ReadinessProbe = ensureProbe(10, 3, 10, corev1.Handler{
+		HTTPGet: &corev1.HTTPGetAction{
+			Path:   "/readyz",
 			Port:   nodeContainerHealthPort,
 			Scheme: corev1.URISchemeHTTP,
 		},
@@ -179,10 +188,22 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	fillSecurityContextCapabilities(livenessProbe.SecurityContext)
 	livenessProbe.ImagePullPolicy = s.getCSINodeDriverRegistrarPullPolicy()
 
+	// readiness probe sidecar
+	readinessProbe := s.ensureContainer(nodeReadinessProbeContainerName,
+		s.getReadinessProbeImage(),
+		[]string{
+			"--csi-address=/csi/csi.sock",
+		},
+	)
+	readinessProbe.SecurityContext = &corev1.SecurityContext{AllowPrivilegeEscalation: boolptr.False()}
+	fillSecurityContextCapabilities(readinessProbe.SecurityContext)
+	readinessProbe.ImagePullPolicy = s.getCSINodeDriverRegistrarPullPolicy()
+
 	return []corev1.Container{
 		nodePlugin,
 		registrar,
 		livenessProbe,
+		readinessProbe,
 	}
 }
 
@@ -287,7 +308,7 @@ func (s *csiNodeSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 			},
 		}
 
-	case nodeLivenessProbeContainerName:
+	case nodeLivenessProbeContainerName, nodeReadinessProbeContainerName:
 		return []corev1.VolumeMount{
 			{
 				Name:      socketVolumeName,
@@ -330,6 +351,14 @@ func (s *csiNodeSyncer) getLivenessProbeImage() string {
 	return s.driver.GetDefaultSidecarImageByName(config.LivenessProbe)
 }
 
+func (s *csiNodeSyncer) getReadinessProbeImage() string {
+	sidecar := s.getSidecarByName(config.ReadinessProbe)
+	if sidecar != nil {
+		return fmt.Sprintf("%s:%s", sidecar.Repository, sidecar.Tag)
+	}
+	return s.driver.GetDefaultSidecarImageByName(config.ReadinessProbe)
+}
+
 func (s *csiNodeSyncer) getCSINodeDriverRegistrarPullPolicy() corev1.PullPolicy {
 	sidecar := s.getSidecarByName(config.CSINodeDriverRegistrar)
 	if sidecar != nil && sidecar.ImagePullPolicy != "" {
@@ -340,6 +369,14 @@ func (s *csiNodeSyncer) getCSINodeDriverRegistrarPullPolicy() corev1.PullPolicy 
 
 func (s *csiNodeSyncer) getLivenessProbePullPolicy() corev1.PullPolicy {
 	sidecar := s.getSidecarByName(config.LivenessProbe)
+	if sidecar != nil && sidecar.ImagePullPolicy != "" {
+		return sidecar.ImagePullPolicy
+	}
+	return corev1.PullIfNotPresent
+}
+
+func (s *csiNodeSyncer) getReadinessProbePullPolicy() corev1.PullPolicy {
+	sidecar := s.getSidecarByName(config.ReadinessProbe)
 	if sidecar != nil && sidecar.ImagePullPolicy != "" {
 		return sidecar.ImagePullPolicy
 	}

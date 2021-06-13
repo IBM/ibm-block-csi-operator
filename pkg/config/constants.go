@@ -25,7 +25,7 @@ const (
 	ProductName = "ibm-block-csi-driver"
 	Masterlabel = "node-role.kubernetes.io/master"
 
-	NodeAgentRepository  = "ibmcom/ibm-node-agent"
+	NodeAgentRepository = "ibmcom/ibm-node-agent"
 
 	ENVIscsiAgentPort = "ISCSI_AGENT_PORT"
 	ENVEndpoint       = "ENDPOINT"
@@ -38,13 +38,15 @@ const (
 	CSISnapshotter         = "csi-snapshotter"
 	CSIResizer             = "csi-resizer"
 	LivenessProbe          = "livenessprobe"
+	ReadinessProbe         = "readinessprobe"
 
-	ControllerSocketVolumeMountPath                       = "/var/lib/csi/sockets/pluginproxy/"
-	NodeSocketVolumeMountPath                             = "/csi"
-	ControllerLivenessProbeContainerSocketVolumeMountPath = "/csi"
-	ControllerSocketPath                                  = "/var/lib/csi/sockets/pluginproxy/csi.sock"
-	NodeSocketPath                                        = "/csi/csi.sock"
-	NodeRegistrarSocketPath                               = "/var/lib/kubelet/plugins/block.csi.ibm.com/csi.sock"
-	CSIEndpoint                                           = "unix:///var/lib/csi/sockets/pluginproxy/csi.sock"
-	CSINodeEndpoint                                       = "unix:///csi/csi.sock"
+	ControllerSocketVolumeMountPath                        = "/var/lib/csi/sockets/pluginproxy/"
+	NodeSocketVolumeMountPath                              = "/csi"
+	ControllerLivenessProbeContainerSocketVolumeMountPath  = "/csi"
+	ControllerReadinessProbeContainerSocketVolumeMountPath = "/csi"
+	ControllerSocketPath                                   = "/var/lib/csi/sockets/pluginproxy/csi.sock"
+	NodeSocketPath                                         = "/csi/csi.sock"
+	NodeRegistrarSocketPath                                = "/var/lib/kubelet/plugins/block.csi.ibm.com/csi.sock"
+	CSIEndpoint                                            = "unix:///var/lib/csi/sockets/pluginproxy/csi.sock"
+	CSINodeEndpoint                                        = "unix:///csi/csi.sock"
 )

@@ -37,13 +37,14 @@ import (
 )
 
 const (
-	socketVolumeName                     = "socket-dir"
-	controllerContainerName              = "ibm-block-csi-controller"
-	provisionerContainerName             = "csi-provisioner"
-	attacherContainerName                = "csi-attacher"
-	snapshotterContainerName             = "csi-snapshotter"
-	resizerContainerName                 = "csi-resizer"
-	controllerLivenessProbeContainerName = "liveness-probe"
+	socketVolumeName                      = "socket-dir"
+	controllerContainerName               = "ibm-block-csi-controller"
+	provisionerContainerName              = "csi-provisioner"
+	attacherContainerName                 = "csi-attacher"
+	snapshotterContainerName              = "csi-snapshotter"
+	resizerContainerName                  = "csi-resizer"
+	controllerLivenessProbeContainerName  = "liveness-probe"
+	controllerReadinessProbeContainerName = "readiness-probe"
 
 	controllerContainerHealthPortName   = "healthz"
 	controllerContainerHealthPortNumber = 9808
@@ -133,6 +134,14 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		},
 	})
 
+	controllerPlugin.ReadinessProbe = ensureProbe(10, 100, 5, corev1.Handler{
+		HTTPGet: &corev1.HTTPGetAction{
+			Path:   "/readyz",
+			Port:   controllerContainerHealthPort,
+			Scheme: corev1.URISchemeHTTP,
+		},
+	})
+
 	// csi provisioner sidecar
 	provisioner := s.ensureContainer(provisionerContainerName,
 		s.getCSIProvisionerImage(),
@@ -174,6 +183,15 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	)
 	livenessProbe.ImagePullPolicy = s.getLivenessProbePullPolicy()
 
+	// readiness probe sidecar
+	readinessProbe := s.ensureContainer(controllerReadinessProbeContainerName,
+		s.getReadinessProbeImage(),
+		[]string{
+			"--csi-address=/csi/csi.sock",
+		},
+	)
+	readinessProbe.ImagePullPolicy = s.getReadinessProbePullPolicy()
+
 	return []corev1.Container{
 		controllerPlugin,
 		provisioner,
@@ -181,6 +199,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		snapshotter,
 		resizer,
 		livenessProbe,
+		readinessProbe,
 	}
 }
 
@@ -296,6 +315,14 @@ func (s *csiControllerSyncer) getVolumeMountsFor(name string) []corev1.VolumeMou
 				MountPath: config.ControllerLivenessProbeContainerSocketVolumeMountPath,
 			},
 		}
+
+	case controllerReadinessProbeContainerName:
+		return []corev1.VolumeMount{
+			{
+				Name:      socketVolumeName,
+				MountPath: config.ControllerReadinessProbeContainerSocketVolumeMountPath,
+			},
+		}
 	}
 	return nil
 }
@@ -332,6 +359,10 @@ func (s *csiControllerSyncer) getLivenessProbeImage() string {
 	return s.getSidecarImageByName(config.LivenessProbe)
 }
 
+func (s *csiControllerSyncer) getReadinessProbeImage() string {
+	return s.getSidecarImageByName(config.ReadinessProbe)
+}
+
 func (s *csiControllerSyncer) getCSISnapshotterImage() string {
 	return s.getSidecarImageByName(config.CSISnapshotter)
 }
@@ -358,6 +389,10 @@ func (s *csiControllerSyncer) getCSIProvisionerPullPolicy() corev1.PullPolicy {
 
 func (s *csiControllerSyncer) getLivenessProbePullPolicy() corev1.PullPolicy {
 	return s.getSidecarPullPolicy(config.LivenessProbe)
+}
+
+func (s *csiControllerSyncer) getReadinessProbePullPolicy() corev1.PullPolicy {
+	return s.getSidecarPullPolicy(config.ReadinessProbe)
 }
 
 func (s *csiControllerSyncer) getCSISnapshotterPullPolicy() corev1.PullPolicy {
