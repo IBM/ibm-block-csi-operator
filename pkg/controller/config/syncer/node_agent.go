@@ -40,6 +40,7 @@ const (
 	nodeContainerName                = "ibm-block-csi-node"
 	nodeDriverRegistrarContainerName = "node-driver-registrar"
 	nodeLivenessProbeContainerName   = "liveness-probe"
+	nodeReadinessProbeContainerName  = "readiness-probe"
 
 	nodeContainerHealthPortName   = "healthz"
 	nodeContainerHealthPortNumber = 9808
