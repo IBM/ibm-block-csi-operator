@@ -28,7 +28,7 @@ wait_for_checks_to_complete(){
       sleep 5
     done
     fi
-    if [ "$(gh pr checks $community_operators_branch --repo $github_csiblock_community_operators_repository | grep -i fail | wc -l)" -gt 0 ]
+    if [ "$(gh pr checks $community_operators_branch --repo $github_csiblock_community_operators_repository | grep -iv pass | wc -l)" -gt 0 ]
     then
       export all_checks_passed=false
     fi
