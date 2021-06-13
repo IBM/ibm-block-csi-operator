@@ -1,8 +1,6 @@
 #!/bin/bash -xe
 set +o pipefail
 
-sleep 20
-
 print_checks_and_delete_pr(){
   community_operators_branch=$1
   cluster_kind=$2

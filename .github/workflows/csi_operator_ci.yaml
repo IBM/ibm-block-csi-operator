@@ -19,7 +19,7 @@ jobs:
      operator_image_for_test: "ibmcom/ibm-block-csi-operator:latest"
 
   prepare_env:
-   name: "prepare_env"
+   name: "prepare env"
    needs: operator_image_build
    runs-on: ubuntu-latest
    steps:
