@@ -35,7 +35,7 @@ jobs:
         run: |
           build/ci/install_ci_dependencies.sh
       - uses: FranzDiebold/github-env-vars-action@v2
-      - name: Prepare_env
+      - name: Prepare env
         id: environment_setup
         run: |
           build/ci/prepare_env.sh
