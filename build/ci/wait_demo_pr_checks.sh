@@ -8,7 +8,7 @@ wait_for_checks_to_complete(){
   export repo_pr=`gh pr list --repo $github_csiblock_community_operators_repository | grep $community_operators_branch`
   if [[ "$repo_pr" == *"$community_operators_branch"* ]]; then
     sleep 5
-    while [ `"${gh_pr_checks_command[@]}" | grep -i pending | wc -l` -eq 0 ]; do
+    while [ `"${gh_pr_checks_command[@]}" | grep -i pending | wc -l` -gt 0 ]; do
       sleep 15
     done
     summary_counter=0
@@ -22,7 +22,7 @@ wait_for_checks_to_complete(){
       fi
     done
     if [[ $all_tests_passed == "false" ]]; then
-      while [ `"${gh_pr_checks_command[@]}" | grep -i pending | wc -l` -eq 0 ]; do
+      while [ `"${gh_pr_checks_command[@]}" | grep -i pending | wc -l` -gt 0 ]; do
         sleep 5
       done
     fi
