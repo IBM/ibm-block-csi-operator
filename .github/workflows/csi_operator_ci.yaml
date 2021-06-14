@@ -22,6 +22,10 @@ jobs:
    name: "prepare env"
    needs: operator_image_build
    runs-on: ubuntu-latest
+   env:
+     github_csiblock_community_operators_repository: "csiblock/community-operators"
+     community_operators_kubernetes_branch: "ibm-block-csi-update-kubernetes-${{ github.run_number }}"
+     community_operators_openshift_branch: "ibm-block-csi-update-openshift-${{ github.run_number }}"
    steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -29,9 +33,19 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
-      - name: Install dependencies
+      - name: Setup dependencies
         run: |
-          build/ci/install_ci_dependencies.sh
+          build/ci/setup_ci_dependencies.sh
+      - uses: actions/cache@v2
+        with:
+          path: ${{ env.pythonLocation }}
+          key: ${{ env.pythonLocation }}-${{ hashFiles('dev-requirements.txt') }}
+      - name: Save gitconfig file
+        uses: actions/upload-artifact@v2
+        with:
+          name: gitconfig-file
+          path: /home/runner/.gitconfig
+          retention-days: 1
       - uses: FranzDiebold/github-env-vars-action@v2
       - name: Prepare env
         id: environment_setup
@@ -44,6 +58,7 @@ jobs:
      operator_image_in_branch: "${{ steps.environment_setup.outputs.operator_image_in_branch }}"
      operator_image_for_test: ${{ needs.operator_image_build.outputs.operator_image_for_test }}
      csv_file:  ${{ steps.environment_setup.outputs.csv_file }}
+     github_build_number: ${{ github.run_number }}
 
   CI-csi-demo-pr:
     name: "community-operators fork checks"
@@ -53,30 +68,50 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - uses: actions/cache@v2
+        with:
+          path: ${{ env.pythonLocation }}
+          key: ${{ env.pythonLocation }}-${{ hashFiles('dev-requirements.txt') }}
+      - name: Retrieve gitconfig file
+        uses: actions/download-artifact@v2
+        with:
+          name: gitconfig-file
+          path: /home/runner
       - name: Create demo PR
         run: |
           build/ci/create_demo_pr.sh
         env:
-          github_csiblock_community_operators_repository: "csiblock/community-operators"
-          community_operators_kubernetes_branch: "ibm-block-csi-update-kubernetes-${{ github.run_number }}"
-          community_operators_openshift_branch: "ibm-block-csi-update-openshift-${{ github.run_number }}"
+          github_csiblock_community_operators_repository: ${{ env.github_csiblock_community_operators_repository }}
+          community_operators_kubernetes_branch: ${{ env.community_operators_kubernetes_branch }}
+          community_operators_openshift_branch: ${{ env.community_operators_openshift_branch }}
           github_token: ${{ secrets.CSIBLOCK_GITHUB_TOKEN }}
           repository_path: ${{ needs.prepare_env.outputs.repository_path }}
           operator_image_in_branch: ${{ needs.prepare_env.outputs.operator_image_in_branch }}
           operator_image_for_test: ${{ needs.prepare_env.outputs.operator_image_for_test }}
           csv_file: ${{ needs.prepare_env.outputs.csv_file }}
+      - name: Wait for all the checks to finish running
+        run: |
+          build/ci/wait_demo_pr_checks.sh
+        env:
+          github_csiblock_community_operators_repository: ${{ env.github_csiblock_community_operators_repository }}
+          community_operators_kubernetes_branch: ${{ env.community_operators_kubernetes_branch }}
+          community_operators_openshift_branch: ${{ env.community_operators_openshift_branch }}
       - name: Assert all demo PR checks passed
         run: |
-          build/ci/check_demo_pr_checks.sh
+          build/ci/check_all_checks.sh
         env:
-          github_csiblock_community_operators_repository: "csiblock/community-operators"
-          community_operators_kubernetes_branch: "ibm-block-csi-update-kubernetes-${{ github.run_number }}"
-          community_operators_openshift_branch: "ibm-block-csi-update-openshift-${{ github.run_number }}"
+          github_csiblock_community_operators_repository: ${{ env.github_csiblock_community_operators_repository }}
+          community_operators_kubernetes_branch: ${{ env.community_operators_kubernetes_branch }}
+          community_operators_openshift_branch: ${{ env.community_operators_openshift_branch }}
       - name: Clean demo PR
         if: always()
         run: |
           build/ci/clean_demo_pr.sh
         env:
-          github_csiblock_community_operators_repository: "csiblock/community-operators"
-          community_operators_kubernetes_branch: "ibm-block-csi-update-kubernetes-${{ github.run_number }}"
-          community_operators_openshift_branch: "ibm-block-csi-update-openshift-${{ github.run_number }}"
+          github_csiblock_community_operators_repository: ${{ env.github_csiblock_community_operators_repository }}
+          community_operators_kubernetes_branch: ${{ env.community_operators_kubernetes_branch }}
+          community_operators_openshift_branch: ${{ env.community_operators_openshift_branch }}
