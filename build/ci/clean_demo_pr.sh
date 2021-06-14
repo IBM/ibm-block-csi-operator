@@ -7,7 +7,7 @@ print_checks_and_delete_pr(){
   export repo_pr=`gh pr list --repo $github_csiblock_community_operators_repository | grep $community_operators_branch`
   if [[ "$repo_pr" == *"$community_operators_branch"* ]]; then
     echo "The $cluster_kind checks:"
-    gh pr checks $community_operators_branch --repo $github_csiblock_community_operators_repository
+    gh pr checks $community_operators_branch --repo $github_csiblock_community_operators_repository || true
     gh pr close $community_operators_branch --delete-branch --repo $github_csiblock_community_operators_repository
   fi
 }

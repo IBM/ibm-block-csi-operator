@@ -1,11 +1,11 @@
 #!/bin/bash -xe
 set +o pipefail
 
-yq -y --arg operator_image $operator_image_for_test '.spec.install.spec.deployments[0].spec.template.spec.containers[0].image |= "$operator_image"' $csv_file > temp.yaml
+yq -y --arg operator_image $operator_image_for_test '.spec.install.spec.deployments[0].spec.template.spec.containers[0].image |= $operator_image' $csv_file > temp.yaml
 cat temp.yaml > $csv_file
-yq -y --arg operator_image $operator_image_for_test '.metadata.annotations.containerImage |= "$operator_image"' $csv_file > temp.yaml
+yq -y --arg operator_image $operator_image_for_test '.metadata.annotations.containerImage |= $operator_image' $csv_file > temp.yaml
 cat temp.yaml > $csv_file
-yq -y --arg operator_image $operator_image_for_test '.spec.relatedImages[0].image |= "$operator_image"' $csv_file > temp.yaml
+yq -y --arg operator_image $operator_image_for_test '.spec.relatedImages[0].image |= $operator_image' $csv_file > temp.yaml
 cat temp.yaml > $csv_file
 
 echo $github_token > github_token.txt
