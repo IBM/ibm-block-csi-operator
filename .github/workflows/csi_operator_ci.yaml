@@ -53,7 +53,6 @@ jobs:
      repository_path: "${{ steps.environment_setup.outputs.repository_path }}"
      operator_image_for_test: ${{ needs.operator_image_build.outputs.operator_image_for_test }}
      csv_file:  ${{ steps.environment_setup.outputs.csv_file }}
-     github_build_number: ${{ github.run_number }}
 
   CI-csi-demo-pr:
     name: "community-operators fork checks"
@@ -68,6 +67,7 @@ jobs:
       repository_path: ${{ needs.prepare_env.outputs.repository_path }}
       operator_image_for_test: ${{ needs.prepare_env.outputs.operator_image_for_test }}
       csv_file: ${{ needs.prepare_env.outputs.csv_file }}
+      github_build_number: ${{ github.run_number }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
