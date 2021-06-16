@@ -31,7 +31,7 @@ jobs:
           python-version: '3.x'
       - name: Setup dependencies
         run: |
-          build/ci/setup_ci_dependencies.sh
+          build/ci/community/setup_ci_dependencies.sh
       - uses: actions/cache@v2
         with:
           path: ${{ env.pythonLocation }}
@@ -46,7 +46,7 @@ jobs:
       - name: Prepare env
         id: environment_setup
         run: |
-          build/ci/prepare_env.sh
+          build/ci/community/prepare_env.sh
    outputs:
      community_operators_path: "${{ steps.environment_setup.outputs.community_operators_path }}"
      upstream_community_operators_path: "${{ steps.environment_setup.outputs.upstream_community_operators_path }}"
@@ -86,14 +86,14 @@ jobs:
           path: /home/runner
       - name: Create demo PR
         run: |
-          build/ci/create_demo_pr.sh
-      - name: Wait for all the checks to finish running
+          build/ci/community/create_demo_pr.sh
+      - name: Wait for all demo PR checks to finish
         run: |
-          build/ci/wait_demo_pr_checks.sh
+          build/ci/community/wait_demo_pr_checks.sh
       - name: Assert all demo PR checks passed
         run: |
-          build/ci/check_all_checks.sh
+          build/ci/community/check_all_checks.sh
       - name: Clean demo PR
         if: always()
         run: |
-          build/ci/clean_demo_pr.sh
+          build/ci/community/clean_demo_pr.sh

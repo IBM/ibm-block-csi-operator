@@ -1,8 +1,8 @@
 #!/bin/bash -xe
 set +o pipefail
 
-export csv_version=`yq .channels[0].currentCSV deploy/olm-catalog/ibm-block-csi-operator-community/ibm-block-csi-operator.package.yaml`
-export csv_version=`echo ${csv_version//ibm-block-csi-operator.v}`
+csv_version=`yq .channels[0].currentCSV deploy/olm-catalog/ibm-block-csi-operator-community/ibm-block-csi-operator.package.yaml`
+csv_version=`echo ${csv_version//ibm-block-csi-operator.v}`
 export csv_version=`echo ${csv_version//\"}`
 export repository_path=~/work/$CI_REPOSITORY_NAME/$CI_REPOSITORY_NAME
 export csv_file=$repository_path/deploy/olm-catalog/ibm-block-csi-operator-community/$csv_version/ibm-block-csi-operator.v$csv_version.clusterserviceversion.yaml
