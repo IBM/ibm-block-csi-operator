@@ -23,7 +23,6 @@ if ! [ -x "$(command -v operator-sdk)" ]; then
   exit 1
 fi
 
-# Disable generation due failure see CSI-1888
-#operator-sdk generate k8s
+operator-sdk generate k8s
 
-#operator-sdk generate openapi
+operator-sdk generate crds

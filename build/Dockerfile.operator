@@ -24,10 +24,10 @@ RUN CGO_ENABLED=1 GOOS=linux go build \
 	github.com/IBM/ibm-block-csi-operator/cmd/manager
 
 
-FROM registry.access.redhat.com/ubi8/ubi-minimal:8.3-230
+FROM registry.access.redhat.com/ubi8/ubi-minimal:8.4-200.1622548483
 MAINTAINER IBM Storage
 
-ARG VERSION=1.5.0
+ARG VERSION=1.6.0
 ARG BUILD_NUMBER=0
 
 ###Required Labels

@@ -62,7 +62,7 @@ func NewCSIControllerSyncer(c client.Client, scheme *runtime.Scheme, driver *ibm
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        config.GetNameForResource(config.CSIController, driver.Name),
 			Namespace:   driver.Namespace,
-			Annotations: driver.GetAnnotations(),
+			Annotations: driver.GetAnnotations("", ""),
 			Labels:      driver.GetLabels(),
 		},
 	}
@@ -85,7 +85,7 @@ func (s *csiControllerSyncer) SyncFn() error {
 
 	// ensure template
 	out.Spec.Template.ObjectMeta.Labels = s.driver.GetCSIControllerPodLabels()
-	out.Spec.Template.ObjectMeta.Annotations = s.driver.GetAnnotations()
+	out.Spec.Template.ObjectMeta.Annotations = s.driver.GetAnnotations("", "")
 
 	err := mergo.Merge(&out.Spec.Template.Spec, s.ensurePodSpec(), mergo.WithTransformers(transformers.PodSpec))
 	if err != nil {
@@ -125,7 +125,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	})
 	controllerPlugin.ImagePullPolicy = s.driver.Spec.Controller.ImagePullPolicy
 
-	controllerPlugin.LivenessProbe = ensureProbe(10, 100, 2, corev1.Handler{
+	controllerPlugin.LivenessProbe = ensureProbe(10, 100, 5, corev1.Handler{
 		HTTPGet: &corev1.HTTPGetAction{
 			Path:   "/healthz",
 			Port:   controllerContainerHealthPort,
