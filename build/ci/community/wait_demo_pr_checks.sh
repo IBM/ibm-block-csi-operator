@@ -4,7 +4,7 @@ set +o pipefail
 wait_for_checks_to_complete(){
   community_operators_branch=$1
   all_tests_passed=false
-  gh_pr_checks_command="`gh pr checks $community_operators_branch --repo $github_csiblock_community_operators_repository`"
+  gh_pr_checks_command="gh pr checks $community_operators_branch --repo $github_csiblock_community_operators_repository"
   export repo_pr=`gh pr list --repo $github_csiblock_community_operators_repository | grep $community_operators_branch`
   if [[ "$repo_pr" == *"$community_operators_branch"* ]]; then
     sleep 5
