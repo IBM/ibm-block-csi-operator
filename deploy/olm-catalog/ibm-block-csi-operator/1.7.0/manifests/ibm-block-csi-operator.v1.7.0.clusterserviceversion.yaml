@@ -437,7 +437,6 @@ spec:
               - watch
               - list
               - update
-              
       deployments:
         - name: ibm-block-csi-operator
           spec:
