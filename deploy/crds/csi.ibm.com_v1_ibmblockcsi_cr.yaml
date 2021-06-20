@@ -65,7 +65,7 @@ spec:
     imagePullPolicy: IfNotPresent
   - name: csi-snapshotter
     repository: k8s.gcr.io/sig-storage/csi-snapshotter
-    tag: "v3.0.2"
+    tag: "v3.0.3"
     imagePullPolicy: IfNotPresent
   - name: csi-resizer
     repository: k8s.gcr.io/sig-storage/csi-resizer
