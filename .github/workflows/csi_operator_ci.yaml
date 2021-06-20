@@ -25,26 +25,21 @@ jobs:
    steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
       - name: Setup dependencies
         run: |
           build/ci/community/setup_ci_dependencies.sh
-      - uses: actions/cache@v2
-        with:
-          path: ${{ env.pythonLocation }}
-          key: ${{ env.pythonLocation }}-${{ hashFiles('dev-requirements.txt') }}
-      - name: Save gitconfig file
+      - name: Save dependencies files
         uses: actions/upload-artifact@v2
         with:
           name: gitconfig-file
-          path: /home/runner/.gitconfig
+          path: |
+            /home/runner/.gitconfig
+            /home/runner/.bash_profile
           retention-days: 1
       - uses: FranzDiebold/github-env-vars-action@v2
       - name: Prepare env
         id: environment_setup
+        shell: bash -l {0}
         run: |
           build/ci/community/prepare_env.sh
    outputs:
@@ -60,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      github_csiblock_community_operators_repository: "csiblock/community-operators"
+      forked_community_operators_repository: "csiblock/community-operators"
       community_operators_kubernetes_branch: "ibm-block-csi-update-kubernetes-${{ github.run_number }}"
       community_operators_openshift_branch: "ibm-block-csi-update-openshift-${{ github.run_number }}"
       github_token: ${{ secrets.CSIBLOCK_GITHUB_TOKEN }}
@@ -85,6 +80,7 @@ jobs:
           name: gitconfig-file
           path: /home/runner
       - name: Create demo PR
+        shell: bash -l {0}
         run: |
           build/ci/community/create_demo_pr.sh
       - name: Wait for all demo PR checks to finish
