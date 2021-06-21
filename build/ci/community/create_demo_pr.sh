@@ -1,9 +1,11 @@
-#!/bin/bash -xe
+#!/bin/bash -xel
 set +o pipefail
 
-yq eval ".spec.install.spec.deployments[0].spec.template.spec.containers[0].image |= env(operator_image_for_test)" $csv_file -i
-yq eval ".metadata.annotations.containerImage |= env(operator_image_for_test)" $csv_file -i
-yq eval ".spec.relatedImages[0].image |= env(operator_image_for_test)" $csv_file -i
+cd $(dirname $csv_file)
+yq eval ".spec.install.spec.deployments[0].spec.template.spec.containers[0].image |= env(operator_image_for_test)" $(basename $csv_file) -i
+yq eval ".metadata.annotations.containerImage |= env(operator_image_for_test)" $(basename $csv_file) -i
+yq eval ".spec.relatedImages[0].image |= env(operator_image_for_test)" $(basename $csv_file) -i
+cd -
 
 echo $github_token > github_token.txt
 gh auth login --with-token < github_token.txt

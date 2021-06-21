@@ -1,4 +1,4 @@
-#!/bin/bash -xe
+#!/bin/bash -xel
 set +o pipefail
 
 csv_version=`yq eval .channels[0].currentCSV deploy/olm-catalog/ibm-block-csi-operator-community/ibm-block-csi-operator.package.yaml`

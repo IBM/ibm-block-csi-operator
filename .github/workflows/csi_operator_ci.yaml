@@ -39,7 +39,6 @@ jobs:
       - uses: FranzDiebold/github-env-vars-action@v2
       - name: Prepare env
         id: environment_setup
-        shell: bash -l {0}
         run: |
           build/ci/community/prepare_env.sh
    outputs:
@@ -66,21 +65,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
-      - uses: actions/cache@v2
-        with:
-          path: ${{ env.pythonLocation }}
-          key: ${{ env.pythonLocation }}-${{ hashFiles('dev-requirements.txt') }}
       - name: Retrieve gitconfig file
         uses: actions/download-artifact@v2
         with:
           name: gitconfig-file
           path: /home/runner
       - name: Create demo PR
-        shell: bash -l {0}
         run: |
           build/ci/community/create_demo_pr.sh
       - name: Wait for all demo PR checks to finish
