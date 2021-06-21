@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM golang:1.13.1
+FROM golang:1.13.8
 
 ENV GO111MODULE=on \
     GOROOT=/usr/local/go \
@@ -21,7 +21,7 @@ ENV CR_YAML=$WORKDIR/deploy/crds/csi.ibm.com_v1_ibmblockcsi_cr.yaml
 WORKDIR $WORKDIR
 
 RUN go get github.com/onsi/ginkgo/ginkgo
-RUN RELEASE_VERSION=v0.16.0 \
+RUN RELEASE_VERSION=v0.18.0 \
     && ARCH=$(uname -m) \
     && SDK_ASSET=operator-sdk-${RELEASE_VERSION}-${ARCH}-linux-gnu \
     && curl -LO https://github.com/operator-framework/operator-sdk/releases/download/${RELEASE_VERSION}/${SDK_ASSET} \

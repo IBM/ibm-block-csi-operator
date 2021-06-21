@@ -18,6 +18,7 @@ package ibmblockcsi
 
 import (
 	"fmt"
+
 	csiv1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	csiversion "github.com/IBM/ibm-block-csi-operator/version"
@@ -67,7 +68,7 @@ func (c *IBMBlockCSI) GetLabels() labels.Set {
 }
 
 // GetAnnotations returns all the annotations to be set on all resources
-func (c *IBMBlockCSI) GetAnnotations() labels.Set {
+func (c *IBMBlockCSI) GetAnnotations(daemonSetRestartedKey string , daemonSetRestartedValue string) labels.Set {
 	labels := labels.Set{
 		"productID":      config.ProductName,
 		"productName":    config.ProductName,
@@ -80,6 +81,10 @@ func (c *IBMBlockCSI) GetAnnotations() labels.Set {
 				labels[k] = v
 			}
 		}
+	}
+
+	if !labels.Has(daemonSetRestartedKey) && daemonSetRestartedKey != ""{
+		labels[daemonSetRestartedKey] = daemonSetRestartedValue
 	}
 
 	return labels
