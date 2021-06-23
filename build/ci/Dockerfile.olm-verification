@@ -16,7 +16,7 @@ FROM python:3
 
 WORKDIR /usr/src/app
 
-RUN RELEASE_VERSION=v1.4.0 \
+RUN RELEASE_VERSION=v1.9.0 \
     && ARCH=$(if [ "$(uname -m)" = "x86_64" ]; then echo "amd64"; else echo "$(uname -m)" ; fi) \
     && SDK_ASSET=operator-sdk_linux_${ARCH} \
     && curl -LO https://github.com/operator-framework/operator-sdk/releases/download/${RELEASE_VERSION}/${SDK_ASSET} \

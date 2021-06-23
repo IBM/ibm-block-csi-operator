@@ -15,8 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ARCH=$(uname -m)
-
 NON_BUNDLE_FORMAT_VERSIONS_FOR_CERTIFIED=()
 NON_BUNDLE_FORMAT_VERSIONS_FOR_COMMUNITY=("1.0.0" "1.1.0" "1.2.0" "1.3.0" "1.4.0" "1.5.0")
 
@@ -36,9 +34,5 @@ verify(){
   done
 }
 
-if [ "${ARCH}" != "ppc64le" ]; then
-  verify "deploy/olm-catalog/ibm-block-csi-operator/" "NON_BUNDLE_FORMAT_VERSIONS_FOR_CERTIFIED"
-  verify "deploy/olm-catalog/ibm-block-csi-operator-community/" "NON_BUNDLE_FORMAT_VERSIONS_FOR_COMMUNITY"
-else
-  echo "The tool does not support ${ARCH} arch. Skipping OLM validation"
-fi
+verify "deploy/olm-catalog/ibm-block-csi-operator/" "NON_BUNDLE_FORMAT_VERSIONS_FOR_CERTIFIED"
+verify "deploy/olm-catalog/ibm-block-csi-operator-community/" "NON_BUNDLE_FORMAT_VERSIONS_FOR_COMMUNITY"
