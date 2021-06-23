@@ -22,8 +22,7 @@ build:
 
 .PHONY: olm-verification
 olm-verification:
-	operator-courier --verbose verify deploy/olm-catalog/ibm-block-csi-operator-community
-	build/ci/olm_ocp_verification.sh
+	build/ci/olm_verification.sh
 
 .PHONY: test
 test: update
