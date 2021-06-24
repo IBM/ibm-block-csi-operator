@@ -15,7 +15,7 @@ pipeline {
                 sh './build/ci/run_unittests.sh'
             }
         }
-        stage ('Run olm validations') {
+        stage ('Run OLM validations') {
             steps {
                 sh './build/ci/run_olm_validation.sh'
             }

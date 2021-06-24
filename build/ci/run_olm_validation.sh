@@ -18,7 +18,5 @@
 
 docker build -f build/ci/Dockerfile.olm-validation -t operator-olm-validation .
 
-ARCH=$(uname -m)
-
 DOCKER_PATH=$(which docker)
 docker run --rm -t -v /var/run/docker.sock:/var/run/docker.sock -v "${DOCKER_PATH}":/usr/bin/docker operator-olm-validation
