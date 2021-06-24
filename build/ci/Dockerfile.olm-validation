@@ -28,4 +28,4 @@ RUN RELEASE_VERSION=v1.9.0 \
 COPY Makefile Makefile
 COPY build/ build/
 COPY deploy/olm-catalog deploy/olm-catalog
-CMD ["make", "olm-verification"]
+CMD ["make", "olm-validation"]

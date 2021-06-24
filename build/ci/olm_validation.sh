@@ -18,7 +18,7 @@
 NON_BUNDLE_FORMAT_VERSIONS_FOR_CERTIFIED=()
 NON_BUNDLE_FORMAT_VERSIONS_FOR_COMMUNITY=("1.0.0" "1.1.0" "1.2.0" "1.3.0" "1.4.0" "1.5.0")
 
-verify(){
+validate(){
   olm_bundles_dir="$1*/"
   non_bundle_format_versions=$2[@]
   non_bundle_format_versions=("${!non_bundle_format_versions}")
@@ -34,5 +34,5 @@ verify(){
   done
 }
 
-verify "deploy/olm-catalog/ibm-block-csi-operator/" "NON_BUNDLE_FORMAT_VERSIONS_FOR_CERTIFIED"
-verify "deploy/olm-catalog/ibm-block-csi-operator-community/" "NON_BUNDLE_FORMAT_VERSIONS_FOR_COMMUNITY"
+validate "deploy/olm-catalog/ibm-block-csi-operator/" "NON_BUNDLE_FORMAT_VERSIONS_FOR_CERTIFIED"
+validate "deploy/olm-catalog/ibm-block-csi-operator-community/" "NON_BUNDLE_FORMAT_VERSIONS_FOR_COMMUNITY"
