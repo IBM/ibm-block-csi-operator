@@ -430,9 +430,6 @@ func (r *ReconcileIBMBlockCSI) getControllerPod(controllerStatefulset *appsv1.St
 	return err
 }
 
-	return r.client.Delete(context.TODO(), pod)
-}
-
 func (r *ReconcileIBMBlockCSI) rolloutRestartNode(node *appsv1.DaemonSet) error {
 	restartedAt := fmt.Sprintf("%s/restartedAt", oconfig.APIGroup)
 	timestamp := time.Now().String()
