@@ -1,9 +1,6 @@
 #!/bin/bash -xe
 set +o pipefail
 
-export passed_k8s_checks=false
-export passed_openshift_checks=false
-
 did_all_checks_pass(){
   community_operators_branch=$1
   all_checks_passed=false
