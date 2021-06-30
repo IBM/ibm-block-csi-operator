@@ -235,21 +235,22 @@ func IsTopologyInUse(ctx context.Context) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	log.Info(fmt.Sprintf("check if topology is in use in nodes: %v", nodes))
 	var nodeUseTopology bool
 	for _, node := range nodes.Items {
 		nodeUseTopology = false
 		for key := range node.Labels {
+			log.Info(fmt.Sprintf("current key: %v", key))
 			for _, prefix := range topologyPrefixes {
 				if strings.HasPrefix(key, prefix) {
 					nodeUseTopology = true
 				}
 			}
 		}
+		log.Info(fmt.Sprintf("check if topology is in use in nodes: %v", node.Labels))
+		log.Info(fmt.Sprintf("IsTopologyInUse: %v", nodeUseTopology))
 		if !nodeUseTopology {
 			return false, nil
 		}
 	}
-	log.Info(fmt.Sprintf("IsTopologyInUse: %v", nodeUseTopology))
 	return true, nil
 }
