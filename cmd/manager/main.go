@@ -235,7 +235,7 @@ func IsTopologyInUse(ctx context.Context) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	log.Info("check if topology is in use in nodes: %v", nodes)
+	log.Info(fmt.Sprintf("check if topology is in use in nodes: %v", nodes))
 	var nodeUseTopology bool
 	for _, node := range nodes.Items {
 		nodeUseTopology = false
@@ -250,6 +250,6 @@ func IsTopologyInUse(ctx context.Context) (bool, error) {
 			return false, nil
 		}
 	}
-	log.Info("IsTopologyInUse: %v", nodeUseTopology)
+	log.Info(fmt.Sprintf("IsTopologyInUse: %v", nodeUseTopology))
 	return true, nil
 }
