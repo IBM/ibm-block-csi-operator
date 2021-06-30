@@ -36,4 +36,3 @@ fi
 
 docker_image_branch_tag=`echo $operator_branch| sed 's|/|.|g'`
 echo "::set-output name=docker_image_branch_tag::${docker_image_branch_tag}"
-echo "::set-output name=operator_branch::${operator_branch}"
