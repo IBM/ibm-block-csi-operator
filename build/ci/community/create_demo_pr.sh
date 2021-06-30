@@ -2,9 +2,15 @@
 set +o pipefail
 
 cd $(dirname $csv_file)
-yq eval ".spec.install.spec.deployments[0].spec.template.spec.containers[0].image |= env(operator_image_for_test)" $(basename $csv_file) -i
-yq eval ".metadata.annotations.containerImage |= env(operator_image_for_test)" $(basename $csv_file) -i
-yq eval ".spec.relatedImages[0].image |= env(operator_image_for_test)" $(basename $csv_file) -i
+declare -a operator_image_fields=(
+    ".spec.install.spec.deployments[0].spec.template.spec.containers[0].image"
+    ".metadata.annotations.containerImage"
+    ".spec.relatedImages[0].image"
+)
+for image_field in "${operator_image_fields[@]}"
+do
+    yq eval "$image_field |= env(operator_image_for_test)" $(basename $csv_file) -i
+done
 cd -
 
 echo $github_token > github_token.txt
