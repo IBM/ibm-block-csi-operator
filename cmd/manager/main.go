@@ -20,8 +20,13 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/IBM/ibm-block-csi-operator/pkg/controller/ibmblockcsi/syncer"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"os"
 	"runtime"
+	"strings"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -50,10 +55,13 @@ import (
 )
 
 // Change below variables to serve metrics on different host or port.
+
 var (
 	metricsHost               = "0.0.0.0"
 	metricsPort         int32 = 8383
 	operatorMetricsPort int32 = 8686
+	topologyPrefixes          = [...]string{"topology.kubernetes.io", "topology.block.csi.ibm.com"}
+	topologyEnabled     bool
 )
 var log = logf.Log.WithName("cmd")
 
@@ -125,6 +133,13 @@ func main() {
 		os.Exit(1)
 	}
 
+	topologyEnabled, err = IsTopologyInUse(ctx)
+	if err != nil {
+		log.Error(err, "")
+		os.Exit(1)
+	}
+	syncer.TopologyEnabled = topologyEnabled
+
 	log.Info("Registering Components.")
 
 	// Setup Scheme for all resources
@@ -140,34 +155,34 @@ func main() {
 	}
 
 	/*
-	// NOTE: Should enable it back in later version - issue CSI-613
-	if err = serveCRMetrics(cfg); err != nil {
-		log.Info("Could not generate and serve custom resource metrics", "error", err.Error())
-	}
-
-	// Add to the below struct any other metrics ports you want to expose.
-	servicePorts := []v1.ServicePort{
-		{Port: metricsPort, Name: metrics.OperatorPortName, Protocol: v1.ProtocolTCP, TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: metricsPort}},
-		{Port: operatorMetricsPort, Name: metrics.CRPortName, Protocol: v1.ProtocolTCP, TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: operatorMetricsPort}},
-	}
-	// Create Service object to expose the metrics port(s).
-	service, err := metrics.CreateMetricsService(ctx, cfg, servicePorts)
-	if err != nil {
-		log.Info("Could not create metrics Service", "error", err.Error())
-	}
-
-	// CreateServiceMonitors will automatically create the prometheus-operator ServiceMonitor resources
-	// necessary to configure Prometheus to scrape metrics from this operator.
-	services := []*v1.Service{service}
-	_, err = metrics.CreateServiceMonitors(cfg, namespace, services)
-	if err != nil {
-		log.Info("Could not create ServiceMonitor object", "error", err.Error())
-		// If this operator is deployed to a cluster without the prometheus-operator running, it will return
-		// ErrServiceMonitorNotPresent, which can be used to safely skip ServiceMonitor creation.
-		if err == metrics.ErrServiceMonitorNotPresent {
-			log.Info("Install prometheus-operator in your cluster to create ServiceMonitor objects", "error", err.Error())
+		// NOTE: Should enable it back in later version - issue CSI-613
+		if err = serveCRMetrics(cfg); err != nil {
+			log.Info("Could not generate and serve custom resource metrics", "error", err.Error())
 		}
-	}
+
+		// Add to the below struct any other metrics ports you want to expose.
+		servicePorts := []v1.ServicePort{
+			{Port: metricsPort, Name: metrics.OperatorPortName, Protocol: v1.ProtocolTCP, TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: metricsPort}},
+			{Port: operatorMetricsPort, Name: metrics.CRPortName, Protocol: v1.ProtocolTCP, TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: operatorMetricsPort}},
+		}
+		// Create Service object to expose the metrics port(s).
+		service, err := metrics.CreateMetricsService(ctx, cfg, servicePorts)
+		if err != nil {
+			log.Info("Could not create metrics Service", "error", err.Error())
+		}
+
+		// CreateServiceMonitors will automatically create the prometheus-operator ServiceMonitor resources
+		// necessary to configure Prometheus to scrape metrics from this operator.
+		services := []*v1.Service{service}
+		_, err = metrics.CreateServiceMonitors(cfg, namespace, services)
+		if err != nil {
+			log.Info("Could not create ServiceMonitor object", "error", err.Error())
+			// If this operator is deployed to a cluster without the prometheus-operator running, it will return
+			// ErrServiceMonitorNotPresent, which can be used to safely skip ServiceMonitor creation.
+			if err == metrics.ErrServiceMonitorNotPresent {
+				log.Info("Install prometheus-operator in your cluster to create ServiceMonitor objects", "error", err.Error())
+			}
+		}
 	*/
 
 	log.Info("Starting the Cmd.")
@@ -204,3 +219,35 @@ func serveCRMetrics(cfg *rest.Config) error {
 	return nil
 }
 */
+func IsTopologyInUse(ctx context.Context) (bool, error) {
+	kubeConfig, err := rest.InClusterConfig()
+	if err != nil {
+		log.Info("unable to load in-cluster configuration: %v", err)
+		log.Info("skipping topology retrieval. we might not be in a k8s cluster")
+		return false, nil
+	}
+
+	client, err := kubernetes.NewForConfig(kubeConfig)
+	if err != nil {
+		return false, err
+	}
+	nodes, err := client.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
+	if err != nil {
+		return false, err
+	}
+	var nodeUseTopology bool
+	for _, node := range nodes.Items {
+		nodeUseTopology = false
+		for key := range node.Labels {
+			for _, prefix := range topologyPrefixes {
+				if strings.HasPrefix(key, prefix) {
+					nodeUseTopology = true
+				}
+			}
+		}
+		if !nodeUseTopology {
+			return false, nil
+		}
+	}
+	return true, nil
+}

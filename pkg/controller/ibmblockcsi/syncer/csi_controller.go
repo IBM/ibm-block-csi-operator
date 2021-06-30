@@ -18,7 +18,6 @@ package syncer
 
 import (
 	"fmt"
-
 	"github.com/imdario/mergo"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -50,6 +49,7 @@ const (
 )
 
 var controllerContainerHealthPort = intstr.FromInt(controllerContainerHealthPortNumber)
+var TopologyEnabled bool
 
 type csiControllerSyncer struct {
 	driver *ibmblockcsi.IBMBlockCSI
@@ -132,12 +132,15 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 			Scheme: corev1.URISchemeHTTP,
 		},
 	})
-
 	// csi provisioner sidecar
+	provisionerArgs := []string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s", "--default-fstype=ext4"}
+	if TopologyEnabled {
+		provisionerArgs = append(provisionerArgs, "--feature-gates=Topology=true")
+	}
 	provisioner := s.ensureContainer(provisionerContainerName,
 		s.getCSIProvisionerImage(),
 		// TODO: make timeout configurable
-		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s", "--default-fstype=ext4"},
+		provisionerArgs,
 	)
 	provisioner.ImagePullPolicy = s.getCSIProvisionerPullPolicy()
 
