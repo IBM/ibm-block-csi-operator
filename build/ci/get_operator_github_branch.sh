@@ -9,7 +9,7 @@ wanted_image_tag=`echo $CI_ACTION_REF_NAME | sed 's|/|.|g'`
 does_the_docker_image_has_tag(){
   driver_component=$1
   does_docker_image_has_tag=false
-  image_tags=`docker-hub tags --orgname csiblock1 --reponame ibm-block-csi-$driver_component --all-pages | grep $wanted_image_tag | awk '{print$2}'`
+  export image_tags=`docker-hub tags --orgname csiblock1 --reponame ibm-block-csi-$driver_component --all-pages | grep $wanted_image_tag | awk '{print$2}'`
   for tag in $image_tags
   do
     if [[ "$tag" == "$wanted_image_tag" ]]; then
