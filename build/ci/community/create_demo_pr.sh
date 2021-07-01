@@ -27,7 +27,7 @@ create_demo_pr(){
   dest_path=$2
   cluster_kind=$3  
   repo_pr=`gh pr list --repo $forked_community_operators_repository | grep $community_operators_branch`
-  if [[ "$repo_pr" == *"$community_operators_branch"* ]]; then
+  if [[ "`eval $repo_pr`" == *"$community_operators_branch"* ]]; then
     gh pr close $community_operators_branch --delete-branch --repo $forked_community_operators_repository
   fi
   git checkout master
