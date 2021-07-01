@@ -2,26 +2,25 @@
 set +o pipefail
 
 operator_branch=develop
+DOCKER_HUB_USERNAME=csiblock1
+DOCKER_HUB_PASSWORD=$csiblock_dockerhub_password
+wanted_image_tag=`echo $CI_ACTION_REF_NAME | sed 's|/|.|g'`
 
-token=`curl -X POST -H "Content-Type: application/json" -d '{"username": "csiblock1", "password": "'$csiblock_dockerhub_password'"}' https://hub.docker.com/v2/users/login | jq .token`
-token=`echo ${token//\"}`
-controller_image_tags=`curl -s -H "Authorization: JWT ${token}" https://hub.docker.com/v2/namespaces/csiblock1/repositories/ibm-block-csi-controller/images | jq .results[0] | jq .tags | jq -c '.[]' | jq .tag`
-node_image_tags=`curl -s -H "Authorization: JWT ${token}" https://hub.docker.com/v2/namespaces/csiblock1/repositories/ibm-block-csi-node/images | jq .results[0] | jq .tags | jq -c '.[]' | jq .tag`
 does_the_docker_image_has_tag(){
-  image_tags=$@
+  driver_component=$1
   does_docker_image_has_tag=false
+  image_tags=`docker-hub tags --orgname csiblock1 --reponame ibm-block-csi-$driver_component --all-pages | grep $wanted_image_tag | awk '{print$2}'`
   for tag in $image_tags
   do
-    tag=`echo ${tag//\"}`
-    if [[ "$tag" == `echo $CI_ACTION_REF_NAME | sed 's|/|.|g'` ]]; then
+    if [[ "$tag" == "$wanted_image_tag" ]]; then
       does_docker_image_has_tag=true
     fi
   done
   echo $does_docker_image_has_tag
 }
 
-does_controller_docker_image_has_tag=$(does_the_docker_image_has_tag $controller_image_tags)
-does_node_docker_image_has_tag=$(does_the_docker_image_has_tag $node_image_tags)
+does_controller_docker_image_has_tag=$(does_the_docker_image_has_tag controller)
+does_node_docker_image_has_tag=$(does_the_docker_image_has_tag node)
 
 if [ $does_controller_docker_image_has_tag == "true" ] && [ $does_node_docker_image_has_tag == "true" ]; then
   operator_branches=`curl -H "Authorization: token $github_token" https://api.github.com/repos/IBM/ibm-block-csi-operator/branches | jq -c '.[]' | jq -r .name`
