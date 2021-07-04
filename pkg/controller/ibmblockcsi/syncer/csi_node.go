@@ -55,12 +55,13 @@ type csiNodeSyncer struct {
 }
 
 // NewCSINodeSyncer returns a syncer for CSI node
-func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockcsi.IBMBlockCSI) syncer.Interface {
+func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockcsi.IBMBlockCSI, 
+	daemonSetRestartedKey string , daemonSetRestartedValue string) syncer.Interface {
 	obj := &appsv1.DaemonSet{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        config.GetNameForResource(config.CSINode, driver.Name),
 			Namespace:   driver.Namespace,
-			Annotations: driver.GetAnnotations(),
+			Annotations: driver.GetAnnotations(daemonSetRestartedKey, daemonSetRestartedValue),
 			Labels:      driver.GetLabels(),
 		},
 	}
@@ -71,18 +72,18 @@ func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockc
 	}
 
 	return syncer.NewObjectSyncer(config.CSINode.String(), driver.Unwrap(), obj, c, scheme, func() error {
-		return sync.SyncFn()
+		return sync.SyncFn(daemonSetRestartedKey, daemonSetRestartedValue)
 	})
 }
 
-func (s *csiNodeSyncer) SyncFn() error {
+func (s *csiNodeSyncer) SyncFn(daemonSetRestartedKey string , daemonSetRestartedValue string) error {
 	out := s.obj.(*appsv1.DaemonSet)
 
 	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCSINodeSelectorLabels())
 
 	// ensure template
 	out.Spec.Template.ObjectMeta.Labels = s.driver.GetCSINodePodLabels()
-	out.Spec.Template.ObjectMeta.Annotations = s.driver.GetAnnotations()
+	out.Spec.Template.ObjectMeta.Annotations = s.driver.GetAnnotations(daemonSetRestartedKey, daemonSetRestartedValue)
 
 	err := mergo.Merge(&out.Spec.Template.Spec, s.ensurePodSpec(), mergo.WithTransformers(transformers.PodSpec))
 	if err != nil {
