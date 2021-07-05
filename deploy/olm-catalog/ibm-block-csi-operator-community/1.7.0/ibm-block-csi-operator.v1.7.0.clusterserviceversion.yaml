@@ -344,7 +344,7 @@ spec:
         group: csi.ibm.com
         kind: IBMBlockCSI
         displayName: "IBM block storage CSI driver"
-        description: "Represents an block storage CSI driver"
+        description: "Represents a block storage CSI driver"
         resources:
           - kind: ServiceAccount
             name: ''
