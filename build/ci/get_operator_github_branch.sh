@@ -14,6 +14,7 @@ does_the_docker_image_has_tag(){
   do
     if [[ "$tag" == "$wanted_image_tag" ]]; then
       does_docker_image_has_tag=true
+      break
     fi
   done
   echo $does_docker_image_has_tag
