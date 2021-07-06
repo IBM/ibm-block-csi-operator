@@ -21,7 +21,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/IBM/ibm-block-csi-operator/pkg/controller/ibmblockcsi/syncer"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -47,7 +46,7 @@ import (
 	"github.com/spf13/pflag"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 
-	//v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	//"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
