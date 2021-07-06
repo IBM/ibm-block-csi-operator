@@ -21,6 +21,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/IBM/ibm-block-csi-operator/pkg/controller/ibmblockcsi/syncer"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -238,7 +239,7 @@ func IsTopologyInUse(ctx context.Context) (bool, error) {
 	var nodeUseTopology bool
 	for _, node := range nodes.Items {
 		nodeUseTopology = false
-		if len(node.Spec.Taints) == 0 {
+		if IsSchedulable(node) {
 			for key := range node.Labels {
 				log.Info(fmt.Sprintf("current key: %v", key))
 				for _, prefix := range topologyPrefixes {
@@ -247,12 +248,20 @@ func IsTopologyInUse(ctx context.Context) (bool, error) {
 					}
 				}
 			}
-			log.Info(fmt.Sprintf("check if topology is in use in nodes: %v", node.Labels))
-			log.Info(fmt.Sprintf("IsTopologyInUse: %v", nodeUseTopology))
 			if !nodeUseTopology {
 				return false, nil
 			}
 		}
 	}
 	return true, nil
+}
+
+func IsSchedulable(node corev1.Node) bool {
+	taints := node.Spec.Taints
+	for _, taint := range taints {
+		if taint.Effect == corev1.TaintEffectNoSchedule {
+			return false
+		}
+	}
+	return true
 }
