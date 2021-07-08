@@ -44,20 +44,20 @@ jobs:
           mkdir -p build/_output/reports && chmod 777 build/_output/reports
           ./build/ci/run_unittests.sh
 
-  Run_OLM_verifications:
+  Run_OLM_validation:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Run OLM verifications
+      - name: Run OLM validation
         run: |
-          ./build/ci/run_olm_verification.sh
+          ./build/ci/run_olm_validation.sh
           
   CSI-Build-and-push-images:
     runs-on: ubuntu-latest
     needs:
       - Unit_testing
-      - Run_OLM_verifications
+      - Run_OLM_validation
     strategy:
       matrix:
         image_type: ['nodeagent', 'operator']
