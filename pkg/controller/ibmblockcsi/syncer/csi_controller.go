@@ -132,6 +132,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 			Scheme: corev1.URISchemeHTTP,
 		},
 	})
+
 	// csi provisioner sidecar
 	provisionerArgs := []string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s", "--default-fstype=ext4"}
 	if TopologyEnabled {

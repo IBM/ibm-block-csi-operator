@@ -46,6 +46,7 @@ import (
 	"github.com/spf13/pflag"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 
+	//v1 "k8s.io/api/core/v1"
 	//"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -54,7 +55,6 @@ import (
 )
 
 // Change below variables to serve metrics on different host or port.
-
 var (
 	metricsHost               = "0.0.0.0"
 	metricsPort         int32 = 8383
