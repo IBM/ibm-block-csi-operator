@@ -14,14 +14,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
-ARCH=$(uname -m)
+docker build -f build/ci/Dockerfile.olm-validation -t operator-olm-validation .
 
-if [ "${ARCH}" !=  "ppc64le" ]; then
-  for olm_ocp_bundle_dir in deploy/olm-catalog/ibm-block-csi-operator/*/ ; do
-    echo "Validating ${olm_ocp_bundle_dir}"
-    operator-sdk bundle --verbose validate "${olm_ocp_bundle_dir}"
-  done
-else
-  echo "Skipping OLM OCP validation on ${ARCH} arch"
-fi
+DOCKER_PATH=$(which docker)
+docker run --rm -t -v /var/run/docker.sock:/var/run/docker.sock -v "${DOCKER_PATH}":/usr/bin/docker operator-olm-validation
