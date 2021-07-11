@@ -46,7 +46,6 @@ import (
 	"github.com/spf13/pflag"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 
-	corev1 "k8s.io/api/core/v1"
 	//"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -224,7 +223,7 @@ func IsTopologyInUse(ctx context.Context) (bool, error) {
 	if err != nil {
 		log.Info("unable to load in-cluster configuration: %v", err)
 		log.Info("skipping topology retrieval. we might not be in a k8s cluster")
-		return false, nil
+		return false, err
 	}
 
 	client, err := kubernetes.NewForConfig(kubeConfig)
@@ -235,32 +234,14 @@ func IsTopologyInUse(ctx context.Context) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	var nodeUseTopology bool
 	for _, node := range nodes.Items {
-		nodeUseTopology = false
-		if IsSchedulable(node) {
-			for key := range node.Labels {
-				log.Info(fmt.Sprintf("current key: %v", key))
-				for _, prefix := range topologyPrefixes {
-					if strings.HasPrefix(key, prefix) {
-						nodeUseTopology = true
-					}
+		for key := range node.Labels {
+			for _, prefix := range topologyPrefixes {
+				if strings.HasPrefix(key, prefix) {
+					return true, nil
 				}
 			}
-			if !nodeUseTopology {
-				return false, nil
-			}
 		}
 	}
-	return true, nil
-}
-
-func IsSchedulable(node corev1.Node) bool {
-	taints := node.Spec.Taints
-	for _, taint := range taints {
-		if taint.Effect == corev1.TaintEffectNoSchedule {
-			return false
-		}
-	}
-	return true
+	return false, nil
 }
