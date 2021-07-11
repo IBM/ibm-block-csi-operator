@@ -131,6 +131,7 @@ func main() {
 		log.Error(err, "")
 		os.Exit(1)
 	}
+
 	topologyEnabled, err = IsTopologyInUse(ctx)
 	if err != nil {
 		log.Error(err, "")
