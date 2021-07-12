@@ -60,7 +60,6 @@ var (
 	metricsPort         int32 = 8383
 	operatorMetricsPort int32 = 8686
 	topologyPrefixes          = [...]string{"topology.kubernetes.io", "topology.block.csi.ibm.com"}
-	topologyEnabled     bool
 )
 var log = logf.Log.WithName("cmd")
 
@@ -132,7 +131,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	topologyEnabled, err = IsTopologyInUse(ctx)
+	topologyEnabled, err := IsTopologyInUse(ctx)
 	if err != nil {
 		log.Error(err, "")
 		os.Exit(1)
@@ -221,11 +220,8 @@ func serveCRMetrics(cfg *rest.Config) error {
 func IsTopologyInUse(ctx context.Context) (bool, error) {
 	kubeConfig, err := rest.InClusterConfig()
 	if err != nil {
-		log.Info("unable to load in-cluster configuration: %v", err)
-		log.Info("skipping topology retrieval. we might not be in a k8s cluster")
 		return false, err
 	}
-
 	client, err := kubernetes.NewForConfig(kubeConfig)
 	if err != nil {
 		return false, err
