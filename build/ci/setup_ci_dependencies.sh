@@ -13,3 +13,9 @@ yq() {
                   -i -v "${PWD}":/workdir mikefarah/yq "$@"
 }
 EOL
+
+source /home/runner/.bash_profile
+cd common
+image_version=`yq eval .channels[0].currentCSV ibm-block-csi-operator.package.yaml`
+image_version=`echo ${image_version//ibm-block-csi-operator.v}`
+echo "::set-output name=image_version::${image_version}"
