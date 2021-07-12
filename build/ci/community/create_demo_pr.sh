@@ -2,6 +2,7 @@
 set +o pipefail
 
 cd $(dirname $csv_file)
+chmod 547 $(basename $csv_file) 
 declare -a operator_image_fields=(
     ".spec.install.spec.deployments[0].spec.template.spec.containers[0].image"
     ".metadata.annotations.containerImage"
