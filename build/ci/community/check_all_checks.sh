@@ -1,6 +1,8 @@
 #!/bin/bash -xe
 set +o pipefail
 
+# CSI-3172 - run rad hat bot checks
+
 did_all_checks_pass(){
   community_operators_branch=$1
   all_checks_passed=false

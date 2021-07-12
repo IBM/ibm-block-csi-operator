@@ -1,22 +1,25 @@
 #!/bin/bash -xe
 set +o pipefail
 
+gh_pr_checks_command (){
+  community_operators_branch=$1
+  gh pr checks $community_operators_branch --repo $forked_community_operators_repository
+}
+
 wait_fot_checks_to_start(){
   community_operators_branch=$1
   forked_community_operators_repository=$2
-  gh_pr_checks_command="gh pr checks $community_operators_branch --repo $forked_community_operators_repository"
-  while [ `$gh_pr_checks_command | grep -i pending | wc -l` -eq 0 ]; do
+  while [ `gh_pr_checks_command $community_operators_branch | grep -i pending | wc -l` -eq 0 ]; do
     sleep 1
   done
 }
 wait_for_checks_to_complete(){
   community_operators_branch=$1
   all_tests_passed=false
-  gh_pr_checks_command="gh pr checks $community_operators_branch --repo $forked_community_operators_repository"
   repo_pr=`gh pr list --repo $forked_community_operators_repository | grep $community_operators_branch`
   if [[ "$repo_pr" == *"$community_operators_branch"* ]]; then
     wait_fot_checks_to_start $community_operators_branch $forked_community_operators_repository
-    test_summary="$gh_pr_checks_command | grep -i summary"
+    test_summary="gh_pr_checks_command $community_operators_branch | grep -i summary"
     while [[ ! "`eval $test_summary`" =~ "pass" ]] && [[ ! "`eval $test_summary`" =~ "fail" ]]; do
       sleep 1
     done
