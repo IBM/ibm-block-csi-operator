@@ -7,7 +7,7 @@ DOCKER_HUB_PASSWORD=$csiblock_dockerhub_password
 triggering_branch=$CI_ACTION_REF_NAME
 target_image_tag=`echo $triggering_branch | sed 's|/|.|g'`
 
-does_triggering_branch_in_docker_image_tags(){
+is_private_branch_component_image_exist(){
   driver_component=$1
   does_docker_image_has_tag=false
   export image_tags=`docker-hub tags --orgname csiblock1 --reponame ibm-block-csi-$driver_component --all-pages | grep $target_image_tag | awk '{print$2}'`

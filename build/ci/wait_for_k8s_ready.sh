@@ -3,16 +3,21 @@ set +o pipefail
 
 is_kubernetes_cluster_ready (){
   pods=`kubectl get pods -A | awk '{print$3}' | grep -iv ready`
-  all_the_containers_are_runninig=true
+  all_containers_are_running=false
+  has_not_ready_pod=false
   for pod in $pods; do
-    running_containers=`echo $pod | awk -F / '{print$1}'`
-    wanted_containers=`echo $pod | awk -F / '{print$2}'`
-    if [ $running_containers != $wanted_containers ]; then
-      all_the_containers_are_runninig=false
+    running_containers_count=`echo $pod | awk -F / '{print$1}'`
+    total_containers_count=`echo $pod | awk -F / '{print$2}'`
+    if [ $running_containers_count != $total_containers_count ]; then
+      has_not_ready_pod=true
       break
     fi
   done
-  echo $all_the_containers_are_runninig
+  if [[ "$has_not_ready_pod" == "false" ]]: then
+    all_containers_are_running=true
+  fi
+  
+  echo $all_containers_are_running
 }
 
 while [[ `is_kubernetes_cluster_ready` == "false" ]]; do
