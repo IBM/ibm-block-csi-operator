@@ -7,7 +7,7 @@ DOCKER_HUB_PASSWORD=$csiblock_dockerhub_password
 triggering_branch=$CI_ACTION_REF_NAME
 target_image_tag=`echo $triggering_branch | sed 's|/|.|g'`
 
-does_the_docker_image_has_tag(){
+does_triggering_branch_in_docker_image_tags(){
   driver_component=$1
   does_docker_image_has_tag=false
   export image_tags=`docker-hub tags --orgname csiblock1 --reponame ibm-block-csi-$driver_component --all-pages | grep $target_image_tag | awk '{print$2}'`
@@ -21,18 +21,11 @@ does_the_docker_image_has_tag(){
   echo $does_docker_image_has_tag
 }
 
-does_controller_docker_image_has_tag=$(does_the_docker_image_has_tag controller)
-does_node_docker_image_has_tag=$(does_the_docker_image_has_tag node)
+does_controller_docker_image_has_tag=$(does_triggering_branch_in_docker_image_tags controller)
+does_node_docker_image_has_tag=$(does_triggering_branch_in_docker_image_tags node)
 
 if [ $does_controller_docker_image_has_tag == "true" ] && [ $does_node_docker_image_has_tag == "true" ]; then
-  operator_branches=`curl -H "Authorization: token $github_token" https://api.github.com/repos/IBM/ibm-block-csi-operator/branches | jq -c '.[]' | jq -r .name`
-  for branch_name in $operator_branches
-  do
-    if [ "$branch_name" == "$triggering_branch" ]; then
-      operator_branch=$triggering_branch
-    fi
-  
-  done
+  operator_branch=$triggering_branch
 fi
 
 docker_image_branch_tag=`echo $operator_branch| sed 's|/|.|g'`

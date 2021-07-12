@@ -140,10 +140,10 @@ jobs:
         with:
           path: ${{ env.pythonLocation }}
           key: ${{ env.pythonLocation }}-${{ hashFiles('dev-requirements.txt') }}
-      - name: Get the operator github branch
-        id: operator_github_branch
+      - name: Get the driver github branch
+        id: driver_github_branch
         run: |
-          build/ci/get_operator_github_branch.sh
+          build/ci/get_driver_github_branch.sh
         env:
           github_token: ${{ secrets.CSIBLOCK_GITHUB_TOKEN }}
       - name: Create k8s Kind Cluster
@@ -157,7 +157,7 @@ jobs:
         run: |
           build/ci/deploy_driver.sh
         env:
-          driver_images_tag: "${{ steps.operator_github_branch.outputs.docker_image_branch_tag }}"
+          driver_images_tag: "${{ steps.driver_github_branch.outputs.docker_image_branch_tag }}"
           operator_image_tag_for_test: "${{ needs.CSI-Build-and-push-images.outputs.operator_image_tag_for_test }}"
           operator_file: "deploy/installer/generated/ibm-block-csi-operator.yaml"
           cr_file: "deploy/crds/csi.ibm.com_v1_ibmblockcsi_cr.yaml"
