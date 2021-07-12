@@ -22,7 +22,7 @@ jobs:
       - name: Setup dependencies
         id: setup_dependencies
         run: |
-          build/ci/setup_ci_dependencies.sh
+          build/ci/github_actions/setup_ci_dependencies.sh
       - uses: actions/cache@v2
         with:
           path: ${{ env.pythonLocation }}
@@ -143,7 +143,7 @@ jobs:
       - name: Get the driver github branch
         id: driver_github_branch
         run: |
-          build/ci/get_driver_github_branch.sh
+          build/ci/github_actions/driver/get_driver_github_branch.sh
         env:
           github_token: ${{ secrets.CSIBLOCK_GITHUB_TOKEN }}
       - name: Create k8s Kind Cluster
@@ -152,10 +152,10 @@ jobs:
           version: v0.11.1
       - name: Wait for k8s cluster to be ready
         run: |
-          build/ci/wait_for_k8s_ready.sh
+          build/ci/github_actions/driver/wait_for_k8s_ready.sh
       - name: Deploy ibm block csi driver
         run: |
-          build/ci/deploy_driver.sh
+          build/ci/github_actions/driver/deploy_driver.sh
         env:
           driver_images_tag: "${{ steps.driver_github_branch.outputs.docker_image_branch_tag }}"
           operator_image_tag_for_test: "${{ needs.CSI-Build-and-push-images.outputs.operator_image_tag_for_test }}"
@@ -163,11 +163,11 @@ jobs:
           cr_file: "deploy/crds/csi.ibm.com_v1_ibmblockcsi_cr.yaml"
       - name: Wait for csi ibm block driver to be ready
         run: |
-          build/ci/wait_for_driver_to_be_ready.sh
+          build/ci/github_actions/driver/wait_for_driver_to_be_ready.sh
       - name: Save driver pods logs
         if: always()
         run: |
-          build/ci/save_driver_pods_logs.sh
+          build/ci/github_actions/driver/save_driver_pods_logs.sh
       - name: Upload driver pods logs
         if: always()
         uses: actions/upload-artifact@v2
