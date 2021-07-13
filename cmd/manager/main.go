@@ -21,9 +21,8 @@ import (
 	"flag"
 	"fmt"
 	"github.com/IBM/ibm-block-csi-operator/pkg/controller/ibmblockcsi/syncer"
+	kubeutil "github.com/IBM/ibm-block-csi-operator/pkg/util/kubernetes"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 	"os"
 	"runtime"
 	"strings"
@@ -218,15 +217,8 @@ func serveCRMetrics(cfg *rest.Config) error {
 }
 */
 func IsTopologyInUse(ctx context.Context) (bool, error) {
-	kubeConfig, err := rest.InClusterConfig()
-	if err != nil {
-		return false, err
-	}
-	client, err := kubernetes.NewForConfig(kubeConfig)
-	if err != nil {
-		return false, err
-	}
-	nodes, err := client.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
+	kubeClient := kubeutil.KubeClient
+	nodes, err := kubeClient.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return false, err
 	}
@@ -241,3 +233,4 @@ func IsTopologyInUse(ctx context.Context) (bool, error) {
 	}
 	return false, nil
 }
+
