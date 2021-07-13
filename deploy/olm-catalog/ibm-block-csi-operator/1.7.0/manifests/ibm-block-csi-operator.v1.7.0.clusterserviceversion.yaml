@@ -79,7 +79,7 @@ metadata:
               {
                 "name": "csi-provisioner",
                 "repository": "k8s.gcr.io/sig-storage/csi-provisioner",
-                "tag": "v2.1.0",
+                "tag": "v2.2.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
@@ -91,7 +91,7 @@ metadata:
               {
                 "name": "csi-snapshotter",
                 "repository": "k8s.gcr.io/sig-storage/csi-snapshotter",
-                "tag": "v3.0.2",
+                "tag": "v3.0.3",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
