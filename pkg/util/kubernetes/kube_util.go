@@ -41,12 +41,12 @@ func initKubeClient() *kubernetes.Clientset {
 		log.Error(err, "")
 		os.Exit(1)
 	}
-	KubeClient, err = kubernetes.NewForConfig(clientConfig)
+	client, err := kubernetes.NewForConfig(clientConfig)
 	if err != nil {
 		log.Error(err, "")
 		os.Exit(1)
 	}
-	return KubeClient
+	return client
 }
 
 func ServerVersion(client discovery.DiscoveryInterface) (string, error) {
