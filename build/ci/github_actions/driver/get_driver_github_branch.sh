@@ -21,8 +21,8 @@ is_private_branch_component_image_exist(){
   echo $does_docker_image_has_tag
 }
 
-does_controller_docker_image_has_tag=$(does_triggering_branch_in_docker_image_tags controller)
-does_node_docker_image_has_tag=$(does_triggering_branch_in_docker_image_tags node)
+does_controller_docker_image_has_tag=$(is_private_branch_component_image_exist controller)
+does_node_docker_image_has_tag=$(is_private_branch_component_image_exist node)
 
 if [ $does_controller_docker_image_has_tag == "true" ] && [ $does_node_docker_image_has_tag == "true" ]; then
   operator_branch=$triggering_branch
