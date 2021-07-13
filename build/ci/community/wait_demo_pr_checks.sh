@@ -9,7 +9,7 @@ gh_pr_checks_command (){
 wait_fot_checks_to_start(){
   community_operators_branch=$1
   forked_community_operators_repository=$2
-  while [ `gh_pr_checks_command $community_operators_branch | grep -i pending | wc -l` -eq 0 ]; do
+  while [ `gh_pr_checks_command $community_operators_branch | wc -l` -eq 0 ]; do
     sleep 1
   done
 }
