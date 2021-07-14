@@ -20,8 +20,12 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/IBM/ibm-block-csi-operator/pkg/controller/ibmblockcsi/syncer"
+	kubeutil "github.com/IBM/ibm-block-csi-operator/pkg/util/kubernetes"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"os"
 	"runtime"
+	"strings"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -54,6 +58,7 @@ var (
 	metricsHost               = "0.0.0.0"
 	metricsPort         int32 = 8383
 	operatorMetricsPort int32 = 8686
+	topologyPrefixes          = [...]string{"topology.kubernetes.io", "topology.block.csi.ibm.com"}
 )
 var log = logf.Log.WithName("cmd")
 
@@ -124,6 +129,13 @@ func main() {
 		log.Error(err, "")
 		os.Exit(1)
 	}
+
+	topologyEnabled, err := IsTopologyInUse(ctx)
+	if err != nil {
+		log.Error(err, "")
+		os.Exit(1)
+	}
+	syncer.TopologyEnabled = topologyEnabled
 
 	log.Info("Registering Components.")
 
@@ -204,3 +216,21 @@ func serveCRMetrics(cfg *rest.Config) error {
 	return nil
 }
 */
+func IsTopologyInUse(ctx context.Context) (bool, error) {
+	kubeClient := kubeutil.KubeClient
+	nodes, err := kubeClient.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
+	if err != nil {
+		return false, err
+	}
+	for _, node := range nodes.Items {
+		for key := range node.Labels {
+			for _, prefix := range topologyPrefixes {
+				if strings.HasPrefix(key, prefix) {
+					return true, nil
+				}
+			}
+		}
+	}
+	return false, nil
+}
+
