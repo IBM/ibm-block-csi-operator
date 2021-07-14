@@ -18,36 +18,16 @@ package kubernetes
 
 import (
 	"fmt"
-	"k8s.io/client-go/kubernetes"
-	"os"
 	"runtime"
 
 	"github.com/pkg/errors"
+
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"sigs.k8s.io/controller-runtime/pkg/client/config"
-	logf "sigs.k8s.io/controller-runtime/pkg/log"
 
 	version "github.com/IBM/ibm-block-csi-operator/version"
 )
-
-var log = logf.Log.WithName("kube_util")
-var KubeClient = initKubeClient()
-
-func initKubeClient() *kubernetes.Clientset {
-	clientConfig, err := config.GetConfig()
-	if err != nil {
-		log.Error(err, "")
-		os.Exit(1)
-	}
-	client, err := kubernetes.NewForConfig(clientConfig)
-	if err != nil {
-		log.Error(err, "")
-		os.Exit(1)
-	}
-	return client
-}
 
 func ServerVersion(client discovery.DiscoveryInterface) (string, error) {
 	versionInfo, err := client.ServerVersion()
