@@ -50,6 +50,7 @@ const (
 )
 
 var controllerContainerHealthPort = intstr.FromInt(controllerContainerHealthPortNumber)
+var TopologyEnabled = false
 
 type csiControllerSyncer struct {
 	driver *ibmblockcsi.IBMBlockCSI
@@ -134,10 +135,14 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	})
 
 	// csi provisioner sidecar
+	// TODO: make timeout configurable
+	provisionerArgs := []string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s", "--default-fstype=ext4"}
+	if TopologyEnabled {
+		provisionerArgs = append(provisionerArgs, "--feature-gates=Topology=true")
+	}
 	provisioner := s.ensureContainer(provisionerContainerName,
 		s.getCSIProvisionerImage(),
-		// TODO: make timeout configurable
-		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s", "--default-fstype=ext4"},
+		provisionerArgs,
 	)
 	provisioner.ImagePullPolicy = s.getCSIProvisionerPullPolicy()
 
