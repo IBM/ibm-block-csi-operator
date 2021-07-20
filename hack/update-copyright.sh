@@ -22,6 +22,17 @@ CURRENT_PATH=$(dirname "$BASH_SOURCE")
 PROTECT_ROOT=$CURRENT_PATH/..
 VENDOR_PATH=$CURRENT_PATH/../vendor
 BOILERPLATE=$CURRENT_PATH/boilerplate.go.txt
+excluded_files=("tools.go" "matan")
+
+function contains()
+{
+    local i
+    for i in "${@}"
+	do
+        [[ "$i" == "$1" ]] && return 0;  # 0 is true
+    done
+    return 1  # 1 is false
+}
 
 echo "add copyright header"
 
@@ -31,9 +42,12 @@ for file in $(find $PROTECT_ROOT -not -path "$VENDOR_PATH/*" -not -name "zz_gene
     # the file already has a copyright.
 	continue
   else
-    cat $BOILERPLATE > $file.tmp;
-    echo "" >> $file.tmp;
-    cat $file >> $file.tmp;
-    mv $file.tmp $file;
+    if !(contains $file_name "${excluded_files[@]}")
+    then
+      cat $BOILERPLATE > $file.tmp;
+      echo "" >> $file.tmp;
+      cat $file >> $file.tmp;
+      mv $file.tmp $file;
+    fi
   fi
 done
