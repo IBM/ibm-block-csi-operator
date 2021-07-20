@@ -49,13 +49,12 @@ func NewInformersMap(config *rest.Config,
 	scheme *runtime.Scheme,
 	mapper meta.RESTMapper,
 	resync time.Duration,
-	namespace string,
-	selectors SelectorsByGVK,
-) *InformersMap {
+	namespace string) *InformersMap {
+
 	return &InformersMap{
-		structured:   newStructuredInformersMap(config, scheme, mapper, resync, namespace, selectors),
-		unstructured: newUnstructuredInformersMap(config, scheme, mapper, resync, namespace, selectors),
-		metadata:     newMetadataInformersMap(config, scheme, mapper, resync, namespace, selectors),
+		structured:   newStructuredInformersMap(config, scheme, mapper, resync, namespace),
+		unstructured: newUnstructuredInformersMap(config, scheme, mapper, resync, namespace),
+		metadata:     newMetadataInformersMap(config, scheme, mapper, resync, namespace),
 
 		Scheme: scheme,
 	}
@@ -106,19 +105,16 @@ func (m *InformersMap) Get(ctx context.Context, gvk schema.GroupVersionKind, obj
 }
 
 // newStructuredInformersMap creates a new InformersMap for structured objects.
-func newStructuredInformersMap(config *rest.Config, scheme *runtime.Scheme, mapper meta.RESTMapper, resync time.Duration,
-	namespace string, selectors SelectorsByGVK) *specificInformersMap {
-	return newSpecificInformersMap(config, scheme, mapper, resync, namespace, selectors, createStructuredListWatch)
+func newStructuredInformersMap(config *rest.Config, scheme *runtime.Scheme, mapper meta.RESTMapper, resync time.Duration, namespace string) *specificInformersMap {
+	return newSpecificInformersMap(config, scheme, mapper, resync, namespace, createStructuredListWatch)
 }
 
 // newUnstructuredInformersMap creates a new InformersMap for unstructured objects.
-func newUnstructuredInformersMap(config *rest.Config, scheme *runtime.Scheme, mapper meta.RESTMapper, resync time.Duration,
-	namespace string, selectors SelectorsByGVK) *specificInformersMap {
-	return newSpecificInformersMap(config, scheme, mapper, resync, namespace, selectors, createUnstructuredListWatch)
+func newUnstructuredInformersMap(config *rest.Config, scheme *runtime.Scheme, mapper meta.RESTMapper, resync time.Duration, namespace string) *specificInformersMap {
+	return newSpecificInformersMap(config, scheme, mapper, resync, namespace, createUnstructuredListWatch)
 }
 
 // newMetadataInformersMap creates a new InformersMap for metadata-only objects.
-func newMetadataInformersMap(config *rest.Config, scheme *runtime.Scheme, mapper meta.RESTMapper, resync time.Duration,
-	namespace string, selectors SelectorsByGVK) *specificInformersMap {
-	return newSpecificInformersMap(config, scheme, mapper, resync, namespace, selectors, createMetadataListWatch)
+func newMetadataInformersMap(config *rest.Config, scheme *runtime.Scheme, mapper meta.RESTMapper, resync time.Duration, namespace string) *specificInformersMap {
+	return newSpecificInformersMap(config, scheme, mapper, resync, namespace, createMetadataListWatch)
 }

@@ -38,7 +38,7 @@ type WebhookBuilder struct {
 	config  *rest.Config
 }
 
-// WebhookManagedBy allows inform its manager.Manager.
+// WebhookManagedBy allows inform its manager.Manager
 func WebhookManagedBy(m manager.Manager) *WebhookBuilder {
 	return &WebhookBuilder{mgr: m}
 }
@@ -86,7 +86,7 @@ func (blder *WebhookBuilder) registerWebhooks() error {
 	return nil
 }
 
-// registerDefaultingWebhook registers a defaulting webhook if th.
+// registerDefaultingWebhook registers a defaulting webhook if th
 func (blder *WebhookBuilder) registerDefaultingWebhook() {
 	defaulter, isDefaulter := blder.apiType.(admission.Defaulter)
 	if !isDefaulter {
@@ -157,11 +157,11 @@ func (blder *WebhookBuilder) isAlreadyHandled(path string) bool {
 }
 
 func generateMutatePath(gvk schema.GroupVersionKind) string {
-	return "/mutate-" + strings.ReplaceAll(gvk.Group, ".", "-") + "-" +
+	return "/mutate-" + strings.Replace(gvk.Group, ".", "-", -1) + "-" +
 		gvk.Version + "-" + strings.ToLower(gvk.Kind)
 }
 
 func generateValidatePath(gvk schema.GroupVersionKind) string {
-	return "/validate-" + strings.ReplaceAll(gvk.Group, ".", "-") + "-" +
+	return "/validate-" + strings.Replace(gvk.Group, ".", "-", -1) + "-" +
 		gvk.Version + "-" + strings.ToLower(gvk.Kind)
 }
