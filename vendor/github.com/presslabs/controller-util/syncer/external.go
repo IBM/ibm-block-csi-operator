@@ -22,7 +22,6 @@ import (
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
-	logf "sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 type externalSyncer struct {
@@ -46,8 +45,6 @@ func (s *externalSyncer) ObjectOwner() runtime.Object {
 
 func (s *externalSyncer) Sync(ctx context.Context) (SyncResult, error) {
 	var err error
-
-	log := logf.FromContext(ctx, "syncer", s.name)
 
 	result := SyncResult{}
 	result.Operation, err = s.syncFn(ctx, s.obj)

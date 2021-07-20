@@ -29,6 +29,7 @@ import (
 	"k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -44,7 +45,7 @@ type CRDInstallOptions struct {
 	Paths []string
 
 	// CRDs is a list of CRDs to install
-	CRDs []client.Object
+	CRDs []runtime.Object
 
 	// ErrorIfPathMissing will cause an error if a Path does not exist
 	ErrorIfPathMissing bool
@@ -65,7 +66,7 @@ const defaultPollInterval = 100 * time.Millisecond
 const defaultMaxWait = 10 * time.Second
 
 // InstallCRDs installs a collection of CRDs into a cluster by reading the crd yaml files from a directory
-func InstallCRDs(config *rest.Config, options CRDInstallOptions) ([]client.Object, error) {
+func InstallCRDs(config *rest.Config, options CRDInstallOptions) ([]runtime.Object, error) {
 	defaultCRDOptions(&options)
 
 	// Read the CRD yamls into options.CRDs
@@ -110,7 +111,7 @@ func defaultCRDOptions(o *CRDInstallOptions) {
 }
 
 // WaitForCRDs waits for the CRDs to appear in discovery
-func WaitForCRDs(config *rest.Config, crds []client.Object, options CRDInstallOptions) error {
+func WaitForCRDs(config *rest.Config, crds []runtime.Object, options CRDInstallOptions) error {
 	// Add each CRD to a map of GroupVersion to Resource
 	waitingFor := map[schema.GroupVersion]*sets.String{}
 	for _, crd := range runtimeCRDListToUnstructured(crds) {
@@ -127,17 +128,14 @@ func WaitForCRDs(config *rest.Config, crds []client.Object, options CRDInstallOp
 		if err != nil {
 			return err
 		}
-		versions, found, err := unstructured.NestedSlice(crd.Object, "spec", "versions")
-		if err != nil {
-			return err
-		}
-
-		// gvs should be added here only if single version is found. If multiple version is found we will add those version
-		// based on the version is served or not.
-		if crdVersion != "" && !found {
+		if crdVersion != "" {
 			gvs = append(gvs, schema.GroupVersion{Group: crdGroup, Version: crdVersion})
 		}
 
+		versions, _, err := unstructured.NestedSlice(crd.Object, "spec", "versions")
+		if err != nil {
+			return err
+		}
 		for _, version := range versions {
 			versionMap, ok := version.(map[string]interface{})
 			if !ok {
@@ -246,7 +244,7 @@ func UninstallCRDs(config *rest.Config, options CRDInstallOptions) error {
 }
 
 // CreateCRDs creates the CRDs
-func CreateCRDs(config *rest.Config, crds []client.Object) error {
+func CreateCRDs(config *rest.Config, crds []runtime.Object) error {
 	cs, err := client.New(config, client.Options{})
 	if err != nil {
 		return err
@@ -276,7 +274,7 @@ func CreateCRDs(config *rest.Config, crds []client.Object) error {
 }
 
 // renderCRDs iterate through options.Paths and extract all CRD files.
-func renderCRDs(options *CRDInstallOptions) ([]client.Object, error) {
+func renderCRDs(options *CRDInstallOptions) ([]runtime.Object, error) {
 	var (
 		err   error
 		info  os.FileInfo
@@ -327,7 +325,7 @@ func renderCRDs(options *CRDInstallOptions) ([]client.Object, error) {
 	}
 
 	// Converting map to a list to return
-	var res []client.Object
+	var res []runtime.Object
 	for _, obj := range crds {
 		res = append(res, obj)
 	}

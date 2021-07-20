@@ -5,7 +5,6 @@ import (
 	apiextensionsv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 var (
@@ -39,7 +38,7 @@ func mergePaths(s1, s2 []string) []string {
 
 // mergeCRDs merges two CRD slices using their names.
 // This function makes no guarantees about order of the merged slice.
-func mergeCRDs(s1, s2 []client.Object) []client.Object {
+func mergeCRDs(s1, s2 []runtime.Object) []runtime.Object {
 	m := make(map[string]*unstructured.Unstructured)
 	for _, obj := range runtimeCRDListToUnstructured(s1) {
 		m[obj.GetName()] = obj
@@ -47,7 +46,7 @@ func mergeCRDs(s1, s2 []client.Object) []client.Object {
 	for _, obj := range runtimeCRDListToUnstructured(s2) {
 		m[obj.GetName()] = obj
 	}
-	merged := make([]client.Object, len(m))
+	merged := make([]runtime.Object, len(m))
 	i := 0
 	for _, obj := range m {
 		merged[i] = obj
@@ -56,7 +55,7 @@ func mergeCRDs(s1, s2 []client.Object) []client.Object {
 	return merged
 }
 
-func runtimeCRDListToUnstructured(l []client.Object) []*unstructured.Unstructured {
+func runtimeCRDListToUnstructured(l []runtime.Object) []*unstructured.Unstructured {
 	res := []*unstructured.Unstructured{}
 	for _, obj := range l {
 		u := &unstructured.Unstructured{}
