@@ -1,0 +1,20 @@
+# permissions for end users to view ibmblockcsis.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ibmblockcsi-viewer-role
+rules:
+- apiGroups:
+  - csi.ibm.com
+  resources:
+  - ibmblockcsis
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - csi.ibm.com
+  resources:
+  - ibmblockcsis/status
+  verbs:
+  - get

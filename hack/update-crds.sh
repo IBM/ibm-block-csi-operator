@@ -23,6 +23,6 @@ if ! [ -x "$(command -v operator-sdk)" ]; then
   exit 1
 fi
 
-operator-sdk generate k8s
+make generate
 
-operator-sdk generate crds
+make manifests

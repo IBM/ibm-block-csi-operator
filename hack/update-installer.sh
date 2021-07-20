@@ -21,7 +21,7 @@
 
 CURRENT_PATH=$(dirname "$BASH_SOURCE")
 DEPLOY_PATH=$CURRENT_PATH/../deploy
-CRD_PATH=$DEPLOY_PATH/crds
+CRD_PATH=$CURRENT_PATH/../config/crd/bases
 
 TARGET_FILE_NAME=ibm-block-csi-operator.yaml
 TARGET_FILE=$DEPLOY_PATH/installer/generated/$TARGET_FILE_NAME
