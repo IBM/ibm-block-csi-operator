@@ -21,7 +21,16 @@
 
 CURRENT_PATH=$(dirname "$BASH_SOURCE")
 DEPLOY_PATH=$CURRENT_PATH/../deploy
+COFIG_PATH=$CURRENT_PATH/../config
 CRD_PATH=$CURRENT_PATH/../config/crd/bases
+
+declare -a operator_deploy_files=(
+    "crd/bases/csi.ibm.com_ibmblockcsis.yaml"
+    "manager/manager.yaml"
+    "rbac/role.yaml"
+    "rbac/role_binding.yaml"
+    "rbac/service_account.yaml"
+)
 
 TARGET_FILE_NAME=ibm-block-csi-operator.yaml
 TARGET_FILE=$DEPLOY_PATH/installer/generated/$TARGET_FILE_NAME
@@ -60,9 +69,9 @@ do
     fi
 done
 
-for file_name in $(ls $DEPLOY_PATH)
+for file_name in "${operator_deploy_files[@]}"
 do
-    file=$DEPLOY_PATH/$file_name
+    file=$COFIG_PATH/$file_name
     if test -f $file
     then
         if !(contains $file_name "${excluded_files[@]}")
