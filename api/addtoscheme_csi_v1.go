@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package controller
+package apis
 
 import (
-	"github.com/IBM/ibm-block-csi-operator/pkg/controller/volumeattachment"
+	v1 "github.com/IBM/ibm-block-csi-operator/api/v1"
 )
-
-func init() {
-	// AddToManagerFuncs is a list of functions to create controllers and add them to a manager.
-	AddToManagerFuncs = append(AddToManagerFuncs, volumeattachment.Add)
-}
+ 
+ func init() {
+	 // Register the types with the Scheme so the components can map objects to GroupVersionKinds and back
+	 AddToSchemes = append(AddToSchemes, v1.SchemeBuilder.AddToScheme)
+ }

@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-package config
+package apis
 
-// Validate checks if the spec is valid
-// Replace it with kubernetes native default setter when it is available.
-// https://kubernetes.io/docs/tasks/access-kubernetes-api/custom-resources/custom-resource-definitions/#validation
-func (c *Config) Validate() error {
-	return nil
-}
+import (
+	"k8s.io/apimachinery/pkg/runtime"
+)
+
+// AddToSchemes may be used to add all resources defined in the project to a Scheme
+ var AddToSchemes runtime.SchemeBuilder
+ 
+ // AddToScheme adds all Resources to the Scheme
+ func AddToScheme(s *runtime.Scheme) error {
+	 return AddToSchemes.AddToScheme(s)
+ }

@@ -1,18 +1,18 @@
-/**
- * Copyright 2019 IBM Corp.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+/*
+Copyright 2021.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 
 package v1
 
@@ -45,8 +45,9 @@ type CSISidecar struct {
 	ImagePullPolicy corev1.PullPolicy `json:"imagePullPolicy"`
 }
 
+// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+
 // IBMBlockCSISpec defines the desired state of IBMBlockCSI
-// +k8s:openapi-gen=true
 type IBMBlockCSISpec struct {
 	Controller IBMBlockCSIControllerSpec `json:"controller"`
 	Node       IBMBlockCSINodeSpec       `json:"node"`
@@ -62,7 +63,6 @@ type IBMBlockCSISpec struct {
 
 // seems not work in this way, need to figure out why
 //// IBMBlockCSIComponentSpec defines the desired state of IBMBlockCSIController
-//// +k8s:openapi-gen=true
 //type BlockCSIComponent struct {
 //	Repository string `json:"repository"`
 //	Tag        string `json:"tag"`
@@ -79,7 +79,6 @@ type IBMBlockCSISpec struct {
 //}
 
 // IBMBlockCSIControllerSpec defines the desired state of IBMBlockCSIController
-// +k8s:openapi-gen=true
 type IBMBlockCSIControllerSpec struct {
 	// BlockCSIComponent `json:"blockCSIComponent"`
 
@@ -98,7 +97,6 @@ type IBMBlockCSIControllerSpec struct {
 }
 
 // IBMBlockCSINodeSpec defines the desired state of IBMBlockCSINode
-// +k8s:openapi-gen=true
 type IBMBlockCSINodeSpec struct {
 	// BlockCSIComponent `json:"blockCSIComponent"`
 
@@ -117,7 +115,6 @@ type IBMBlockCSINodeSpec struct {
 }
 
 // IBMBlockCSIStatus defines the observed state of IBMBlockCSI
-// +k8s:openapi-gen=true
 type IBMBlockCSIStatus struct {
 	// Phase is the driver running phase
 	Phase           DriverPhase `json:"phase"`
@@ -128,11 +125,10 @@ type IBMBlockCSIStatus struct {
 	Version string `json:"version"`
 }
 
-// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
 
 // IBMBlockCSI is the Schema for the ibmblockcsis API
-// +k8s:openapi-gen=true
-// +kubebuilder:subresource:status
 // +kubebuilder:resource:path=ibmblockcsis,scope=Namespaced,shortName=ibc
 type IBMBlockCSI struct {
 	metav1.TypeMeta   `json:",inline"`
@@ -142,7 +138,7 @@ type IBMBlockCSI struct {
 	Status IBMBlockCSIStatus `json:"status,omitempty"`
 }
 
-// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+//+kubebuilder:object:root=true
 
 // IBMBlockCSIList contains a list of IBMBlockCSI
 type IBMBlockCSIList struct {
