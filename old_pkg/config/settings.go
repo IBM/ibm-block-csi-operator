@@ -18,11 +18,10 @@ package config
 
 import (
 	"fmt"
+	v1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
 	"io/ioutil"
-	"os"
-
-	v1 "github.com/IBM/ibm-block-csi-operator/api/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
+	"os"
 	"sigs.k8s.io/yaml"
 )
 
