@@ -11,19 +11,22 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/presslabs/controller-util v0.2.6
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
-	k8s.io/api v0.21.2
-	k8s.io/apimachinery v0.21.2
-	k8s.io/client-go v11.0.1-0.20190409021438-1a26190bd76a+incompatible
+	k8s.io/api v0.19.0
+	k8s.io/apimachinery v0.19.0
+	k8s.io/client-go v0.19.0
 	sigs.k8s.io/controller-runtime v0.9.2
 	sigs.k8s.io/yaml v1.2.0
 )
 
-// Pinned to kubernetes-1.21.2
+// Pinned to kubernetes-1.18.0
 replace (
-	k8s.io/api => k8s.io/api v0.21.2
-	k8s.io/apimachinery => k8s.io/apimachinery v0.21.2
-	k8s.io/client-go => k8s.io/client-go v0.21.2
-	sigs.k8s.io/controller-runtime => sigs.k8s.io/controller-runtime v0.6.3
+	github.com/Azure/go-autorest => github.com/Azure/go-autorest v12.2.0+incompatible
+	k8s.io/api => k8s.io/api v0.18.0
+	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.18.0
+	k8s.io/apimachinery => k8s.io/apimachinery v0.18.0
+	k8s.io/client-go => k8s.io/client-go v0.18.0
+	k8s.io/cloud-provider => k8s.io/cloud-provider v0.18.0
+	sigs.k8s.io/controller-runtime => sigs.k8s.io/controller-runtime v0.6.2
 )
 
 replace (

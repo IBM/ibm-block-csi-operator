@@ -112,7 +112,8 @@ func main() {
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder
-
+	
+	ctx := context.TODO()
 	topologyEnabled, err := IsTopologyInUse(ctx)
 	if err != nil {
 		log.Error(err, "")
