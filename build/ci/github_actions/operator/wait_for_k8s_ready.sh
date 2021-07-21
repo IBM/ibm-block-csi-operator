@@ -1,7 +1,7 @@
 #!/bin/bash -xe
 set +o pipefail
 
-is_pods_ready (){
+are_pods_ready (){
   pods=$@
   are_all_pods_ready=false
   for pod in $pods; do
