@@ -16,7 +16,7 @@ image_version=`cat version/version.go | grep -i driverversion | awk -F = '{print
 image_version=`echo ${image_version//\"}`
 # CSI-3173 - move image_version value into a common config file
 operator_image_tag_for_test=`build/ci/get_image_tag_from_branch.sh ${image_version} ${build_number} ${CI_ACTION_REF_NAME}`
-operator_image_tag_for_test=`echo $operator_image_tag_for_test | awk '{print$1}'`
 docker_image_branch_tag=`echo $operator_image_tag_for_test | awk '{print$2}'`
+operator_image_tag_for_test=`echo $operator_image_tag_for_test | awk '{print$1}'`
 echo "::set-output name=docker_image_branch_tag::${docker_image_branch_tag}"
 echo "::set-output name=operator_image_tag_for_test::${operator_image_tag_for_test}"
