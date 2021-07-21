@@ -71,6 +71,10 @@ spec:
     repository: k8s.gcr.io/sig-storage/csi-resizer
     tag: "v1.1.0"
     imagePullPolicy: IfNotPresent
+  - name: csi-addons-replicator
+    repository: quay.io/csiaddons/volumereplication-operator
+    tag: "v0.1.0"
+    imagePullPolicy: IfNotPresent
   - name: livenessprobe
     repository: k8s.gcr.io/sig-storage/livenessprobe
     tag: "v2.2.0"

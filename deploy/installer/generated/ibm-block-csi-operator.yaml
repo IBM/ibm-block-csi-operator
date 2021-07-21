@@ -1752,6 +1752,40 @@ rules:
   - watch
   - list
   - update
+- apiGroups:
+  - replication.storage.openshift.io
+  resources:
+  - volumereplicationclasses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - replication.storage.openshift.io
+  resources:
+  - volumereplications
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - replication.storage.openshift.io
+  resources:
+  - volumereplications/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - replication.storage.openshift.io
+  resources:
+  - volumereplications/status
+  verbs:
+  - get
+  - patch
+  - update
 
 ---
 kind: ClusterRoleBinding
