@@ -180,12 +180,12 @@ func (r *IBMBlockCSIReconciler) Reconcile(req ctrl.Request) (reconcile.Result, e
 	}
 
 	// sync the resources which change over time
-	csiControllerSyncer := clustersyncer.NewCSIControllerSyncer(r, r.Scheme, instance)
+	csiControllerSyncer := clustersyncer.NewCSIControllerSyncer(r, instance)
 	if err := syncer.Sync(context.TODO(), csiControllerSyncer, r.recorder); err != nil {
 		return reconcile.Result{}, err
 	}
 
-	csiNodeSyncer := clustersyncer.NewCSINodeSyncer(r, r.Scheme, instance, daemonSetRestartedKey, daemonSetRestartedValue)
+	csiNodeSyncer := clustersyncer.NewCSINodeSyncer(r, instance, daemonSetRestartedKey, daemonSetRestartedValue)
 	if err := syncer.Sync(context.TODO(), csiNodeSyncer, r.recorder); err != nil {
 		return reconcile.Result{}, err
 	}

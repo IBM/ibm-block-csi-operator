@@ -52,13 +52,11 @@ type IBMBlockCSISpec struct {
 	Controller IBMBlockCSIControllerSpec `json:"controller"`
 	Node       IBMBlockCSINodeSpec       `json:"node"`
 
-	// +listType=set
 	// +kubebuilder:validation:Optional
-	Sidecars []CSISidecar `json:"sidecars"`
+	Sidecars []CSISidecar `json:"sidecars,omitempty"`
 
-	// +listType=set
 	// +kubebuilder:validation:Optional
-	ImagePullSecrets []string `json:"imagePullSecrets"`
+	ImagePullSecrets []string `json:"imagePullSecrets,omitempty"`
 }
 
 // seems not work in this way, need to figure out why
@@ -89,11 +87,10 @@ type IBMBlockCSIControllerSpec struct {
 	ImagePullPolicy corev1.PullPolicy `json:"imagePullPolicy"`
 
 	// +kubebuilder:validation:Optional
-	Affinity *corev1.Affinity `json:"affinity"`
+	Affinity *corev1.Affinity `json:"affinity,omitempty"`
 
-	// +listType=set
 	// +kubebuilder:validation:Optional
-	Tolerations []corev1.Toleration `json:"tolerations"`
+	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
 }
 
 // IBMBlockCSINodeSpec defines the desired state of IBMBlockCSINode
@@ -107,11 +104,10 @@ type IBMBlockCSINodeSpec struct {
 	ImagePullPolicy corev1.PullPolicy `json:"imagePullPolicy"`
 
 	// +kubebuilder:validation:Optional
-	Affinity *corev1.Affinity `json:"affinity"`
+	Affinity *corev1.Affinity `json:"affinity,omitempty"`
 
-	// +listType=set
 	// +kubebuilder:validation:Optional
-	Tolerations []corev1.Toleration `json:"tolerations"`
+	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
 }
 
 // IBMBlockCSIStatus defines the observed state of IBMBlockCSI

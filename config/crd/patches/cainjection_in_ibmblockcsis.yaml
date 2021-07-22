@@ -5,3 +5,10 @@ metadata:
   annotations:
     cert-manager.io/inject-ca-from: $(CERTIFICATE_NAMESPACE)/$(CERTIFICATE_NAME)
   name: ibmblockcsis.csi.ibm.com
+  labels:
+    app.kubernetes.io/name: ibmblockcsis
+    app.kubernetes.io/instance: ibmblockcsis
+    app.kubernetes.io/managed-by: ibm-block-csi-operator
+    product: ibm-block-csi-driver
+    release: v1.7.0
+    csi: ibm

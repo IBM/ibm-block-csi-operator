@@ -17,10 +17,37 @@
 package controller
 
 import (
+	"os"
+
 	"github.com/IBM/ibm-block-csi-operator/controllers"
+	"k8s.io/apimachinery/pkg/runtime"
+	ctrl "sigs.k8s.io/controller-runtime"
+)
+
+var (
+	scheme   			 = runtime.NewScheme()
+	setupLog 			 = ctrl.Log.WithName("setup")
+	watchNamespaceEnvVar = "WATCH_NAMESPACE"
+	topologyPrefixes	 = [...]string{"topology.kubernetes.io", "topology.block.csi.ibm.com"}
+	metricsAddr          = ":8080"
+	probeAddr            = ":8081"
+	enableLeaderElection = false
 )
 
 func init() {
 	// AddToManagerFuncs is a list of functions to create controllers and add them to a manager.
+	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
+		Scheme:                 scheme,
+		MetricsBindAddress:     metricsAddr,
+		Port:                   9443,
+		HealthProbeBindAddress: probeAddr,
+		LeaderElection:         enableLeaderElection,
+		LeaderElectionID:       "csi.ibm.com",
+	})
+	if err != nil {
+		setupLog.Error(err, "unable to start manager")
+		os.Exit(1)
+	}
+
 	AddToManagerFuncs = append(AddToManagerFuncs, controllers.SetupWithManager)
 }

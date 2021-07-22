@@ -23,6 +23,6 @@ if ! [ -x "$(command -v operator-sdk)" ]; then
   exit 1
 fi
 
-make generate
+#make generate
 
-make manifests
+#make manifests

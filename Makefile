@@ -226,6 +226,8 @@ olm-validation:
 .PHONY: test
 test: update
 	# for go 1.13+, set GOFLAGS to enable vendor mod for ginkgo
+	tests/test-setup.sh
+	cp -r testbin/ ../
 	GO111MODULE=on GOFLAGS='-mod=vendor' ginkgo -r -skipPackage pkg/controller
 
 .PHONY: update

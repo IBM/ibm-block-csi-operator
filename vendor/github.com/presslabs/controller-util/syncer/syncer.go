@@ -21,33 +21,30 @@ import (
 	"fmt"
 
 	"github.com/iancoleman/strcase"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
-	logf "sigs.k8s.io/controller-runtime/pkg/log"
 )
-
-var log = logf.Log.WithName("syncer")
 
 const (
 	eventNormal  = "Normal"
 	eventWarning = "Warning"
 )
 
-func getKey(obj runtime.Object) (types.NamespacedName, error) {
-	key := types.NamespacedName{}
+var (
+	// ErrOwnerDeleted is returned when the object owner is marked for deletion.
+	ErrOwnerDeleted = fmt.Errorf("owner is deleted")
 
-	objMeta, ok := obj.(metav1.Object)
-	if !ok {
-		return key, wrapNotObjectErr(fmt.Sprintf("%T", obj))
-	}
+	// ErrIgnore is returned for ignored errors.
+	// Ignored errors are treated by the syncer as successful syncs.
+	ErrIgnore = fmt.Errorf("ignored error")
+)
 
-	key.Name = objMeta.GetName()
-	key.Namespace = objMeta.GetNamespace()
-
-	return key, nil
+// IgnoredError wraps and marks errors as being ignored.
+func IgnoredError(err error) error {
+	return fmt.Errorf("%s: %w", err, ErrIgnore)
 }
 
 func basicEventReason(objKindName string, err error) string {
@@ -56,6 +53,26 @@ func basicEventReason(objKindName string, err error) string {
 	}
 
 	return fmt.Sprintf("%sSyncSuccessfull", strcase.ToCamel(objKindName))
+}
+
+// Redacts sensitive data from runtime.Object making them suitable for logging.
+func redact(obj runtime.Object) runtime.Object {
+	switch exposed := obj.(type) {
+	case *corev1.Secret:
+		redacted := exposed.DeepCopy()
+		redacted.Data = nil
+		redacted.StringData = nil
+		exposed.ObjectMeta.DeepCopyInto(&redacted.ObjectMeta)
+
+		return redacted
+	case *corev1.ConfigMap:
+		redacted := exposed.DeepCopy()
+		redacted.Data = nil
+
+		return redacted
+	}
+
+	return obj
 }
 
 // Sync mutates the subject of the syncer interface using controller-runtime
@@ -79,6 +96,6 @@ func Sync(ctx context.Context, syncer Interface, recorder record.EventRecorder) 
 type WithoutOwner struct{}
 
 // GetOwner implementation of syncer interface for the case the subject has no owner.
-func (*WithoutOwner) GetOwner() runtime.Object {
+func (*WithoutOwner) GetOwner() client.Object {
 	return nil
 }

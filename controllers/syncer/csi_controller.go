@@ -58,7 +58,7 @@ type csiControllerSyncer struct {
 }
 
 // NewCSIControllerSyncer returns a syncer for CSI controller
-func NewCSIControllerSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockcsi.IBMBlockCSI) syncer.Interface {
+func NewCSIControllerSyncer(c client.Client, driver *ibmblockcsi.IBMBlockCSI) syncer.Interface {
 	obj := &appsv1.StatefulSet{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        config.GetNameForResource(config.CSIController, driver.Name),
@@ -73,7 +73,7 @@ func NewCSIControllerSyncer(c client.Client, scheme *runtime.Scheme, driver *ibm
 		obj:    obj,
 	}
 
-	return syncer.NewObjectSyncer(config.CSIController.String(), driver.Unwrap(), obj, c, scheme, func() error {
+	return syncer.NewObjectSyncer(config.CSIController.String(), driver.Unwrap(), obj, c, func() error {
 		return sync.SyncFn()
 	})
 }

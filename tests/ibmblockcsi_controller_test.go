@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package controller_test
+package controllers_test
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
@@ -48,12 +49,12 @@ var _ = Describe("Controller", func() {
 			},
 			Spec: csiv1.IBMBlockCSISpec{
 				Controller: csiv1.IBMBlockCSIControllerSpec{
-					Repository: "fake-controller-repo",
-					Tag:        "fake-controller-tag",
+					Repository:  "fake-controller-repo",
+					Tag:         "fake-controller-tag",
 				},
 				Node: csiv1.IBMBlockCSINodeSpec{
-					Repository: "fake-node-repo",
-					Tag:        "fake-node-tag",
+					Repository:  "fake-node-repo",
+					Tag:         "fake-node-tag",
 				},
 			},
 		}
@@ -69,6 +70,7 @@ var _ = Describe("Controller", func() {
 				Ω(err).ShouldNot(HaveOccurred())
 
 				found := &csiv1.IBMBlockCSI{}
+				fmt.Println(found)
 				key := types.NamespacedName{
 					Name:      ibcName,
 					Namespace: ns,

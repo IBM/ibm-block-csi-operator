@@ -55,7 +55,7 @@ type csiNodeSyncer struct {
 }
 
 // NewCSINodeSyncer returns a syncer for CSI node
-func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockcsi.IBMBlockCSI, 
+func NewCSINodeSyncer(c client.Client, driver *ibmblockcsi.IBMBlockCSI, 
 	daemonSetRestartedKey string , daemonSetRestartedValue string) syncer.Interface {
 	obj := &appsv1.DaemonSet{
 		ObjectMeta: metav1.ObjectMeta{
@@ -71,7 +71,7 @@ func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockc
 		obj:    obj,
 	}
 
-	return syncer.NewObjectSyncer(config.CSINode.String(), driver.Unwrap(), obj, c, scheme, func() error {
+	return syncer.NewObjectSyncer(config.CSINode.String(), driver.Unwrap(), obj, c, func() error {
 		return sync.SyncFn(daemonSetRestartedKey, daemonSetRestartedValue)
 	})
 }
