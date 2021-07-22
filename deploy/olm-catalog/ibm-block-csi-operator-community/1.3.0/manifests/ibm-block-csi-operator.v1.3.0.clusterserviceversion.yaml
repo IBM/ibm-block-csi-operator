@@ -1,14 +1,14 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
-  name: ibm-block-csi-operator.v1.2.0
+  name: ibm-block-csi-operator.v1.3.0
   namespace: placeholder
   annotations:
     capabilities: "Basic Install"
     categories: "Storage,Cloud Provider"
     certified: "true"
-    containerImage: ibmcom/ibm-block-csi-operator:1.2.0
-    createdAt: "2020-02-19T13:14:00Z"
+    containerImage: ibmcom/ibm-block-csi-operator:1.3.0
+    createdAt: "2020-08-30T15:15:00Z"
     description: "Run IBM block storage CSI driver on OpenShift."
     repository: https://github.com/IBM/ibm-block-csi-operator
     support: IBM
@@ -23,7 +23,7 @@ metadata:
           "spec": {
             "controller": {
               "repository": "ibmcom/ibm-block-csi-driver-controller",
-              "tag": "1.2.0",
+              "tag": "1.3.0",
               "imagePullPolicy": "IfNotPresent",
               "affinity": {
                 "nodeAffinity": {
@@ -48,7 +48,7 @@ metadata:
             },
             "node": {
               "repository": "ibmcom/ibm-block-csi-driver-node",
-              "tag": "1.2.0",
+              "tag": "1.3.0",
               "imagePullPolicy": "IfNotPresent",
               "affinity": {
                 "nodeAffinity": {
@@ -81,13 +81,13 @@ metadata:
               {
                 "name": "csi-provisioner",
                 "repository": "quay.io/k8scsi/csi-provisioner",
-                "tag": "v1.5.0",
+                "tag": "v1.6.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-attacher",
                 "repository": "quay.io/k8scsi/csi-attacher",
-                "tag": "v1.2.1",
+                "tag": "v2.2.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
@@ -99,7 +99,7 @@ metadata:
               {
                 "name": "livenessprobe",
                 "repository": "quay.io/k8scsi/livenessprobe",
-                "tag": "v1.1.0",
+                "tag": "v2.0.0",
                 "imagePullPolicy": "IfNotPresent"
               }
             ]
@@ -113,22 +113,22 @@ spec:
 
     This is the official operator to deploy and manage IBM block storage CSI driver.
 
-    Supported container platforms:
-      - OpenShift v4.3
-      - OpenShift v4.4
-      - Kubernetes v1.16
-      - Kubernetes v1.17
+    Supported container platforms (and architectures):
+      - OpenShift v4.3 (IBM Z and IBM PowerPC)
+      - OpenShift v4.4 (x86 and IBM Z)
+      - OpenShift v4.5 (x86)
+      - Kubernetes v1.17 (x86)
+      - Kubernetes v1.18 (x86)
 
     Supported IBM storage systems:
-      - IBM FlashSystem 9100
-      - IBM Spectrum Virtualize Family (including IBM Flash family members built with IBM Spectrum Virtualize (FlashSystem 5010, 5030, 5100, 7200, 9100, 9200, 9200R) and IBM SAN Volume Controller (SVC) models SV2, SA2)
+      - IBM Spectrum Virtualize Family including IBM SAN Volume Controller (SVC) and IBM FlashSystem® family members built with IBM Spectrum® Virtualize (FlashSystem 5010, 5030, 5100, 7200, 9100, 9200, 9200R)
       - IBM FlashSystem A9000/R
       - IBM DS8880
       - IBM DS8900
 
-    Supported operating systems:
-      - RHEL 7.x (x86 architecture)
-      - RHCOS (x86 and IBM Z architecture)
+    Supported operating systems (and architectures):
+      - RHEL 7.x (x86)
+      - RHCOS (x86, IBM Z, and IBM PowerPC)
 
     Full documentation can be found on the [IBM Knowledge Center](https://www.ibm.com/support/knowledgecenter/SSRQ8T).
 
@@ -288,7 +288,7 @@ spec:
     ```bash
     $ kubectl get pod -l app.kubernetes.io/name=ibm-block-csi-operator -n <namespace>
     NAME                                    READY   STATUS    RESTARTS   AGE
-    ibm-block-csi-operator-5bb7996b86-xntss 2/2     Running   0          10m
+    ibm-block-csi-operator-5bb7996b86-xntss 1/1     Running   0          10m
     ```
 
     ### Create an IBMBlockCSI custom resource
@@ -405,13 +405,12 @@ spec:
     - IBM
     - BlockStorage
     - CSI
-  version: 1.2.0
-  replaces: ibm-block-csi-operator.v1.1.0
+  version: 1.3.0
   maturity: stable
   maintainers:
     - name: Guang Jiong Lou
       email: luogj@cn.ibm.com
-  minKubeVersion: 1.16.0
+  minKubeVersion: 1.17.0
   provider:
     name: IBM
   links:
@@ -751,7 +750,7 @@ spec:
                     capabilities:
                       drop:
                       - ALL
-                  image: ibmcom/ibm-block-csi-operator:1.2.0
+                  image: ibmcom/ibm-block-csi-operator:1.3.0
                   imagePullPolicy: IfNotPresent
                   command:
                   - ibm-block-csi-operator
