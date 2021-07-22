@@ -112,7 +112,6 @@ func (s *csiControllerSyncer) ensurePodSpec() corev1.PodSpec {
 }
 
 func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
-	// controller plugin container
 	controllerPlugin := s.ensureContainer(controllerContainerName,
 		s.driver.GetCSIControllerImage(),
 		[]string{"--csi-endpoint=$(CSI_ENDPOINT)"},
@@ -134,34 +133,26 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		},
 	})
 
-	// csi provisioner sidecar
 	provisioner := s.ensureContainer(provisionerContainerName,
 		s.getCSIProvisionerImage(),
-		// TODO: make timeout configurable
 		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s", "--default-fstype=ext4"},
 	)
 	provisioner.ImagePullPolicy = s.getCSIProvisionerPullPolicy()
 
-	// csi attacher sidecar
 	attacher := s.ensureContainer(attacherContainerName,
 		s.getCSIAttacherImage(),
-		// TODO: make timeout configurable
 		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=180s"},
 	)
 	attacher.ImagePullPolicy = s.getCSIAttacherPullPolicy()
 
-	// csi snapshotter sidecar
 	snapshotter := s.ensureContainer(snapshotterContainerName,
 		s.getCSISnapshotterImage(),
-		// TODO: make timeout configurable
 		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s"},
 	)
 	snapshotter.ImagePullPolicy = s.getCSISnapshotterPullPolicy()
 
-	// csi resizer sidecar
 	resizer := s.ensureContainer(resizerContainerName,
 		s.getCSIResizerImage(),
-		// TODO: make timeout configurable
 		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s"},
 	)
 	resizer.ImagePullPolicy = s.getCSIResizerPullPolicy()
@@ -175,7 +166,6 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	)
 	replicator.ImagePullPolicy = s.getCSIAddonsReplicatorPullPolicy()
 
-	// liveness probe sidecar
 	livenessProbe := s.ensureContainer(controllerLivenessProbeContainerName,
 		s.getLivenessProbeImage(),
 		[]string{
