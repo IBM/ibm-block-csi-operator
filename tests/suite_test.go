@@ -17,13 +17,10 @@
 package controllers_test
 
 import (
-	"fmt"
-	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/IBM/ibm-block-csi-operator/controllers"
-	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -39,18 +36,18 @@ import (
 	//+kubebuilder:scaffold:imports
 )
 
+const controllerName = "ibmblockcsi-controller"
+
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
 var cfg *rest.Config
 var k8sClient client.Client
 var testEnv *envtest.Environment
-var kubeVersion = "1.18"
-var nodeAgentPort = "10086"
-var storageAgentPort = "10010"
-var storageAgentAddress = "localhost:" + storageAgentPort
-var setupLog = ctrl.Log.WithName("setup")
-
+//var kubeVersion = "1.18"
+//var nodeAgentPort = "10086"
+//var storageAgentPort = "10010"
+//var storageAgentAddress = "localhost:" + storageAgentPort
 
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -61,12 +58,14 @@ func TestAPIs(t *testing.T) {
 }
 
 var _ = BeforeSuite(func() {
-	Expect(os.Setenv(config.ENVKubeVersion, kubeVersion)).To(Succeed())
-	Expect(os.Setenv(config.ENVIscsiAgentPort, nodeAgentPort)).To(Succeed())
-	Expect(os.Setenv(config.ENVEndpoint, storageAgentAddress)).To(Succeed())
-	Expect(os.Setenv("TEST_ASSET_KUBE_APISERVER", "../../testbin/kube-apiserver")).To(Succeed())
-	Expect(os.Setenv("TEST_ASSET_ETCD", "../../testbin/etcd")).To(Succeed())
-	Expect(os.Setenv("TEST_ASSET_KUBECTL", "../../testbin/kubectl")).To(Succeed())
+	//Expect(os.Setenv(config.ENVKubeVersion, kubeVersion)).To(Succeed())
+	//Expect(os.Setenv(config.ENVIscsiAgentPort, nodeAgentPort)).To(Succeed())
+	//Expect(os.Setenv(config.ENVEndpoint, storageAgentAddress)).To(Succeed())
+	//Expect(os.Setenv("TEST_ASSET_KUBE_APISERVER", "../../testbin/kube-apiserver")).To(Succeed())
+	//Expect(os.Setenv("TEST_ASSET_ETCD", "../../testbin/etcd")).To(Succeed())
+	//Expect(os.Setenv("TEST_ASSET_KUBECTL", "../../testbin/kubectl")).To(Succeed())
+	//fmt.Println("hi")
+	Fail("jkj")
 
 	logf.SetLogger(zap.New(zap.WriteTo(GinkgoWriter), zap.UseDevMode(true)))
 
@@ -74,6 +73,7 @@ var _ = BeforeSuite(func() {
 	testEnv = &envtest.Environment{
 		CRDDirectoryPaths:     []string{filepath.Join("..", "config", "crd", "bases")},
 		ErrorIfCRDPathMissing: true,
+		AttachControlPlaneOutput: true,
 	}
 
 	cfg, err := testEnv.Start()
@@ -92,19 +92,22 @@ var _ = BeforeSuite(func() {
 		Scheme: scheme.Scheme,
 	})
 	Expect(err).ToNot(HaveOccurred())
-	fmt.Println(mgr)
 
+	//err = controllers.Add(mgr)
 	err = (&controllers.IBMBlockCSIReconciler{
-		Client:      mgr.GetClient(),
-		Scheme:      mgr.GetScheme(),
-		Namespace:   "default",
+		Client:        k8sClient,
+		Log:       	   ctrl.Log.WithName("controller").WithName("ibmblockcsi-controller"),
+		Scheme:        scheme.Scheme,
+		Namespace:     "default",
+		ServerVersion: "1.20",
+		Recorder:      mgr.GetEventRecorderFor(controllerName),
 	}).SetupWithManager(mgr)
 	Expect(err).ToNot(HaveOccurred())
-
-	go func() {
-		err = mgr.Start(ctrl.SetupSignalHandler())
-		Expect(err).ToNot(HaveOccurred())
-	}()
+	
+	//go func() {
+	//	err = mgr.Start(ctrl.SetupSignalHandler())
+	//	Expect(err).ToNot(HaveOccurred())
+	//}()
 
 }, 60)
 
@@ -112,10 +115,10 @@ var _ = AfterSuite(func() {
 	By("tearing down the test environment")
 	err := testEnv.Stop()
 	Expect(err).NotTo(HaveOccurred())
-	Expect(os.Unsetenv(config.ENVKubeVersion)).To(Succeed())
-	Expect(os.Unsetenv(config.ENVIscsiAgentPort)).To(Succeed())
-	Expect(os.Unsetenv(config.ENVEndpoint)).To(Succeed())
-	Expect(os.Unsetenv("TEST_ASSET_KUBE_APISERVER")).To(Succeed())
-	Expect(os.Unsetenv("TEST_ASSET_ETCD")).To(Succeed())
-	Expect(os.Unsetenv("TEST_ASSET_KUBECTL")).To(Succeed())
+	//Expect(os.Unsetenv(config.ENVKubeVersion)).To(Succeed())
+	//Expect(os.Unsetenv(config.ENVIscsiAgentPort)).To(Succeed())
+	//Expect(os.Unsetenv(config.ENVEndpoint)).To(Succeed())
+	//Expect(os.Unsetenv("TEST_ASSET_KUBE_APISERVER")).To(Succeed())
+	//Expect(os.Unsetenv("TEST_ASSET_ETCD")).To(Succeed())
+	//Expect(os.Unsetenv("TEST_ASSET_KUBECTL")).To(Succeed())
 })

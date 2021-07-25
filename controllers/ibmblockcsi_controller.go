@@ -62,15 +62,18 @@ var log = logf.Log.WithName("ibmblockcsi_controller")
 
 type reconciler func(instance *ibmblockcsi.IBMBlockCSI) error
 
+
+
 // IBMBlockCSIReconciler reconciles a IBMBlockCSI object
 type IBMBlockCSIReconciler struct {
 	// This client, initialized using mgr.Client() above, is a split client
 	// that reads objects from the cache and writes to the apiserver
 	client.Client
+	Log          logr.Logger
 	Scheme        *runtime.Scheme
 	Namespace     string
-	recorder      record.EventRecorder
-	serverVersion string
+	Recorder      record.EventRecorder
+	ServerVersion string
 }
 
 // the rbac rule requires an empty row at the end to render
@@ -99,13 +102,34 @@ type IBMBlockCSIReconciler struct {
 //+kubebuilder:rbac:groups=snapshot.storage.k8s.io,resources=volumesnapshotcontents,verbs=get;watch;list;create;update;delete
 //+kubebuilder:rbac:groups=snapshot.storage.k8s.io,resources=volumesnapshotcontents/status,verbs=update
 //+kubebuilder:rbac:groups=snapshot.storage.k8s.io,resources=volumesnapshots,verbs=get;watch;list;update
+func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request) (reconcile.Result, error) {
+	ctx = context.Background()
+	log := r.Log.WithValues("memcached", req.NamespacedName)
+	// Fetch the Memcached instance
+	memcached := &csiv1.IBMBlockCSI{}
+	err := r.Get(ctx, req.NamespacedName, memcached)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			// Request object not found, could have been deleted after reconcile request.
+			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
+			// Return and don't requeue
+			log.Info("Memcached resource not found. Ignoring since object must be deleted")
+			return reconcile.Result{}, nil
+		}
+		// Error reading the object - requeue the request.
+		log.Error(err, "Failed to get Memcached")
+		return reconcile.Result{}, err
+	}
+	return reconcile.Result{}, nil
+}
 
-func (r *IBMBlockCSIReconciler) Reconcile(req ctrl.Request) (reconcile.Result, error) {
-	reqLogger := log.WithValues("Request.Namespace", req.Namespace, "Request.Name", req.Name)
+
+func (r *IBMBlockCSIReconciler) osht_Reconcile(ctx context.Context, req ctrl.Request) (reconcile.Result, error) {
+	reqLogger := r.Log.WithValues("Request.Namespace", req.Namespace, "Request.Name", req.Name)
 	reqLogger.Info("Reconciling IBMBlockCSI")
 
 	// Fetch the IBMBlockCSI instance
-	instance := ibmblockcsi.New(&csiv1.IBMBlockCSI{}, r.serverVersion)
+	instance := ibmblockcsi.New(&csiv1.IBMBlockCSI{}, r.ServerVersion)
 	//instance := &csiv1.IBMBlockCSI{}
 	err := r.Get(context.TODO(), req.NamespacedName, instance.Unwrap())
 	if err != nil {
@@ -180,13 +204,13 @@ func (r *IBMBlockCSIReconciler) Reconcile(req ctrl.Request) (reconcile.Result, e
 	}
 
 	// sync the resources which change over time
-	csiControllerSyncer := clustersyncer.NewCSIControllerSyncer(r, instance)
-	if err := syncer.Sync(context.TODO(), csiControllerSyncer, r.recorder); err != nil {
+	csiControllerSyncer := clustersyncer.NewCSIControllerSyncer(r.Client, r.Scheme, instance)
+	if err := syncer.Sync(context.TODO(), csiControllerSyncer, r.Recorder); err != nil {
 		return reconcile.Result{}, err
 	}
 
-	csiNodeSyncer := clustersyncer.NewCSINodeSyncer(r, instance, daemonSetRestartedKey, daemonSetRestartedValue)
-	if err := syncer.Sync(context.TODO(), csiNodeSyncer, r.recorder); err != nil {
+	csiNodeSyncer := clustersyncer.NewCSINodeSyncer(r.Client, r.Scheme, instance, daemonSetRestartedKey, daemonSetRestartedValue)
+	if err := syncer.Sync(context.TODO(), csiNodeSyncer, r.Recorder); err != nil {
 		return reconcile.Result{}, err
 	}
 
@@ -219,18 +243,18 @@ func getServerVersion() (string, error) {
 // SetupWithManager sets up the controller with the Manager.
 func (r *IBMBlockCSIReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	
-	serverVersion, err := getServerVersion()
-	if err != nil {
-		panic(err)
-	}
-
-	log.Info(fmt.Sprintf("Kubernetes Version: %s", serverVersion))
+	//serverVersion, err := getServerVersion()
+	//if err != nil {
+	//	panic(err)
+	//}
+//
+	//log.Info(fmt.Sprintf("Kubernetes Version: %s", serverVersion))
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&csiv1.IBMBlockCSI{}).
-		Owns(&appsv1.StatefulSet{}).
-		Owns(&appsv1.DaemonSet{}).
-		Owns(&corev1.ServiceAccount{}).
+		//Owns(&appsv1.StatefulSet{}).
+		//Owns(&appsv1.DaemonSet{}).
+		//Owns(&corev1.ServiceAccount{}).
 		Complete(r)
 }
 
