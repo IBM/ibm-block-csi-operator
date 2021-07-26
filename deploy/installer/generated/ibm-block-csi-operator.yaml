@@ -6,13 +6,6 @@ metadata:
     controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
   name: ibmblockcsis.csi.ibm.com
-  labels:
-    app.kubernetes.io/name: ibmblockcsis
-    app.kubernetes.io/instance: ibmblockcsis
-    app.kubernetes.io/managed-by: ibm-block-csi-operator
-    product: ibm-block-csi-driver
-    release: v1.7.0
-    csi: ibm
 spec:
   group: csi.ibm.com
   names:
@@ -1755,6 +1748,7 @@ rules:
   - volumeattachments/status
   verbs:
   - patch
+
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -1774,6 +1768,7 @@ subjects:
 - kind: ServiceAccount
   name: ibm-block-csi-operator
   namespace: default
+
 ---
 apiVersion: v1
 kind: ServiceAccount

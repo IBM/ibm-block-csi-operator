@@ -49,13 +49,27 @@ var _ = Describe("Controller", func() {
 			},
 			Spec: csiv1.IBMBlockCSISpec{
 				Controller: csiv1.IBMBlockCSIControllerSpec{
-					Repository:  "fake-controller-repo",
-					Tag:         "fake-controller-tag",
+					Repository: "fake-controller-repo",
+					Tag:        "fake-controller-tag",
 				},
 				Node: csiv1.IBMBlockCSINodeSpec{
-					Repository:  "fake-node-repo",
-					Tag:         "fake-node-tag",
+					Repository: "fake-node-repo",
+					Tag:        "fake-node-tag",
 				},
+				//Sidecars: []csiv1.CSISidecar{
+				//	{
+				//		Name:            "sidecar",
+				//		Repository:      "fake-controller-repo",
+				//		Tag:             "fake-controller-tag",
+				//		ImagePullPolicy: "IfNotPresent",
+				//	},
+				//	{
+				//		Name:            "sidecar2",
+				//		Repository:      "fake-controller-repo2",
+				//		Tag:             "fake-controller-tag2",
+				//		ImagePullPolicy: "IfNotPresent",
+				//	},
+				//},
 			},
 		}
 

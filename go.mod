@@ -18,13 +18,24 @@ require (
 	sigs.k8s.io/yaml v1.2.0
 )
 
-// Pinned to kubernetes-1.18.0
+// Pinned to kubernetes-1.20.2
 replace (
 	k8s.io/api => k8s.io/api v0.20.2
 	k8s.io/apimachinery => k8s.io/apimachinery v0.20.2
 	k8s.io/client-go => k8s.io/client-go v0.20.2
 	sigs.k8s.io/controller-runtime => sigs.k8s.io/controller-runtime v0.8.2
 )
+
+// Pinned to kubernetes-1.18.0
+//replace (
+//	github.com/Azure/go-autorest => github.com/Azure/go-autorest v12.2.0+incompatible
+//	k8s.io/api => k8s.io/api v0.18.0
+//	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.18.0
+//	k8s.io/apimachinery => k8s.io/apimachinery v0.18.0
+//	k8s.io/client-go => k8s.io/client-go v0.18.0
+//	k8s.io/cloud-provider => k8s.io/cloud-provider v0.18.0
+//	sigs.k8s.io/controller-runtime => sigs.k8s.io/controller-runtime v0.6.2
+//)
 
 replace (
 	// Indirect operator-sdk dependencies use git.apache.org, which is frequently

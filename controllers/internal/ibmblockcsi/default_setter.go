@@ -26,7 +26,7 @@ import (
 // Replace it with kubernetes native default setter when it is available.
 // https://kubernetes.io/docs/tasks/access-kubernetes-api/custom-resources/custom-resource-definitions/#defaulting
 func (c *IBMBlockCSI) SetDefaults() bool {
-	
+
 	c.setDefaultForNilSliceFields()
 
 	if c.isAnyUnofficialRepo() {

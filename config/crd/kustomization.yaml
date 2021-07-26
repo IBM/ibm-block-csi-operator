@@ -19,3 +19,8 @@ patchesStrategicMerge:
 # the following config is for teaching kustomize how to do kustomization for CRDs.
 configurations:
 - kustomizeconfig.yaml
+
+patches:
+# the following patch file adds labels to the operator ClusterRole definition in role.yaml
+# role.yaml is a generated file, and adding labels directly to the file does not work.
+- cainjection_in_ibmblockcsis.yaml

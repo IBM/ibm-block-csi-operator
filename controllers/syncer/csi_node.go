@@ -55,8 +55,8 @@ type csiNodeSyncer struct {
 }
 
 // NewCSINodeSyncer returns a syncer for CSI node
-func NewCSINodeSyncer(c client.Client, driver *ibmblockcsi.IBMBlockCSI, 
-	daemonSetRestartedKey string , daemonSetRestartedValue string) syncer.Interface {
+func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockcsi.IBMBlockCSI,
+	daemonSetRestartedKey string, daemonSetRestartedValue string) syncer.Interface {
 	obj := &appsv1.DaemonSet{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        config.GetNameForResource(config.CSINode, driver.Name),
@@ -76,7 +76,7 @@ func NewCSINodeSyncer(c client.Client, driver *ibmblockcsi.IBMBlockCSI,
 	})
 }
 
-func (s *csiNodeSyncer) SyncFn(daemonSetRestartedKey string , daemonSetRestartedValue string) error {
+func (s *csiNodeSyncer) SyncFn(daemonSetRestartedKey string, daemonSetRestartedValue string) error {
 	out := s.obj.(*appsv1.DaemonSet)
 
 	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCSINodeSelectorLabels())
@@ -98,7 +98,7 @@ func (s *csiNodeSyncer) ensurePodSpec() corev1.PodSpec {
 		Containers:         s.ensureContainersSpec(),
 		Volumes:            s.ensureVolumes(),
 		HostIPC:            true,
-		HostNetwork: 		true,
+		HostNetwork:        true,
 		ServiceAccountName: config.GetNameForResource(config.CSINodeServiceAccount, s.driver.Name),
 		Affinity:           s.driver.Spec.Node.Affinity,
 		Tolerations:        s.driver.Spec.Node.Tolerations,

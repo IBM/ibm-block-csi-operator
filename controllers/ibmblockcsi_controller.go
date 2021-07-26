@@ -69,8 +69,8 @@ type IBMBlockCSIReconciler struct {
 	client.Client
 	Scheme        *runtime.Scheme
 	Namespace     string
-	recorder      record.EventRecorder
-	serverVersion string
+	Recorder      record.EventRecorder
+	ServerVersion string
 }
 
 // the rbac rule requires an empty row at the end to render
@@ -99,13 +99,12 @@ type IBMBlockCSIReconciler struct {
 //+kubebuilder:rbac:groups=snapshot.storage.k8s.io,resources=volumesnapshotcontents,verbs=get;watch;list;create;update;delete
 //+kubebuilder:rbac:groups=snapshot.storage.k8s.io,resources=volumesnapshotcontents/status,verbs=update
 //+kubebuilder:rbac:groups=snapshot.storage.k8s.io,resources=volumesnapshots,verbs=get;watch;list;update
-
-func (r *IBMBlockCSIReconciler) Reconcile(req ctrl.Request) (reconcile.Result, error) {
+func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request) (reconcile.Result, error) {
 	reqLogger := log.WithValues("Request.Namespace", req.Namespace, "Request.Name", req.Name)
 	reqLogger.Info("Reconciling IBMBlockCSI")
 
 	// Fetch the IBMBlockCSI instance
-	instance := ibmblockcsi.New(&csiv1.IBMBlockCSI{}, r.serverVersion)
+	instance := ibmblockcsi.New(&csiv1.IBMBlockCSI{}, r.ServerVersion)
 	//instance := &csiv1.IBMBlockCSI{}
 	err := r.Get(context.TODO(), req.NamespacedName, instance.Unwrap())
 	if err != nil {
@@ -180,13 +179,13 @@ func (r *IBMBlockCSIReconciler) Reconcile(req ctrl.Request) (reconcile.Result, e
 	}
 
 	// sync the resources which change over time
-	csiControllerSyncer := clustersyncer.NewCSIControllerSyncer(r, instance)
-	if err := syncer.Sync(context.TODO(), csiControllerSyncer, r.recorder); err != nil {
+	csiControllerSyncer := clustersyncer.NewCSIControllerSyncer(r.Client, r.Scheme, instance)
+	if err := syncer.Sync(context.TODO(), csiControllerSyncer, r.Recorder); err != nil {
 		return reconcile.Result{}, err
 	}
 
-	csiNodeSyncer := clustersyncer.NewCSINodeSyncer(r, instance, daemonSetRestartedKey, daemonSetRestartedValue)
-	if err := syncer.Sync(context.TODO(), csiNodeSyncer, r.recorder); err != nil {
+	csiNodeSyncer := clustersyncer.NewCSINodeSyncer(r.Client, r.Scheme, instance, daemonSetRestartedKey, daemonSetRestartedValue)
+	if err := syncer.Sync(context.TODO(), csiNodeSyncer, r.Recorder); err != nil {
 		return reconcile.Result{}, err
 	}
 
@@ -218,7 +217,7 @@ func getServerVersion() (string, error) {
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *IBMBlockCSIReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	
+
 	serverVersion, err := getServerVersion()
 	if err != nil {
 		panic(err)
@@ -281,8 +280,11 @@ func (r *IBMBlockCSIReconciler) removeFinalizer(instance *ibmblockcsi.IBMBlockCS
 
 func (r *IBMBlockCSIReconciler) getAccessorAndFinalizerName(instance *ibmblockcsi.IBMBlockCSI) (metav1.Object, string, error) {
 	logger := log.WithName("getAccessorAndFinalizerName")
+	test := instance.GetObjectKind()
+	fmt.Println(test)
 	lowercaseKind := strings.ToLower(instance.GetObjectKind().GroupVersionKind().Kind)
 	finalizerName := fmt.Sprintf("%s.%s", lowercaseKind, oconfig.APIGroup)
+	//	finalizerName := fmt.Sprintf("ibmblockcsi.%s", oconfig.APIGroup)
 
 	accessor, err := meta.Accessor(instance)
 	if err != nil {
@@ -366,8 +368,8 @@ func (r *IBMBlockCSIReconciler) restartControllerPod(logger logr.Logger, instanc
 	}
 
 	logger.Info("controller requires restart",
-	"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
-	"Replicas", controllerStatefulset.Status.Replicas)
+		"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
+		"Replicas", controllerStatefulset.Status.Replicas)
 	logger.Info("restarting csi controller")
 
 	err = r.getControllerPod(controllerStatefulset, controllerPod)
@@ -381,13 +383,13 @@ func (r *IBMBlockCSIReconciler) restartControllerPod(logger logr.Logger, instanc
 	return r.restartControllerPodfromStatefulSet(logger, controllerStatefulset, controllerPod)
 }
 
-func (r *IBMBlockCSIReconciler) restartControllerPodfromStatefulSet(logger logr.Logger, 
+func (r *IBMBlockCSIReconciler) restartControllerPodfromStatefulSet(logger logr.Logger,
 	controllerStatefulset *appsv1.StatefulSet, controllerPod *corev1.Pod) error {
 	logger.Info("controller requires restart",
-	"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
-	"Replicas", controllerStatefulset.Status.Replicas)
+		"ReadyReplicas", controllerStatefulset.Status.ReadyReplicas,
+		"Replicas", controllerStatefulset.Status.Replicas)
 	logger.Info("restarting csi controller")
-	
+
 	return r.Delete(context.TODO(), controllerPod)
 }
 
@@ -477,7 +479,7 @@ func (r *IBMBlockCSIReconciler) reconcileServiceAccount(instance *ibmblockcsi.IB
 			}
 			if nodeServiceAccountName == sa.Name {
 				logger.Info("node rollout requires restart",
-					"DesiredNumberScheduled", nodeDaemonSet.Status.DesiredNumberScheduled,				
+					"DesiredNumberScheduled", nodeDaemonSet.Status.DesiredNumberScheduled,
 					"NumberAvailable", nodeDaemonSet.Status.NumberAvailable)
 				logger.Info("csi node stopped being ready - restarting it")
 				rErr := r.rolloutRestartNode(nodeDaemonSet)

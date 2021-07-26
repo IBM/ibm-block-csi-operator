@@ -25,7 +25,7 @@ const (
 	ProductName = "ibm-block-csi-driver"
 	Masterlabel = "node-role.kubernetes.io/master"
 
-	NodeAgentRepository  = "ibmcom/ibm-node-agent"
+	NodeAgentRepository = "ibmcom/ibm-node-agent"
 
 	ENVIscsiAgentPort = "ISCSI_AGENT_PORT"
 	ENVEndpoint       = "ENDPOINT"

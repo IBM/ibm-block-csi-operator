@@ -45,10 +45,10 @@ import (
 )
 
 var (
-	scheme   			 = runtime.NewScheme()
-	setupLog 			 = ctrl.Log.WithName("setup")
+	scheme               = runtime.NewScheme()
+	setupLog             = ctrl.Log.WithName("setup")
 	watchNamespaceEnvVar = "WATCH_NAMESPACE"
-	topologyPrefixes	 = [...]string{"topology.kubernetes.io", "topology.block.csi.ibm.com"}
+	topologyPrefixes     = [...]string{"topology.kubernetes.io", "topology.block.csi.ibm.com"}
 )
 
 var log = logf.Log.WithName("cmd")
@@ -96,7 +96,7 @@ func main() {
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "csi.ibm.com",
-		Namespace:               namespace,
+		Namespace:              namespace,
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
@@ -104,15 +104,15 @@ func main() {
 	}
 
 	if err = (&controllers.IBMBlockCSIReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-		Namespace:     namespace,
+		Client:    mgr.GetClient(),
+		Scheme:    mgr.GetScheme(),
+		Namespace: namespace,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "IBMBlockCSI")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder
-	
+
 	ctx := context.TODO()
 	topologyEnabled, err := IsTopologyInUse(ctx)
 	if err != nil {
@@ -129,11 +129,11 @@ func main() {
 }
 
 func getWatchNamespace() (string, error) {
-    ns, found := os.LookupEnv(watchNamespaceEnvVar)
-    if !found {
-        return "", fmt.Errorf("%s must be set", watchNamespaceEnvVar)
-    }
-    return ns, nil
+	ns, found := os.LookupEnv(watchNamespaceEnvVar)
+	if !found {
+		return "", fmt.Errorf("%s must be set", watchNamespaceEnvVar)
+	}
+	return ns, nil
 }
 
 func IsTopologyInUse(ctx context.Context) (bool, error) {

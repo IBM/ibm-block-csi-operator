@@ -46,7 +46,7 @@ var DefaultCr v1.IBMBlockCSI
 var DefaultSidecarsByName map[string]v1.CSISidecar
 
 var OfficialRegistriesUsernames = sets.NewString(IBMRegistryUsername, K8SRegistryUsername,
-	                                             QuayRegistryUsername, RedHatRegistryUsername)
+	QuayRegistryUsername, RedHatRegistryUsername)
 
 func LoadDefaultsOfIBMBlockCSI() error {
 	crYamlPath := os.Getenv(EnvNameCrYaml)

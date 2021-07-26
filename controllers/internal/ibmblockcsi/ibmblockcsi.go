@@ -68,7 +68,7 @@ func (c *IBMBlockCSI) GetLabels() labels.Set {
 }
 
 // GetAnnotations returns all the annotations to be set on all resources
-func (c *IBMBlockCSI) GetAnnotations(daemonSetRestartedKey string , daemonSetRestartedValue string) labels.Set {
+func (c *IBMBlockCSI) GetAnnotations(daemonSetRestartedKey string, daemonSetRestartedValue string) labels.Set {
 	labels := labels.Set{
 		"productID":      config.ProductName,
 		"productName":    config.ProductName,
@@ -83,7 +83,7 @@ func (c *IBMBlockCSI) GetAnnotations(daemonSetRestartedKey string , daemonSetRes
 		}
 	}
 
-	if !labels.Has(daemonSetRestartedKey) && daemonSetRestartedKey != ""{
+	if !labels.Has(daemonSetRestartedKey) && daemonSetRestartedKey != "" {
 		labels[daemonSetRestartedKey] = daemonSetRestartedValue
 	}
 
