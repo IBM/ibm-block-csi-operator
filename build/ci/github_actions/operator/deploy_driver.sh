@@ -28,14 +28,18 @@ edit_cr_images (){
 
 edit_cr_images
 
-cd $(dirname $operator_file)
-operator_image_in_branch=`yq eval '(.spec.template.spec.containers[0].image | select(. == "*ibmcom*"))' $(basename $operator_file)`
-sed -i "s+$operator_image_in_branch+$operator_image_for_test+g" $(basename $operator_file)
+edit_operator_yaml_image (){
+  cd $(dirname $operator_yaml)
+  operator_image_in_branch=`yq eval '(.spec.template.spec.containers[0].image | select(. == "*ibmcom*"))' $(basename $operator_yaml)`
+  sed -i "s+$operator_image_in_branch+$operator_image_for_test+g" $(basename $operator_yaml)
 cd -
+}
 
-cat $operator_file | grep image:
+edit_operator_yaml_image
+
+cat $operator_yaml | grep image:
 cat $cr_file | grep repository:
 cat $cr_file | grep tag:
 
-kubectl apply -f $operator_file
+kubectl apply -f $operator_yaml
 kubectl apply -f $cr_file

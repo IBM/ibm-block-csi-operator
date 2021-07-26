@@ -162,11 +162,11 @@ jobs:
         env:
           driver_images_tag: "${{ steps.driver_github_branch.outputs.docker_image_branch_tag }}"
           operator_image_tag_for_test: "${{ needs.CSI-Build-and-push-images.outputs.operator_image_tag_for_test }}"
-          operator_file: "deploy/installer/generated/ibm-block-csi-operator.yaml"
+          operator_yaml: "deploy/installer/generated/ibm-block-csi-operator.yaml"
           cr_file: "deploy/crds/csi.ibm.com_v1_ibmblockcsi_cr.yaml"
       - name: Wait for csi ibm block driver to be ready
         run: |
-          build/ci/github_actions/operator/wait_for_driver_to_be_ready.sh
+          build/ci/github_actions/operator/wait_for_driver_ready.sh
       - name: Save driver pods logs
         if: always()
         run: |
