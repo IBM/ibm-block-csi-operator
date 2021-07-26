@@ -62,14 +62,12 @@ var log = logf.Log.WithName("ibmblockcsi_controller")
 
 type reconciler func(instance *ibmblockcsi.IBMBlockCSI) error
 
-
-
 // IBMBlockCSIReconciler reconciles a IBMBlockCSI object
 type IBMBlockCSIReconciler struct {
 	// This client, initialized using mgr.Client() above, is a split client
 	// that reads objects from the cache and writes to the apiserver
 	client.Client
-	Log          logr.Logger
+	Log           logr.Logger
 	Scheme        *runtime.Scheme
 	Namespace     string
 	Recorder      record.EventRecorder
@@ -108,7 +106,6 @@ func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 	// Fetch the IBMBlockCSI instance
 	instance := ibmblockcsi.New(&csiv1.IBMBlockCSI{}, r.ServerVersion)
-	//instance := &csiv1.IBMBlockCSI{}
 	err := r.Get(context.TODO(), req.NamespacedName, instance.Unwrap())
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -230,9 +227,9 @@ func (r *IBMBlockCSIReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&csiv1.IBMBlockCSI{}).
-		//Owns(&appsv1.StatefulSet{}).
-		//Owns(&appsv1.DaemonSet{}).
-		//Owns(&corev1.ServiceAccount{}).
+		Owns(&appsv1.StatefulSet{}).
+		Owns(&appsv1.DaemonSet{}).
+		Owns(&corev1.ServiceAccount{}).
 		Complete(r)
 }
 
@@ -283,11 +280,14 @@ func (r *IBMBlockCSIReconciler) removeFinalizer(instance *ibmblockcsi.IBMBlockCS
 
 func (r *IBMBlockCSIReconciler) getAccessorAndFinalizerName(instance *ibmblockcsi.IBMBlockCSI) (metav1.Object, string, error) {
 	logger := log.WithName("getAccessorAndFinalizerName")
-	test := instance.GetObjectKind()
-	fmt.Println(test)
-	lowercaseKind := strings.ToLower(instance.GetObjectKind().GroupVersionKind().Kind)
-	finalizerName := fmt.Sprintf("%s.%s", lowercaseKind, oconfig.APIGroup)
-	//	finalizerName := fmt.Sprintf("ibmblockcsi.%s", oconfig.APIGroup)
+	//test := instance.GetObjectKind()
+	//fmt.Println("matan")
+	//fmt.Println(instance.GetObjectKind())
+	//gvk, err := apiutil.GVKForObject(instance, r.Scheme)
+	//fmt.Println(gvk.Kind)
+	//lowercaseKind := strings.ToLower(instance.GetObjectKind().GroupVersionKind().Kind)
+	//finalizerName := fmt.Sprintf("%s.%s", lowercaseKind, oconfig.APIGroup)
+	finalizerName := fmt.Sprintf("ibmblockcsi.%s", oconfig.APIGroup)
 
 	accessor, err := meta.Accessor(instance)
 	if err != nil {

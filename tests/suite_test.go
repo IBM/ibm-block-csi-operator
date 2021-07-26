@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/IBM/ibm-block-csi-operator/controllers"
+	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -37,7 +38,7 @@ import (
 	//+kubebuilder:scaffold:imports
 )
 
-const controllerName = "ibmblockcsi-controller"
+//const controllerName = "ibmblockcsi-controller"
 
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
@@ -97,18 +98,18 @@ var _ = BeforeSuite(func() {
 
 	//err = controllers.Add(mgr)
 	err = (&controllers.IBMBlockCSIReconciler{
-		Client:        k8sClient,
-		Scheme:        scheme.Scheme,
-		Namespace:     "default",
-		ServerVersion: "1.20",
-		Recorder:      mgr.GetEventRecorderFor(controllerName),
+		Client:    k8sClient,
+		Scheme:    scheme.Scheme,
+		Namespace: "default",
+		//ServerVersion: "1.20",
+		//Recorder:      mgr.GetEventRecorderFor(controllerName),
 	}).SetupWithManager(mgr)
 	Expect(err).ToNot(HaveOccurred())
-	
-	//go func() {
-	//	err = mgr.Start(ctrl.SetupSignalHandler())
-	//	Expect(err).ToNot(HaveOccurred())
-	//}()
+
+	go func() {
+		err = mgr.Start(ctrl.SetupSignalHandler())
+		Expect(err).ToNot(HaveOccurred())
+	}()
 
 }, 60)
 

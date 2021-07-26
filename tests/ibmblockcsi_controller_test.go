@@ -18,7 +18,6 @@ package controllers_test
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
@@ -56,20 +55,44 @@ var _ = Describe("Controller", func() {
 					Repository: "fake-node-repo",
 					Tag:        "fake-node-tag",
 				},
-				//Sidecars: []csiv1.CSISidecar{
-				//	{
-				//		Name:            "sidecar",
-				//		Repository:      "fake-controller-repo",
-				//		Tag:             "fake-controller-tag",
-				//		ImagePullPolicy: "IfNotPresent",
-				//	},
-				//	{
-				//		Name:            "sidecar2",
-				//		Repository:      "fake-controller-repo2",
-				//		Tag:             "fake-controller-tag2",
-				//		ImagePullPolicy: "IfNotPresent",
-				//	},
-				//},
+				Sidecars: []csiv1.CSISidecar{
+					{
+						Name:            "csi-node-driver-registrar",
+						Repository:      "fake-registrar-repo",
+						Tag:             "fake-registrar-tag",
+						ImagePullPolicy: "IfNotPresent",
+					},
+					//{
+					//	Name:            "csi-provisioner",
+					//	Repository:      "k8s.gcr.io/sig-storage/csi-provisioner",
+					//	Tag:             "v2.1.0",
+					//	ImagePullPolicy: "IfNotPresent",
+					//},
+					//{
+					//	Name:            "csi-attacher",
+					//	Repository:      "k8s.gcr.io/sig-storage/csi-attacher",
+					//	Tag:             "v3.1.0",
+					//	ImagePullPolicy: "IfNotPresent",
+					//},
+					//{
+					//	Name:            "csi-snapshotter",
+					//	Repository:      "k8s.gcr.io/sig-storage/csi-snapshotter",
+					//	Tag:             "v3.0.2",
+					//	ImagePullPolicy: "IfNotPresent",
+					//},
+					//{
+					//	Name:            "csi-resizer",
+					//	Repository:      "k8s.gcr.io/sig-storage/csi-resizer",
+					//	Tag:             "v1.1.0",
+					//	ImagePullPolicy: "IfNotPresent",
+					//},
+					{
+						Name:            "livenessprobe",
+						Repository:      "fake-livenessprobe-repo",
+						Tag:             "fake-livenessprobe-repo",
+						ImagePullPolicy: "IfNotPresent",
+					},
+				},
 			},
 		}
 
@@ -81,10 +104,9 @@ var _ = Describe("Controller", func() {
 
 			It("should create all the relevant objects", func(done Done) {
 				err := k8sClient.Create(context.Background(), ibc)
-				Ω(err).ShouldNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 
 				found := &csiv1.IBMBlockCSI{}
-				fmt.Println(found)
 				key := types.NamespacedName{
 					Name:      ibcName,
 					Namespace: ns,
