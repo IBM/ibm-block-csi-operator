@@ -22,7 +22,6 @@ import (
 	"testing"
 
 	"github.com/IBM/ibm-block-csi-operator/controllers"
-	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -105,11 +104,11 @@ var _ = BeforeSuite(func() {
 		Recorder:      mgr.GetEventRecorderFor(controllerName),
 	}).SetupWithManager(mgr)
 	Expect(err).ToNot(HaveOccurred())
-
-	go func() {
-		err = mgr.Start(ctrl.SetupSignalHandler())
-		Expect(err).ToNot(HaveOccurred())
-	}()
+	
+	//go func() {
+	//	err = mgr.Start(ctrl.SetupSignalHandler())
+	//	Expect(err).ToNot(HaveOccurred())
+	//}()
 
 }, 60)
 

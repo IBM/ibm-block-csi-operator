@@ -62,11 +62,14 @@ var log = logf.Log.WithName("ibmblockcsi_controller")
 
 type reconciler func(instance *ibmblockcsi.IBMBlockCSI) error
 
+
+
 // IBMBlockCSIReconciler reconciles a IBMBlockCSI object
 type IBMBlockCSIReconciler struct {
 	// This client, initialized using mgr.Client() above, is a split client
 	// that reads objects from the cache and writes to the apiserver
 	client.Client
+	Log          logr.Logger
 	Scheme        *runtime.Scheme
 	Namespace     string
 	Recorder      record.EventRecorder
@@ -227,9 +230,9 @@ func (r *IBMBlockCSIReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&csiv1.IBMBlockCSI{}).
-		Owns(&appsv1.StatefulSet{}).
-		Owns(&appsv1.DaemonSet{}).
-		Owns(&corev1.ServiceAccount{}).
+		//Owns(&appsv1.StatefulSet{}).
+		//Owns(&appsv1.DaemonSet{}).
+		//Owns(&corev1.ServiceAccount{}).
 		Complete(r)
 }
 
