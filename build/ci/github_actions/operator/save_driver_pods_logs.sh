@@ -9,7 +9,8 @@ run_action_on_pod (){
     pod_type=$1
     action=$2
     extra_args=$3
-    kubectl $action $(get_all_pods_by_type $pod_type) $extra_args > "/tmp/driver_$(get_all_pods_by_type $pod_type)_${action}.txt"
+    get_all_pods_by_type=$(get_all_pods_by_type $pod_type)
+    kubectl $action $get_all_pods_by_type $extra_args > "/tmp/driver_${get_all_pods_by_type}_${action}.txt"
 
 }
 

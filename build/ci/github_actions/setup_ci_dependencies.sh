@@ -12,11 +12,17 @@ yq() {
 }
 EOL
 
+# CSI-3173 - move image_version value into a common config file
 image_version=`cat version/version.go | grep -i driverversion | awk -F = '{print $2}'`
 image_version=`echo ${image_version//\"}`
-# CSI-3173 - move image_version value into a common config file
-operator_image_tag_for_test=`build/ci/get_image_tags_from_branch.sh ${image_version} ${build_number} ${CI_ACTION_REF_NAME}`
-docker_image_branch_tag=`echo $operator_image_tag_for_test | awk '{print$2}'`
-operator_image_tag_for_test=`echo $operator_image_tag_for_test | awk '{print$1}'`
+GITHUB_SHA=${GITHUB_SHA:0:7}_
+operator_image_tags_for_test=`build/ci/get_image_tags_from_branch.sh ${CI_ACTION_REF_NAME} ${image_version} ${build_number} ${GITHUB_SHA}`
+docker_image_branch_tag=`echo $operator_image_tags_for_test | awk '{print$2}'`
+operator_image_tag_for_test=`echo $operator_image_tags_for_test | awk '{print$1}'`
+
+if [ "$docker_image_branch_tag" == "develop" ]; then
+  docker_image_branch_tag=latest
+fi
+
 echo "::set-output name=docker_image_branch_tag::${docker_image_branch_tag}"
 echo "::set-output name=operator_image_tag_for_test::${operator_image_tag_for_test}"

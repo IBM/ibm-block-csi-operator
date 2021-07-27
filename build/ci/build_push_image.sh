@@ -9,7 +9,7 @@ done
 NODE_IMAGE=ibm-node-agent
 
 # Prepare specific tag for the image
-tags=`build/ci/get_image_tags_from_branch.sh ${IMAGE_VERSION} ${BUILD_NUMBER} ${GIT_BRANCH}`
+tags=`build/ci/get_image_tags_from_branch.sh ${GIT_BRANCH} ${IMAGE_VERSION} ${BUILD_NUMBER}`
 specific_tag=`echo $tags | awk '{print$1}'`
 
 # Set latest tag only if its from develop branch or master and prepare tags
