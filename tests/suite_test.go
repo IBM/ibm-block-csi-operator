@@ -96,7 +96,6 @@ var _ = BeforeSuite(func() {
 	})
 	Expect(err).ToNot(HaveOccurred())
 
-	//err = controllers.Add(mgr)
 	err = (&controllers.IBMBlockCSIReconciler{
 		Client:    k8sClient,
 		Scheme:    scheme.Scheme,
