@@ -125,6 +125,7 @@ jobs:
       controller_repository_for_test: csiblock1/ibm-block-csi-controller
       node_repository_for_test: csiblock1/ibm-block-csi-node
       operator_image_repository_for_test: csiblock1/ibm-block-csi-operator
+      operator_image_tag_for_test: "${{ needs.CSI-Build-and-push-images.outputs.operator_image_tag_for_test }}"
     timeout-minutes: 7
     steps:
       - name: Checkout
@@ -161,7 +162,6 @@ jobs:
           build/ci/github_actions/operator/deploy_driver.sh
         env:
           driver_images_tag: "${{ steps.driver_github_branch.outputs.docker_image_branch_tag }}"
-          operator_image_tag_for_test: "${{ needs.CSI-Build-and-push-images.outputs.operator_image_tag_for_test }}"
           operator_yaml: "deploy/installer/generated/ibm-block-csi-operator.yaml"
           cr_file: "deploy/crds/csi.ibm.com_v1_ibmblockcsi_cr.yaml"
       - name: Wait for csi ibm block driver to be ready
