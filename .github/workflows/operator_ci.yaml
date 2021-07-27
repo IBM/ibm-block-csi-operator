@@ -167,6 +167,8 @@ jobs:
       - name: Wait for csi ibm block driver to be ready
         run: |
           build/ci/github_actions/operator/wait_for_driver_ready.sh
+        env:
+          driver_images_tag: "${{ steps.driver_github_branch.outputs.docker_image_branch_tag }}"
       - name: Save driver pods logs
         if: always()
         run: |

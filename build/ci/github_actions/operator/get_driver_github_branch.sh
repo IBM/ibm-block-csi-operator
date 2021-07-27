@@ -29,4 +29,4 @@ if [ $is_controller_docker_image_has_tag == "true" ] && [ $is_node_docker_image_
   operator_branch=$target_image_tag
 fi
 
-echo "::set-output name=docker_image_branch_tag::${docker_image_branch_tag}"
+echo "::set-output name=docker_image_branch_tag::${operator_branch}"
