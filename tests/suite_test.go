@@ -64,11 +64,6 @@ var _ = BeforeSuite(func() {
 	Expect(os.Setenv(config.ENVKubeVersion, kubeVersion)).To(Succeed())
 	Expect(os.Setenv(config.ENVIscsiAgentPort, nodeAgentPort)).To(Succeed())
 	Expect(os.Setenv(config.ENVEndpoint, storageAgentAddress)).To(Succeed())
-	//Expect(os.Setenv("TEST_ASSET_KUBE_APISERVER", "../../testbin/kube-apiserver")).To(Succeed())
-	//Expect(os.Setenv("TEST_ASSET_ETCD", "../../testbin/etcd")).To(Succeed())
-	//Expect(os.Setenv("TEST_ASSET_KUBECTL", "../../testbin/kubectl")).To(Succeed())
-	//fmt.Println("hi")
-	//Fail("jkj")
 
 	logf.SetLogger(zap.New(zap.WriteTo(GinkgoWriter), zap.UseDevMode(true)))
 
@@ -100,8 +95,6 @@ var _ = BeforeSuite(func() {
 		Client:    k8sClient,
 		Scheme:    scheme.Scheme,
 		Namespace: "default",
-		//ServerVersion: "1.20",
-		//Recorder:      mgr.GetEventRecorderFor(controllerName),
 	}).SetupWithManager(mgr)
 	Expect(err).ToNot(HaveOccurred())
 
@@ -119,7 +112,4 @@ var _ = AfterSuite(func() {
 	Expect(os.Unsetenv(config.ENVKubeVersion)).To(Succeed())
 	Expect(os.Unsetenv(config.ENVIscsiAgentPort)).To(Succeed())
 	Expect(os.Unsetenv(config.ENVEndpoint)).To(Succeed())
-	//Expect(os.Unsetenv("TEST_ASSET_KUBE_APISERVER")).To(Succeed())
-	//Expect(os.Unsetenv("TEST_ASSET_ETCD")).To(Succeed())
-	//Expect(os.Unsetenv("TEST_ASSET_KUBECTL")).To(Succeed())
 })
