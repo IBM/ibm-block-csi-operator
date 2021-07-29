@@ -43,7 +43,7 @@ wait_for_driver_deployment_to_finish (){
   done
 }
 
-is_wanted_image_in_pod (){
+is_expected_image_in_pod (){
   pod_type=$1
   wanted_pod_image=$2
   image_in_pod=`kubectl describe pod $(get_csi_pods | grep $pod_type) | grep -i image: | \
