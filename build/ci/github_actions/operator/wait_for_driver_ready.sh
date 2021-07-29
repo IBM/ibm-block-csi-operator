@@ -46,24 +46,25 @@ wait_for_driver_deployment_to_finish (){
 is_wanted_image_in_pod (){
   pod_type=$1
   wanted_pod_image=$2
-  image_in_pod=`kubectl describe pod $(get_csi_pods | grep $pod_type) | -i image: | grep $wanted_pod_image | awk -F Image: '{print$2}' | awk '{print$1}'`
+  image_in_pod=`kubectl describe pod $(get_csi_pods | grep $pod_type) | grep -i image: | \
+   grep $wanted_pod_image | awk -F Image: '{print$2}' | awk '{print$1}'`
   if [[ $image_in_pod != $wanted_pod_image ]]; then
     echo "$pod_type's image is not the wanted image ($wanted_pod_image)"
     exit 1
   fi
 }
 
-check_the_pods_images (){
-  wanted_node_image=$node_repository_for_test:$driver_images_tag
-  wanted_controller_image=$controller_repository_for_test:$driver_images_tag
-  wanted_operator_image=$operator_image_repository_for_test:$operator_image_tag_for_test
-  is_wanted_image_in_pod "operator" $wanted_operator_image
-  is_wanted_image_in_pod "controller" $wanted_controller_image
-  is_wanted_image_in_pod "node" $wanted_node_image
+chec_pods_images (){
+  expected_node_image=$node_repository_for_test:$driver_images_tag
+  expected_controller_image=$controller_repository_for_test:$driver_images_tag
+  expected_operator_image=$operator_image_repository_for_test:$operator_image_tag_for_test
+  is_expected_image_in_pod "operator" $wanted_operator_image
+  is_expected_image_in_pod "controller" $wanted_controller_image
+  is_expected_image_in_pod "node" $wanted_node_image
 }
 
 wait_for_driver_deployment_to_start
 wait_for_driver_deployment_to_finish
-check_the_pods_images
+chec_pods_images
 echo Driver is running
 get_csi_pods

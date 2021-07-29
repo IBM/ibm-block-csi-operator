@@ -5,12 +5,12 @@ get_all_pods_by_type (){
     kubectl get pod -l csi | grep $pod_type | awk '{print$1}'
 }
 
-run_action_on_pod (){
+save_action_output (){
     pod_type=$1
     action=$2
     extra_args=$3
-    get_all_pods_by_type=$(get_all_pods_by_type $pod_type)
-    kubectl $action $get_all_pods_by_type $extra_args > "/tmp/driver_${get_all_pods_by_type}_${action}.txt"
+    pod_names=$(get_all_pods_by_type $pod_type)
+    kubectl $action $pod_names $extra_args > "/tmp/driver_${pod_names}_${action}.txt"
 
 }
 
@@ -22,6 +22,6 @@ declare -a pod_types=(
 
 for pod_type in "${pod_types[@]}"
 do
-    run_action_on_pod $pod_type logs "-c ibm-block-csi-$pod_type"
-    run_action_on_pod $pod_type "describe pod" ""
+    save_action_output $pod_type logs "-c ibm-block-csi-$pod_type"
+    save_action_output $pod_type "describe pod" ""
 done
