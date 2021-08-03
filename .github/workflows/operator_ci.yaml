@@ -10,7 +10,7 @@ on:
       - master
 jobs:
   Prepare_env:
-   name: "prepare env"
+   name: "Prepare env"
    runs-on: ubuntu-latest
    steps:
       - name: Checkout code
@@ -38,7 +38,7 @@ jobs:
             /home/runner/.bash_profile
           retention-days: 1
    outputs:
-     docker_image_branch_tag: "${{ steps.setup_dependencies.outputs.docker_image_branch_tag }}"
+     image_branch_tag: "${{ steps.setup_dependencies.outputs.image_branch_tag }}"
      operator_image_tag_for_test: "${{ steps.setup_dependencies.outputs.operator_image_tag_for_test }}"
 
   Unit_testing:
@@ -62,7 +62,7 @@ jobs:
         run: |
           ./build/ci/run_olm_validation.sh
           
-  CSI-Build-and-push-images:
+  CSI_Build_and_push_images:
     name: "CSI Build and push images"
     runs-on: ubuntu-latest
     needs:
@@ -101,7 +101,7 @@ jobs:
           push: true
           tags: |
             csiblock1/ibm-block-csi-${{ matrix.image_type }}:${{ needs.Prepare_env.outputs.operator_image_tag_for_test }}
-            csiblock1/ibm-block-csi-${{ matrix.image_type }}:${{ needs.Prepare_env.outputs.docker_image_branch_tag }}
+            csiblock1/ibm-block-csi-${{ matrix.image_type }}:${{ needs.Prepare_env.outputs.image_branch_tag }}
             csiblock1/ibm-block-csi-${{ matrix.image_type }}:latest
           file: build/Dockerfile.${{ matrix.image_type }}
           cache-from: type=local,src=/tmp/.buildx-${{ matrix.image_type }}
@@ -116,7 +116,7 @@ jobs:
     outputs:
       operator_image_tag_for_test: "${{ needs.Prepare_env.outputs.operator_image_tag_for_test }}"
 
-  Create-cluster:
+  Create_cluster:
     runs-on: ubuntu-latest
     name: "Create cluster"
     needs: CSI-Build-and-push-images
@@ -126,6 +126,7 @@ jobs:
       node_repository_for_test: csiblock1/ibm-block-csi-node
       operator_image_repository_for_test: csiblock1/ibm-block-csi-operator
       operator_image_tag_for_test: "${{ needs.CSI-Build-and-push-images.outputs.operator_image_tag_for_test }}"
+      operator_image_for_test: "csiblock1/ibm-block-csi-operator:${{ needs.CSI-Build-and-push-images.outputs.operator_image_tag_for_test }}"
     timeout-minutes: 7
     steps:
       - name: Checkout
@@ -144,8 +145,8 @@ jobs:
         with:
           path: ${{ env.pythonLocation }}
           key: ${{ env.pythonLocation }}-${{ hashFiles('dev-requirements.txt') }}
-      - name: Get the driver github branch
-        id: driver_github_branch
+      - name: Get driver branch
+        id: driver_branch
         run: |
           build/ci/github_actions/operator/get_driver_branch_tag.sh
         env:
@@ -161,18 +162,18 @@ jobs:
         run: |
           build/ci/github_actions/operator/deploy_driver.sh
         env:
-          driver_images_tag: "${{ steps.driver_github_branch.outputs.docker_image_branch_tag }}"
+          driver_images_tag: "${{ steps.driver_branch.outputs.image_branch_tag }}"
           operator_yaml: "deploy/installer/generated/ibm-block-csi-operator.yaml"
           cr_file: "deploy/crds/csi.ibm.com_v1_ibmblockcsi_cr.yaml"
       - name: Wait for csi ibm block driver to be ready
         run: |
           build/ci/github_actions/operator/wait_for_driver_ready.sh
         env:
-          driver_images_tag: "${{ steps.driver_github_branch.outputs.docker_image_branch_tag }}"
-      - name: Save driver pods logs
+          driver_images_tag: "${{ steps.driver_branch.outputs.image_branch_tag }}"
+      - name: Save driver pods logs to artifacts
         if: always()
         run: |
-          build/ci/github_actions/operator/save_driver_pods_logs.sh
+          build/ci/github_actions/operator/save_driver_logs_to_artifacts.sh
       - name: Upload driver pods logs
         if: always()
         uses: actions/upload-artifact@v2
