@@ -10,9 +10,7 @@ install_ci_dependencies (){
 install_ci_dependencies
 cat >>/home/runner/.bash_profile <<'EOL'
 yq() {
-  docker run --rm -e operator_image_for_test=$operator_image_for_test\
-                  -e cr_image_value=$cr_image_value\
-                  -i -v "${PWD}":/workdir mikefarah/yq "$@"
+  docker run --rm -i -v "${PWD}":/workdir mikefarah/yq "$@"
 }
 EOL
 
