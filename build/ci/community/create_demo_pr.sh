@@ -26,13 +26,13 @@ create_demo_pr(){
   if [[ "`eval $repo_pr`" == *"$community_operators_branch"* ]]; then
     gh pr close $community_operators_branch --delete-branch --repo $forked_repository
   fi
-  git checkout master
+  git checkout main
   git checkout -b $community_operators_branch
   yes | cp -r $repository_path/deploy/olm-catalog/ibm-block-csi-operator-community/ $dest_path
   git add .
   git commit --signoff -m "build number $github_build_number $cluster_kind"
   git push origin $community_operators_branch
-  gh pr create --title "IBM Block CSI update $cluster_kind" --repo $forked_repository --base master --head $community_operators_branch --body "pr check"
+  gh pr create --title "IBM Block CSI update $cluster_kind" --repo $forked_repository --base main --head $community_operators_branch --body "pr check"
   cd -
 }
 
@@ -45,8 +45,8 @@ update_community_operators_fork (){
   cd $forked_repository-fork
   git remote set-url origin https://csiblock:$github_token@github.com/$forked_repository.git
   git fetch upstream
-  git rebase upstream/master
-  git push origin master --force
+  git rebase upstream/main
+  git push origin main --force
   cd -
 }
 
