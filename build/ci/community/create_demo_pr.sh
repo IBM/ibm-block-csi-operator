@@ -33,7 +33,7 @@ create_demo_pr(){
   git commit --signoff -m "build number $github_build_number $cluster_kind"
   git push origin $community_operators_branch
   gh pr create --title "IBM Block CSI update $cluster_kind" --repo $forked_repository --base master --head $community_operators_branch --body "pr check"
-  cd ..
+  cd -
 }
 
 update_community_operators_fork (){
@@ -47,7 +47,7 @@ update_community_operators_fork (){
   git fetch upstream
   git rebase upstream/master
   git push origin master --force
-  cd ..
+  cd -
 }
 
 edit_operator_image_in_csv_yaml_file
