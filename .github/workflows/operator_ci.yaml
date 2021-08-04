@@ -119,14 +119,14 @@ jobs:
   Create_cluster:
     runs-on: ubuntu-latest
     name: "Create cluster"
-    needs: CSI-Build-and-push-images
+    needs: CSI_Build_and_push_images
     env:
       csiblock_dockerhub_password: ${{ secrets.CSIBLOCK_DOCKERHUB_PASSWORD }}
       controller_repository_for_test: csiblock1/ibm-block-csi-controller
       node_repository_for_test: csiblock1/ibm-block-csi-node
       operator_image_repository_for_test: csiblock1/ibm-block-csi-operator
-      operator_specific_tag_for_test: "${{ needs.CSI-Build-and-push-images.outputs.operator_specific_tag_for_test }}"
-      operator_image_for_test: "csiblock1/ibm-block-csi-operator:${{ needs.CSI-Build-and-push-images.outputs.operator_specific_tag_for_test }}"
+      operator_specific_tag_for_test: "${{ needs.CSI_Build_and_push_images.outputs.operator_specific_tag_for_test }}"
+      operator_image_for_test: "csiblock1/ibm-block-csi-operator:${{ needs.CSI_Build_and_push_images.outputs.operator_specific_tag_for_test }}"
     timeout-minutes: 7
     steps:
       - name: Checkout
