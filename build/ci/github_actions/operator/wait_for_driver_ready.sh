@@ -46,7 +46,7 @@ wait_for_driver_deployment_to_finish (){
 assert_expected_image_in_pod (){
   pod_type=$1
   expected_pod_image=$2
-  image_in_pod=`kubectl describe pod $(get_csi_pods | grep $pod_type | awk '{print$1}') | grep -i image: | \
+  image_in_pod=`kubectl describe pod $(get_csi_pods | grep $pod_type | awk '{print$2}') | grep -i image: | \
    grep $expected_pod_image | awk -F Image: '{print$2}' | awk '{print$1}'`
   if [[ $image_in_pod != $expected_pod_image ]]; then
     echo "$pod_type's image ($image_in_pod) is not the expected image ($expected_pod_image)"
