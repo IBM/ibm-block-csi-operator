@@ -33,10 +33,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/record"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -78,15 +76,8 @@ func getServerVersion() (string, error) {
 	if found {
 		return kubeVersion, nil
 	}
-	clientConfig, err := config.GetConfig()
-	if err != nil {
-		return "", err
-	}
 
-	kubeClient, err := kubernetes.NewForConfig(clientConfig)
-	if err != nil {
-		return "", err
-	}
+	kubeClient := kubeutil.KubeClient
 
 	serverVersion, err := kubeutil.ServerVersion(kubeClient.Discovery())
 	if err != nil {
@@ -644,6 +635,7 @@ func (r *ReconcileIBMBlockCSI) getClusterRoles(instance *ibmblockcsi.IBMBlockCSI
 	externalAttacher := instance.GenerateExternalAttacherClusterRole()
 	externalSnapshotter := instance.GenerateExternalSnapshotterClusterRole()
 	externalResizer := instance.GenerateExternalResizerClusterRole()
+	csiAddonsReplicator := instance.GenerateCSIAddonsReplicatorClusterRole()
 	controllerSCC := instance.GenerateSCCForControllerClusterRole()
 	nodeSCC := instance.GenerateSCCForNodeClusterRole()
 
@@ -652,6 +644,7 @@ func (r *ReconcileIBMBlockCSI) getClusterRoles(instance *ibmblockcsi.IBMBlockCSI
 		externalAttacher,
 		externalSnapshotter,
 		externalResizer,
+		csiAddonsReplicator,
 		controllerSCC,
 		nodeSCC,
 	}
@@ -717,6 +710,7 @@ func (r *ReconcileIBMBlockCSI) getClusterRoleBindings(instance *ibmblockcsi.IBMB
 	externalAttacher := instance.GenerateExternalAttacherClusterRoleBinding()
 	externalSnapshotter := instance.GenerateExternalSnapshotterClusterRoleBinding()
 	externalResizer := instance.GenerateExternalResizerClusterRoleBinding()
+	csiAddonsReplicator := instance.GenerateCSIAddonsReplicatorClusterRoleBinding()
 	controllerSCC := instance.GenerateSCCForControllerClusterRoleBinding()
 	nodeSCC := instance.GenerateSCCForNodeClusterRoleBinding()
 
@@ -725,6 +719,7 @@ func (r *ReconcileIBMBlockCSI) getClusterRoleBindings(instance *ibmblockcsi.IBMB
 		externalAttacher,
 		externalSnapshotter,
 		externalResizer,
+		csiAddonsReplicator,
 		controllerSCC,
 		nodeSCC,
 	}

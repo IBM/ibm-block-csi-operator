@@ -43,6 +43,7 @@ const (
 	attacherContainerName                = "csi-attacher"
 	snapshotterContainerName             = "csi-snapshotter"
 	resizerContainerName                 = "csi-resizer"
+	replicatorContainerName              = "csi-addons-replicator"
 	controllerLivenessProbeContainerName = "liveness-probe"
 
 	controllerContainerHealthPortName   = "healthz"
@@ -50,6 +51,7 @@ const (
 )
 
 var controllerContainerHealthPort = intstr.FromInt(controllerContainerHealthPortNumber)
+var TopologyEnabled = false
 
 type csiControllerSyncer struct {
 	driver *ibmblockcsi.IBMBlockCSI
@@ -111,7 +113,6 @@ func (s *csiControllerSyncer) ensurePodSpec() corev1.PodSpec {
 }
 
 func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
-	// controller plugin container
 	controllerPlugin := s.ensureContainer(controllerContainerName,
 		s.driver.GetCSIControllerImage(),
 		[]string{"--csi-endpoint=$(CSI_ENDPOINT)"},
@@ -133,39 +134,43 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		},
 	})
 
-	// csi provisioner sidecar
+	provisionerArgs := []string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s", "--default-fstype=ext4"}
+	if TopologyEnabled {
+		provisionerArgs = append(provisionerArgs, "--feature-gates=Topology=true")
+	}
 	provisioner := s.ensureContainer(provisionerContainerName,
 		s.getCSIProvisionerImage(),
-		// TODO: make timeout configurable
-		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s", "--default-fstype=ext4"},
+		provisionerArgs,
 	)
 	provisioner.ImagePullPolicy = s.getCSIProvisionerPullPolicy()
 
-	// csi attacher sidecar
 	attacher := s.ensureContainer(attacherContainerName,
 		s.getCSIAttacherImage(),
-		// TODO: make timeout configurable
 		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=180s"},
 	)
 	attacher.ImagePullPolicy = s.getCSIAttacherPullPolicy()
 
-	// csi snapshotter sidecar
 	snapshotter := s.ensureContainer(snapshotterContainerName,
 		s.getCSISnapshotterImage(),
-		// TODO: make timeout configurable
 		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s"},
 	)
 	snapshotter.ImagePullPolicy = s.getCSISnapshotterPullPolicy()
 
-	// csi resizer sidecar
 	resizer := s.ensureContainer(resizerContainerName,
 		s.getCSIResizerImage(),
-		// TODO: make timeout configurable
 		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s"},
 	)
 	resizer.ImagePullPolicy = s.getCSIResizerPullPolicy()
 
-	// liveness probe sidecar
+	leaderElectionNamespaceFlag := fmt.Sprintf("--leader-election-namespace=%s", s.driver.Namespace)
+	driverNameFlag := fmt.Sprintf("--driver-name=%s", config.DriverName)
+	replicator := s.ensureContainer(replicatorContainerName,
+		s.getCSIAddonsReplicatorImage(),
+		[]string{leaderElectionNamespaceFlag, driverNameFlag,
+			"--csi-address=$(ADDRESS)", "--zap-log-level=5", "--rpc-timeout=30s"},
+	)
+	replicator.ImagePullPolicy = s.getCSIAddonsReplicatorPullPolicy()
+
 	livenessProbe := s.ensureContainer(controllerLivenessProbeContainerName,
 		s.getLivenessProbeImage(),
 		[]string{
@@ -180,6 +185,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		attacher,
 		snapshotter,
 		resizer,
+		replicator,
 		livenessProbe,
 	}
 }
@@ -268,7 +274,8 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 			},
 		}
 
-	case provisionerContainerName, attacherContainerName, snapshotterContainerName, resizerContainerName:
+	case provisionerContainerName, attacherContainerName, snapshotterContainerName,
+		resizerContainerName, replicatorContainerName:
 		return []corev1.EnvVar{
 			{
 				Name:  "ADDRESS",
@@ -281,7 +288,8 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 
 func (s *csiControllerSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 	switch name {
-	case controllerContainerName, provisionerContainerName, attacherContainerName, snapshotterContainerName, resizerContainerName:
+	case controllerContainerName, provisionerContainerName, attacherContainerName, snapshotterContainerName,
+		resizerContainerName, replicatorContainerName:
 		return []corev1.VolumeMount{
 			{
 				Name:      socketVolumeName,
@@ -340,6 +348,10 @@ func (s *csiControllerSyncer) getCSIResizerImage() string {
 	return s.getSidecarImageByName(config.CSIResizer)
 }
 
+func (s *csiControllerSyncer) getCSIAddonsReplicatorImage() string {
+	return s.getSidecarImageByName(config.CSIAddonsReplicator)
+}
+
 func (s *csiControllerSyncer) getSidecarPullPolicy(sidecarName string) corev1.PullPolicy {
 	sidecar := s.getSidecarByName(sidecarName)
 	if sidecar != nil && sidecar.ImagePullPolicy != "" {
@@ -366,6 +378,10 @@ func (s *csiControllerSyncer) getCSISnapshotterPullPolicy() corev1.PullPolicy {
 
 func (s *csiControllerSyncer) getCSIResizerPullPolicy() corev1.PullPolicy {
 	return s.getSidecarPullPolicy(config.CSIResizer)
+}
+
+func (s *csiControllerSyncer) getCSIAddonsReplicatorPullPolicy() corev1.PullPolicy {
+	return s.getSidecarPullPolicy(config.CSIAddonsReplicator)
 }
 
 func ensurePorts(ports ...corev1.ContainerPort) []corev1.ContainerPort {
