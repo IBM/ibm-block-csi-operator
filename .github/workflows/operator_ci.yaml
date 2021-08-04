@@ -180,5 +180,5 @@ jobs:
         with:
           name: Driver logs
           path: |
-            /tmp/driver_*.txt
+            /tmp/*.txt
           retention-days: 7
