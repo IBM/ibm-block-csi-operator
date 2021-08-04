@@ -54,7 +54,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
+      original_community_operators_repository: "k8s-operatorhub/community-operators"
+      original_community_operators_repository_prod: "redhat-openshift-ecosystem/community-operators-prod"
       forked_community_operators_repository: "csiblock/community-operators"
+      forked_community_operators_repository_prod: "csiblock/community-operators-prod"
       community_operators_kubernetes_branch: "ibm-block-csi-update-kubernetes-${{ github.run_number }}"
       community_operators_openshift_branch: "ibm-block-csi-update-openshift-${{ github.run_number }}"
       github_token: ${{ secrets.CSIBLOCK_GITHUB_TOKEN }}
