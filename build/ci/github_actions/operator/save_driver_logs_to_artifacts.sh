@@ -8,10 +8,10 @@ get_all_pods_by_type (){
 save_action_output (){
     pod_type=$1
     action=$2
-    action=`echo $action | awk '{print$1}'`
+    action_for_artifacte_files=`echo $action | awk '{print$1}'`
     extra_args=$3
     pod_names=$(get_all_pods_by_type $pod_type)
-    kubectl $action $pod_names $extra_args > "/tmp/${pod_names}_${action}.txt"
+    kubectl $action $pod_names $extra_args > "/tmp/${pod_names}_${action_for_artifacte_files}.txt"
 }
 
 declare -a pod_types=(
