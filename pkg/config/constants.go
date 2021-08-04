@@ -37,6 +37,7 @@ const (
 	CSIAttacher            = "csi-attacher"
 	CSISnapshotter         = "csi-snapshotter"
 	CSIResizer             = "csi-resizer"
+	CSIAddonsReplicator    = "csi-addons-replicator"
 	LivenessProbe          = "livenessprobe"
 
 	ControllerSocketVolumeMountPath                       = "/var/lib/csi/sockets/pluginproxy/"

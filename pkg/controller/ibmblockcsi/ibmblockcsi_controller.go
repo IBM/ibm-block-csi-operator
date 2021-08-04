@@ -635,6 +635,7 @@ func (r *ReconcileIBMBlockCSI) getClusterRoles(instance *ibmblockcsi.IBMBlockCSI
 	externalAttacher := instance.GenerateExternalAttacherClusterRole()
 	externalSnapshotter := instance.GenerateExternalSnapshotterClusterRole()
 	externalResizer := instance.GenerateExternalResizerClusterRole()
+	csiAddonsReplicator := instance.GenerateCSIAddonsReplicatorClusterRole()
 	controllerSCC := instance.GenerateSCCForControllerClusterRole()
 	nodeSCC := instance.GenerateSCCForNodeClusterRole()
 
@@ -643,6 +644,7 @@ func (r *ReconcileIBMBlockCSI) getClusterRoles(instance *ibmblockcsi.IBMBlockCSI
 		externalAttacher,
 		externalSnapshotter,
 		externalResizer,
+		csiAddonsReplicator,
 		controllerSCC,
 		nodeSCC,
 	}
@@ -708,6 +710,7 @@ func (r *ReconcileIBMBlockCSI) getClusterRoleBindings(instance *ibmblockcsi.IBMB
 	externalAttacher := instance.GenerateExternalAttacherClusterRoleBinding()
 	externalSnapshotter := instance.GenerateExternalSnapshotterClusterRoleBinding()
 	externalResizer := instance.GenerateExternalResizerClusterRoleBinding()
+	csiAddonsReplicator := instance.GenerateCSIAddonsReplicatorClusterRoleBinding()
 	controllerSCC := instance.GenerateSCCForControllerClusterRoleBinding()
 	nodeSCC := instance.GenerateSCCForNodeClusterRoleBinding()
 
@@ -716,6 +719,7 @@ func (r *ReconcileIBMBlockCSI) getClusterRoleBindings(instance *ibmblockcsi.IBMB
 		externalAttacher,
 		externalSnapshotter,
 		externalResizer,
+		csiAddonsReplicator,
 		controllerSCC,
 		nodeSCC,
 	}
