@@ -6,9 +6,8 @@ gh_pr_checks_command (){
   gh pr checks $community_operators_branch --repo $forked_community_operators_repository
 }
 
-wait_fot_checks_to_start(){
+wait_for_checks_to_start(){
   community_operators_branch=$1
-  forked_community_operators_repository=$2
   while [ `gh_pr_checks_command $community_operators_branch | wc -l` -eq 0 ]; do
     sleep 1
   done
@@ -18,7 +17,7 @@ wait_for_checks_to_complete(){
   all_tests_passed=false
   repo_pr=`gh pr list --repo $forked_community_operators_repository | grep $community_operators_branch`
   if [[ "$repo_pr" == *"$community_operators_branch"* ]]; then
-    wait_fot_checks_to_start $community_operators_branch $forked_community_operators_repository
+    wait_for_checks_to_start $community_operators_branch
     test_summary="gh_pr_checks_command $community_operators_branch | grep -i summary"
     while [[ ! "`eval $test_summary`" =~ "pass" ]] && [[ ! "`eval $test_summary`" =~ "fail" ]]; do
       sleep 1
