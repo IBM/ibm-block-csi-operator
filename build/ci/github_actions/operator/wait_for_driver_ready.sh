@@ -57,7 +57,7 @@ assert_expected_image_in_pod (){
 assert_pods_images (){
   expected_node_image=$node_repository_for_test:$driver_images_tag
   expected_controller_image=$controller_repository_for_test:$driver_images_tag
-  expected_operator_image=$operator_image_repository_for_test:$operator_specific_tag _for_test
+  expected_operator_image=$operator_image_repository_for_test:$operator_specific_tag_for_test
   assert_expected_image_in_pod "operator" $expected_operator_image
   assert_expected_image_in_pod "controller" $expected_controller_image
   assert_expected_image_in_pod "node" $expected_node_image

@@ -20,11 +20,11 @@ image_version=`echo ${image_version//\"}`
 GITHUB_SHA=${GITHUB_SHA:0:7}_
 operator_image_tags_for_test=`build/ci/get_image_tags_from_branch.sh ${CI_ACTION_REF_NAME} ${image_version} ${build_number} ${GITHUB_SHA}`
 image_branch_tag=`echo $operator_image_tags_for_test | awk '{print$2}'`
-operator_specific_tag _for_test=`echo $operator_image_tags_for_test | awk '{print$1}'`
+operator_specific_tag_for_test=`echo $operator_image_tags_for_test | awk '{print$1}'`
 
 if [ "$image_branch_tag" == "develop" ]; then
   image_branch_tag=latest
 fi
 
 echo "::set-output name=image_branch_tag::${image_branch_tag}"
-echo "::set-output name=operator_specific_tag _for_test::${operator_specific_tag _for_test}"
+echo "::set-output name=operator_specific_tag_for_test::${operator_specific_tag_for_test}"
