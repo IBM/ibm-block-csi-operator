@@ -4,7 +4,7 @@ set +o pipefail
 driver_is_ready=false
 actual_driver_running_time_in_seconds=0
 minimum_driver_running_time_in_seconds=10
-containers_saffix=ibm-block-csi
+containers_suffix=ibm-block-csi
 declare -a driver_pods_types=(
   "controller"
   "node"
@@ -20,8 +20,8 @@ get_image_pod_by_type (){
   containers_images=`kubectl get pods $(get_csi_pods | grep $pod_type | awk '{print$2}') -o jsonpath='{range .spec.containers[*]}{.name},{.image} {end}'`
   for containers_image in containers_images
   do
-    if [[  "$container" =~ "$container_to_check," ]]; then
-      echo $container | awk -F , '{print$2}'
+    if [[  "$containers_image" =~ "$container_to_check," ]]; then
+      echo $containers_image | awk -F , '{print$2}'
       break
     fi
   done
@@ -60,7 +60,7 @@ wait_for_driver_deployment_to_finish (){
 assert_expected_image_in_pod (){
   pod_type=$1
   expected_pod_image=$2
-  container_to_check=$containers_saffix-$pod_type
+  container_to_check=$containers_suffix-$pod_type
   image_in_pod=`get_image_pod_by_type $pod_type $container_to_check`
   if [[ $image_in_pod != $expected_pod_image ]]; then
     echo "$pod_type's image ($image_in_pod) is not the expected image ($expected_pod_image)"
