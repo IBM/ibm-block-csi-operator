@@ -5,13 +5,23 @@ get_all_pods_by_type (){
     kubectl get pod -l csi | grep $pod_type | awk '{print$1}'
 }
 
-save_action_output (){
+run_action_and_save_output (){
     pod_type=$1
     action=$2
-    action_for_artifacte_files=`echo $action | awk '{print$1}'`
+    action_name=`echo $action | awk '{print$1}'`
     extra_args=$3
     pod_names=$(get_all_pods_by_type $pod_type)
-    kubectl $action $pod_names $extra_args > "/tmp/${pod_names}_${action_for_artifacte_files}.txt"
+    kubectl $action $pod_names $extra_args > "/tmp/${pod_names}_${action_name}.txt"
+}
+
+save_logs_of_all_containers_in_pod (){
+    pod_type=$1
+    pod_names=$(get_all_pods_by_type $pod_type)
+    containers=`kubectl get pods $pod_names -o jsonpath='{.spec.containers[*].name}'`
+    for container in $containers
+    do
+        run_action_and_save_output $pod_type logs "-c $container"
+    done
 }
 
 declare -a pod_types=(
@@ -22,6 +32,6 @@ declare -a pod_types=(
 
 for pod_type in "${pod_types[@]}"
 do
-    save_action_output $pod_type logs "-c ibm-block-csi-$pod_type"
-    save_action_output $pod_type "describe pod" ""
+    save_logs_of_all_containers_in_pod $pod_type
+    run_action_and_save_output $pod_type "describe pod" ""
 done

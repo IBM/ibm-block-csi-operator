@@ -4,6 +4,7 @@ set +o pipefail
 driver_is_ready=false
 actual_driver_running_time_in_seconds=0
 minimum_driver_running_time_in_seconds=10
+containers_saffix=ibm-block-csi
 declare -a driver_pods_types=(
   "controller"
   "node"
@@ -13,9 +14,17 @@ get_csi_pods (){
   kubectl get pod -A -l csi
 }
 
-get_pod_images_by_type (){
+get_image_pod_by_type (){
   pod_type=$1
-  kubectl describe pod $(get_csi_pods | grep $pod_type | awk '{print$2}') | grep -i image:
+  container_to_check=$2
+  containers_images=`kubectl get pods $(get_csi_pods | grep $pod_type | awk '{print$2}') -o jsonpath='{range .spec.containers[*]}{.name},{.image} {end}'`
+  for containers_image in containers_images
+  do
+    if [[  "$container" =~ "$container_to_check," ]]; then
+      echo $container | awk -F , '{print$2}'
+      break
+    fi
+  done
 }
 
 wait_for_driver_pod_to_start (){
@@ -51,7 +60,8 @@ wait_for_driver_deployment_to_finish (){
 assert_expected_image_in_pod (){
   pod_type=$1
   expected_pod_image=$2
-  image_in_pod=`get_pod_images_by_type $pod_type | grep $expected_pod_image | awk -F Image: '{print$2}' | awk '{print$1}'`
+  container_to_check=$containers_saffix-$pod_type
+  image_in_pod=`get_image_pod_by_type $pod_type $container_to_check`
   if [[ $image_in_pod != $expected_pod_image ]]; then
     echo "$pod_type's image ($image_in_pod) is not the expected image ($expected_pod_image)"
     exit 1
@@ -62,9 +72,15 @@ assert_pods_images (){
   expected_node_image=$node_repository_for_test:$driver_images_tag
   expected_controller_image=$controller_repository_for_test:$driver_images_tag
   expected_operator_image=$operator_image_repository_for_test:$operator_specific_tag_for_test
-  assert_expected_image_in_pod "operator" $expected_operator_image
-  assert_expected_image_in_pod "controller" $expected_controller_image
-  assert_expected_image_in_pod "node" $expected_node_image
+  declare -A drivers_components_in_k8s=(
+      ["operator"]="$expected_operator_image"
+      ["controller"]="$expected_controller_image"
+      ["node"]="$expected_node_image"
+  )
+  for driver_component in ${!drivers_components_in_k8s[@]}; do
+      driver_component_expected_image=${drivers_components_in_k8s[${driver_component}]}
+      assert_expected_image_in_pod $driver_component $driver_component_expected_image
+  done
 }
 
 wait_for_driver_deployment_to_start

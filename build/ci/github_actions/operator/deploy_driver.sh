@@ -26,6 +26,7 @@ edit_cr_images (){
 edit_operator_yaml_image (){
   cd $(dirname $operator_yaml)
   operator_image_in_branch=`yq eval '(.spec.template.spec.containers[0].image | select(. == "*ibmcom*"))' $(basename $operator_yaml)`
+  # CSI-3223
   sed -i "s+$operator_image_in_branch+$operator_image_for_test+g" $(basename $operator_yaml)
 cd -
 }

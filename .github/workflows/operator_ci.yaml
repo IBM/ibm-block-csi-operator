@@ -9,7 +9,7 @@ on:
       - develop
       - master
 jobs:
-  Prepare_env:
+  prepare_env:
    name: "Prepare env"
    runs-on: ubuntu-latest
    steps:
@@ -41,7 +41,7 @@ jobs:
      image_branch_tag: "${{ steps.setup_dependencies.outputs.image_branch_tag }}"
      operator_specific_tag_for_test: "${{ steps.setup_dependencies.outputs.operator_specific_tag_for_test }}"
 
-  Unit_testing:
+  unit_testing:
     runs-on: ubuntu-latest
     name: "Unit testing"
     steps:
@@ -52,7 +52,7 @@ jobs:
           mkdir -p build/_output/reports && chmod 777 build/_output/reports
           ./build/ci/run_unittests.sh
 
-  Run_OLM_validation:
+  run_olm_validation:
     runs-on: ubuntu-latest
     name: "Run OLM validation"
     steps:
@@ -62,16 +62,16 @@ jobs:
         run: |
           ./build/ci/run_olm_validation.sh
           
-  CSI_Build_and_push_images:
+  csi_build_and_push_images:
     name: "CSI Build and push images"
     runs-on: ubuntu-latest
     needs:
-      - Unit_testing
-      - Run_OLM_validation
-      - Prepare_env
+      - unit_testing
+      - run_olm_validation
+      - prepare_env
     strategy:
       matrix:
-        image_type: ['nodeagent', 'operator']
+        image_type: ['operator']
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -100,8 +100,8 @@ jobs:
           platforms: linux/amd64,linux/ppc64le,linux/s390x
           push: true
           tags: |
-            csiblock1/ibm-block-csi-${{ matrix.image_type }}:${{ needs.Prepare_env.outputs.operator_specific_tag_for_test }}
-            csiblock1/ibm-block-csi-${{ matrix.image_type }}:${{ needs.Prepare_env.outputs.image_branch_tag }}
+            csiblock1/ibm-block-csi-${{ matrix.image_type }}:${{ needs.prepare_env.outputs.operator_specific_tag_for_test }}
+            csiblock1/ibm-block-csi-${{ matrix.image_type }}:${{ needs.prepare_env.outputs.image_branch_tag }}
             csiblock1/ibm-block-csi-${{ matrix.image_type }}:latest
           file: build/Dockerfile.${{ matrix.image_type }}
           cache-from: type=local,src=/tmp/.buildx-${{ matrix.image_type }}
@@ -114,19 +114,19 @@ jobs:
           [[ -G /tmp/.buildx-${{ matrix.image_type }} ]] && rm -rf /tmp/.buildx-${{ matrix.image_type }}
           mv /tmp/.buildx-new-${{ matrix.image_type }} /tmp/.buildx-${{ matrix.image_type }}
     outputs:
-      operator_specific_tag_for_test: "${{ needs.Prepare_env.outputs.operator_specific_tag_for_test }}"
+      operator_specific_tag_for_test: "${{ needs.prepare_env.outputs.operator_specific_tag_for_test }}"
 
-  Create_cluster:
+  create_cluster:
     runs-on: ubuntu-latest
     name: "Create cluster"
-    needs: CSI_Build_and_push_images
+    needs: csi_build_and_push_images
     env:
       csiblock_dockerhub_password: ${{ secrets.CSIBLOCK_DOCKERHUB_PASSWORD }}
       controller_repository_for_test: csiblock1/ibm-block-csi-controller
       node_repository_for_test: csiblock1/ibm-block-csi-node
       operator_image_repository_for_test: csiblock1/ibm-block-csi-operator
-      operator_specific_tag_for_test: "${{ needs.CSI_Build_and_push_images.outputs.operator_specific_tag_for_test }}"
-      operator_image_for_test: "csiblock1/ibm-block-csi-operator:${{ needs.CSI_Build_and_push_images.outputs.operator_specific_tag_for_test }}"
+      operator_specific_tag_for_test: "${{ needs.csi_build_and_push_images.outputs.operator_specific_tag_for_test }}"
+      operator_image_for_test: "csiblock1/ibm-block-csi-operator:${{ needs.csi_build_and_push_images.outputs.operator_specific_tag_for_test }}"
     timeout-minutes: 7
     steps:
       - name: Checkout
