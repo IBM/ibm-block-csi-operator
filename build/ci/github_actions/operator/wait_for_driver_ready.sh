@@ -13,6 +13,11 @@ get_csi_pods (){
   kubectl get pod -A -l csi
 }
 
+get_pod_images_by_type (){
+  pod_type=$1
+  kubectl describe pod $(get_csi_pods | grep $pod_type | awk '{print$2}') | grep -i image:
+}
+
 wait_for_driver_pod_to_start (){
   driver_pod_type=$1
   while [ "$(get_csi_pods | grep $driver_pod_type | wc -l)" -eq 0 ]; do
@@ -46,8 +51,7 @@ wait_for_driver_deployment_to_finish (){
 assert_expected_image_in_pod (){
   pod_type=$1
   expected_pod_image=$2
-  image_in_pod=`kubectl describe pod $(get_csi_pods | grep $pod_type | awk '{print$2}') | grep -i image: | \
-   grep $expected_pod_image | awk -F Image: '{print$2}' | awk '{print$1}'`
+  image_in_pod=`get_pod_images_by_type $pod_type | grep $expected_pod_image | awk -F Image: '{print$2}' | awk '{print$1}'`
   if [[ $image_in_pod != $expected_pod_image ]]; then
     echo "$pod_type's image ($image_in_pod) is not the expected image ($expected_pod_image)"
     exit 1
