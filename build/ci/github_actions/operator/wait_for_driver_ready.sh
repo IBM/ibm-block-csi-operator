@@ -18,7 +18,7 @@ get_image_pod_by_type (){
   pod_type=$1
   container_to_check=$2
   containers_images=`kubectl get pods $(get_csi_pods | grep $pod_type | awk '{print$2}') -o jsonpath='{range .spec.containers[*]}{.name},{.image} {end}'`
-  for containers_image in containers_images
+  for containers_image in $containers_images
   do
     if [[  "$containers_image" =~ "$container_to_check," ]]; then
       echo $containers_image | awk -F , '{print$2}'
