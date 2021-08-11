@@ -24,5 +24,5 @@ hack/update-crds.sh
 cp -r bin/ ../$ibm_operator_name/
 cd ..
 diff -qr $ibm_operator_name $ibm_operator_name-copy/
-rm -rm $ibm_operator_name-copy/
+rm -rf $ibm_operator_name-copy/
 cd $ibm_operator_name
