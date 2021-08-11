@@ -19,7 +19,7 @@
 ibm_operator_name=ibm-block-csi-operator
 cd ..
 cp -r $ibm_operator_name ./$ibm_operator_name-copy
-cd $ibm_operator_name/
+cd $ibm_operator_name-copy/
 hack/update-crds.sh
 cp -r bin/ ../$ibm_operator_name/
 cd ..
