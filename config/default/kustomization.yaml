@@ -1,11 +1,7 @@
 # Adds namespace to all resources.
 namespace: default
 
-# Value of this field is prepended to the
-# names of all resources, e.g. a deployment named
-# "wordpress" becomes "alices-wordpress".
-# Note that it should also match with the prefix (text before '-') of the namespace
-# field above.
+
 namePrefix: ibm-block-csi-operator-
 
 # Labels to add to all resources and selectors.
@@ -16,12 +12,6 @@ bases:
 - ../crd
 - ../rbac
 - ../manager
-
-patchesStrategicMerge:
-# Protect the /metrics endpoint by putting it behind auth.
-# If you want your controller-manager to expose the /metrics
-# endpoint w/o any authn/z, please comment the following line.
-- manager_auth_proxy_patch.yaml
 
 # the following config is for teaching kustomize how to do var substitution
 vars:

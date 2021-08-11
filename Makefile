@@ -24,9 +24,6 @@ else
 GOBIN=$(shell go env GOBIN)
 endif
 
-# Setting SHELL to bash allows bash commands to be executed by recipes.
-# This is a requirement for 'setup-envtest.sh' in the test target.
-# Options are set to exit when a recipe line exits non-zero or a piped command fails.
 SHELL = /usr/bin/env bash -o pipefail
 .SHELLFLAGS = -ec
 
@@ -37,8 +34,8 @@ help: ## Display this help.
 
 manifests: controller-gen kustomize## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=ibm-block-csi-operator webhook paths="./..." output:crd:artifacts:config=config/crd/bases
-#	$(KUSTOMIZE) build config/crd > config/crd/bases/csi.ibm.com_ibmblockcsis_tmp.yaml
-#	mv config/crd/bases/csi.ibm.com_ibmblockcsis_tmp.yaml config/crd/bases/csi.ibm.com_ibmblockcsis.yaml
+	$(KUSTOMIZE) build config/crd > config/crd/bases/csi.ibm.com_ibmblockcsis_tmp.yaml
+	mv config/crd/bases/csi.ibm.com_ibmblockcsis_tmp.yaml config/crd/bases/csi.ibm.com_ibmblockcsis.yaml
 
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
@@ -72,6 +69,7 @@ olm-validation:
 
 .PHONY: test
 test: update
+	hack/check-generated-manifests.sh
 	ginkgo -r -v -skipPackage tests
 
 .PHONY: update
