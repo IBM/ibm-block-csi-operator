@@ -1,4 +1,0 @@
-## Append samples you want in your CSV to this file as resources ##
-resources:
-- csi.ibm.com_v1_ibmblockcsi_cr.yaml
-#+kubebuilder:scaffold:manifestskustomizesamples

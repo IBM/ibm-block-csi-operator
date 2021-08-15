@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM golang:1.15
+FROM golang:1.15.14
 
 ENV GO111MODULE=on \
     GOROOT=/usr/local/go \
     WORKDIR=/go/src/github.com/IBM/ibm-block-csi-operator
-ENV     CR_YAML=$WORKDIR/config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml
+ENV CR_YAML=$WORKDIR/config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml
 WORKDIR $WORKDIR
 
 RUN go get github.com/onsi/ginkgo/ginkgo
