@@ -146,9 +146,9 @@ jobs:
           path: ${{ env.pythonLocation }}
           key: ${{ env.pythonLocation }}-${{ hashFiles('dev-requirements.txt') }}
       - name: Get driver branch
-        id: driver_branch
+        id: driver_images_tag_from_branch
         run: |
-          build/ci/github_actions/operator/get_driver_branch_tag.sh
+          build/ci/github_actions/operator/get_driver_images_tag_from_branch.sh
         env:
           github_token: ${{ secrets.CSIBLOCK_GITHUB_TOKEN }}
       - name: Create k8s Kind Cluster
@@ -162,14 +162,14 @@ jobs:
         run: |
           build/ci/github_actions/operator/deploy_driver.sh
         env:
-          driver_images_tag: "${{ steps.driver_branch.outputs.image_branch_tag }}"
+          driver_images_tag: "${{ steps.driver_images_tag_from_branch.outputs.image_branch_tag }}"
           operator_yaml: "deploy/installer/generated/ibm-block-csi-operator.yaml"
           cr_file: "deploy/crds/csi.ibm.com_v1_ibmblockcsi_cr.yaml"
       - name: Wait for csi ibm block driver to be ready
         run: |
           build/ci/github_actions/operator/wait_for_driver_ready.sh
         env:
-          driver_images_tag: "${{ steps.driver_branch.outputs.image_branch_tag }}"
+          driver_images_tag: "${{ steps.driver_images_tag_from_branch.outputs.image_branch_tag }}"
       - name: Save driver pods logs to artifacts
         if: always()
         run: |
@@ -178,7 +178,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: Driver logs
+          name: driver_logs
           path: |
             /tmp/*.txt
           retention-days: 7

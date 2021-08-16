@@ -6,12 +6,12 @@ get_all_pods_by_type (){
 }
 
 run_action_and_save_output (){
-    pod_type=$1
+    pod_names=$1
     action=$2
     action_name=`echo $action | awk '{print$1}'`
     extra_args=$3
-    pod_names=$(get_all_pods_by_type $pod_type)
-    kubectl $action $pod_names $extra_args > "/tmp/${pod_names}_${action_name}.txt"
+    container_name=$4
+    kubectl $action $pod_names $extra_args > "/tmp/${pod_names}_container_${container_name}_${action_name}.txt"
 }
 
 save_logs_of_all_containers_in_pod (){
@@ -20,7 +20,7 @@ save_logs_of_all_containers_in_pod (){
     containers=`kubectl get pods $pod_names -o jsonpath='{.spec.containers[*].name}'`
     for container in $containers
     do
-        run_action_and_save_output $pod_type logs "-c $container"
+        run_action_and_save_output $pod_names logs "-c $container" $container
     done
 }
 

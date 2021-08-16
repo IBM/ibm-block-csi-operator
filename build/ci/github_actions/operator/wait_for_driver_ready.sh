@@ -1,10 +1,10 @@
 #!/bin/bash -xe
 set +o pipefail
 
-driver_is_ready=false
+is_driver_ready=false
 actual_driver_running_time_in_seconds=0
 minimum_driver_running_time_in_seconds=10
-containers_suffix=ibm-block-csi
+containers_prefix=ibm-block-csi
 declare -a driver_pods_types=(
   "controller"
   "node"
@@ -16,11 +16,11 @@ get_csi_pods (){
 
 get_image_pod_by_type (){
   pod_type=$1
-  container_to_check=$2
+  component_to_check=$2
   containers_images=`kubectl get pods $(get_csi_pods | grep $pod_type | awk '{print$2}') -o jsonpath='{range .spec.containers[*]}{.name},{.image} {end}'`
   for containers_image in $containers_images
   do
-    if [[  "$containers_image" =~ "$container_to_check," ]]; then
+    if [[  "$containers_image" =~ "$component_to_check," ]]; then
       echo $containers_image | awk -F , '{print$2}'
       break
     fi
@@ -43,11 +43,11 @@ wait_for_driver_deployment_to_start (){
 }
 
 wait_for_driver_deployment_to_finish (){
-  while [ $driver_is_ready == "false" ]; do
+  while [ $is_driver_ready == "false" ]; do
     if [ "$(get_csi_pods | grep -iv running | grep -iv name | wc -l)" -eq 0 ]; then
       ((++actual_driver_running_time_in_seconds))
       if [ $actual_driver_running_time_in_seconds -eq $minimum_driver_running_time_in_seconds ]; then
-        driver_is_ready=true
+        is_driver_ready=true
       fi
     else
       actual_driver_running_time_in_seconds=0
@@ -60,8 +60,8 @@ wait_for_driver_deployment_to_finish (){
 assert_expected_image_in_pod (){
   pod_type=$1
   expected_pod_image=$2
-  container_to_check=$containers_suffix-$pod_type
-  image_in_pod=`get_image_pod_by_type $pod_type $container_to_check`
+  component_to_check=$containers_prefix-$pod_type
+  image_in_pod=`get_image_pod_by_type $pod_type $component_to_check`
   if [[ $image_in_pod != $expected_pod_image ]]; then
     echo "$pod_type's image ($image_in_pod) is not the expected image ($expected_pod_image)"
     exit 1
