@@ -24,4 +24,3 @@ hack/update-crds.sh
 cd ..
 diff -qr --exclude=bin $project_dirname $project_dirname-copy/
 rm -rf $project_dirname-copy/
-cd $project_dirname
