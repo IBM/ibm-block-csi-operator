@@ -26,7 +26,7 @@ edit_cr_images (){
 edit_operator_yaml_image (){
   cd $(dirname $operator_yaml)
   operator_image_in_branch=`yq eval '(. | select(.kind == "Deployment") | .spec.template.spec.containers[0].image)' $(basename $operator_yaml)`
-  sed -i "s+$operator_image_in_branch+$operator_image_for_test+g" $(basename $operator_yaml) ## TODO: CSI-3223 need to edit the operator image only in a specifics places
+  sed -i "s+$operator_image_in_branch+$operator_image_for_test+g" $(basename $operator_yaml) ## TODO: CSI-3223 avoid using sed
 cd -
 }
 
