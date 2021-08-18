@@ -280,14 +280,8 @@ func (r *IBMBlockCSIReconciler) removeFinalizer(instance *ibmblockcsi.IBMBlockCS
 
 func (r *IBMBlockCSIReconciler) getAccessorAndFinalizerName(instance *ibmblockcsi.IBMBlockCSI) (metav1.Object, string, error) {
 	logger := log.WithName("getAccessorAndFinalizerName")
-	//test := instance.GetObjectKind()
-	//fmt.Println("matan")
-	//fmt.Println(instance.GetObjectKind())
-	//gvk, err := apiutil.GVKForObject(instance, r.Scheme)
-	//fmt.Println(gvk.Kind)
-	//lowercaseKind := strings.ToLower(instance.GetObjectKind().GroupVersionKind().Kind)
-	//finalizerName := fmt.Sprintf("%s.%s", lowercaseKind, oconfig.APIGroup)
-	finalizerName := fmt.Sprintf("ibmblockcsi.%s", oconfig.APIGroup)
+	lowercaseKind := strings.ToLower(instance.GetObjectKind().GroupVersionKind().Kind)
+	finalizerName := fmt.Sprintf("%s.%s", lowercaseKind, oconfig.APIGroup)
 
 	accessor, err := meta.Accessor(instance)
 	if err != nil {
