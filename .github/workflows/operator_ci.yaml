@@ -84,7 +84,7 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
-          username: 'csiblock1'
+          username: '${{ secrets.CSIBLOCK_DOCKERHUB_USERNAME }}'
           password: '${{ secrets.CSIBLOCK_DOCKERHUB_PASSWORD }}'
       - name: Cache Docker layers
         uses: actions/cache@v2
@@ -100,9 +100,9 @@ jobs:
           platforms: linux/amd64,linux/ppc64le,linux/s390x
           push: true
           tags: |
-            csiblock1/ibm-block-csi-${{ matrix.image_type }}:${{ needs.prepare_env.outputs.operator_specific_tag_for_test }}
-            csiblock1/ibm-block-csi-${{ matrix.image_type }}:${{ needs.prepare_env.outputs.image_branch_tag }}
-            csiblock1/ibm-block-csi-${{ matrix.image_type }}:latest
+            ${{ secrets.CSIBLOCK_DOCKERHUB_USERNAME }}/ibm-block-csi-${{ matrix.image_type }}:${{ needs.prepare_env.outputs.operator_specific_tag_for_test }}
+            ${{ secrets.CSIBLOCK_DOCKERHUB_USERNAME }}/ibm-block-csi-${{ matrix.image_type }}:${{ needs.prepare_env.outputs.image_branch_tag }}
+            ${{ secrets.CSIBLOCK_DOCKERHUB_USERNAME }}/ibm-block-csi-${{ matrix.image_type }}:latest
           file: build/Dockerfile.${{ matrix.image_type }}
           cache-from: type=local,src=/tmp/.buildx-${{ matrix.image_type }}
           cache-to: type=local,dest=/tmp/.buildx-new-${{ matrix.image_type }}
@@ -122,11 +122,12 @@ jobs:
     needs: csi_build_and_push_images
     env:
       csiblock_dockerhub_password: ${{ secrets.CSIBLOCK_DOCKERHUB_PASSWORD }}
-      controller_repository_for_test: csiblock1/ibm-block-csi-controller
-      node_repository_for_test: csiblock1/ibm-block-csi-node
-      operator_image_repository_for_test: csiblock1/ibm-block-csi-operator
+      csiblock_dockerhub_username: ${{ secrets.CSIBLOCK_DOCKERHUB_USERNAME }}
+      controller_repository_for_test: '${{ secrets.CSIBLOCK_DOCKERHUB_USERNAME }}/ibm-block-csi-controller'
+      node_repository_for_test: '${{ secrets.CSIBLOCK_DOCKERHUB_USERNAME }}/ibm-block-csi-node'
+      operator_image_repository_for_test: '${{ secrets.CSIBLOCK_DOCKERHUB_USERNAME }}/ibm-block-csi-operator'
       operator_specific_tag_for_test: "${{ needs.csi_build_and_push_images.outputs.operator_specific_tag_for_test }}"
-      operator_image_for_test: "csiblock1/ibm-block-csi-operator:${{ needs.csi_build_and_push_images.outputs.operator_specific_tag_for_test }}"
+      operator_image_for_test: "${{ secrets.CSIBLOCK_DOCKERHUB_USERNAME }}/ibm-block-csi-operator:${{ needs.csi_build_and_push_images.outputs.operator_specific_tag_for_test }}"
     timeout-minutes: 7
     steps:
       - name: Checkout

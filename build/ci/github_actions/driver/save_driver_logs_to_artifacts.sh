@@ -12,7 +12,7 @@ run_action_and_save_output (){
     extra_args=$4
     container_name=$5
     pod_names=$(get_all_pods_by_type $pod_type)
-    kubectl $action $pod_names $extra_args > "/tmp/${pod_names}_container_${container_name}_${action_name}.txt"
+    kubectl $action $pod_names $extra_args > "/tmp/${pod_names}_${container_name}_${action_name}.txt"
 }
 
 save_logs_of_all_containers_in_pod (){
