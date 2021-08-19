@@ -1,6 +1,9 @@
 #!/bin/bash -xel
 set +o pipefail
 
+expected_node_image=$node_repository_for_test:$driver_images_tag
+expected_controller_image=$controller_repository_for_test:$driver_images_tag
+
 install_worker_prerequisites() {
   kind_node_name=`docker ps --format "{{.Names}}"`
   docker exec -i $kind_node_name apt-get update
@@ -23,20 +26,11 @@ edit_cr_images (){
   cd -
 }
 
-edit_operator_yaml_image (){
-  cd $(dirname $operator_yaml)
-  operator_image_in_branch=`yq eval '(. | select(.kind == "Deployment") | .spec.template.spec.containers[0].image)' $(basename $operator_yaml)`
-  sed -i "s+$operator_image_in_branch+$operator_image_for_test+g" $(basename $operator_yaml) ## TODO: CSI-3223 avoid using sed
-cd -
-}
-
 install_worker_prerequisites
 edit_cr_images
-edit_operator_yaml_image
-
-cat $operator_yaml | grep image:
 cat $cr_file | grep repository:
 cat $cr_file | grep tag:
-
-kubectl apply -f $operator_yaml
 kubectl apply -f $cr_file
+. wait_for_pods_ready_utils.sh && wait_for_driver_deployment_to_start
+. wait_for_pods_ready_utils.sh && assert_pods_images $expected_node_image $expected_controller_image
+. wait_for_pods_ready_utils.sh && wait_for_driver_deployment_to_finish

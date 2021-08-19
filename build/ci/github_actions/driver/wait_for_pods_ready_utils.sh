@@ -27,7 +27,7 @@ get_image_pod_by_type (){
   done
 }
 
-wait_for_driver_pod_to_start (){
+wait_for_pod_to_start (){
   driver_pod_type=$1
   while [ "$(get_csi_pods | grep $driver_pod_type | wc -l)" -eq 0 ]; do
     echo "The $driver_pod_type is not deployed"
@@ -38,7 +38,7 @@ wait_for_driver_pod_to_start (){
 wait_for_driver_deployment_to_start (){
   for driver_pods_type in "${driver_pods_types[@]}"
   do
-    wait_for_driver_pod_to_start $driver_pods_type
+    wait_for_pod_to_start $driver_pods_type
   done
 }
 
@@ -69,11 +69,9 @@ assert_expected_image_in_pod (){
 }
 
 assert_pods_images (){
-  expected_node_image=$node_repository_for_test:$driver_images_tag
-  expected_controller_image=$controller_repository_for_test:$driver_images_tag
-  expected_operator_image=$operator_image_repository_for_test:$operator_specific_tag_for_test
+  expected_node_image=$1
+  expected_controller_image=$2
   declare -A drivers_components_in_k8s=(
-      ["operator"]="$expected_operator_image"
       ["controller"]="$expected_controller_image"
       ["node"]="$expected_node_image"
   )
@@ -82,9 +80,3 @@ assert_pods_images (){
       assert_expected_image_in_pod $driver_component $driver_component_expected_image
   done
 }
-
-wait_for_driver_deployment_to_start
-wait_for_driver_deployment_to_finish
-assert_pods_images
-echo Driver is running
-get_csi_pods
