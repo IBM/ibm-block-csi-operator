@@ -160,7 +160,7 @@ jobs:
           build/ci/github_actions/wait_for_k8s_ready.sh
       - name: Deploy ibm block csi operator
         run: |
-          build/ci/github_actions/driver/deploy_operator.sh
+          build/ci/github_actions/operator/deploy_operator.sh
         env:
           operator_yaml: "deploy/installer/generated/ibm-block-csi-operator.yaml"
       - name: Deploy ibm block csi driver
