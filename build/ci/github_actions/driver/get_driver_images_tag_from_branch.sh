@@ -2,8 +2,6 @@
 set +o pipefail
 
 driver_images_tag_from_branch=latest
-DOCKER_HUB_USERNAME=$csiblock_docker_registry_username
-DOCKER_HUB_PASSWORD=$csiblock_docker_registry_password
 triggering_branch=$CI_ACTION_REF_NAME
 target_image_tags=`build/ci/get_image_tags_from_branch.sh ${triggering_branch}`
 target_specific_tag=`echo $target_image_tags | awk '{print$2}'`
@@ -11,14 +9,10 @@ target_specific_tag=`echo $target_image_tags | awk '{print$2}'`
 is_private_branch_component_image_exists(){
   driver_component=$1
   is_image_tag_exists=false
-  export image_tags=`docker-hub tags --orgname $csiblock_docker_registry_username --reponame ibm-block-csi-$driver_component --all-pages | grep $target_specific_tag | awk '{print$2}'`
-  for tag in $image_tags
-  do
-    if [[ "$tag" == "$target_specific_tag" ]]; then
-      is_image_tag_exists=true
-      break
-    fi
-  done
+  export driver_image_inspect=`docker manifest inspect $csiblock_docker_registry_username/ibm-block-csi-$driver_component:$target_specific_tag`
+  if [[ "$driver_image_inspect" != "" ]]; then
+    is_image_tag_exists=true
+  fi
   echo $is_image_tag_exists
 }
 

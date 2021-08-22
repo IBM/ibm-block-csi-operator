@@ -12,6 +12,7 @@ are_pods_ready (){
     fi
   done
   echo false
+}
 
 is_kubernetes_cluster_ready (){
   pods=`kubectl get pods -A | awk '{print$3}' | grep -iv ready`

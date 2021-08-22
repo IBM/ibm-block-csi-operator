@@ -120,7 +120,6 @@ jobs:
     name: "Create cluster"
     needs: csi_build_and_push_images
     env:
-      csiblock_docker_registry_password: ${{ secrets.CSIBLOCK_DOCKER_REGISTRY_PASSWORD }}
       csiblock_docker_registry_username: ${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}
       controller_repository_for_test: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}/ibm-block-csi-controller'
       node_repository_for_test: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}/ibm-block-csi-node'

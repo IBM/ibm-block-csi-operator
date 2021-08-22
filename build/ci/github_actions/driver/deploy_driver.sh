@@ -31,6 +31,7 @@ edit_cr_images
 cat $cr_file | grep repository:
 cat $cr_file | grep tag:
 kubectl apply -f $cr_file
-. build/ci/github_actions/deploy_object.sh && wait_for_driver_deployment_to_start
-. build/ci/github_actions/deploy_object.sh && assert_pods_images $expected_node_image $expected_controller_image
-. build/ci/github_actions/deploy_object.sh && wait_for_driver_deployment_to_finish
+. build/ci/github_actions/deploy_object.sh
+wait_for_driver_deployment_to_start
+assert_pods_images $expected_node_image $expected_controller_image
+wait_for_driver_deployment_to_finish

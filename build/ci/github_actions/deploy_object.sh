@@ -14,6 +14,10 @@ get_csi_pods (){
   kubectl get pod -A -l csi
 }
 
+get_operator_pod (){
+  kubectl get pod -A -l app.kubernetes.io/name=ibm-block-csi-operator
+}
+
 get_image_pod_by_type (){
   pod_type=$1
   component_to_check=$2
@@ -43,8 +47,18 @@ wait_for_driver_deployment_to_start (){
 }
 
 wait_for_driver_deployment_to_finish (){
+  wait_for_pods_to_finish get_csi_pods
+}
+
+wait_for_operator_deployment_to_finish (){
+  wait_for_pods_to_finish get_operator_pod
+}
+
+
+wait_for_pods_to_finish (){
+  get_pods_command=$1
   while [ $is_driver_ready == "false" ]; do
-    if [ "$(get_csi_pods | grep -iv running | grep -iv name | wc -l)" -eq 0 ]; then
+    if [ "$($get_pods_command | grep -iv running | grep -iv name | wc -l)" -eq 0 ]; then
       ((++actual_driver_running_time_in_seconds))
       if [ $actual_driver_running_time_in_seconds -eq $minimum_driver_running_time_in_seconds ]; then
         is_driver_ready=true
