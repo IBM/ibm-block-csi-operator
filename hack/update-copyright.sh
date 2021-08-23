@@ -22,7 +22,7 @@ CURRENT_PATH=$(dirname "$BASH_SOURCE")
 PROTECT_ROOT=$CURRENT_PATH/..
 VENDOR_PATH=$CURRENT_PATH/../vendor
 BOILERPLATE=$CURRENT_PATH/boilerplate.go.txt
-excluded_files=("tools.go" "ibmblockcsi_controller_test.go")
+excluded_files=("tools.go")
 
 function contains()
 {
