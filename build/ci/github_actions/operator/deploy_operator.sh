@@ -11,7 +11,7 @@ cd -
 edit_operator_yaml_image
 cat $operator_yaml | grep image:
 kubectl apply -f $operator_yaml
-. build/ci/github_actions/deploy_object.sh \
+. build/ci/github_actions/deployment.sh
 wait_for_pod_to_start "operator"
 assert_expected_image_in_pod "operator" $operator_image_for_test
 wait_for_operator_deployment_to_finish
