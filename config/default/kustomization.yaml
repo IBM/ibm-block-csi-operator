@@ -1,9 +1,0 @@
-# Adds namespace to all resources.
-namespace: default
-
-namePrefix: ibm-block-csi-operator-
-
-bases:
-- ../crd
-- ../rbac
-- ../manager
