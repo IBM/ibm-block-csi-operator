@@ -21,8 +21,8 @@
 
 CURRENT_PATH=$(dirname "$BASH_SOURCE")
 DEPLOY_PATH=$CURRENT_PATH/../deploy
-COFIG_PATH=$CURRENT_PATH/../config
-CRD_PATH=$CURRENT_PATH/../config/crd/bases
+CONFIG_PATH=$CURRENT_PATH/../config
+CRD_PATH=$CONFIG_PATH/crd/bases
 
 declare -a operator_deploy_files=(
     "crd/bases/csi.ibm.com_ibmblockcsis.yaml"
@@ -71,7 +71,7 @@ done
 
 for file_name in "${operator_deploy_files[@]}"
 do
-    file=$COFIG_PATH/$file_name
+    file=$CONFIG_PATH/$file_name
     if test -f $file
     then
         if !(contains $file_name "${excluded_files[@]}")
