@@ -36,10 +36,10 @@ import (
 )
 
 const (
-	registrationVolumeName           = "registration-dir"
-	nodeContainerName                = "ibm-block-csi-node"
-	nodeDriverRegistrarContainerName = "node-driver-registrar"
-	nodeLivenessProbeContainerName   = "liveness-probe"
+	registrationVolumeName              = "registration-dir"
+	nodeContainerName                   = "ibm-block-csi-node"
+	csiNodeDriverRegistrarContainerName = "csi-node-driver-registrar"
+	nodeLivenessProbeContainerName      = "livenessprobe"
 
 	nodeContainerHealthPortName   = "healthz"
 	nodeContainerHealthPortNumber = 9808

@@ -36,10 +36,10 @@ import (
 )
 
 const (
-	registrationVolumeName           = "registration-dir"
-	nodeContainerName                = "ibm-block-csi-node"
-	nodeDriverRegistrarContainerName = "node-driver-registrar"
-	nodeLivenessProbeContainerName   = "liveness-probe"
+	registrationVolumeName              = "registration-dir"
+	nodeContainerName                   = "ibm-block-csi-node"
+	csiNodeDriverRegistrarContainerName = "csi-node-driver-registrar"
+	nodeLivenessProbeContainerName      = "livenessprobe"
 
 	nodeContainerHealthPortName   = "healthz"
 	nodeContainerHealthPortNumber = 9808
@@ -55,8 +55,8 @@ type csiNodeSyncer struct {
 }
 
 // NewCSINodeSyncer returns a syncer for CSI node
-func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockcsi.IBMBlockCSI, 
-	daemonSetRestartedKey string , daemonSetRestartedValue string) syncer.Interface {
+func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockcsi.IBMBlockCSI,
+	daemonSetRestartedKey string, daemonSetRestartedValue string) syncer.Interface {
 	obj := &appsv1.DaemonSet{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        config.GetNameForResource(config.CSINode, driver.Name),
@@ -76,7 +76,7 @@ func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockc
 	})
 }
 
-func (s *csiNodeSyncer) SyncFn(daemonSetRestartedKey string , daemonSetRestartedValue string) error {
+func (s *csiNodeSyncer) SyncFn(daemonSetRestartedKey string, daemonSetRestartedValue string) error {
 	out := s.obj.(*appsv1.DaemonSet)
 
 	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCSINodeSelectorLabels())
@@ -98,7 +98,7 @@ func (s *csiNodeSyncer) ensurePodSpec() corev1.PodSpec {
 		Containers:         s.ensureContainersSpec(),
 		Volumes:            s.ensureVolumes(),
 		HostIPC:            true,
-		HostNetwork: 		true,
+		HostNetwork:        true,
 		ServiceAccountName: config.GetNameForResource(config.CSINodeServiceAccount, s.driver.Name),
 		Affinity:           s.driver.Spec.Node.Affinity,
 		Tolerations:        s.driver.Spec.Node.Tolerations,
@@ -148,8 +148,8 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 		"DAC_OVERRIDE",
 	)
 
-	// node driver registrar sidecar
-	registrar := s.ensureContainer(nodeDriverRegistrarContainerName,
+	// csi node driver registrar sidecar
+	registrar := s.ensureContainer(csiNodeDriverRegistrarContainerName,
 		s.getCSINodeDriverRegistrarImage(),
 		[]string{
 			"--csi-address=$(ADDRESS)",
@@ -226,7 +226,7 @@ func (s *csiNodeSyncer) getEnvFor(name string) []corev1.EnvVar {
 			envVarFromField("KUBE_NODE_NAME", "spec.nodeName"),
 		}
 
-	case nodeDriverRegistrarContainerName:
+	case csiNodeDriverRegistrarContainerName:
 		return []corev1.EnvVar{
 			{
 				Name:  "ADDRESS",
@@ -275,7 +275,7 @@ func (s *csiNodeSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 			},
 		}
 
-	case nodeDriverRegistrarContainerName:
+	case csiNodeDriverRegistrarContainerName:
 		return []corev1.VolumeMount{
 			{
 				Name:      socketVolumeName,

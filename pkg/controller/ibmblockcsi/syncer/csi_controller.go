@@ -43,7 +43,7 @@ const (
 	attacherContainerName                = "csi-attacher"
 	snapshotterContainerName             = "csi-snapshotter"
 	resizerContainerName                 = "csi-resizer"
-	controllerLivenessProbeContainerName = "liveness-probe"
+	controllerLivenessProbeContainerName = "livenessprobe"
 
 	controllerContainerHealthPortName   = "healthz"
 	controllerContainerHealthPortNumber = 9808
