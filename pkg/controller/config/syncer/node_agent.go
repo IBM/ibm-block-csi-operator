@@ -36,15 +36,7 @@ import (
 )
 
 const (
-	registrationVolumeName              = "registration-dir"
-	nodeContainerName                   = "ibm-block-csi-node"
-	csiNodeDriverRegistrarContainerName = "csi-node-driver-registrar"
-	nodeLivenessProbeContainerName      = "livenessprobe"
-
-	nodeContainerHealthPortName   = "healthz"
 	nodeContainerHealthPortNumber = 9808
-
-	registrationVolumeMountPath = "/registration"
 )
 
 var nodeContainerHealthPort = intstr.FromInt(nodeContainerHealthPortNumber)
