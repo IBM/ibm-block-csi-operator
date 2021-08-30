@@ -124,19 +124,15 @@ defaultAddCapabilities: null
 fsGroup:
   type: RunAsAny
 groups:
-priority: 10
 readOnlyRootFilesystem: false
 requiredDropCapabilities:
 - MKNOD
 runAsUser:
-  type: RunAsAny
+  type: MustRunAsRange
 seLinuxContext:
   type: MustRunAs
 supplementalGroups:
   type: RunAsAny
-users:
-- system:serviceaccount:ibm-block-csi:ibm-block-csi-operator
-- system:serviceaccount:ibm-block-csi:ibm-block-csi-controller-sa
 volumes:
 - configMap
 - downwardAPI
@@ -175,15 +171,13 @@ priority: null
 readOnlyRootFilesystem: false
 requiredDropCapabilities: null
 runAsUser:
-  type: RunAsAny
+  type: MustRunAsRange
 seLinuxContext:
   type: RunAsAny
 seccompProfiles:
 - '*'
 supplementalGroups:
   type: RunAsAny
-users:
-- system:serviceaccount:ibm-block-csi:ibm-block-csi-node-sa
 volumes:
 - '*'
 ```
