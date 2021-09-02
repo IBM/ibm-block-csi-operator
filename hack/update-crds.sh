@@ -16,13 +16,8 @@
 # limitations under the License.
 #
 
-# Run operator-sdk generate k8s and operator-sdk generate openapi to update code after crd changes.
+# Run make generate and make manifests to update code after crd changes.
 
-if ! [ -x "$(command -v operator-sdk)" ]; then
-  echo 'Error: operator-sdk is not installed.' >&2
-  exit 1
-fi
+make generate
 
-operator-sdk generate k8s
-
-operator-sdk generate crds
+make manifests
