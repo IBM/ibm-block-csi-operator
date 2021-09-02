@@ -18,10 +18,11 @@ package config
 
 import (
 	"fmt"
-	v1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
 	"io/ioutil"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"os"
+
+	v1 "github.com/IBM/ibm-block-csi-operator/api/v1"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/yaml"
 )
 
@@ -45,7 +46,7 @@ var DefaultCr v1.IBMBlockCSI
 var DefaultSidecarsByName map[string]v1.CSISidecar
 
 var OfficialRegistriesUsernames = sets.NewString(IBMRegistryUsername, K8SRegistryUsername,
-	                                             QuayRegistryUsername, RedHatRegistryUsername)
+	QuayRegistryUsername, RedHatRegistryUsername)
 
 func LoadDefaultsOfIBMBlockCSI() error {
 	crYamlPath := os.Getenv(EnvNameCrYaml)

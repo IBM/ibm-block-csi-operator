@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM golang:1.13.1
+FROM golang:1.15.14
 
 WORKDIR /go/src/github.com/IBM/ibm-block-csi-operator/
 COPY . .
@@ -21,7 +21,7 @@ RUN CGO_ENABLED=1 GOOS=linux go build \
     -gcflags all=-trimpath=${GOPATH} \
 	-asmflags all=-trimpath=${GOPATH} \
 	-mod=vendor \
-	github.com/IBM/ibm-block-csi-operator/cmd/manager
+	main.go
 
 
 FROM registry.access.redhat.com/ubi8/ubi-minimal:8.4-208
@@ -50,7 +50,7 @@ COPY build/health_check.sh .
 RUN chmod 777 ./health_check.sh
 COPY ./LICENSE /licenses/
 COPY ./NOTICES /licenses/
-COPY ./deploy/crds/csi.ibm.com_v1_ibmblockcsi_cr.yaml ${CR_YAML}
+COPY ./config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml ${CR_YAML}
 RUN chmod 0444 ${CR_YAML}
 
 # install operator binary

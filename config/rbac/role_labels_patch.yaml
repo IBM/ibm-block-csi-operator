@@ -1,0 +1,9 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    product: ibm-block-csi-driver
+    csi: ibm
+    app.kubernetes.io/name: ibm-block-csi-operator
+    app.kubernetes.io/instance: ibm-block-csi-operator
+    app.kubernetes.io/managed-by: ibm-block-csi-operator
