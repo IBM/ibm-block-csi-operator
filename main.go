@@ -44,7 +44,7 @@ var (
 	scheme               = runtime.NewScheme()
 	setupLog             = ctrl.Log.WithName("setup")
 	watchNamespaceEnvVar = "WATCH_NAMESPACE"
-	topologyPrefixes     = [...]string{"topology.kubernetes.io", "topology.block.csi.ibm.com"}
+	topologyPrefix       = "topology.block.csi.ibm.com"
 )
 
 var log = logf.Log.WithName("cmd")
@@ -128,10 +128,8 @@ func IsTopologyInUse(ctx context.Context) (bool, error) {
 	}
 	for _, node := range nodes.Items {
 		for key := range node.Labels {
-			for _, prefix := range topologyPrefixes {
-				if strings.HasPrefix(key, prefix) {
-					return true, nil
-				}
+			if strings.HasPrefix(key, topologyPrefix) {
+				return true, nil
 			}
 		}
 	}
