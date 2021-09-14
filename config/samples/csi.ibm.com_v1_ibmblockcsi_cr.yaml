@@ -72,8 +72,8 @@ spec:
     tag: "v1.1.0"
     imagePullPolicy: IfNotPresent
   - name: csi-addons-replicator
-    repository: stg-artifactory.haifa.ibm.com:5030/replication_sidecar
-    tag: "test2"
+    repository: quay.io/csiblock/replication_sidecar
+    tag: "test"
     imagePullPolicy: IfNotPresent
   - name: livenessprobe
     repository: k8s.gcr.io/sig-storage/livenessprobe
