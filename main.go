@@ -44,7 +44,7 @@ var (
 	scheme               = runtime.NewScheme()
 	setupLog             = ctrl.Log.WithName("setup")
 	watchNamespaceEnvVar = "WATCH_NAMESPACE"
-	topologyPrefixes     = [...]string{"topology.kubernetes.io", "topology.block.csi.ibm.com"}
+	topologyPrefixes     = [...]string{"topology.block.csi.ibm.com"}
 )
 
 var log = logf.Log.WithName("cmd")
