@@ -100,6 +100,10 @@ type IBMBlockCSIReconciler struct {
 //+kubebuilder:rbac:groups=snapshot.storage.k8s.io,resources=volumesnapshotcontents,verbs=get;watch;list;create;update;delete
 //+kubebuilder:rbac:groups=snapshot.storage.k8s.io,resources=volumesnapshotcontents/status,verbs=update
 //+kubebuilder:rbac:groups=snapshot.storage.k8s.io,resources=volumesnapshots,verbs=get;watch;list;update
+//+kubebuilder:rbac:groups=replication.storage.openshift.io,resources=volumereplicationclasses,verbs=get;list;watch
+//+kubebuilder:rbac:groups=replication.storage.openshift.io,resources=volumereplications,verbs=create;delete;get;list;patch;update;watch
+//+kubebuilder:rbac:groups=replication.storage.openshift.io,resources=volumereplications/finalizers,verbs=update
+//+kubebuilder:rbac:groups=replication.storage.openshift.io,resources=volumereplications/status,verbs=get;patch;update
 func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request) (reconcile.Result, error) {
 	reqLogger := log.WithValues("Request.Namespace", req.Namespace, "Request.Name", req.Name)
 	reqLogger.Info("Reconciling IBMBlockCSI")
@@ -612,6 +616,7 @@ func (r *IBMBlockCSIReconciler) getClusterRoles(instance *ibmblockcsi.IBMBlockCS
 	externalAttacher := instance.GenerateExternalAttacherClusterRole()
 	externalSnapshotter := instance.GenerateExternalSnapshotterClusterRole()
 	externalResizer := instance.GenerateExternalResizerClusterRole()
+	csiAddonsReplicator := instance.GenerateCSIAddonsReplicatorClusterRole()
 	controllerSCC := instance.GenerateSCCForControllerClusterRole()
 	nodeSCC := instance.GenerateSCCForNodeClusterRole()
 
@@ -620,6 +625,7 @@ func (r *IBMBlockCSIReconciler) getClusterRoles(instance *ibmblockcsi.IBMBlockCS
 		externalAttacher,
 		externalSnapshotter,
 		externalResizer,
+		csiAddonsReplicator,
 		controllerSCC,
 		nodeSCC,
 	}
@@ -685,6 +691,7 @@ func (r *IBMBlockCSIReconciler) getClusterRoleBindings(instance *ibmblockcsi.IBM
 	externalAttacher := instance.GenerateExternalAttacherClusterRoleBinding()
 	externalSnapshotter := instance.GenerateExternalSnapshotterClusterRoleBinding()
 	externalResizer := instance.GenerateExternalResizerClusterRoleBinding()
+	csiAddonsReplicator := instance.GenerateCSIAddonsReplicatorClusterRoleBinding()
 	controllerSCC := instance.GenerateSCCForControllerClusterRoleBinding()
 	nodeSCC := instance.GenerateSCCForNodeClusterRoleBinding()
 
@@ -693,6 +700,7 @@ func (r *IBMBlockCSIReconciler) getClusterRoleBindings(instance *ibmblockcsi.IBM
 		externalAttacher,
 		externalSnapshotter,
 		externalResizer,
+		csiAddonsReplicator,
 		controllerSCC,
 		nodeSCC,
 	}
