@@ -1,0 +1,31 @@
+# Copyright IBM Corporation 2020.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+FROM python:3
+
+WORKDIR /usr/src/app
+
+RUN RELEASE_VERSION=v1.9.0 \
+    && ARCH=$(if [ "$(uname -m)" = "x86_64" ]; then echo "amd64"; else echo "$(uname -m)" ; fi) \
+    && SDK_ASSET=operator-sdk_linux_${ARCH} \
+    && curl -LO https://github.com/operator-framework/operator-sdk/releases/download/${RELEASE_VERSION}/${SDK_ASSET} \
+    && chmod +x ${SDK_ASSET} \
+    && mkdir -p /usr/local/bin/ \
+    && cp ${SDK_ASSET} /usr/local/bin/operator-sdk \
+    && rm ${SDK_ASSET}
+
+COPY Makefile Makefile
+COPY build/ build/
+COPY deploy/olm-catalog deploy/olm-catalog
+CMD ["make", "olm-validation"]
