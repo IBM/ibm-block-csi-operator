@@ -126,6 +126,8 @@ jobs:
       operator_image_repository_for_test: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}/ibm-block-csi-operator'
       operator_specific_tag_for_test: "${{ needs.csi_build_and_push_images.outputs.operator_specific_tag_for_test }}"
       operator_image_for_test: "${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}/ibm-block-csi-operator:${{ needs.csi_build_and_push_images.outputs.operator_specific_tag_for_test }}"
+      operator_yaml: "deploy/installer/generated/ibm-block-csi-operator.yaml"
+      cr_file: "config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml"
     timeout-minutes: 7
     steps:
       - name: Checkout
@@ -160,14 +162,11 @@ jobs:
       - name: Deploy ibm block csi operator
         run: |
           build/ci/github_actions/operator/deploy_operator.sh
-        env:
-          operator_yaml: "deploy/installer/generated/ibm-block-csi-operator.yaml"
       - name: Deploy ibm block csi driver
         run: |
           build/ci/github_actions/driver/deploy_driver.sh
         env:
           driver_images_tag: "${{ steps.driver_images_tag_from_branch.outputs.image_branch_tag }}"
-          cr_file: "deploy/crds/csi.ibm.com_v1_ibmblockcsi_cr.yaml"
       - name: Save driver pods logs to artifacts
         if: always()
         run: |

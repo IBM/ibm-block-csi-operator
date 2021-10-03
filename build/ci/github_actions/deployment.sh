@@ -82,7 +82,7 @@ assert_expected_image_in_pod (){
   fi
 }
 
-assert_pods_images (){
+assert_driver_images_in_pods (){
   expected_node_image=$1
   expected_controller_image=$2
   declare -A drivers_components_in_k8s=(
@@ -93,4 +93,11 @@ assert_pods_images (){
       driver_component_expected_image=${drivers_components_in_k8s[${driver_component}]}
       assert_expected_image_in_pod $driver_component $driver_component_expected_image
   done
+}
+
+assert_operator_image_in_pod (){
+  operator_image_for_test=$1
+  kubectl apply -f $operator_yaml
+  wait_for_pod_to_start "operator"
+  assert_expected_image_in_pod "operator" $operator_image_for_test
 }

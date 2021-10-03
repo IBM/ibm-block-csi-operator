@@ -11,8 +11,7 @@ install_worker_prerequisites() {
 }
 
 edit_cr_images (){
-  cd $(dirname $cr_file)
-  chmod 547 $(basename $cr_file)
+  chmod 547 $cr_file
   declare -A cr_image_fields=(
       [".spec.controller.repository"]="$controller_repository_for_test"
       [".spec.controller.tag"]="$driver_images_tag"
@@ -21,9 +20,8 @@ edit_cr_images (){
   )
   for image_field in ${!cr_image_fields[@]}; do
       cr_image_value=${cr_image_fields[${image_field}]}
-      yq eval "${image_field} |= \"${cr_image_value}\"" $(basename $cr_file) -i
+      yq eval "${image_field} |= \"${cr_image_value}\"" $cr_file -i
   done
-  cd -
 }
 
 install_worker_prerequisites
@@ -33,5 +31,5 @@ cat $cr_file | grep tag:
 kubectl apply -f $cr_file
 . build/ci/github_actions/deployment.sh
 wait_for_driver_deployment_to_start
-assert_pods_images $expected_node_image $expected_controller_image
+assert_driver_images_in_pods $expected_node_image $expected_controller_image
 wait_for_driver_deployment_to_finish
