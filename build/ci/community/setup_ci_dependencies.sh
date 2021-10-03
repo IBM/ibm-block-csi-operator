@@ -10,3 +10,8 @@ sudo apt-get install gh
 
 git config --global user.email csi.block1@il.ibm.com
 git config --global user.name csiblock
+
+image_version=`cat version/version.go | grep -i driverversion | awk -F = '{print $2}'`
+image_version=`echo ${image_version//\"}`
+
+echo "::set-output name=image_branch_tag::${image_branch_tag}"

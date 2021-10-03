@@ -26,6 +26,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Setup dependencies
+        id: setup_dependencies
         run: |
           build/ci/community/setup_ci_dependencies.sh
       - name: Save dependencies files
@@ -42,6 +43,7 @@ jobs:
         run: |
           build/ci/community/prepare_env.sh
    outputs:
+     image_branch_tag: "${{ steps.setup_dependencies.outputs.image_branch_tag }}"
      community_operators_path: "${{ steps.environment_setup.outputs.community_operators_path }}"
      upstream_community_operators_path: "${{ steps.environment_setup.outputs.upstream_community_operators_path }}"
      repository_path: "${{ steps.environment_setup.outputs.repository_path }}"
@@ -65,6 +67,7 @@ jobs:
       operator_image_for_test: ${{ needs.prepare_env.outputs.operator_image_for_test }}
       csv_file: ${{ needs.prepare_env.outputs.csv_file }}
       github_build_number: ${{ github.run_number }}
+      latest_operator_version: ${{ needs.prepare_env.outputs.image_branch_tag }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
