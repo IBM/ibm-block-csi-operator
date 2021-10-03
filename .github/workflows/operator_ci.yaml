@@ -62,7 +62,7 @@ jobs:
         run: |
           ./build/ci/run_olm_validation.sh
           
-  csi_build_and_push_images:
+  build_and_push_images:
     name: "CSI Build and push images"
     runs-on: ubuntu-latest
     needs:
@@ -118,14 +118,14 @@ jobs:
   create_cluster:
     runs-on: ubuntu-latest
     name: "Create cluster"
-    needs: csi_build_and_push_images
+    needs: build_and_push_images
     env:
       csiblock_docker_registry_username: ${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}
       controller_repository_for_test: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}/ibm-block-csi-controller'
       node_repository_for_test: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}/ibm-block-csi-node'
       operator_image_repository_for_test: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}/ibm-block-csi-operator'
-      operator_specific_tag_for_test: "${{ needs.csi_build_and_push_images.outputs.operator_specific_tag_for_test }}"
-      operator_image_for_test: "${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}/ibm-block-csi-operator:${{ needs.csi_build_and_push_images.outputs.operator_specific_tag_for_test }}"
+      operator_specific_tag_for_test: "${{ needs.build_and_push_images.outputs.operator_specific_tag_for_test }}"
+      operator_image_for_test: "${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}/ibm-block-csi-operator:${{ needs.build_and_push_images.outputs.operator_specific_tag_for_test }}"
       operator_yaml: "deploy/installer/generated/ibm-block-csi-operator.yaml"
       cr_file: "config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml"
     timeout-minutes: 7
