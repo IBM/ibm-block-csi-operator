@@ -1,3 +1,19 @@
+/*
+Copyright 2018 Pressinfra SRL.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package syncer
 
 import (
@@ -6,6 +22,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	logf "sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 type externalSyncer struct {
@@ -15,21 +32,34 @@ type externalSyncer struct {
 	syncFn func(context.Context, interface{}) (controllerutil.OperationResult, error)
 }
 
-func (s *externalSyncer) GetObject() interface{}   { return s.obj }
-func (s *externalSyncer) GetOwner() runtime.Object { return s.owner }
+func (s *externalSyncer) Object() interface{} {
+	return s.obj
+}
+
+func (s *externalSyncer) ObjectType() string {
+	return fmt.Sprintf("%T", s.obj)
+}
+
+func (s *externalSyncer) ObjectOwner() runtime.Object {
+	return s.owner
+}
+
 func (s *externalSyncer) Sync(ctx context.Context) (SyncResult, error) {
 	var err error
+
+	log := logf.FromContext(ctx, "syncer", s.name)
+
 	result := SyncResult{}
 	result.Operation, err = s.syncFn(ctx, s.obj)
 
 	if err != nil {
 		result.SetEventData(eventWarning, basicEventReason(s.name, err),
-			fmt.Sprintf("%T failed syncing: %s", s.obj, err))
-		log.Error(err, string(result.Operation), "kind", fmt.Sprintf("%T", s.obj))
+			fmt.Sprintf("%s failed syncing: %s", s.ObjectType(), err))
+		log.Error(err, string(result.Operation), "kind", s.ObjectType())
 	} else {
 		result.SetEventData(eventNormal, basicEventReason(s.name, err),
-			fmt.Sprintf("%T successfully %s", s.obj, result.Operation))
-		log.V(1).Info(string(result.Operation), "kind", fmt.Sprintf("%T", s.obj))
+			fmt.Sprintf("%s successfully %s", s.ObjectType(), result.Operation))
+		log.V(1).Info(string(result.Operation), "kind", s.ObjectType())
 	}
 
 	return result, err
@@ -38,8 +68,9 @@ func (s *externalSyncer) Sync(ctx context.Context) (SyncResult, error) {
 // NewExternalSyncer creates a new syncer which syncs a generic object
 // persisting it's state into and external store The name is used for logging
 // and event emitting purposes and should be an valid go identifier in upper
-// camel case. (eg. GiteaRepo)
-func NewExternalSyncer(name string, owner runtime.Object, obj interface{}, syncFn func(context.Context, interface{}) (controllerutil.OperationResult, error)) Interface {
+// camel case. (eg. GiteaRepo).
+func NewExternalSyncer(name string, owner runtime.Object, obj interface{},
+	syncFn func(context.Context, interface{}) (controllerutil.OperationResult, error)) Interface {
 	return &externalSyncer{
 		name:   name,
 		obj:    obj,
