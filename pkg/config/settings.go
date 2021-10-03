@@ -18,10 +18,11 @@ package config
 
 import (
 	"fmt"
-	v1 "github.com/IBM/ibm-block-csi-operator/pkg/apis/csi/v1"
 	"io/ioutil"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"os"
+
+	v1 "github.com/IBM/ibm-block-csi-operator/api/v1"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/yaml"
 )
 
@@ -34,10 +35,11 @@ const (
 
 	NodeAgentPort = "10086"
 
-	IBMRegistryUsername    = "ibmcom"
-	K8SRegistryUsername    = "k8s.gcr.io/sig-storage"
-	QuayRegistryUsername   = "quay.io/k8scsi"
-	RedHatRegistryUsername = "registry.redhat.io/openshift4"
+	IBMRegistryUsername        = "ibmcom"
+	K8SRegistryUsername        = "k8s.gcr.io/sig-storage"
+	QuayRegistryUsername       = "quay.io/k8scsi"
+	QuayAddonsRegistryUsername = "quay.io/csiaddons"
+	RedHatRegistryUsername     = "registry.redhat.io/openshift4"
 )
 
 var DefaultCr v1.IBMBlockCSI
@@ -45,7 +47,8 @@ var DefaultCr v1.IBMBlockCSI
 var DefaultSidecarsByName map[string]v1.CSISidecar
 
 var OfficialRegistriesUsernames = sets.NewString(IBMRegistryUsername, K8SRegistryUsername,
-	                                             QuayRegistryUsername, RedHatRegistryUsername)
+	                                             QuayRegistryUsername, QuayAddonsRegistryUsername,
+	                                             RedHatRegistryUsername)
 
 func LoadDefaultsOfIBMBlockCSI() error {
 	crYamlPath := os.Getenv(EnvNameCrYaml)

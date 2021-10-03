@@ -25,7 +25,7 @@ const (
 	ProductName = "ibm-block-csi-driver"
 	Masterlabel = "node-role.kubernetes.io/master"
 
-	NodeAgentRepository  = "ibmcom/ibm-node-agent"
+	NodeAgentRepository = "ibmcom/ibm-node-agent"
 
 	ENVIscsiAgentPort = "ISCSI_AGENT_PORT"
 	ENVEndpoint       = "ENDPOINT"
@@ -37,6 +37,7 @@ const (
 	CSIAttacher            = "csi-attacher"
 	CSISnapshotter         = "csi-snapshotter"
 	CSIResizer             = "csi-resizer"
+	CSIAddonsReplicator    = "csi-addons-replicator"
 	LivenessProbe          = "livenessprobe"
 
 	ControllerSocketVolumeMountPath                       = "/var/lib/csi/sockets/pluginproxy/"
