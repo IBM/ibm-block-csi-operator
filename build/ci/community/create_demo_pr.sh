@@ -1,7 +1,7 @@
 #!/bin/bash -xel
 set +o pipefail
 
-edit_operator_image_in_csv_yaml_file (){
+edit_operator_image_in_csv_yaml (){
   cd $(dirname $csv_file)
   chmod 547 $(basename $csv_file) 
   declare -a operator_image_fields=(
@@ -50,7 +50,7 @@ update_community_operators_fork (){
   cd -
 }
 
-edit_operator_image_in_csv_yaml_file
+edit_operator_image_in_csv_yaml
 update_community_operators_fork $forked_community_operators_repository $original_community_operators_repository
 update_community_operators_fork $forked_community_operators_repository_prod $original_community_operators_repository_prod
 create_demo_pr $community_operators_kubernetes_branch "operators/" "kubernetes" $forked_community_operators_repository
