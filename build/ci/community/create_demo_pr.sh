@@ -28,7 +28,7 @@ create_demo_pr(){
   fi
   git checkout main
   git checkout -b $community_operators_branch
-  yes | cp -r $repository_path/deploy/olm-catalog/ibm-block-csi-operator-community/$latest_operator_version/ $dest_path/ibm-block-csi-operator-community/test
+  yes | cp -r $repository_path/deploy/olm-catalog/ibm-block-csi-operator-community/$latest_operator_version/ $dest_path/ibm-block-csi-operator-community
   git add .
   git commit --signoff -m "build number $github_build_number $cluster_kind"
   git push origin $community_operators_branch
