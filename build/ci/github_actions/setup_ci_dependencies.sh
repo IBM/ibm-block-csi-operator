@@ -2,7 +2,7 @@
 set +o pipefail
 
 install_ci_dependencies (){
-  python -m pip install --upgrade pip
+  python -m pip install --upgrade pip==21.2.4
   echo docker-hub==2.2.0 > dev-requirements.txt
   pip install -r dev-requirements.txt
 }
