@@ -29,7 +29,7 @@ edit_cr_images
 cat $cr_yaml | grep repository:
 cat $cr_yaml | grep tag:
 kubectl apply -f $cr_yaml
-. build/ci/github_actions/deployment.sh
+source build/ci/github_actions/deployment.sh
 wait_for_driver_deployment_to_start
 assert_driver_images_in_pods $expected_node_image $expected_controller_image
 wait_for_driver_deployment_to_finish

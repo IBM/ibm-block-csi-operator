@@ -17,12 +17,7 @@ are_pods_ready (){
 is_kubernetes_cluster_ready (){
   pods=`kubectl get pods -A | awk '{print$3}' | grep -iv ready`
   are_all_pods_ready=$(are_pods_ready $pods)
-  if [ $are_all_pods_ready == "true" ]; then
-      echo true
-      break
-  fi
-  
-  echo false
+  echo $are_all_pods_ready
 }
 
 while [[ `is_kubernetes_cluster_ready` == "false" ]]; do

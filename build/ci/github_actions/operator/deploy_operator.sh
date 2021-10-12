@@ -8,6 +8,6 @@ edit_operator_yaml_image (){
 
 edit_operator_yaml_image
 cat $operator_yaml | grep image:
-. build/ci/github_actions/deployment.sh
+source build/ci/github_actions/deployment.sh
 assert_operator_image_in_pod $operator_image_for_test
 wait_for_operator_deployment_to_finish
