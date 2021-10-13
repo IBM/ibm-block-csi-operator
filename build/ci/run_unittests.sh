@@ -16,5 +16,5 @@
 # limitations under the License.
 #
 
-docker build -f build/ci/Dockerfile.unittest -t operator-unittests .
-docker run --rm -t operator-unittests
+make build-unit-test-image
+make run-unit-test

@@ -22,5 +22,5 @@ WORKDIR $WORKDIR
 
 RUN go get github.com/onsi/ginkgo/ginkgo
 
-COPY . .
-CMD ["make", "test"]
+#COPY . .
+#CMD ["make", "test"]

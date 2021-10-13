@@ -20,7 +20,7 @@ project_dirname=ibm-block-csi-operator
 cd ..
 cp -r $project_dirname ./$project_dirname-copy
 cd $project_dirname-copy/
-hack/update-crds.sh
+hack/update-genrated-yamls.sh
 cd ..
 diff -qr --exclude=bin $project_dirname $project_dirname-copy/
 rm -rf $project_dirname-copy/

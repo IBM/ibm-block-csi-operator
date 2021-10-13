@@ -61,10 +61,23 @@ rm -rf $$TMP_DIR ;\
 endef
 
 # custom
+run_unit_tests_image=docker run --rm -e KUSTOMIZE=$(KUSTOMIZE) -v "${PWD}":/go/src/github.com/IBM/ibm-block-csi-operator -t operator-unittests
+
+define clean_bin_files
+  [[ -G bin/ ]] && rm -rf bin/
+endef
 
 .PHONY: olm-validation
 olm-validation:
 	build/ci/olm_validation.sh
+
+.PHONY: build-unit-test-image
+build-unit-test-image:
+	docker build -f build/ci/Dockerfile.unittest -t operator-unittests .
+
+.PHONY: run-unit-test
+run-unit-test:
+	$(run_unit_tests_image) make test
 
 .PHONY: test
 test: update
@@ -72,8 +85,19 @@ test: update
 	ginkgo -r -v -skipPackage tests
 
 .PHONY: update
-update:
+update: kustomize
 	hack/update-all.sh
+	$(call clean_bin_files)
+
+.PHONY: update-generated-yamls
+update-generated-yamls: download-generation-commands
+	$(run_unit_tests_image) hack/update-genrated-yamls.sh
+	$(run_unit_tests_image) hack/update-installer.sh
+
+.PHONY: download-generation-commands
+download-generation-commands:
+	$(run_unit_tests_image) make kustomize
+	$(run_unit_tests_image) make controller-gen
 
 .PHONY: list
 list:
