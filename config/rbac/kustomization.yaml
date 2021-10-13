@@ -6,3 +6,7 @@ resources:
 
 patchesStrategicMerge:
 - role_labels_patch.yaml
+
+yq eval-all 'select(fileIndex == 0) * select(fileIndex == 1)' config/rbac/role.yaml config/rbac/role_labels_patch.yaml -i
+
+yq eval-all 'select(fileIndex==0).spec.install.spec.clusterPermissions[0].rules = select(fileIndex==1).rules | select(fi==0)' file2.yaml file1.yaml -i
