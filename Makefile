@@ -63,10 +63,6 @@ endef
 # custom
 run_unit_tests_image=docker run --rm -v $(CURDIR):/go/src/github.com/IBM/ibm-block-csi-operator -t operator-unittests
 
-define clean_bin_files
-  [[ -G bin/ ]] && rm -rf bin/
-endef
-
 .PHONY: olm-validation
 olm-validation:
 	build/ci/olm_validation.sh
@@ -87,7 +83,6 @@ test: update
 .PHONY: update
 update: kustomize
 	hack/update-all.sh
-	$(call clean_bin_files)
 
 .PHONY: update-generated-yamls
 update-generated-yamls:
