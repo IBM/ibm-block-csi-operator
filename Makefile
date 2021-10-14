@@ -86,7 +86,7 @@ update: kustomize
 
 .PHONY: update-generated-yamls
 update-generated-yamls:
-	$(run_unit_tests_image) hack/update-genrated-yamls.sh
+	$(run_unit_tests_image) hack/update-yamls.sh
 	$(run_unit_tests_image) hack/update-installer.sh
 
 .PHONY: list
