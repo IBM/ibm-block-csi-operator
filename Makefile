@@ -39,11 +39,11 @@ manifests: controller-gen kustomize## Generate WebhookConfiguration, ClusterRole
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
-CONTROLLER_GEN = $(shell pwd)/bin/controller-gen
+CONTROLLER_GEN = controller-gen
 controller-gen: ## Download controller-gen locally if necessary.
 	$(call go-get-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@v0.4.1)
 
-KUSTOMIZE = $(shell pwd)/bin/kustomize
+KUSTOMIZE = kustomize
 kustomize: ## Download kustomize locally if necessary.
 	$(call go-get-tool,$(KUSTOMIZE),sigs.k8s.io/kustomize/kustomize/v3@v3.8.7)
 
@@ -55,13 +55,13 @@ TMP_DIR=$$(mktemp -d) ;\
 cd $$TMP_DIR ;\
 go mod init tmp ;\
 echo "Downloading $(2)" ;\
-GOBIN=$(PROJECT_DIR)/bin go get $(2) ;\
+go get $(2) ;\
 rm -rf $$TMP_DIR ;\
 }
 endef
 
 # custom
-run_unit_tests_image=docker run --rm -e KUSTOMIZE=$(KUSTOMIZE) -v "${PWD}":/go/src/github.com/IBM/ibm-block-csi-operator -t operator-unittests
+run_unit_tests_image=docker run --rm -v $(CURDIR):/go/src/github.com/IBM/ibm-block-csi-operator -t operator-unittests
 
 define clean_bin_files
   [[ -G bin/ ]] && rm -rf bin/
@@ -90,14 +90,9 @@ update: kustomize
 	$(call clean_bin_files)
 
 .PHONY: update-generated-yamls
-update-generated-yamls: download-generation-commands
+update-generated-yamls:
 	$(run_unit_tests_image) hack/update-genrated-yamls.sh
 	$(run_unit_tests_image) hack/update-installer.sh
-
-.PHONY: download-generation-commands
-download-generation-commands:
-	$(run_unit_tests_image) make kustomize
-	$(run_unit_tests_image) make controller-gen
 
 .PHONY: list
 list:

@@ -20,5 +20,5 @@
 # folder into one file.
 
 yes | cp deploy/installer/generated/kustomization.yaml .
-${PWD}/bin/kustomize build -o deploy/installer/generated/ibm-block-csi-operator.yaml
+kustomize build -o deploy/installer/generated/ibm-block-csi-operator.yaml
 rm -rf kustomization.yaml
