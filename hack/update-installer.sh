@@ -19,6 +19,6 @@
 # Combine all the operator related yamls in the deploy
 # folder into one file.
 
-yes | cp deploy/installer/generated/kustomization.yaml .
+yes | cp deploy/installer/kustomization.yaml .
 kustomize build -o deploy/installer/generated/ibm-block-csi-operator.yaml
 rm -f kustomization.yaml
