@@ -16,5 +16,5 @@
 # limitations under the License.
 #
 
-make build-unit-tests-image
-make run-unit-tests
+docker build -f build/ci/Dockerfile.unittest -t operator-unittests .
+docker run --rm -v ${PWD}:/go/src/github.com/IBM/ibm-block-csi-operator -t operator-unittests
