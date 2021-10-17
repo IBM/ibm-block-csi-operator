@@ -21,4 +21,4 @@
 
 yes | cp deploy/installer/generated/kustomization.yaml .
 kustomize build -o deploy/installer/generated/ibm-block-csi-operator.yaml
-rm -rf kustomization.yaml
+rm -f kustomization.yaml

@@ -16,5 +16,5 @@
 # limitations under the License.
 #
 
-make build-unit-test-image
-make run-unit-test
+make build-unit-tests-image
+make run-unit-tests

@@ -67,12 +67,12 @@ run_unit_tests_image=docker run --rm -v $(CURDIR):/go/src/github.com/IBM/ibm-blo
 olm-validation:
 	build/ci/olm_validation.sh
 
-.PHONY: build-unit-test-image
-build-unit-test-image:
+.PHONY: build-unit-tests-image
+build-unit-tests-image:
 	docker build -f build/ci/Dockerfile.unittest -t operator-unittests .
 
-.PHONY: run-unit-test
-run-unit-test:
+.PHONY: run-unit-tests
+run-unit-tests:
 	$(run_unit_tests_image) make test
 
 .PHONY: test
