@@ -17,4 +17,4 @@
 #
 
 docker build -f build/ci/Dockerfile.unittest -t operator-unittests .
-docker run --rm -v ${PWD}:/go/src/github.com/IBM/ibm-block-csi-operator -t operator-unittests
+docker run --rm -t operator-unittests
