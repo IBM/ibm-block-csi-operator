@@ -18,9 +18,9 @@
 
 project_dirname=ibm-block-csi-operator
 cd ..
-cp -r $project_dirname ./$project_dirname-copy
-cd $project_dirname-copy/
+cp -r $project_dirname ./$project_dirname-expected
+cd $project_dirname-expected/
 hack/update-config-yamls.sh
 cd ..
-diff -qr --exclude=bin $project_dirname $project_dirname-copy/
-rm -rf $project_dirname-copy/
+diff -qr --exclude=bin $project_dirname $project_dirname-expected/
+rm -rf $project_dirname-expected/

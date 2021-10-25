@@ -76,13 +76,16 @@ run-unit-tests:
 	$(run_unit_tests_image) make test
 
 .PHONY: test
-test: update
-	hack/check-generated-manifests.sh
+test: check-generated-manifests update
 	ginkgo -r -v -skipPackage tests
 
 .PHONY: update
 update: kustomize
 	hack/update-all.sh
+
+.PHONY: check-generated-manifests
+check-generated-manifests:
+	hack/check-generated-manifests.sh
 
 .PHONY: update-generated-yamls
 update-generated-yamls:
