@@ -25,6 +25,11 @@ RUN go get github.com/onsi/ginkgo/ginkgo@v1.16.4 \
     && make kustomize \
     && make controller-gen
 
+ARG VERSION=v4.9.6
+ARG BINARY=yq_linux_386
+RUN wget https://github.com/mikefarah/yq/releases/download/${VERSION}/${BINARY} -O /usr/bin/yq \ 
+    && chmod +x /usr/bin/yq
+
 COPY . .
 
 CMD ["make", "test"]
