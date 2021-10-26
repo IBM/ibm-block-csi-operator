@@ -12,9 +12,8 @@ metadata:
     description: "Run IBM block storage CSI driver on OpenShift."
     repository: https://github.com/IBM/ibm-block-csi-operator
     support: IBM
-    alm-examples: >-
+    alm-examples: |-
       [
-
         {
           "apiVersion": "csi.ibm.com/v1",
           "kind": "IBMBlockCSI",
