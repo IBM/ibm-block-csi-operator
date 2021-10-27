@@ -80,7 +80,7 @@ test: check-generated-manifests update
 	ginkgo -r -v -skipPackage tests
 
 .PHONY: update
-update: kustomize
+update:
 	hack/update-all.sh
 
 .PHONY: check-generated-manifests
