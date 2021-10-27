@@ -1,6 +1,3 @@
 resources:
 - bases/csi.ibm.com_ibmblockcsis.yaml
 #+kubebuilder:scaffold:crdkustomizeresource
-
-patchesStrategicMerge:
-- patches/labels_patch.yaml
