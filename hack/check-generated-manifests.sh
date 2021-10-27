@@ -16,11 +16,26 @@
 # limitations under the License.
 #
 
-project_dirname=ibm-block-csi-operator
-cd ..
-cp -r $project_dirname ./$project_dirname-expected
-cd $project_dirname-expected/
-hack/update-config-yamls.sh
-cd ..
-diff -qr --exclude=bin $project_dirname $project_dirname-expected/
-rm -rf $project_dirname-expected/
+check_generation (){
+  project_dirname=ibm-block-csi-operator
+  cd ..
+  cp -r $project_dirname ./$project_dirname-expected
+  cd $project_dirname-expected/
+  make update
+  cd ..
+  diff -qr --exclude=bin $project_dirname $project_dirname-expected/
+  rm -rf $project_dirname-expected/
+  cd $project_dirname
+}
+
+check_if_roles_are_align (){
+  source hack/update-roles-in-csv.sh
+  latest_csi_version=$(get_latest_csi_version)
+  csv_files=$(ls deploy/olm-catalog/*/$latest_csi_version/manifests/ibm-block-csi-operator.v$latest_csi_version.clusterserviceversion.yaml)
+  for csv_file in $csv_files; do
+    diff <(yq e .rules config/rbac/role.yaml) <(yq e .spec.install.spec.clusterPermissions[0].rules $csv_file)
+  done
+}
+
+check_generation
+check_if_roles_are_align
