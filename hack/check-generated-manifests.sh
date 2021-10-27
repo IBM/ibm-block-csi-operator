@@ -39,4 +39,3 @@ check_if_roles_are_align (){
 
 check_generation
 check_if_roles_are_align
-a
