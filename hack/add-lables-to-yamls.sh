@@ -16,11 +16,11 @@
 # limitations under the License.
 #
 
-declare -A yamls_with_wanted_lables=(
+declare -A yamls_with_required_lables=(
     ["config/rbac/role.yaml"]="config/rbac/patches/role_labels_patch.yaml"
     ["config/crd/bases/csi.ibm.com_ibmblockcsis.yaml"]="config/crd/patches/labels_patch.yaml"
 )
-for yaml_file in ${!yamls_with_wanted_lables[@]}; do
-    wanted_lables=${yamls_with_wanted_lables[${yaml_file}]}
-    yq eval-all 'select(fileIndex == 0) * select(fileIndex == 1)' ${yaml_file} ${wanted_lables} -i
+for yaml_file in ${!yamls_with_required_lables[@]}; do
+    required_lables=${yamls_with_required_lables[${yaml_file}]}
+    yq eval-all 'select(fileIndex == 0) * select(fileIndex == 1)' ${yaml_file} ${required_lables} -i
 done
