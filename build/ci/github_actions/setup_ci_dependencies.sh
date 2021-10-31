@@ -10,15 +10,15 @@ install_ci_dependencies (){
 
 install_ci_dependencies
 # CSI-3173 - move image_version value into a common config file
-image_version=`cat version/version.go | grep -i driverversion | awk -F = '{print $2}'`
-image_version=`echo ${image_version//\"}`
-operator_image_tags_for_test=`build/ci/get_image_tags_from_branch.sh ${CI_ACTION_REF_NAME} ${image_version} ${build_number} ${GITHUB_SHA}`
-image_branch_tag=`echo $operator_image_tags_for_test | awk '{print$2}'`
-operator_specific_tag_for_test=`echo $operator_image_tags_for_test | awk '{print$1}'`
+image_version=$(cat version/version.go | grep -i driverversion | awk -F = '{print $2}')
+image_version=$(echo ${image_version//\"})
+operator_image_tags_for_test=$(build/ci/get_image_tags_from_branch.sh ${CI_ACTION_REF_NAME} ${image_version} ${build_number} ${GITHUB_SHA})
+branch_image_tag=$(echo $operator_image_tags_for_test | awk '{print$2}')
+operator_specific_tag_for_test=$(echo $operator_image_tags_for_test | awk '{print$1}')
 
-if [ "$image_branch_tag" == "develop" ]; then
-  image_branch_tag=latest
+if [ "$branch_image_tag" == "develop" ]; then
+  branch_image_tag=latest
 fi
 
-echo "::set-output name=image_branch_tag::${image_branch_tag}"
+echo "::set-output name=branch_image_tag::${branch_image_tag}"
 echo "::set-output name=operator_specific_tag_for_test::${operator_specific_tag_for_test}"

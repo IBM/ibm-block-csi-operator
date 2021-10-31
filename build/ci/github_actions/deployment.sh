@@ -21,7 +21,7 @@ get_operator_pod (){
 get_image_pod_by_type (){
   pod_type=$1
   component_to_check=$2
-  containers_images=`kubectl get pods $(get_csi_pods | grep $pod_type | awk '{print$2}') -o jsonpath='{range .spec.containers[*]}{.name},{.image} {end}'`
+  containers_images=$(kubectl get pods $(get_csi_pods | grep $pod_type | awk '{print$2}') -o jsonpath='{range .spec.containers[*]}{.name},{.image} {end}')
   for containers_image in $containers_images
   do
     if [[  "$containers_image" =~ "$component_to_check," ]]; then
@@ -75,7 +75,7 @@ assert_expected_image_in_pod (){
   pod_type=$1
   expected_pod_image=$2
   component_to_check=$containers_prefix-$pod_type
-  image_in_pod=`get_image_pod_by_type $pod_type $component_to_check`
+  image_in_pod=$(get_image_pod_by_type $pod_type $component_to_check)
   if [[ $image_in_pod != $expected_pod_image ]]; then
     echo "$pod_type's image ($image_in_pod) is not the expected image ($expected_pod_image)"
     exit 1

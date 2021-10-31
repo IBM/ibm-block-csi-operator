@@ -38,7 +38,7 @@ jobs:
             /home/runner/.bash_profile
           retention-days: 1
    outputs:
-     image_branch_tag: "${{ steps.setup_dependencies.outputs.image_branch_tag }}"
+     branch_image_tag: "${{ steps.setup_dependencies.outputs.branch_image_tag }}"
      operator_specific_tag_for_test: "${{ steps.setup_dependencies.outputs.operator_specific_tag_for_test }}"
 
   unit_testing:
@@ -101,7 +101,7 @@ jobs:
           push: true
           tags: |
             ${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}/ibm-block-csi-${{ matrix.image_type }}:${{ needs.prepare_env.outputs.operator_specific_tag_for_test }}
-            ${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}/ibm-block-csi-${{ matrix.image_type }}:${{ needs.prepare_env.outputs.image_branch_tag }}
+            ${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}/ibm-block-csi-${{ matrix.image_type }}:${{ needs.prepare_env.outputs.branch_image_tag }}
           file: build/Dockerfile.${{ matrix.image_type }}
           cache-from: type=local,src=/tmp/.buildx-${{ matrix.image_type }}
           cache-to: type=local,dest=/tmp/.buildx-new-${{ matrix.image_type }}
@@ -166,7 +166,7 @@ jobs:
         run: |
           build/ci/github_actions/driver/deploy_driver.sh
         env:
-          driver_images_tag: "${{ steps.driver_images_tag_from_branch.outputs.image_branch_tag }}"
+          driver_images_tag: "${{ steps.driver_images_tag_from_branch.outputs.branch_image_tag }}"
       - name: Save driver pods logs to artifacts
         if: always()
         run: |

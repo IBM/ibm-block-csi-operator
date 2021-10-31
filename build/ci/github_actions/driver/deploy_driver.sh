@@ -5,7 +5,7 @@ expected_node_image=$node_repository_for_test:$driver_images_tag
 expected_controller_image=$controller_repository_for_test:$driver_images_tag
 
 install_worker_prerequisites() {
-  kind_node_name=`docker ps --format "{{.Names}}"`
+  kind_node_name=$(docker ps --format "{{.Names}}")
   docker exec -i $kind_node_name apt-get update
   docker exec -i $kind_node_name apt -y install open-iscsi
 }

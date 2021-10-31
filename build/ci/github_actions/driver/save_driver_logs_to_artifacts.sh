@@ -18,7 +18,7 @@ run_action_and_save_output (){
 save_logs_of_all_containers_in_pod (){
     pod_type=$1
     pod_names=$(get_all_pods_by_type $pod_type)
-    containers=`kubectl get pods $pod_names -o jsonpath='{.spec.containers[*].name}'`
+    containers=$(kubectl get pods $pod_names -o jsonpath='{.spec.containers[*].name}')
     for container in $containers
     do
         run_action_and_save_output $pod_type logs "log" "-c $container" $container

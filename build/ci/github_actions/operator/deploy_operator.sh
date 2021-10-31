@@ -2,7 +2,7 @@
 set +o pipefail
 
 edit_operator_yaml_image (){
-  operator_image_in_branch=`yq eval '(. | select(.kind == "Deployment") | .spec.template.spec.containers[0].image)' $operator_yaml`
+  operator_image_in_branch=$(yq eval '(. | select(.kind == "Deployment") | .spec.template.spec.containers[0].image)' $operator_yaml)
   sed -i "s+$operator_image_in_branch+$operator_image_for_test+g" $operator_yaml ## TODO: CSI-3223 avoid using sed
 }
 
