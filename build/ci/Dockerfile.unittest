@@ -27,7 +27,10 @@ RUN go get github.com/onsi/ginkgo/ginkgo@v1.16.4 \
 
 COPY hack/get_yq.sh hack/get_yq.sh
 ARG YQ_VERSION=v4.13.5
-RUN hack/get_yq.sh
+ARG BINARY=yq_linux_386
+RUN YQ_BINARY=$(if [ "$(uname -m)" = "x86_64" ]; then echo "yq_linux_amd64"; else echo "yq_linux_$(uname -m)" ; fi) \
+    && wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O /usr/bin/yq \ 
+    && chmod +x /usr/bin/yq
 
 COPY . .
 

@@ -16,9 +16,9 @@
 # limitations under the License.
 #
 
-get_latest_csi_version (){
-  latest_csi_version=$(cat version/version.go | grep -i driverversion | awk -F = '{print $2}')
-  echo ${latest_csi_version//\"}
+get_current_csi_version (){
+  current_csi_version=$(cat version/version.go | grep -i driverversion | awk -F = '{print $2}')
+  echo ${current_csi_version//\"}
 }
 
 declare -a bundle_names=(
@@ -26,12 +26,12 @@ declare -a bundle_names=(
   "ibm-block-csi-operator"
 )
 
-latest_csi_version=$(get_latest_csi_version)
+current_csi_version=$(get_current_csi_version)
 
 main() {
   for bundle_name in "${bundle_names[@]}"
   do
-    csv_path=deploy/olm-catalog/$bundle_name/$latest_csi_version/manifests/ibm-block-csi-operator.v$latest_csi_version.clusterserviceversion.yaml
+    csv_path=deploy/olm-catalog/$bundle_name/$current_csi_version/manifests/ibm-block-csi-operator.v$current_csi_version.clusterserviceversion.yaml
     yq eval-all 'select(fileIndex==0).spec.install.spec.clusterPermissions[0].rules = select(fileIndex==1).rules | select(fi==0)'  $csv_path config/rbac/role.yaml -i
   done
 }

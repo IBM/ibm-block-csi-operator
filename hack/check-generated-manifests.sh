@@ -28,14 +28,14 @@ check_generation (){
   cd $project_dirname
 }
 
-check_if_roles_are_align (){
+verify_no_roles_diff (){
   source hack/update-roles-in-csv.sh
-  latest_csi_version=$(get_latest_csi_version)
-  csv_files=$(ls deploy/olm-catalog/*/$latest_csi_version/manifests/ibm-block-csi-operator.v$latest_csi_version.clusterserviceversion.yaml)
+  current_csi_version=$(get_current_csi_version)
+  csv_files=$(ls deploy/olm-catalog/*/$current_csi_version/manifests/ibm-block-csi-operator.v$current_csi_version.clusterserviceversion.yaml)
   for csv_file in $csv_files; do
     diff <(yq e .rules config/rbac/role.yaml) <(yq e .spec.install.spec.clusterPermissions[0].rules $csv_file)
   done
 }
 
 check_generation
-check_if_roles_are_align
+verify_no_roles_diff
