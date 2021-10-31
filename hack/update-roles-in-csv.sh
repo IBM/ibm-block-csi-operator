@@ -21,18 +21,25 @@ get_current_csi_version (){
   echo ${current_csi_version//\"}
 }
 
-declare -a bundle_names=(
-  "ibm-block-csi-operator-community"
-  "ibm-block-csi-operator"
-)
+are_csv_files_exsists_in_current_csi_version (){
+  current_csi_version=$(get_current_csi_version)
+  if ! compgen -G "${PWD}/deploy/olm-catalog/*/$current_csi_version" > /dev/null; then
+    exit 0
+  fi
+}
 
-current_csi_version=$(get_current_csi_version)
+get_csv_files (){
+  current_csi_version=$(get_current_csi_version)
+  ls deploy/olm-catalog/*/$current_csi_version/manifests/ibm-block-csi-operator.v$current_csi_version.clusterserviceversion.yaml
+}
 
 main() {
-  for bundle_name in "${bundle_names[@]}"
+  current_csi_version=$(get_current_csi_version)
+  are_csv_files_exsists_in_current_csi_version
+  csv_files=$(get_csv_files)
+  for csv_file in $csv_files
   do
-    csv_path=deploy/olm-catalog/$bundle_name/$current_csi_version/manifests/ibm-block-csi-operator.v$current_csi_version.clusterserviceversion.yaml
-    yq eval-all 'select(fileIndex==0).spec.install.spec.clusterPermissions[0].rules = select(fileIndex==1).rules | select(fi==0)'  $csv_path config/rbac/role.yaml -i
+    yq eval-all 'select(fileIndex==0).spec.install.spec.clusterPermissions[0].rules = select(fileIndex==1).rules | select(fi==0)'  $csv_file config/rbac/role.yaml -i
   done
 }
 

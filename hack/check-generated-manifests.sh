@@ -30,8 +30,8 @@ check_generation (){
 
 verify_no_roles_diff (){
   source hack/update-roles-in-csv.sh
-  current_csi_version=$(get_current_csi_version)
-  csv_files=$(ls deploy/olm-catalog/*/$current_csi_version/manifests/ibm-block-csi-operator.v$current_csi_version.clusterserviceversion.yaml)
+  are_csv_files_exsists_in_current_csi_version
+  csv_files=$(get_csv_files)
   for csv_file in $csv_files; do
     diff <(yq e .rules config/rbac/role.yaml) <(yq e .spec.install.spec.clusterPermissions[0].rules $csv_file)
   done
