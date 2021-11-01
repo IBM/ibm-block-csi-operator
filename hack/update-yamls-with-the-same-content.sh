@@ -33,8 +33,12 @@ get_csv_files (){
   ls deploy/olm-catalog/*/$current_csi_version/manifests/ibm-block-csi-operator.v$current_csi_version.clusterserviceversion.yaml
 }
 
-main() {
+get_bundle_crds (){
   current_csi_version=$(get_current_csi_version)
+  ls deploy/olm-catalog/*/$current_csi_version/manifests/csi.ibm.com_ibmblockcsis.yaml
+}
+
+align_roles (){
   are_csv_files_exsists_in_current_csi_version
   csv_files=$(get_csv_files)
   for csv_file in $csv_files
@@ -43,7 +47,21 @@ main() {
   done
 }
 
-if [[ "${0##*/}" == "update-roles-in-csv.sh" ]]; then
+align_crds (){
+  are_csv_files_exsists_in_current_csi_version
+  bundle_crds=$(get_bundle_crds)
+  for bundle_crd in $bundle_crds
+  do
+    yes | cp config/crd/bases/csi.ibm.com_ibmblockcsis.yaml $bundle_crd
+  done
+}
+
+main() {
+  align_roles
+  align_crds
+}
+
+if [[ "${0##*/}" == "update-yamls-with-the-same-content.sh" ]]; then
     main
 fi
 
