@@ -3,7 +3,7 @@ set +o pipefail
 
 driver_images_tag_from_branch=latest
 triggering_branch=$CI_ACTION_REF_NAME
-branch_image_tag=$(build/ci/get_image_tags_from_branch.sh ${triggering_branch})
+target_image_tags=$(build/ci/get_image_tags_from_branch.sh ${triggering_branch})
 branch_image_tag=$(echo $branch_image_tag | awk '{print$2}')
 
 is_private_branch_component_image_exists(){
