@@ -9,7 +9,7 @@ install_ci_dependencies (){
 }
 
 install_ci_dependencies
-triggering_branch = ${CI_ACTION_REF_NAME}
+triggering_branch=${CI_ACTION_REF_NAME}
 # CSI-3173 - move image_version value into a common config file
 image_version=$(cat version/version.go | grep -i driverversion | awk -F = '{print $2}')
 image_version=$(echo ${image_version//\"})
