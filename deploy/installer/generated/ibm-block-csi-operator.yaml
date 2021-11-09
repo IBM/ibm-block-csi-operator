@@ -1251,8 +1251,7 @@ rules:
 - apiGroups:
   - security.openshift.io
   resourceNames:
-  - anyuid
-  - privileged
+  - restricted
   resources:
   - securitycontextconstraints
   verbs:

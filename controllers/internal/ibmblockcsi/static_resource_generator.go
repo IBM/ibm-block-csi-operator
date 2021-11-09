@@ -422,7 +422,7 @@ func (c *IBMBlockCSI) GenerateSCCForControllerClusterRole() *rbacv1.ClusterRole 
 			{
 				APIGroups:     []string{securityOpenshiftApiGroup},
 				Resources:     []string{securityContextConstraintsResource},
-				ResourceNames: []string{"anyuid"},
+				ResourceNames: []string{"restricted"},
 				Verbs:         []string{"use"},
 			},
 		},
@@ -458,7 +458,7 @@ func (c *IBMBlockCSI) GenerateSCCForNodeClusterRole() *rbacv1.ClusterRole {
 			{
 				APIGroups:     []string{securityOpenshiftApiGroup},
 				Resources:     []string{securityContextConstraintsResource},
-				ResourceNames: []string{"privileged"},
+				ResourceNames: []string{"restricted"},
 				Verbs:         []string{"use"},
 			},
 			{
