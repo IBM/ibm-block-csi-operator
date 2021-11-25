@@ -1,13 +1,13 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: ibm-block-csi-operator
   labels:
-    product: ibm-block-csi-driver
-    csi: ibm
-    app.kubernetes.io/name: ibm-block-csi-operator
     app.kubernetes.io/instance: ibm-block-csi-operator
     app.kubernetes.io/managed-by: ibm-block-csi-operator
+    app.kubernetes.io/name: ibm-block-csi-operator
+    csi: ibm
+    product: ibm-block-csi-driver
+  name: ibm-block-csi-operator
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
