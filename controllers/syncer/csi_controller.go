@@ -174,7 +174,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	livenessProbe := s.ensureContainer(controllerLivenessProbeContainerName,
 		s.getLivenessProbeImage(),
 		[]string{
-			"--csi-address=/csi/csi.sock",
+			"--csi-address=/csi/csi.sock", "--health-port=9807",
 		},
 	)
 	livenessProbe.ImagePullPolicy = s.getLivenessProbePullPolicy()

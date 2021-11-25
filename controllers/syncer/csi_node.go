@@ -172,7 +172,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	livenessProbe := s.ensureContainer(nodeLivenessProbeContainerName,
 		s.getLivenessProbeImage(),
 		[]string{
-			"--csi-address=/csi/csi.sock",
+			"--csi-address=/csi/csi.sock", "--health-port=9807",
 		},
 	)
 	livenessProbe.SecurityContext = &corev1.SecurityContext{AllowPrivilegeEscalation: boolptr.False()}
