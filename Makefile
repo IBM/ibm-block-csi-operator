@@ -76,15 +76,15 @@ run-unit-tests:
 	$(run_unit_tests_image) make test
 
 .PHONY: test
-test: check-generated-manifests update
+test: check-files-alignment update
 	ginkgo -r -v -skipPackage tests
 
 .PHONY: update
 update: kustomize
 	hack/update-all.sh
 
-.PHONY: check-generated-manifests
-check-generated-manifests:
+.PHONY: check-files-alignment
+check-files-alignment:
 	hack/check-files-alignment.sh
 
 .PHONY: update-generated-yamls
