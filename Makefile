@@ -85,7 +85,7 @@ update: kustomize
 
 .PHONY: check-generated-manifests
 check-generated-manifests:
-	hack/check-generated-manifests.sh
+	hack/check-files-alignment.sh
 
 .PHONY: update-generated-yamls
 update-generated-yamls:
