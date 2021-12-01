@@ -16,6 +16,8 @@
 # limitations under the License.
 #
 
+operator_yaml_path=deploy/installer/generated/ibm-block-csi-operator.yaml
+
 get_current_csi_version (){
   current_csi_version=$(cat version/version.go | grep -i driverversion | awk -F = '{print $2}')
   echo ${current_csi_version//\"}
