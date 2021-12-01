@@ -22,11 +22,8 @@ WORKDIR $WORKDIR
 COPY Makefile .
 
 RUN go get github.com/onsi/ginkgo/ginkgo@v1.16.4 \
-    && go get github.com/mikefarah/yq/v4 \
     && make kustomize \
     && make controller-gen
-
-RUN which yq
 
 COPY . .
 
