@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-source hack/get_information_helper.sh
+source hack/project_info.sh
 roles_yaml_path=config/rbac/role.yaml
 origin_crd_yaml_path=config/crd/bases/csi.ibm.com_ibmblockcsis.yaml
 
