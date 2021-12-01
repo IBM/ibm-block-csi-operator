@@ -19,6 +19,7 @@
 # Combine all the operator related yamls in the deploy
 # folder into one file.
 
+source hack/get_information_helper.sh
 yes | cp deploy/installer/kustomization.yaml .
 kustomize build -o $operator_yaml_path
 rm -f kustomization.yaml
