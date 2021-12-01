@@ -230,55 +230,11 @@ spec:
             - apiGroups:
                 - ""
               resources:
-                - pods
-              verbs:
-                - get
-                - delete
-                - list
-                - watch
-            - apiGroups:
-                - ""
-              resources:
                 - configmaps
               verbs:
-                - get
                 - create
                 - delete
-            - apiGroups:
-                - ""
-              resources:
-                - secrets
-              verbs:
                 - get
-                - list
-                - watch
-            - apiGroups:
-                - ""
-              resources:
-                - persistentvolumeclaims
-              verbs:
-                - get
-                - list
-                - watch
-                - update
-            - apiGroups:
-                - ""
-              resources:
-                - persistentvolumeclaims/status
-              verbs:
-                - patch
-            - apiGroups:
-                - ""
-              resources:
-                - persistentvolumes
-              verbs:
-                - get
-                - list
-                - watch
-                - update
-                - create
-                - delete
-                - patch
             - apiGroups:
                 - ""
               resources:
@@ -294,18 +250,49 @@ spec:
                 - list
                 - watch
             - apiGroups:
-                - apps
+                - ""
               resources:
-                - deployments
-                - daemonsets
-                - statefulsets
+                - persistentvolumeclaims
+              verbs:
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - persistentvolumeclaims/status
+              verbs:
+                - patch
+            - apiGroups:
+                - ""
+              resources:
+                - persistentvolumes
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+              verbs:
+                - delete
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - secrets
               verbs:
                 - get
                 - list
                 - watch
-                - update
-                - create
-                - delete
             - apiGroups:
                 - ""
               resources:
@@ -314,51 +301,30 @@ spec:
                 - create
                 - delete
                 - get
-                - watch
                 - list
+                - watch
             - apiGroups:
-                - rbac.authorization.k8s.io
+                - apiextensions.k8s.io
               resources:
-                - clusterroles
-                - clusterrolebindings
+                - customresourcedefinitions
+              verbs:
+                - create
+                - delete
+                - list
+                - watch
+            - apiGroups:
+                - apps
+              resources:
+                - daemonsets
+                - deployments
+                - statefulsets
               verbs:
                 - create
                 - delete
                 - get
-                - watch
                 - list
                 - update
-            - apiGroups:
-                - storage.k8s.io
-              resources:
-                - volumeattachments
-              verbs:
-                - get
-                - list
                 - watch
-                - update
-                - patch
-            - apiGroups:
-                - storage.k8s.io
-              resources:
-                - volumeattachments/status
-              verbs:
-                - patch
-            - apiGroups:
-                - storage.k8s.io
-              resources:
-                - storageclasses
-              verbs:
-                - get
-                - list
-                - watch
-            - apiGroups:
-                - monitoring.coreos.com
-              resources:
-                - servicemonitors
-              verbs:
-                - get
-                - create
             - apiGroups:
                 - apps
               resourceNames:
@@ -368,81 +334,30 @@ spec:
               verbs:
                 - update
             - apiGroups:
-                - storage.k8s.io
-              resources:
-                - csidrivers
-              verbs:
-                - create
-                - delete
-                - get
-                - watch
-                - list
-            - apiGroups:
-                - storage.k8s.io
-              resources:
-                - csinodes
-              verbs:
-                - get
-                - list
-                - watch
-            - apiGroups:
-                - security.openshift.io
-              resourceNames:
-                - anyuid
-                - privileged
-              resources:
-                - securitycontextconstraints
-              verbs:
-                - use
-            - apiGroups:
-                - apiextensions.k8s.io
-              resources:
-                - customresourcedefinitions
-              verbs:
-                - create
-                - list
-                - watch
-                - delete
-            - apiGroups:
                 - csi.ibm.com
               resources:
                 - '*'
               verbs:
                 - '*'
             - apiGroups:
-                - snapshot.storage.k8s.io
+                - monitoring.coreos.com
               resources:
-                - volumesnapshotclasses
+                - servicemonitors
               verbs:
-                - get
-                - watch
-                - list
-            - apiGroups:
-                - snapshot.storage.k8s.io
-              resources:
-                - volumesnapshotcontents
-              verbs:
-                - get
-                - watch
-                - list
                 - create
-                - update
-                - delete
-            - apiGroups:
-                - snapshot.storage.k8s.io
-              resources:
-                - volumesnapshotcontents/status
-              verbs:
-                - update
-            - apiGroups:
-                - snapshot.storage.k8s.io
-              resources:
-                - volumesnapshots
-              verbs:
                 - get
-                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - clusterrolebindings
+                - clusterroles
+              verbs:
+                - create
+                - delete
+                - get
                 - list
                 - update
+                - watch
             - apiGroups:
                 - replication.storage.openshift.io
               resources:
@@ -477,6 +392,91 @@ spec:
                 - get
                 - patch
                 - update
+            - apiGroups:
+                - security.openshift.io
+              resourceNames:
+                - anyuid
+                - privileged
+              resources:
+                - securitycontextconstraints
+              verbs:
+                - use
+            - apiGroups:
+                - snapshot.storage.k8s.io
+              resources:
+                - volumesnapshotclasses
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - snapshot.storage.k8s.io
+              resources:
+                - volumesnapshotcontents
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - snapshot.storage.k8s.io
+              resources:
+                - volumesnapshotcontents/status
+              verbs:
+                - update
+            - apiGroups:
+                - snapshot.storage.k8s.io
+              resources:
+                - volumesnapshots
+              verbs:
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - storage.k8s.io
+              resources:
+                - csidrivers
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - storage.k8s.io
+              resources:
+                - csinodes
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - storage.k8s.io
+              resources:
+                - storageclasses
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - storage.k8s.io
+              resources:
+                - volumeattachments
+              verbs:
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - storage.k8s.io
+              resources:
+                - volumeattachments/status
+              verbs:
+                - patch
 
       deployments:
         - name: ibm-block-csi-operator
