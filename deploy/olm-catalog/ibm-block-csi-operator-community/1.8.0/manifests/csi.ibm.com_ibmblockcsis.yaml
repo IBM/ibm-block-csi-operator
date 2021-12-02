@@ -717,6 +717,8 @@ spec:
                 - repository
                 - tag
                 type: object
+              healthPort:
+                type: integer
               imagePullSecrets:
                 items:
                   type: string
