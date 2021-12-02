@@ -57,6 +57,8 @@ type IBMBlockCSISpec struct {
 
 	// +kubebuilder:validation:Optional
 	ImagePullSecrets []string `json:"imagePullSecrets,omitempty"`
+
+	HealthPort int16 `json:"healthPort,omitempty"`
 }
 
 // seems not work in this way, need to figure out why
