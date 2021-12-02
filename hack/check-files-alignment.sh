@@ -36,8 +36,8 @@ check_generation (){
 verify_full_operator_yaml_is_aligned(){
   echo "check full operator yaml alignment"
   declare -A yaml_kinds_by_origin_yaml_path=(
-      ["config/rbac/role.yaml"]="ClusterRole"
-      ["config/crd/bases/csi.ibm.com_ibmblockcsis.yaml"]="CustomResourceDefinition"
+      [$roles_yaml_path]="ClusterRole"
+      [$origin_crd_yaml_path]="CustomResourceDefinition"
       ["config/rbac/service_account.yaml"]="ServiceAccount"
       ["config/rbac/role_binding.yaml"]="ClusterRoleBinding"
       ["config/manager/manager.yaml"]="Deployment"
