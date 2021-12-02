@@ -126,11 +126,11 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 
 	controllerPlugin.Ports = ensurePorts(corev1.ContainerPort{
 		Name:          controllerContainerHealthPortName,
-		ContainerPort: healthPort,
+		ContainerPort: int32(healthPort),
 	})
 	controllerPlugin.ImagePullPolicy = s.driver.Spec.Controller.ImagePullPolicy
 
-	controllerContainerHealthPort := intstr.FromInt(healthPort)
+	controllerContainerHealthPort := intstr.FromInt(int(healthPort))
 	controllerPlugin.LivenessProbe = ensureProbe(10, 100, 5, corev1.Handler{
 		HTTPGet: &corev1.HTTPGetAction{
 			Path:   "/healthz",

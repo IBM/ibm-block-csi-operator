@@ -123,12 +123,12 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	}
 	nodePlugin.Ports = ensurePorts(corev1.ContainerPort{
 		Name:          nodeContainerHealthPortName,
-		ContainerPort: healthPort,
+		ContainerPort: int32(healthPort),
 	})
 
 	nodePlugin.ImagePullPolicy = s.driver.Spec.Node.ImagePullPolicy
 
-	nodeContainerHealthPort := intstr.FromInt(healthPort)
+	nodeContainerHealthPort := intstr.FromInt(int(healthPort))
 	nodePlugin.LivenessProbe = ensureProbe(10, 3, 10, corev1.Handler{
 		HTTPGet: &corev1.HTTPGetAction{
 			Path:   "/healthz",
