@@ -32,9 +32,9 @@ help: ## Display this help.
 
 ##@ Development
 
-manifests: controller-gen kustomize## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
+manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=ibm-block-csi-operator webhook paths="./..." output:crd:artifacts:config=config/crd/bases
-	$(KUSTOMIZE) build config/crd/ -o config/crd/bases/csi.ibm.com_ibmblockcsis.yaml
+	hack/add-lables-to-yamls.sh
 
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
@@ -80,7 +80,7 @@ test: check-generated-manifests update
 	ginkgo -r -v -skipPackage tests
 
 .PHONY: update
-update: kustomize
+update:
 	hack/update-all.sh
 
 .PHONY: check-generated-manifests

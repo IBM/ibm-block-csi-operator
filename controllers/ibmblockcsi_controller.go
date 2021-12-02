@@ -104,6 +104,7 @@ type IBMBlockCSIReconciler struct {
 //+kubebuilder:rbac:groups=replication.storage.openshift.io,resources=volumereplications,verbs=create;delete;get;list;patch;update;watch
 //+kubebuilder:rbac:groups=replication.storage.openshift.io,resources=volumereplications/finalizers,verbs=update
 //+kubebuilder:rbac:groups=replication.storage.openshift.io,resources=volumereplications/status,verbs=get;patch;update
+
 func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request) (reconcile.Result, error) {
 	reqLogger := log.WithValues("Request.Namespace", req.Namespace, "Request.Name", req.Name)
 	reqLogger.Info("Reconciling IBMBlockCSI")

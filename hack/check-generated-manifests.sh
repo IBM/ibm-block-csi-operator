@@ -16,11 +16,26 @@
 # limitations under the License.
 #
 
-project_dirname=ibm-block-csi-operator
-cd ..
-cp -r $project_dirname ./$project_dirname-expected
-cd $project_dirname-expected/
-hack/update-config-yamls.sh
-cd ..
-diff -qr --exclude=bin $project_dirname $project_dirname-expected/
-rm -rf $project_dirname-expected/
+check_generation (){
+  project_dirname=ibm-block-csi-operator
+  cd ..
+  cp -r $project_dirname ./$project_dirname-expected
+  cd $project_dirname-expected/
+  make update
+  cd ..
+  diff -qr --exclude=bin $project_dirname $project_dirname-expected/
+  rm -rf $project_dirname-expected/
+  cd $project_dirname
+}
+
+verify_no_roles_diff (){
+  source hack/update-yamls-with-the-same-content.sh
+  are_csv_files_exsists_in_current_csi_version
+  csv_files=$(get_csv_files)
+  for csv_file in $csv_files; do
+    diff <(yq e .rules config/rbac/role.yaml) <(yq e .spec.install.spec.clusterPermissions[0].rules $csv_file)
+  done
+}
+
+check_generation
+verify_no_roles_diff
