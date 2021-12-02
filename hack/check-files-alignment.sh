@@ -18,7 +18,7 @@
 
 source hack/project_info.sh
 roles_yaml_path=config/rbac/role.yaml
-origin_crd_yaml_path=config/crd/bases/csi.ibm.com_ibmblockcsis.yaml
+crd_yaml_path=config/crd/bases/csi.ibm.com_ibmblockcsis.yaml
 
 check_generation (){
   echo "check generation"
@@ -37,7 +37,7 @@ verify_full_operator_yaml_is_aligned(){
   echo "check full operator yaml alignment"
   declare -A yaml_kinds_by_origin_yaml_path=(
       [$roles_yaml_path]="ClusterRole"
-      [$origin_crd_yaml_path]="CustomResourceDefinition"
+      [$crd_yaml_path]="CustomResourceDefinition"
       ["config/rbac/service_account.yaml"]="ServiceAccount"
       ["config/rbac/role_binding.yaml"]="ClusterRoleBinding"
       ["config/manager/manager.yaml"]="Deployment"
@@ -62,7 +62,7 @@ verify_no_crds_diff (){
   are_manifest_files_exsists_in_current_csi_version
   crd_files=$(get_bundle_crds)
   for crd_file in $crd_files; do
-    diff $origin_crd_yaml_path $crd_file
+    diff $crd_yaml_path $crd_file
   done
 }
 
