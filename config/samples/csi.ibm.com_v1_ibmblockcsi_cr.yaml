@@ -80,5 +80,6 @@ spec:
     tag: "v2.4.0"
     imagePullPolicy: IfNotPresent
 
+#  healthPort: 9808
 #  imagePullSecrets:
 #  - "secretName"
