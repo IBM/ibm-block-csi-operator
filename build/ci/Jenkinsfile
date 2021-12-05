@@ -28,9 +28,11 @@ pipeline {
         stage ('Build and push images') {
             steps {
                 script {
-                    registryUrl = "https://${DOCKER_REGISTRY}"
-                    docker.withRegistry(registryUrl, registryCredentialsID) {
+                    registryUrl = "${DOCKER_REGISTRY}"
+                    withCredentials([usernamePassword(credentialsId: registryCredentialsID, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        sh 'docker login -u $USERNAME -p $PASSWORD ${DOCKER_REGISTRY}'
                         sh './build/ci/build_push_image.sh build/_output/reports/images_url'
+                        sh 'docker logout ${DOCKER_REGISTRY}'
                     }
                 }
             }
