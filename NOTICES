@@ -5,7 +5,7 @@ This file details additional third party software license agreements
 and third party notices and information that are required 
 to be reproduced for the following programs:
    
-Operator for IBM Block Storage CSI Driver version 1.7.0
+Operator for IBM Block Storage CSI Driver version 1.8.0
 
 
 
@@ -2277,7 +2277,7 @@ End of GNU GPL Version 3.0 License
 
 ===========================================================================
 END OF TERMS AND CONDITIONS FOR SEPARATELY LICENSED CODE for Operator for
-IBM Block Storage CSI Driver version 1.7.0
+IBM Block Storage CSI Driver version 1.8.0
 ===========================================================================
 
 
@@ -2288,7 +2288,7 @@ IBM Block Storage CSI Driver version 1.7.0
 
 GNU GPL and / or LGPL Source Code for:
 
-Operator for IBM Block Storage CSI Driver 1.7.0
+Operator for IBM Block Storage CSI Driver 1.8.0
 
 ===========================================================================
 
@@ -2307,7 +2307,7 @@ General Public License 2.0.
     Red Hat Universal Base Image 7
 
 Source code to any of the above-listed packages distributed with
-Operator for IBM Block Storage CSI Driver 1.7.0 is available at the
+Operator for IBM Block Storage CSI Driver 1.8.0 is available at the
 website below, when a URL is provided, or by sending a request to the
 following address or email:
 
@@ -2336,7 +2336,7 @@ General Public License 3.0.
     Red Hat Universal Base Image 7
 
 Source code to any of the above-listed packages distributed with
-Operator for IBM Block Storage CSI Driver 1.7.0 is available at the
+Operator for IBM Block Storage CSI Driver 1.8.0 is available at the
 website below, when a URL is provided, or by sending a request to the
 following address or email:
 
@@ -2364,7 +2364,7 @@ under the GNU Lesser General Public License 3.0.
     Prometheus version 1.8.2
 
 Source code to any of the above-listed packages distributed with
-Operator for IBM Block Storage CSI Driver 1.7.0 is available at the
+Operator for IBM Block Storage CSI Driver 1.8.0 is available at the
 website below, when a URL is provided, or by sending a request to the
 following address or email:
 
@@ -2411,19 +2411,23 @@ APACHE 2.0 LICENSED CODE:  The Program includes all or portions of
 the following software which IBM obtained under the terms and conditions
 of the Apache License Version 2.0:
 
-api version 0.21.2
-apimacherniery version 0.21.2
-client-go version 0.21.2
+apiextensions-apiserver version 0.18.0
+api version 0.18.0
+apimacherniery version 0.18.0
+cloud-provider version 0.18.0
+client-go version 0.18.0
 code-generator-kubernetes version 1.13.1
-controller-runtime version 0.9.2
+controller-runtime version 0.6.2
 controller-tools version 0.1.11
-controller-util version 0.2.6
+controller-util commit fc080f9
 gengo commit e17681d
+grpc version 1.27.0
+kube-openapi version v0.0.0-20200121204235-bf4fb3bd569c
 logr version 0.1.0
-operator-sdk version 1.9.0
-yaml version 1.2.0
+operator-sdk version 0.18.1
 prometheus-operator version 0.31.1
 prometheus version 1.8.2
+spec version 0.19.3
 thrift
 
 ---------------------------------------------------------------------------
@@ -2636,26 +2640,6 @@ limitations under the License.
 End of Apache Software License Version 2.0
 ---------------------------------------------------------------------------
 
-
-
-===========================================================================
-NOTICE file corresponding to section 4(d) of the Apache License,
-Version 2.0, in this case for the yaml version 1.2.0 distribution
-===========================================================================
-
-Copyright 2011-2016 Canonical Ltd.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 
 
 ===========================================================================
@@ -3089,6 +3073,39 @@ END OF code-generator-kubernetes version 1.13.1 NOTICES AND INFORMATION
 
 @@@@@@@@@@@@
 ===========================================================================
+deep version 1.0.4: The Program includes deep version 1.0.4 software.
+IBM obtained the deep version 1.0.4 software under the terms and
+conditions of the following license(s):
+---------------------------------------------------------------------------
+
+Copyright 2015-2017 Daniel Nichter
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+===========================================================================
+END OF deep version 1.0.4 NOTICES AND INFORMATION
+===========================================================================
+
+
+@@@@@@@@@@@@
+===========================================================================
 errors version 0.9.1: The Program includes errors version 0.9.1
 software. IBM obtained the errors version 0.9.1 software under the
 terms and conditions of the following license(s):
@@ -3127,10 +3144,11 @@ END OF errors version 0.9.1 NOTICES AND INFORMATION
 
 @@@@@@@@@@@@
 ===========================================================================
-ginkgo version 1.16.4: The Program includes ginkgo version 1.16.4
-software. IBM obtained the ginkgo version 1.16.4 software under the
+ginkgo version 1.12.1: The Program includes ginkgo version 1.12.1
+software. IBM obtained the ginkgo version 1.12.1 software under the
 terms and conditions of the following license(s):
 ---------------------------------------------------------------------------
+
 
 Copyright (c) 2013-2014 Onsi Fakhouri
 
@@ -3178,6 +3196,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ========================================================================
 
+The MIT License (MIT)
+
 Copyright (c) 2016 Yasuhiro Matsumoto
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -3201,14 +3221,14 @@ SOFTWARE.
 
 
 ===========================================================================
-END OF ginkgo version 1.16.4 NOTICES AND INFORMATION
+END OF ginkgo version 1.12.1 NOTICES AND INFORMATION
 ===========================================================================
 
 
 @@@@@@@@@@@@
 ===========================================================================
-gomega version 1.13.0: The Program includes gomega version 1.13.0
-software. IBM obtained the gomega version 1.13.0 software under the
+gomega version 1.10.1: The Program includes gomega version 1.10.1
+software. IBM obtained the gomega version 1.10.1 software under the
 terms and conditions of the following license(s):
 ---------------------------------------------------------------------------
 
@@ -3256,101 +3276,20 @@ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  
 
-
-===========================================================================
-END OF gomega version 1.13.0 NOTICES AND INFORMATION
-===========================================================================
-
-
-@@@@@@@@@@@@
-===========================================================================
-lint version 0.0.0-20210508222113-6edffad5e616: The Program includes
-lint version 0.0.0-20210508222113-6edffad5e616 software. IBM obtained
-the lint version 0.0.0-20210508222113-6edffad5e616 software under the
-terms and conditions of the following license(s):
----------------------------------------------------------------------------
-
-
-Copyright (c) 2013 The Go Authors. All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-
-* Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-* Redistributions in binary form must reproduce the above
-copyright notice, this list of conditions and the following disclaimer
-in the documentation and/or other materials provided with the
-distribution.
-* Neither the name of Google Inc. nor the names of its
-contributors may be used to endorse or promote products derived from
-this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ===========================================================================
-END OF lint version 0.0.0-20210508222113-6edffad5e616 NOTICES AND
-INFORMATION
+END OF gomega version 1.10.1 NOTICES AND INFORMATION
 ===========================================================================
 
 
 @@@@@@@@@@@@
 ===========================================================================
-strcase version 0.0.0-20191112232945-16388991a334: The Program includes
-strcase version 0.0.0-20191112232945-16388991a334 software. IBM
-obtained the strcase version 0.0.0-20191112232945-16388991a334 software
-under the terms and conditions of the following license(s):
----------------------------------------------------------------------------
-
-
-The MIT License (MIT)
-
-Copyright (c) 2015 Ian Coleman
-Copyright (c) 2018 Ma_124, <github.com/Ma124>
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, Subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or Substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-
-===========================================================================
-END OF strcase version 0.0.0-20191112232945-16388991a334 NOTICES AND
-INFORMATION
-===========================================================================
-
-
-@@@@@@@@@@@@
-===========================================================================
-mergo version 0.3.12: The Program includes mergo version 0.3.12
-software. IBM obtained the mergo version 0.3.12 software under the
-terms and conditions of the following license(s):
+mergo version 0.3.9: The Program includes mergo version 0.3.9 software.
+IBM obtained the mergo version 0.3.9 software under the terms and
+conditions of the following license(s):
 ---------------------------------------------------------------------------
 
 
@@ -3361,13 +3300,13 @@ Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
 met:
 
-* Redistributions of source code must retain the above copyright
+   * Redistributions of source code must retain the above copyright
 notice, this list of conditions and the following disclaimer.
-* Redistributions in binary form must reproduce the above
+   * Redistributions in binary form must reproduce the above
 copyright notice, this list of conditions and the following disclaimer
 in the documentation and/or other materials provided with the
 distribution.
-* Neither the name of Google Inc. nor the names of its
+   * Neither the name of Google Inc. nor the names of its
 contributors may be used to endorse or promote products derived from
 this software without specific prior written permission.
 
@@ -3385,7 +3324,50 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ===========================================================================
-END OF mergo version 0.3.12 NOTICES AND INFORMATION
+END OF mergo version 0.3.9 NOTICES AND INFORMATION
+===========================================================================
+
+
+@@@@@@@@@@@@
+===========================================================================
+pflag version 1.0.5: The Program includes pflag version 1.0.5 software.
+IBM obtained the pflag version 1.0.5 software under the terms and
+conditions of the following license(s):
+---------------------------------------------------------------------------
+
+
+Copyright (c) 2012 Alex Ogier. All rights reserved.
+Copyright (c) 2012 The Go Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+===========================================================================
+END OF pflag version 1.0.5 NOTICES AND INFORMATION
 ===========================================================================
 
 
@@ -5074,6 +5056,49 @@ END OF prometheus version 1.8.2 NOTICES AND INFORMATION
 
 @@@@@@@@@@@@
 ===========================================================================
+protobuf version 1.4.2: The Program includes protobuf version 1.4.2
+software. IBM obtained the protobuf version 1.4.2 software under the
+terms and conditions of the following license(s):
+---------------------------------------------------------------------------
+
+
+Copyright 2010 The Go Authors.  All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+    * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+
+===========================================================================
+END OF protobuf version 1.4.2 NOTICES AND INFORMATION
+===========================================================================
+
+
+@@@@@@@@@@@@
+===========================================================================
 thrift: The Program includes thrift software. IBM obtained portions of
 the thrift software under the terms and conditions of the following
 license(s):
@@ -5136,6 +5161,6 @@ END OF thrift NOTICES AND INFORMATION
 
 ===========================================================================
 END OF NOTICES AND INFORMATION FOR Operator for IBM Block
-Storage CSI Driver 1.7.0
+Storage CSI Driver 1.8.0
 ===========================================================================
 
