@@ -1,14 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ibm-block-csi-operator
-  namespace: default
   labels:
-    product: ibm-block-csi-driver
-    csi: ibm
-    app.kubernetes.io/name: ibm-block-csi-operator
     app.kubernetes.io/instance: ibm-block-csi-operator
     app.kubernetes.io/managed-by: ibm-block-csi-operator
+    app.kubernetes.io/name: ibm-block-csi-operator
+    csi: ibm
+    product: ibm-block-csi-driver
+  name: ibm-block-csi-operator
+  namespace: default
 spec:
   replicas: 1
   selector:
@@ -16,60 +16,35 @@ spec:
       app.kubernetes.io/name: ibm-block-csi-operator
   template:
     metadata:
+      annotations:
+        productID: 5027566ef6c54de49028be7df25119e1
+        productMetric: FREE
+        productName: IBM Block CSI Driver
+        productVersion: 1.8.0
       labels:
-        app.kubernetes.io/name: ibm-block-csi-operator
         app.kubernetes.io/instance: ibm-block-csi-operator
         app.kubernetes.io/managed-by: ibm-block-csi-operator
-        product: ibm-block-csi-driver
+        app.kubernetes.io/name: ibm-block-csi-operator
         csi: ibm
-      annotations:
-        productName: "IBM Block CSI Driver"
-        productID: "5027566ef6c54de49028be7df25119e1"
-        productVersion: "1.7.0"
-        productMetric: "FREE"
+        product: ibm-block-csi-driver
     spec:
-      serviceAccountName: ibm-block-csi-operator
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
-              - matchExpressions:
-                  - key: kubernetes.io/arch
-                    operator: In
-                    values:
-                      - amd64
-                      - s390x
-                      - ppc64le
+            - matchExpressions:
+              - key: kubernetes.io/arch
+                operator: In
+                values:
+                - amd64
+                - s390x
+                - ppc64le
       containers:
-      - name: ibm-block-csi-operator
-        resources:
-          requests:
-            memory: 100Mi
-            cpu: 50m
-          limits:
-            memory: 500Mi
-            cpu: 100m
-        readinessProbe:
-          exec:
-            command: ["./health_check.sh"]
-          initialDelaySeconds: 3
-          periodSeconds: 1
-        livenessProbe:
-          exec:
-            command: ["./health_check.sh"]
-          initialDelaySeconds: 10
-          periodSeconds: 30
-        securityContext:
-          capabilities:
-            drop:
-            - ALL
-        image: ibmcom/ibm-block-csi-operator:1.7.0
-        imagePullPolicy: IfNotPresent
-        command:
-        - ibm-block-csi-operator
-        args:
+      - args:
         - --zap-encoder
         - console
+        command:
+        - ibm-block-csi-operator
         env:
         - name: WATCH_NAMESPACE
           value: ""
@@ -78,24 +53,31 @@ spec:
             fieldRef:
               fieldPath: metadata.name
         - name: OPERATOR_NAME
-          value: "ibm-block-csi-operator"
-        #- name: ENDPOINT
-        #  value: "unix:///storage/storage.sock:10086"
-        #- name: ISCSI_AGENT_PORT
-        #  value: "10086"
-        #volumeMounts:
-        #- name: socket-dir
-        #  mountPath: /storage/
-      #- name: ibm-storage-agent
-        #image: ibmcom/ibm-storage-agent:0.0.4
-        #imagePullPolicy: IfNotPresent
-        #env:
-        #- name: ENDPOINT
-        #  value: "unix:///storage/storage.sock:10086"
-        #volumeMounts:
-        #- name: socket-dir
-        #  mountPath: /storage/
-
-      #volumes:
-      #- name: socket-dir
-        #emptyDir: {}
+          value: ibm-block-csi-operator
+        image: ibmcom/ibm-block-csi-operator:1.8.0
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          exec:
+            command:
+            - ./health_check.sh
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        name: ibm-block-csi-operator
+        readinessProbe:
+          exec:
+            command:
+            - ./health_check.sh
+          initialDelaySeconds: 3
+          periodSeconds: 1
+        resources:
+          limits:
+            cpu: 100m
+            memory: 500Mi
+          requests:
+            cpu: 50m
+            memory: 100Mi
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+      serviceAccountName: ibm-block-csi-operator
