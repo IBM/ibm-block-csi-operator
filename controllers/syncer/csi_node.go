@@ -180,8 +180,8 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 			healthPortArg,
 		},
 	)
-	livenessProbe.SecurityContext = &corev1.SecurityContext{AllowPrivilegeEscalation: boolptr.False()}
-	fillSecurityContextCapabilities(livenessProbe.SecurityContext)
+	//livenessProbe.SecurityContext = &corev1.SecurityContext{AllowPrivilegeEscalation: boolptr.False()}
+	//fillSecurityContextCapabilities(livenessProbe.SecurityContext)
 	livenessProbe.ImagePullPolicy = s.getCSINodeDriverRegistrarPullPolicy()
 
 	return []corev1.Container{
