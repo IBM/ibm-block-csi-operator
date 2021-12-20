@@ -137,10 +137,10 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 		},
 	})
 
-	//nodePlugin.SecurityContext = &corev1.SecurityContext{
-	//	Privileged:               boolptr.True(),
-	//	AllowPrivilegeEscalation: boolptr.True(),
-	//}
+	nodePlugin.SecurityContext = &corev1.SecurityContext{
+		Privileged:               boolptr.False(),
+		AllowPrivilegeEscalation: boolptr.False(),
+	}
 	fillSecurityContextCapabilities(
 		nodePlugin.SecurityContext,
 		"CHOWN",
