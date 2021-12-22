@@ -23,19 +23,20 @@ get_current_csi_version (){
   echo ${current_csi_version//\"}
 }
 
-are_manifest_files_exsists_in_current_csi_version (){
-  current_csi_version=$(get_current_csi_version)
+current_csi_version=$(get_current_csi_version)
+
+are_manifest_files_exist_in_current_csi_version (){
   if ! compgen -G "${PWD}/deploy/olm-catalog/*/$current_csi_version" > /dev/null; then
     exit 0
   fi
 }
 
 get_csv_files (){
-  current_csi_version=$(get_current_csi_version)
-  ls deploy/olm-catalog/*/$current_csi_version/manifests/ibm-block-csi-operator.v$current_csi_version.clusterserviceversion.yaml
+  ls deploy/olm-catalog/ibm-block-csi-operator-community/$current_csi_version/manifests/ibm-block-csi-operator.v$current_csi_version.clusterserviceversion.yaml
+  ls deploy/olm-catalog/ibm-block-csi-operator/$current_csi_version/manifests/ibm-block-csi-operator.clusterserviceversion.yaml
 }
 
 get_bundle_crds (){
-  current_csi_version=$(get_current_csi_version)
-  ls deploy/olm-catalog/*/$current_csi_version/manifests/csi.ibm.com_ibmblockcsis.yaml
+  ls deploy/olm-catalog/ibm-block-csi-operator-community/$current_csi_version/manifests/csi.ibm.com_ibmblockcsis.yaml
+  ls deploy/olm-catalog/ibm-block-csi-operator/$current_csi_version/manifests/csi.ibm.com_ibmblockcsis.yaml
 }

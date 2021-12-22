@@ -33,6 +33,15 @@ check_generation (){
   cd $project_dirname
 }
 
+verify_yaml_doc_in_multidoc_yaml(){
+  yamls_dictionary=${1#*=}
+  eval "declare -A yaml_kinds_by_origin_yaml_path="${yamls_dictionary}
+  for orignial_yaml in ${!yaml_kinds_by_origin_yaml_path[@]}; do
+    export resource_type=${yaml_kinds_by_origin_yaml_path[${orignial_yaml}]}
+    diff <(yq e '... comments=""' $orignial_yaml) <(yq eval '(. | select(.kind == env(resource_type)))' $operator_yaml_path)
+  done
+}
+
 verify_full_operator_yaml_is_aligned(){
   echo "check full operator yaml alignment"
   declare -A yaml_kinds_by_origin_yaml_path=(
@@ -42,15 +51,12 @@ verify_full_operator_yaml_is_aligned(){
       ["config/rbac/role_binding.yaml"]="ClusterRoleBinding"
       ["config/manager/manager.yaml"]="Deployment"
   )
-  for orignial_yaml in ${!yaml_kinds_by_origin_yaml_path[@]}; do
-    export resource_type=${yaml_kinds_by_origin_yaml_path[${orignial_yaml}]}
-    diff <(yq e '... comments=""' $orignial_yaml) <(yq eval '(. | select(.kind == env(resource_type)))' $operator_yaml_path)
-  done
+  verify_yaml_doc_in_multidoc_yaml "$(declare -p yaml_kinds_by_origin_yaml_path)"
 }
 
 verify_no_roles_diff (){
   echo "check roles alignment"
-  are_manifest_files_exsists_in_current_csi_version
+  are_manifest_files_exist_in_current_csi_version
   csv_files=$(get_csv_files)
   for csv_file in $csv_files; do
     diff <(yq e .rules $roles_yaml_path) <(yq e .spec.install.spec.clusterPermissions[0].rules $csv_file)
@@ -59,7 +65,7 @@ verify_no_roles_diff (){
 
 verify_no_crds_diff (){
   echo "check crds alignment"
-  are_manifest_files_exsists_in_current_csi_version
+  are_manifest_files_exist_in_current_csi_version
   crd_files=$(get_bundle_crds)
   for crd_file in $crd_files; do
     diff $crd_yaml_path $crd_file
