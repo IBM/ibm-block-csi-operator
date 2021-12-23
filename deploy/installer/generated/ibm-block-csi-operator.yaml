@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/name: ibm-block-csi-operator
     csi: ibm
     product: ibm-block-csi-driver
-    release: v1.8.0
+    release: v1.9.0
   name: ibmblockcsis.csi.ibm.com
 spec:
   group: csi.ibm.com
@@ -1103,7 +1103,7 @@ metadata:
     app.kubernetes.io/name: ibm-block-csi-operator
     csi: ibm
     product: ibm-block-csi-driver
-    release: v1.8.0
+    release: v1.9.0
   name: ibm-block-csi-operator
   namespace: default
 ---
@@ -1411,7 +1411,7 @@ spec:
         productID: 5027566ef6c54de49028be7df25119e1
         productMetric: FREE
         productName: IBM Block CSI Driver
-        productVersion: 1.8.0
+        productVersion: 1.9.0
       labels:
         app.kubernetes.io/instance: ibm-block-csi-operator
         app.kubernetes.io/managed-by: ibm-block-csi-operator
@@ -1445,7 +1445,7 @@ spec:
               fieldPath: metadata.name
         - name: OPERATOR_NAME
           value: ibm-block-csi-operator
-        image: ibmcom/ibm-block-csi-operator:1.8.0
+        image: ibmcom/ibm-block-csi-operator:1.9.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           exec:
