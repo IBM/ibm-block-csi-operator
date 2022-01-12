@@ -198,7 +198,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 }
 
 func ensureDefaultResources() corev1.ResourceRequirements {
-	return ensureResources("20m", "200m", "20Mi", "200Mi")
+	return ensureResources("20m", "200m", "20Mi", "500Mi")
 }
 
 func ensureResources(cpuRequests, cpuLimits, memoryRequests, memoryLimits string) corev1.ResourceRequirements {
