@@ -139,7 +139,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		},
 	})
 
-	provisionerArgs := []string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s", "--default-fstype=ext4"}
+	provisionerArgs := []string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=50s", "--default-fstype=ext4"}
 	if TopologyEnabled {
 		provisionerArgs = append(provisionerArgs, "--feature-gates=Topology=true")
 	}
@@ -157,13 +157,13 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 
 	snapshotter := s.ensureContainer(snapshotterContainerName,
 		s.getCSISnapshotterImage(),
-		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s"},
+		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=50s"},
 	)
 	snapshotter.ImagePullPolicy = s.getCSISnapshotterPullPolicy()
 
 	resizer := s.ensureContainer(resizerContainerName,
 		s.getCSIResizerImage(),
-		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s"},
+		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=50s"},
 	)
 	resizer.ImagePullPolicy = s.getCSIResizerPullPolicy()
 
@@ -172,7 +172,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	replicator := s.ensureContainer(replicatorContainerName,
 		s.getCSIAddonsReplicatorImage(),
 		[]string{leaderElectionNamespaceFlag, driverNameFlag,
-			"--csi-address=$(ADDRESS)", "--zap-log-level=5", "--rpc-timeout=30s"},
+			"--csi-address=$(ADDRESS)", "--zap-log-level=5", "--rpc-timeout=50s"},
 	)
 	replicator.ImagePullPolicy = s.getCSIAddonsReplicatorPullPolicy()
 
