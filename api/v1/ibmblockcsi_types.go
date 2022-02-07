@@ -51,7 +51,7 @@ type CSISidecar struct {
 type IBMBlockCSISpec struct {
 	Controller IBMBlockCSIControllerSpec `json:"controller"`
 	Node       IBMBlockCSINodeSpec       `json:"node"`
-
+	CallHome   IBMBlockCSICallHomeSpec   `json:"callHome"`
 	// +kubebuilder:validation:Optional
 	Sidecars []CSISidecar `json:"sidecars,omitempty"`
 
@@ -112,12 +112,30 @@ type IBMBlockCSINodeSpec struct {
 	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
 }
 
+// IBMBlockCSICallHomeSpec defines the desired state of IBMBlockCSINode
+type IBMBlockCSICallHomeSpec struct {
+	Repository string `json:"repository"`
+	Tag        string `json:"tag"`
+
+	ImagePullSecrets []string `json:"imagePullSecrets,omitempty"`
+
+	// +kubebuilder:validation:Optional
+	ImagePullPolicy corev1.PullPolicy `json:"imagePullPolicy"`
+
+	// +kubebuilder:validation:Optional
+	Affinity *corev1.Affinity `json:"affinity,omitempty"`
+
+	// +kubebuilder:validation:Optional
+	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
+}
+
 // IBMBlockCSIStatus defines the observed state of IBMBlockCSI
 type IBMBlockCSIStatus struct {
 	// Phase is the driver running phase
 	Phase           DriverPhase `json:"phase"`
 	ControllerReady bool        `json:"controllerReady"`
 	NodeReady       bool        `json:"nodeReady"`
+	CallHomeReady   bool        `json:"callHomeReady"`
 
 	// Version is the current driver version
 	Version string `json:"version"`

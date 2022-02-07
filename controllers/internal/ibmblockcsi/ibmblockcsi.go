@@ -127,6 +127,13 @@ func (c *IBMBlockCSI) GetCSINodeImage() string {
 	return c.Spec.Node.Repository + ":" + c.Spec.Node.Tag
 }
 
+func (c *IBMBlockCSI) GetCallHomeImage() string {
+	if c.Spec.CallHome.Tag == "" {
+		return c.Spec.CallHome.Repository
+	}
+	return c.Spec.CallHome.Repository + ":" + c.Spec.CallHome.Tag
+}
+
 func (c *IBMBlockCSI) GetDefaultSidecarImageByName(name string) string {
 	if sidecar, found := config.DefaultSidecarsByName[name]; found {
 		return fmt.Sprintf("%s:%s", sidecar.Repository, sidecar.Tag)

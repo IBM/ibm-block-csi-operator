@@ -28,6 +28,7 @@ func (rn ResourceName) String() string {
 const (
 	CSIController                         ResourceName = "csi-controller"
 	CSINode                               ResourceName = "csi-node"
+	CallHome                              ResourceName = "call-home"
 	NodeAgent                             ResourceName = "ibm-node-agent"
 	CSIControllerServiceAccount           ResourceName = "csi-controller-sa"
 	CSINodeServiceAccount                 ResourceName = "csi-node-sa"
