@@ -105,6 +105,10 @@ func (c *IBMBlockCSI) GetCSINodeSelectorLabels() labels.Set {
 	return c.GetSelectorLabels(config.CSINode.String())
 }
 
+func (c *IBMBlockCSI) GetCallHomeSelectorLabels() labels.Set {
+	return c.GetSelectorLabels(config.CallHome.String())
+}
+
 func (c *IBMBlockCSI) GetCSIControllerPodLabels() labels.Set {
 	return labels.Merge(c.GetLabels(), c.GetCSIControllerSelectorLabels())
 }

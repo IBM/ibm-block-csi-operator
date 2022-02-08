@@ -65,7 +65,7 @@ func NewCSICallHomeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmbl
 func (s *callHomeSyncer) SyncFn() error {
 	out := s.obj.(*appsv1.Deployment)
 
-	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCSIControllerSelectorLabels())
+	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCallHomeSelectorLabels())
 
 	err := mergo.Merge(&out.Spec.Template.Spec, s.ensurePodSpec(), mergo.WithTransformers(transformers.PodSpec))
 	if err != nil {
