@@ -65,11 +65,11 @@ func NewCallHomeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblock
 func (s *callHomeSyncer) SyncFn() error {
 	out := s.obj.(*appsv1.StatefulSet)
 
-	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCSINodeSelectorLabels())
+	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCallHomeSelectorLabels())
 	out.Spec.ServiceName = config.GetNameForResource(config.CallHome, s.driver.Name)
 
 	// ensure template
-	out.Spec.Template.ObjectMeta.Labels = s.driver.GetCSIControllerPodLabels()
+	out.Spec.Template.ObjectMeta.Labels = s.driver.GetCallHomePodLabels()
 	out.Spec.Template.ObjectMeta.Annotations = s.driver.GetAnnotations("", "")
 
 	err := mergo.Merge(&out.Spec.Template.Spec, s.ensurePodSpec(), mergo.WithTransformers(transformers.PodSpec))

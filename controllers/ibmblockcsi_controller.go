@@ -313,7 +313,7 @@ func (r *IBMBlockCSIReconciler) updateStatus(instance *ibmblockcsi.IBMBlockCSI, 
 		return err
 	}
 
-	callHomeStatefulset, err := r.getCallHomeStatefulset(instance)
+	callHomeStatefulset, err := r.getCallHomeStatefulSet(instance)
 	if err != nil {
 		return err
 	}
@@ -544,7 +544,7 @@ func (r *IBMBlockCSIReconciler) getNodeDaemonSet(instance *ibmblockcsi.IBMBlockC
 	return node, err
 }
 
-func (r *IBMBlockCSIReconciler) getCallHomeStatefulset(instance *ibmblockcsi.IBMBlockCSI) (*appsv1.StatefulSet, error) {
+func (r *IBMBlockCSIReconciler) getCallHomeStatefulSet(instance *ibmblockcsi.IBMBlockCSI) (*appsv1.StatefulSet, error) {
 	CallHome := &appsv1.StatefulSet{}
 	err := r.Get(context.TODO(), types.NamespacedName{
 		Name:      oconfig.GetNameForResource(oconfig.CallHome, instance.Name),
