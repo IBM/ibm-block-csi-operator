@@ -41,9 +41,9 @@ type callHomeSyncer struct {
 	obj    runtime.Object
 }
 
-// NewCSICallHomeSyncer returns a syncer for CSI controller
-func NewCSICallHomeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockcsi.IBMBlockCSI) syncer.Interface {
-	obj := &appsv1.Deployment{
+// NewCallHomeSyncer returns a syncer for call home
+func NewCallHomeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockcsi.IBMBlockCSI) syncer.Interface {
+	obj := &appsv1.StatefulSet{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        config.GetNameForResource(config.CallHome, driver.Name),
 			Namespace:   driver.Namespace,
@@ -62,7 +62,7 @@ func NewCSICallHomeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmbl
 }
 
 func (s *callHomeSyncer) SyncFn() error {
-	out := s.obj.(*appsv1.Deployment)
+	out := s.obj.(*appsv1.StatefulSet)
 
 	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCallHomeSelectorLabels())
 

@@ -193,7 +193,7 @@ func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return reconcile.Result{}, err
 	}
 
-	csiCallHomeSyncer := clustersyncer.NewCSICallHomeSyncer(r.Client, r.Scheme, instance)
+	csiCallHomeSyncer := clustersyncer.NewCallHomeSyncer(r.Client, r.Scheme, instance)
 	if err := syncer.Sync(context.TODO(), csiCallHomeSyncer, r.Recorder); err != nil {
 		return reconcile.Result{}, err
 	}
@@ -313,14 +313,14 @@ func (r *IBMBlockCSIReconciler) updateStatus(instance *ibmblockcsi.IBMBlockCSI, 
 		return err
 	}
 
-	callHomeDeployment, err := r.getCallHomeDeployment(instance)
+	callHomeStatefulset, err := r.getCallHomeStatefulset(instance)
 	if err != nil {
 		return err
 	}
 
 	instance.Status.ControllerReady = r.isControllerReady(controllerStatefulset)
 	instance.Status.NodeReady = r.isNodeReady(nodeDaemonSet)
-	instance.Status.CallHomeReady = r.isCallHomeReady(callHomeDeployment)
+	instance.Status.CallHomeReady = r.isCallHomeReady(callHomeStatefulset)
 	phase := csiv1.DriverPhaseNone
 	if instance.Status.ControllerReady && instance.Status.NodeReady && instance.Status.CallHomeReady {
 		phase = csiv1.DriverPhaseRunning
@@ -544,8 +544,8 @@ func (r *IBMBlockCSIReconciler) getNodeDaemonSet(instance *ibmblockcsi.IBMBlockC
 	return node, err
 }
 
-func (r *IBMBlockCSIReconciler) getCallHomeDeployment(instance *ibmblockcsi.IBMBlockCSI) (*appsv1.Deployment, error) {
-	CallHome := &appsv1.Deployment{}
+func (r *IBMBlockCSIReconciler) getCallHomeStatefulset(instance *ibmblockcsi.IBMBlockCSI) (*appsv1.StatefulSet, error) {
+	CallHome := &appsv1.StatefulSet{}
 	err := r.Get(context.TODO(), types.NamespacedName{
 		Name:      oconfig.GetNameForResource(oconfig.CallHome, instance.Name),
 		Namespace: instance.Namespace,
@@ -562,7 +562,7 @@ func (r *IBMBlockCSIReconciler) isNodeReady(node *appsv1.DaemonSet) bool {
 	return node.Status.DesiredNumberScheduled == node.Status.NumberAvailable
 }
 
-func (r *IBMBlockCSIReconciler) isCallHomeReady(callHome *appsv1.Deployment) bool {
+func (r *IBMBlockCSIReconciler) isCallHomeReady(callHome *appsv1.StatefulSet) bool {
 	return callHome.Status.ReadyReplicas == callHome.Status.Replicas
 }
 
