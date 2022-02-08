@@ -51,7 +51,7 @@ type CSISidecar struct {
 type IBMBlockCSISpec struct {
 	Controller IBMBlockCSIControllerSpec `json:"controller"`
 	Node       IBMBlockCSINodeSpec       `json:"node"`
-	CallHome   IBMBlockCSICallHomeSpec   `json:"callHome"`
+	CallHome   IBMBlockCallHomeSpec      `json:"callHome"`
 	// +kubebuilder:validation:Optional
 	Sidecars []CSISidecar `json:"sidecars,omitempty"`
 
@@ -112,8 +112,8 @@ type IBMBlockCSINodeSpec struct {
 	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
 }
 
-// IBMBlockCSICallHomeSpec defines the desired state of IBMBlockCSINode
-type IBMBlockCSICallHomeSpec struct {
+// IBMBlockCallHomeSpec defines the desired state of IBMBlockCSICallHome
+type IBMBlockCallHomeSpec struct {
 	Repository string `json:"repository"`
 	Tag        string `json:"tag"`
 

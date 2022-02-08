@@ -193,8 +193,8 @@ func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return reconcile.Result{}, err
 	}
 
-	csiCallHomeSyncer := clustersyncer.NewCallHomeSyncer(r.Client, r.Scheme, instance)
-	if err := syncer.Sync(context.TODO(), csiCallHomeSyncer, r.Recorder); err != nil {
+	callHomeSyncer := clustersyncer.NewCallHomeSyncer(r.Client, r.Scheme, instance)
+	if err := syncer.Sync(context.TODO(), callHomeSyncer, r.Recorder); err != nil {
 		return reconcile.Result{}, err
 	}
 

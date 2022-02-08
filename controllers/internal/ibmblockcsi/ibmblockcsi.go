@@ -117,6 +117,10 @@ func (c *IBMBlockCSI) GetCSINodePodLabels() labels.Set {
 	return labels.Merge(c.GetLabels(), c.GetCSINodeSelectorLabels())
 }
 
+func (c *IBMBlockCSI) GetCallHomePodLabels() labels.Set {
+	return labels.Merge(c.GetLabels(), c.GetCallHomeSelectorLabels())
+}
+
 func (c *IBMBlockCSI) GetCSIControllerImage() string {
 	if c.Spec.Controller.Tag == "" {
 		return c.Spec.Controller.Repository
