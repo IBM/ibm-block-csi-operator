@@ -48,7 +48,6 @@ func NewCSICallHomeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmbl
 			Name:        config.GetNameForResource(config.CallHome, driver.Name),
 			Namespace:   driver.Namespace,
 			Annotations: driver.GetAnnotations("", ""),
-			Labels:      driver.GetLabels(),
 		},
 	}
 
