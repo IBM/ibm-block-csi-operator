@@ -511,6 +511,8 @@ spec:
                     type: array
                   repository:
                     type: string
+                  secretName:
+                    type: string
                   tag:
                     type: string
                   tolerations:
@@ -537,6 +539,7 @@ spec:
                     type: array
                 required:
                 - repository
+                - secretName
                 - tag
                 type: object
               controller:

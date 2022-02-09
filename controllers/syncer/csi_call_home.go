@@ -32,8 +32,8 @@ import (
 )
 
 const (
-	callHomeContainerName              = "ibm-block-call-home"
-	callHomeLivenessProbeContainerName = "liveness-probe"
+	callHomeContainerName = "ibm-block-call-home"
+	secretVolumeName      = "secret-dir"
 )
 
 type callHomeSyncer struct {
@@ -131,10 +131,9 @@ func (s *callHomeSyncer) ensureContainer(name, image string, args []string) core
 	sc := &corev1.SecurityContext{AllowPrivilegeEscalation: boolptr.False()}
 	fillSecurityContextCapabilities(sc)
 	return corev1.Container{
-		Name:  name,
-		Image: image,
-		Args:  args,
-		//EnvFrom:         s.getEnvSourcesFor(name),
+		Name:            name,
+		Image:           image,
+		Args:            args,
 		Env:             s.getEnvFor(name),
 		VolumeMounts:    s.getVolumeMountsFor(name),
 		SecurityContext: sc,
@@ -160,47 +159,38 @@ func (s *callHomeSyncer) envVarFromSecret(sctName, name, key string, opt bool) c
 
 func (s *callHomeSyncer) getEnvFor(name string) []corev1.EnvVar {
 
-	switch name {
-	case callHomeContainerName:
-		return []corev1.EnvVar{
-			{
-				Name:  "CSI_ENDPOINT",
-				Value: config.CSIEndpoint,
-			},
-			{
-				Name:  "CSI_LOGLEVEL",
-				Value: config.DefaultLogLevel,
-			},
-		}
-
-	case provisionerContainerName, attacherContainerName, snapshotterContainerName,
-		resizerContainerName, replicatorContainerName:
-		return []corev1.EnvVar{
-			{
-				Name:  "ADDRESS",
-				Value: config.ControllerSocketPath,
-			},
-		}
+	return []corev1.EnvVar{
+		{
+			Name:  "CSI_ENDPOINT",
+			Value: config.CSIEndpoint,
+		},
+		{
+			Name:  "CSI_LOGLEVEL",
+			Value: config.DefaultLogLevel,
+		},
+		s.envVarFromSecret(
+			s.driver.Spec.CallHome.SecretName,
+			"CALL_HOME_SECRET_USERNAME",
+			"username",
+			false,
+		),
+		s.envVarFromSecret(
+			s.driver.Spec.CallHome.SecretName,
+			"CALL_HOME_SECRET_PASSWORD",
+			"password",
+			false,
+		),
 	}
-	return nil
+
 }
 
 func (s *callHomeSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 	switch name {
-	case controllerContainerName, provisionerContainerName, attacherContainerName, snapshotterContainerName,
-		resizerContainerName, replicatorContainerName:
+	case callHomeContainerName:
 		return []corev1.VolumeMount{
 			{
-				Name:      socketVolumeName,
+				Name:      secretVolumeName,
 				MountPath: config.ControllerSocketVolumeMountPath,
-			},
-		}
-
-	case controllerLivenessProbeContainerName:
-		return []corev1.VolumeMount{
-			{
-				Name:      socketVolumeName,
-				MountPath: config.ControllerLivenessProbeContainerSocketVolumeMountPath,
 			},
 		}
 	}
@@ -209,8 +199,8 @@ func (s *callHomeSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 
 func (s *callHomeSyncer) ensureVolumes() []corev1.Volume {
 	return []corev1.Volume{
-		ensureVolume(socketVolumeName, corev1.VolumeSource{
-			EmptyDir: &corev1.EmptyDirVolumeSource{},
+		ensureVolume(secretVolumeName, corev1.VolumeSource{
+			Secret: &corev1.SecretVolumeSource{SecretName: s.driver.Spec.CallHome.SecretName},
 		}),
 	}
 }

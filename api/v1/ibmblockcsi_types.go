@@ -117,6 +117,9 @@ type IBMBlockCallHomeSpec struct {
 	Repository string `json:"repository"`
 	Tag        string `json:"tag"`
 
+	SecretName string `json:"secretName"`
+
+	// +kubebuilder:validation:Optional
 	ImagePullSecrets []string `json:"imagePullSecrets,omitempty"`
 
 	// +kubebuilder:validation:Optional
