@@ -48,8 +48,7 @@ spec:
     repository: registry.access.redhat.com/ubi8/python-38
     tag: "1-77"
     imagePullPolicy: IfNotPresent
-    secret: demo-secret
-    secretNamespace: default
+    secretName: demo-secret
     affinity:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:

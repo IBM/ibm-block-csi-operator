@@ -32,8 +32,11 @@ import (
 )
 
 const (
-	callHomeContainerName = "ibm-block-call-home"
-	secretVolumeName      = "secret-dir"
+	callHomeContainerName      = "ibm-block-call-home"
+	secretVolumeName           = "secret-dir"
+	secretUsernameKey          = "username"
+	secretPasswordKey          = "password"
+	secretManagementAddressKey = "management_address"
 )
 
 type callHomeSyncer struct {
@@ -170,20 +173,20 @@ func (s *callHomeSyncer) getEnvFor(name string) []corev1.EnvVar {
 		},
 		s.envVarFromSecret(
 			s.driver.Spec.CallHome.SecretName,
-			"CALL_HOME_SECRET_USERNAME",
-			"username",
+			config.EnvCallHomeSecretUsername,
+			secretUsernameKey,
 			false,
 		),
 		s.envVarFromSecret(
 			s.driver.Spec.CallHome.SecretName,
-			"CALL_HOME_SECRET_PASSWORD",
-			"password",
+			config.EnvCALLHomeSecretPassword,
+			secretPasswordKey,
 			false,
 		),
 		s.envVarFromSecret(
 			s.driver.Spec.CallHome.SecretName,
-			"CALL_HOME_SECRET_MANAGEMENT_ADDRESS",
-			"management_address",
+			config.EnvCALLHomeSecretManagementAddress,
+			secretManagementAddressKey,
 			false,
 		),
 	}

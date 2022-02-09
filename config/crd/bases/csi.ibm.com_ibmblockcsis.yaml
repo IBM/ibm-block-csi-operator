@@ -39,7 +39,7 @@ spec:
             description: IBMBlockCSISpec defines the desired state of IBMBlockCSI
             properties:
               callHome:
-                description: IBMBlockCallHomeSpec defines the desired state of IBMBlockCSICallHome
+                description: IBMBlockCSICallHomeSpec defines the desired state of IBMBlockCSICallHome
                 properties:
                   affinity:
                     description: Affinity is a group of affinity scheduling rules.
