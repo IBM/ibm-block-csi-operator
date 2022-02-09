@@ -180,6 +180,12 @@ func (s *callHomeSyncer) getEnvFor(name string) []corev1.EnvVar {
 			"password",
 			false,
 		),
+		s.envVarFromSecret(
+			s.driver.Spec.CallHome.SecretName,
+			"CALL_HOME_SECRET_MANAGEMENT_ADDRESS",
+			"management_address",
+			false,
+		),
 	}
 
 }
