@@ -1564,7 +1564,6 @@ spec:
                   type: object
                 type: array
             required:
-            - callHome
             - controller
             - node
             type: object
