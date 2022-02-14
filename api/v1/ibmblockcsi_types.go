@@ -51,7 +51,9 @@ type CSISidecar struct {
 type IBMBlockCSISpec struct {
 	Controller IBMBlockCSIControllerSpec `json:"controller"`
 	Node       IBMBlockCSINodeSpec       `json:"node"`
-	CallHome   IBMBlockCSICallHomeSpec   `json:"callHome"`
+
+	// +kubebuilder:validation:Optional
+	CallHome IBMBlockCSICallHomeSpec `json:"callHome"`
 	// +kubebuilder:validation:Optional
 	Sidecars []CSISidecar `json:"sidecars,omitempty"`
 
