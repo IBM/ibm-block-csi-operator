@@ -18,7 +18,7 @@ package syncer
 
 import (
 	"github.com/imdario/mergo"
-	appsv1 "k8s.io/api/apps/v1"
+	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -46,7 +46,7 @@ type callHomeSyncer struct {
 
 // NewCallHomeSyncer returns a syncer for call home
 func NewCallHomeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockcsi.IBMBlockCSI) syncer.Interface {
-	obj := &appsv1.StatefulSet{
+	obj := &batchv1.CronJob{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        config.GetNameForResource(config.CallHome, driver.Name),
 			Namespace:   driver.Namespace,
@@ -66,16 +66,19 @@ func NewCallHomeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblock
 }
 
 func (s *callHomeSyncer) SyncFn() error {
-	out := s.obj.(*appsv1.StatefulSet)
+	out := s.obj.(*batchv1.CronJob)
 
-	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCallHomeSelectorLabels())
-	out.Spec.ServiceName = config.GetNameForResource(config.CallHome, s.driver.Name)
+	out.Spec.JobTemplate.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCallHomeSelectorLabels())
+	//out.Spec.ServiceName = config.GetNameForResource(config.CallHome, s.driver.Name)
+
+	//Run once a day at midnight
+	out.Spec.Schedule = "0 0 * * *"
 
 	// ensure template
-	out.Spec.Template.ObjectMeta.Labels = s.driver.GetCallHomePodLabels()
-	out.Spec.Template.ObjectMeta.Annotations = s.driver.GetAnnotations("", "")
+	out.Spec.JobTemplate.ObjectMeta.Labels = s.driver.GetCallHomePodLabels()
+	out.Spec.JobTemplate.ObjectMeta.Annotations = s.driver.GetAnnotations("", "")
 
-	err := mergo.Merge(&out.Spec.Template.Spec, s.ensurePodSpec(), mergo.WithTransformers(transformers.PodSpec))
+	err := mergo.Merge(&out.Spec.JobTemplate.Spec.Template.Spec, s.ensurePodSpec(), mergo.WithTransformers(transformers.PodSpec))
 	if err != nil {
 		return err
 	}
