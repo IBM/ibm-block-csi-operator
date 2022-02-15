@@ -32,7 +32,7 @@ import (
 )
 
 const (
-	callHomeContainerName      = "ibm-block-call-home"
+	callHomeContainerName      = "ibm-block-csi-call-home"
 	secretVolumeName           = "secret-dir"
 	secretUsernameKey          = "username"
 	secretPasswordKey          = "password"
@@ -92,18 +92,9 @@ func (s *callHomeSyncer) ensurePodSpec() corev1.PodSpec {
 			FSGroup:   &fsGroup,
 			RunAsUser: &fsGroup,
 		},
-		ImagePullSecrets: s.getImagePullSecrets(),
-		Affinity:         s.driver.Spec.CallHome.Affinity,
-		Tolerations:      s.driver.Spec.CallHome.Tolerations,
+		Affinity:    s.driver.Spec.CallHome.Affinity,
+		Tolerations: s.driver.Spec.CallHome.Tolerations,
 	}
-}
-
-func (s *callHomeSyncer) getImagePullSecrets() []corev1.LocalObjectReference {
-	var secrets []corev1.LocalObjectReference
-	for _, s := range s.driver.Spec.CallHome.ImagePullSecrets {
-		secrets = append(secrets, corev1.LocalObjectReference{Name: s})
-	}
-	return secrets
 }
 
 func (s *callHomeSyncer) ensureContainersSpec() []corev1.Container {

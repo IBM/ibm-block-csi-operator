@@ -44,22 +44,24 @@ spec:
                     - amd64
                     - s390x
                     - ppc64le
-  callHome:
-    repository: registry.access.redhat.com/ubi8/python-38
-    tag: "1-77"
-    imagePullPolicy: IfNotPresent
-    secretName: demo-secret
-    affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-            - matchExpressions:
-                - key: kubernetes.io/arch
-                  operator: In
-                  values:
-                    - amd64
-                    - s390x
-                    - ppc64le
+
+   # callHome is a statefulSet with ibm-block-csi-call-home container
+#  callHome:
+#    repository: registry.access.redhat.com/ubi8/python-38
+#    tag: "1-77"
+#    imagePullPolicy: IfNotPresent
+#    secretName: demo-secret
+#    affinity:
+#      nodeAffinity:
+#        requiredDuringSchedulingIgnoredDuringExecution:
+#          nodeSelectorTerms:
+#            - matchExpressions:
+#                - key: kubernetes.io/arch
+#                  operator: In
+#                  values:
+#                    - amd64
+#                    - s390x
+#                    - ppc64le
 
 #    tolerations:
 #    - effect: NoSchedule

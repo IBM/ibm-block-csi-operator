@@ -54,6 +54,7 @@ type IBMBlockCSISpec struct {
 
 	// +kubebuilder:validation:Optional
 	CallHome IBMBlockCSICallHomeSpec `json:"callHome"`
+
 	// +kubebuilder:validation:Optional
 	Sidecars []CSISidecar `json:"sidecars,omitempty"`
 
@@ -120,9 +121,6 @@ type IBMBlockCSICallHomeSpec struct {
 	Tag        string `json:"tag"`
 
 	SecretName string `json:"secretName"`
-
-	// +kubebuilder:validation:Optional
-	ImagePullSecrets []string `json:"imagePullSecrets,omitempty"`
 
 	// +kubebuilder:validation:Optional
 	ImagePullPolicy corev1.PullPolicy `json:"imagePullPolicy"`
