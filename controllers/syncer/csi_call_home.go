@@ -78,6 +78,9 @@ func (s *callHomeSyncer) SyncFn() error {
 	// ensure template
 	out.Spec.JobTemplate.ObjectMeta.Labels = s.driver.GetCallHomePodLabels()
 	out.Spec.JobTemplate.ObjectMeta.Annotations = s.driver.GetAnnotations("", "")
+	out.Spec.JobTemplate.Spec.Template.ObjectMeta.Labels = s.driver.GetCallHomePodLabels()
+	defaultSuccessfulJobsHistoryLimit := int32(1)
+	out.Spec.SuccessfulJobsHistoryLimit = &defaultSuccessfulJobsHistoryLimit
 
 	err := mergo.Merge(&out.Spec.JobTemplate.Spec.Template.Spec, s.ensurePodSpec(), mergo.WithTransformers(transformers.PodSpec))
 	if err != nil {
