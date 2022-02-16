@@ -44,7 +44,7 @@ const (
 	snapshotterContainerName             = "csi-snapshotter"
 	resizerContainerName                 = "csi-resizer"
 	replicatorContainerName              = "csi-addons-replicator"
-	controllerLivenessProbeContainerName = "liveness-probe"
+	controllerLivenessProbeContainerName = "livenessprobe"
 
 	controllerContainerHealthPortName          = "healthz"
 	controllerContainerDefaultHealthPortNumber = 9808
