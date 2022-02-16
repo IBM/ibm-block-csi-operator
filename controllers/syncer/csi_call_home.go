@@ -37,6 +37,7 @@ const (
 	secretUsernameKey          = "username"
 	secretPasswordKey          = "password"
 	secretManagementAddressKey = "management_address"
+	defaultCronSchedule        = "0 0 * *"
 )
 
 type callHomeSyncer struct {
@@ -72,7 +73,7 @@ func (s *callHomeSyncer) SyncFn() error {
 	//out.Spec.ServiceName = config.GetNameForResource(config.CallHome, s.driver.Name)
 
 	//Run once a day at midnight
-	out.Spec.Schedule = "0 0 * * *"
+	out.Spec.Schedule = s.getCallHomeSchedule()
 
 	// ensure template
 	out.Spec.JobTemplate.ObjectMeta.Labels = s.driver.GetCallHomePodLabels()
@@ -84,6 +85,13 @@ func (s *callHomeSyncer) SyncFn() error {
 	}
 
 	return nil
+}
+
+func (s *callHomeSyncer) getCallHomeSchedule() string {
+	if s.driver.Spec.CallHome.Schedule == "" {
+		return defaultCronSchedule
+	}
+	return s.driver.Spec.CallHome.Schedule
 }
 
 func (s *callHomeSyncer) ensurePodSpec() corev1.PodSpec {

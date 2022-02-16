@@ -507,6 +507,9 @@ spec:
                     type: string
                   repository:
                     type: string
+                  schedule:
+                    description: The schedule in Cron format, see https://en.wikipedia.org/wiki/Cron.
+                    type: string
                   secretName:
                     type: string
                   tag:
