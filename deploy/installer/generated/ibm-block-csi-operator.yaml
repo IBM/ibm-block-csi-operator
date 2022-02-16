@@ -1722,6 +1722,7 @@ rules:
   - watch
 - apiGroups:
   - apps
+  - batch
   resourceNames:
   - ibm-block-csi-operator
   resources:

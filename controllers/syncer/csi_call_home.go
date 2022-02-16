@@ -68,7 +68,7 @@ func NewCallHomeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblock
 func (s *callHomeSyncer) SyncFn() error {
 	out := s.obj.(*batchv1.CronJob)
 
-	out.Spec.JobTemplate.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCallHomeSelectorLabels())
+	//out.Spec.JobTemplate.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCallHomeSelectorLabels())
 	//out.Spec.ServiceName = config.GetNameForResource(config.CallHome, s.driver.Name)
 
 	//Run once a day at midnight
@@ -95,8 +95,9 @@ func (s *callHomeSyncer) ensurePodSpec() corev1.PodSpec {
 			FSGroup:   &fsGroup,
 			RunAsUser: &fsGroup,
 		},
-		Affinity:    s.driver.Spec.CallHome.Affinity,
-		Tolerations: s.driver.Spec.CallHome.Tolerations,
+		Affinity:      s.driver.Spec.CallHome.Affinity,
+		Tolerations:   s.driver.Spec.CallHome.Tolerations,
+		RestartPolicy: "OnFailure",
 	}
 }
 
