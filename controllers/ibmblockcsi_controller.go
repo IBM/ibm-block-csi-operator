@@ -548,13 +548,13 @@ func (r *IBMBlockCSIReconciler) getNodeDaemonSet(instance *ibmblockcsi.IBMBlockC
 }
 
 func (r *IBMBlockCSIReconciler) getCallHomeCronJob(instance *ibmblockcsi.IBMBlockCSI) (*batchv1.CronJob, error) {
-	CallHome := &batchv1.CronJob{}
+	callHome := &batchv1.CronJob{}
 	err := r.Get(context.TODO(), types.NamespacedName{
 		Name:      oconfig.GetNameForResource(oconfig.CallHome, instance.Name),
 		Namespace: instance.Namespace,
-	}, CallHome)
+	}, callHome)
 
-	return CallHome, err
+	return callHome, err
 }
 
 func (r *IBMBlockCSIReconciler) isControllerReady(controller *appsv1.StatefulSet) bool {

@@ -27,12 +27,7 @@ const (
 
 	NodeAgentRepository = "ibmcom/ibm-node-agent"
 
-	ENVIscsiAgentPort         = "ISCSI_AGENT_PORT"
-	ENVEndpoint               = "ENDPOINT"
-	ENVNodeName               = "NODE_NAME"
-	ENVKubeVersion            = "KUBE_VERSION"
-	EnvCallHomeSecretUsername = "CALL_HOME_SECRET_USERNAME"
-	EnvCALLHomeSecretPassword = "CALL_HOME_SECRET_PASSWORD"
+	ENVKubeVersion = "KUBE_VERSION"
 
 	CSINodeDriverRegistrar = "csi-node-driver-registrar"
 	CSIProvisioner         = "csi-provisioner"
@@ -44,7 +39,7 @@ const (
 
 	ControllerSocketVolumeMountPath                       = "/var/lib/csi/sockets/pluginproxy/"
 	NodeSocketVolumeMountPath                             = "/csi"
-	CallHomeSecretVolumeMountPath                         = "/etc/secret-dir"
+	CallHomeSecretVolumeMountPath                         = "/etc/call-home-secret-dir"
 	ControllerLivenessProbeContainerSocketVolumeMountPath = "/csi"
 	ControllerSocketPath                                  = "/var/lib/csi/sockets/pluginproxy/csi.sock"
 	NodeSocketPath                                        = "/csi/csi.sock"

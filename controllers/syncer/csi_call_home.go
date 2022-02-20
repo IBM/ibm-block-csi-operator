@@ -34,8 +34,6 @@ import (
 const (
 	callHomeContainerName = "ibm-block-csi-call-home"
 	secretVolumeName      = "secret-dir"
-	secretUsernameKey     = "username"
-	secretPasswordKey     = "password"
 	defaultCronSchedule   = "0 0 * *"
 )
 
@@ -67,9 +65,6 @@ func NewCallHomeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblock
 
 func (s *callHomeSyncer) SyncFn() error {
 	out := s.obj.(*batchv1.CronJob)
-
-	//out.Spec.JobTemplate.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCallHomeSelectorLabels())
-	//out.Spec.ServiceName = config.GetNameForResource(config.CallHome, s.driver.Name)
 
 	//Run once a day at midnight
 	out.Spec.Schedule = s.getCallHomeSchedule()
@@ -114,7 +109,7 @@ func (s *callHomeSyncer) ensurePodSpec() corev1.PodSpec {
 
 func (s *callHomeSyncer) ensureContainersSpec() []corev1.Container {
 	callHomePlugin := s.ensureContainer(callHomeContainerName,
-		s.driver.GetCallHomeImage(),
+		s.driver.GetComponentImage(s.driver.Spec.CallHome.Repository, s.driver.Spec.CallHome.Tag),
 		[]string{"--csi-endpoint=$(CSI_ENDPOINT)"},
 	)
 
@@ -143,14 +138,14 @@ func (s *callHomeSyncer) ensureContainer(name, image string, args []string) core
 		Name:            name,
 		Image:           image,
 		Args:            args,
-		Env:             s.getEnvFor(name),
-		VolumeMounts:    s.getVolumeMountsFor(name),
+		Env:             s.getEnv(),
+		VolumeMounts:    s.getVolumeMounts(),
 		SecurityContext: sc,
 		Resources:       ensureDefaultResources(),
 	}
 }
 
-func (s *callHomeSyncer) getEnvFor(name string) []corev1.EnvVar {
+func (s *callHomeSyncer) getEnv() []corev1.EnvVar {
 
 	return []corev1.EnvVar{
 		{
@@ -165,17 +160,14 @@ func (s *callHomeSyncer) getEnvFor(name string) []corev1.EnvVar {
 
 }
 
-func (s *callHomeSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
-	switch name {
-	case callHomeContainerName:
-		return []corev1.VolumeMount{
-			{
-				Name:      secretVolumeName,
-				MountPath: config.CallHomeSecretVolumeMountPath,
-			},
-		}
+func (s *callHomeSyncer) getVolumeMounts() []corev1.VolumeMount {
+	return []corev1.VolumeMount{
+		{
+			Name:      secretVolumeName,
+			MountPath: config.CallHomeSecretVolumeMountPath,
+		},
 	}
-	return nil
+
 }
 
 func (s *callHomeSyncer) ensureVolumes() []corev1.Volume {

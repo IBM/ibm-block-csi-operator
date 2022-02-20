@@ -109,7 +109,6 @@ func (c *IBMBlockCSI) GenerateNodeServiceAccount() *corev1.ServiceAccount {
 	}
 }
 func (c *IBMBlockCSI) GenerateCallHomeServiceAccount() *corev1.ServiceAccount {
-
 	return &corev1.ServiceAccount{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      config.GetNameForResource(config.CallHomeServiceAccount, c.Name),

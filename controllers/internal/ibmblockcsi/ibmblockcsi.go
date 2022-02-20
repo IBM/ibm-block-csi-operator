@@ -121,25 +121,11 @@ func (c *IBMBlockCSI) GetCallHomePodLabels() labels.Set {
 	return labels.Merge(c.GetLabels(), c.GetCallHomeSelectorLabels())
 }
 
-func (c *IBMBlockCSI) GetCSIControllerImage() string {
-	if c.Spec.Controller.Tag == "" {
-		return c.Spec.Controller.Repository
+func (c *IBMBlockCSI) GetComponentImage(repository string, tag string) string {
+	if tag == "" {
+		return repository
 	}
-	return c.Spec.Controller.Repository + ":" + c.Spec.Controller.Tag
-}
-
-func (c *IBMBlockCSI) GetCSINodeImage() string {
-	if c.Spec.Node.Tag == "" {
-		return c.Spec.Node.Repository
-	}
-	return c.Spec.Node.Repository + ":" + c.Spec.Node.Tag
-}
-
-func (c *IBMBlockCSI) GetCallHomeImage() string {
-	if c.Spec.CallHome.Tag == "" {
-		return c.Spec.CallHome.Repository
-	}
-	return c.Spec.CallHome.Repository + ":" + c.Spec.CallHome.Tag
+	return repository + ":" + tag
 }
 
 func (c *IBMBlockCSI) GetDefaultSidecarImageByName(name string) string {
