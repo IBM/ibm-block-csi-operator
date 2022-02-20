@@ -150,22 +150,6 @@ func (s *callHomeSyncer) ensureContainer(name, image string, args []string) core
 	}
 }
 
-func (s *callHomeSyncer) envVarFromSecret(sctName, name, key string, opt bool) corev1.EnvVar {
-	env := corev1.EnvVar{
-		Name: name,
-		ValueFrom: &corev1.EnvVarSource{
-			SecretKeyRef: &corev1.SecretKeySelector{
-				LocalObjectReference: corev1.LocalObjectReference{
-					Name: sctName,
-				},
-				Key:      key,
-				Optional: &opt,
-			},
-		},
-	}
-	return env
-}
-
 func (s *callHomeSyncer) getEnvFor(name string) []corev1.EnvVar {
 
 	return []corev1.EnvVar{
@@ -177,18 +161,6 @@ func (s *callHomeSyncer) getEnvFor(name string) []corev1.EnvVar {
 			Name:  "CSI_LOGLEVEL",
 			Value: config.DefaultLogLevel,
 		},
-		s.envVarFromSecret(
-			s.driver.Spec.CallHome.SecretName,
-			config.EnvCallHomeSecretUsername,
-			secretUsernameKey,
-			false,
-		),
-		s.envVarFromSecret(
-			s.driver.Spec.CallHome.SecretName,
-			config.EnvCALLHomeSecretPassword,
-			secretPasswordKey,
-			false,
-		),
 	}
 
 }
