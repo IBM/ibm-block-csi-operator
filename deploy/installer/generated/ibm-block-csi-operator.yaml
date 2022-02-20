@@ -1654,6 +1654,17 @@ rules:
   verbs:
   - get
 - apiGroups:
+  - batch
+  resources:
+  - cronjobs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - update
+  - watch
+- apiGroups:
   - ""
   resources:
   - persistentvolumeclaims
@@ -1739,7 +1750,6 @@ rules:
   - update
 - apiGroups:
   - csi.ibm.com
-  - batch
   resources:
   - '*'
   verbs:
