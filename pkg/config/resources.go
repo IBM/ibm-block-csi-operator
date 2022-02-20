@@ -32,6 +32,7 @@ const (
 	NodeAgent                             ResourceName = "ibm-node-agent"
 	CSIControllerServiceAccount           ResourceName = "csi-controller-sa"
 	CSINodeServiceAccount                 ResourceName = "csi-node-sa"
+	CallHomeServiceAccount                ResourceName = "call-home-sa"
 	ExternalProvisionerClusterRole        ResourceName = "external-provisioner-clusterrole"
 	ExternalProvisionerClusterRoleBinding ResourceName = "external-provisioner-clusterrolebinding"
 	ExternalAttacherClusterRole           ResourceName = "external-attacher-clusterrole"
@@ -45,7 +46,9 @@ const (
 	CSIControllerSCCClusterRole           ResourceName = "csi-controller-scc-clusterrole"
 	CSIControllerSCCClusterRoleBinding    ResourceName = "csi-controller-scc-clusterrolebinding"
 	CSINodeSCCClusterRole                 ResourceName = "csi-node-scc-clusterrole"
+	CallHomeSCCClusterRole                ResourceName = "call-home-scc-clusterrole"
 	CSINodeSCCClusterRoleBinding          ResourceName = "csi-node-scc-clusterrolebinding"
+	CallHomeSCCClusterRoleBinding         ResourceName = "call-home-scc-clusterrolebinding"
 )
 
 // GetNameForResource returns the name of a resource for a CSI driver

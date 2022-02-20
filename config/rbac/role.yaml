@@ -112,7 +112,6 @@ rules:
   - watch
 - apiGroups:
   - apps
-  - batch
   resourceNames:
   - ibm-block-csi-operator
   resources:
@@ -121,6 +120,7 @@ rules:
   - update
 - apiGroups:
   - csi.ibm.com
+  - batch
   resources:
   - '*'
   verbs:

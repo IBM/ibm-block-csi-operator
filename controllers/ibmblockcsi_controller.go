@@ -645,6 +645,7 @@ func (r *IBMBlockCSIReconciler) getClusterRoles(instance *ibmblockcsi.IBMBlockCS
 	csiAddonsReplicator := instance.GenerateCSIAddonsReplicatorClusterRole()
 	controllerSCC := instance.GenerateSCCForControllerClusterRole()
 	nodeSCC := instance.GenerateSCCForNodeClusterRole()
+	callHomeSCC := instance.GenerateSCCForCallHomeClusterRole()
 
 	return []*rbacv1.ClusterRole{
 		externalProvisioner,
@@ -654,6 +655,7 @@ func (r *IBMBlockCSIReconciler) getClusterRoles(instance *ibmblockcsi.IBMBlockCS
 		csiAddonsReplicator,
 		controllerSCC,
 		nodeSCC,
+		callHomeSCC,
 	}
 }
 

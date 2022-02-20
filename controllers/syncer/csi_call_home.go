@@ -32,12 +32,11 @@ import (
 )
 
 const (
-	callHomeContainerName      = "ibm-block-csi-call-home"
-	secretVolumeName           = "secret-dir"
-	secretUsernameKey          = "username"
-	secretPasswordKey          = "password"
-	secretManagementAddressKey = "management_address"
-	defaultCronSchedule        = "0 0 * *"
+	callHomeContainerName = "ibm-block-csi-call-home"
+	secretVolumeName      = "secret-dir"
+	secretUsernameKey     = "username"
+	secretPasswordKey     = "password"
+	defaultCronSchedule   = "0 0 * *"
 )
 
 type callHomeSyncer struct {
@@ -106,9 +105,10 @@ func (s *callHomeSyncer) ensurePodSpec() corev1.PodSpec {
 			FSGroup:   &fsGroup,
 			RunAsUser: &fsGroup,
 		},
-		Affinity:      s.driver.Spec.CallHome.Affinity,
-		Tolerations:   s.driver.Spec.CallHome.Tolerations,
-		RestartPolicy: "OnFailure",
+		ServiceAccountName: config.GetNameForResource(config.CallHomeServiceAccount, s.driver.Name),
+		Affinity:           s.driver.Spec.CallHome.Affinity,
+		Tolerations:        s.driver.Spec.CallHome.Tolerations,
+		RestartPolicy:      "OnFailure",
 	}
 }
 
@@ -187,12 +187,6 @@ func (s *callHomeSyncer) getEnvFor(name string) []corev1.EnvVar {
 			s.driver.Spec.CallHome.SecretName,
 			config.EnvCALLHomeSecretPassword,
 			secretPasswordKey,
-			false,
-		),
-		s.envVarFromSecret(
-			s.driver.Spec.CallHome.SecretName,
-			config.EnvCALLHomeSecretManagementAddress,
-			secretManagementAddressKey,
 			false,
 		),
 	}
