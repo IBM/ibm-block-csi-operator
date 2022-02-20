@@ -48,7 +48,7 @@ const (
 	volumeReplicationsStatusResource     string = "volumereplications/status"
 	eventsResource                       string = "events"
 	nodesResource                        string = "nodes"
-	namespaceResource                    string = "namespace"
+	namespacesResource                   string = "namespaces"
 	csiNodesResource                     string = "csinodes"
 	secretsResource                      string = "secrets"
 	securityContextConstraintsResource   string = "securitycontextconstraints"
@@ -489,7 +489,7 @@ func (c *IBMBlockCSI) GenerateSCCForCallHomeClusterRole() *rbacv1.ClusterRole {
 		Rules: []rbacv1.PolicyRule{
 			{
 				APIGroups: []string{""},
-				Resources: []string{namespaceResource},
+				Resources: []string{namespacesResource},
 				Verbs:     []string{verbGet},
 			},
 		},
