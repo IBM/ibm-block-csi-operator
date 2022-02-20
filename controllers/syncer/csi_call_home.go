@@ -199,7 +199,7 @@ func (s *callHomeSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 		return []corev1.VolumeMount{
 			{
 				Name:      secretVolumeName,
-				MountPath: config.CallHomeSocketVolumeMountPath,
+				MountPath: config.CallHomeSecretVolumeMountPath,
 			},
 		}
 	}
