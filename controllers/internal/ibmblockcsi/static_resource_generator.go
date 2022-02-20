@@ -492,6 +492,11 @@ func (c *IBMBlockCSI) GenerateSCCForCallHomeClusterRole() *rbacv1.ClusterRole {
 				Resources: []string{namespacesResource},
 				Verbs:     []string{verbGet},
 			},
+			{
+				APIGroups: []string{""},
+				Resources: []string{podsResource},
+				Verbs:     []string{verbList},
+			},
 		},
 	}
 }
