@@ -455,6 +455,7 @@ func (r *IBMBlockCSIReconciler) reconcileServiceAccount(instance *ibmblockcsi.IB
 
 	controller := instance.GenerateControllerServiceAccount()
 	node := instance.GenerateNodeServiceAccount()
+	callHome := instance.GenerateCallHomeServiceAccount()
 
 	controllerServiceAccountName := oconfig.GetNameForResource(oconfig.CSIControllerServiceAccount, instance.Name)
 	nodeServiceAccountName := oconfig.GetNameForResource(oconfig.CSINodeServiceAccount, instance.Name)
@@ -462,6 +463,7 @@ func (r *IBMBlockCSIReconciler) reconcileServiceAccount(instance *ibmblockcsi.IB
 	for _, sa := range []*corev1.ServiceAccount{
 		controller,
 		node,
+		callHome,
 	} {
 		if err := controllerutil.SetControllerReference(instance.Unwrap(), sa, r.Scheme); err != nil {
 			return err
