@@ -47,7 +47,7 @@ spec:
 
    # callHome is a statefulSet with ibm-block-csi-call-home container
 #  callHome:
-#    repository: stg-artifactory.xiv.ibm.com:5030/ibm-block-csi-call-home-amd64
+#    repository: ibmcom/ibm-block-csi-call-home
 #    tag: "1.9.0"
 #    imagePullPolicy: IfNotPresent
 #    secretName: demo-secret
