@@ -724,6 +724,7 @@ func (r *IBMBlockCSIReconciler) getClusterRoleBindings(instance *ibmblockcsi.IBM
 	csiAddonsReplicator := instance.GenerateCSIAddonsReplicatorClusterRoleBinding()
 	controllerSCC := instance.GenerateSCCForControllerClusterRoleBinding()
 	nodeSCC := instance.GenerateSCCForNodeClusterRoleBinding()
+	callHomeSCC := instance.GenerateSCCForCallHomeClusterRoleBinding()
 
 	return []*rbacv1.ClusterRoleBinding{
 		externalProvisioner,
@@ -733,6 +734,7 @@ func (r *IBMBlockCSIReconciler) getClusterRoleBindings(instance *ibmblockcsi.IBM
 		csiAddonsReplicator,
 		controllerSCC,
 		nodeSCC,
+		callHomeSCC,
 	}
 }
 
