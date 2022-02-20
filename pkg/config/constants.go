@@ -27,13 +27,12 @@ const (
 
 	NodeAgentRepository = "ibmcom/ibm-node-agent"
 
-	ENVIscsiAgentPort                  = "ISCSI_AGENT_PORT"
-	ENVEndpoint                        = "ENDPOINT"
-	ENVNodeName                        = "NODE_NAME"
-	ENVKubeVersion                     = "KUBE_VERSION"
-	EnvCallHomeSecretUsername          = "CALL_HOME_SECRET_USERNAME"
-	EnvCALLHomeSecretPassword          = "CALL_HOME_SECRET_PASSWORD"
-	EnvCALLHomeSecretManagementAddress = "CALL_HOME_SECRET_MANAGEMENT_ADDRESS"
+	ENVIscsiAgentPort         = "ISCSI_AGENT_PORT"
+	ENVEndpoint               = "ENDPOINT"
+	ENVNodeName               = "NODE_NAME"
+	ENVKubeVersion            = "KUBE_VERSION"
+	EnvCallHomeSecretUsername = "CALL_HOME_SECRET_USERNAME"
+	EnvCALLHomeSecretPassword = "CALL_HOME_SECRET_PASSWORD"
 
 	CSINodeDriverRegistrar = "csi-node-driver-registrar"
 	CSIProvisioner         = "csi-provisioner"

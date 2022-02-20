@@ -47,8 +47,8 @@ spec:
 
    # callHome is a statefulSet with ibm-block-csi-call-home container
 #  callHome:
-#    repository: registry.access.redhat.com/ubi8/python-38
-#    tag: "1-77"
+#    repository: stg-artifactory.xiv.ibm.com:5030/ibm-block-csi-call-home-amd64
+#    tag: "1.9.0"
 #    imagePullPolicy: IfNotPresent
 #    secretName: demo-secret
 #    affinity:
