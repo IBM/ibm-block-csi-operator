@@ -125,10 +125,6 @@ type IBMBlockCSICallHomeSpec struct {
 	// +kubebuilder:validation:Optional
 	ImagePullPolicy corev1.PullPolicy `json:"imagePullPolicy"`
 
-	// The schedule in Cron format, see https://en.wikipedia.org/wiki/Cron.
-	// +kubebuilder:validation:Optional
-	Schedule string `json:"schedule" protobuf:"bytes,1,opt,name=schedule"`
-
 	// +kubebuilder:validation:Optional
 	Affinity *corev1.Affinity `json:"affinity,omitempty"`
 
