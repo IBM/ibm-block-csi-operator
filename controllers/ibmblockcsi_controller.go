@@ -240,6 +240,7 @@ func (r *IBMBlockCSIReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(&appsv1.StatefulSet{}).
 		Owns(&appsv1.DaemonSet{}).
 		Owns(&corev1.ServiceAccount{}).
+		Owns(&batchv1.CronJob{}).
 		Complete(r)
 }
 
@@ -566,7 +567,7 @@ func (r *IBMBlockCSIReconciler) isNodeReady(node *appsv1.DaemonSet) bool {
 }
 
 func (r *IBMBlockCSIReconciler) isCallHomeReady(callHome *batchv1.CronJob) bool {
-	return len(callHome.Status.Active) == len(callHome.Status.Active)
+	return callHome.Spec.Schedule == clustersyncer.CronSchedule
 }
 
 func (r *IBMBlockCSIReconciler) reconcileClusterRole(instance *ibmblockcsi.IBMBlockCSI) error {

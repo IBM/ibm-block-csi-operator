@@ -34,7 +34,7 @@ import (
 const (
 	callHomeContainerName = "ibm-block-csi-call-home"
 	secretVolumeName      = "call-home-secret-dir"
-	cronSchedule          = "0 0 * *"
+	CronSchedule          = "0 0 * *"
 )
 
 type callHomeSyncer struct {
@@ -67,7 +67,7 @@ func (s *callHomeSyncer) SyncFn() error {
 	out := s.obj.(*batchv1.CronJob)
 
 	//Run once a day at midnight
-	out.Spec.Schedule = cronSchedule
+	out.Spec.Schedule = CronSchedule
 
 	// ensure template
 	out.Spec.JobTemplate.ObjectMeta.Labels = s.driver.GetCallHomePodLabels()
