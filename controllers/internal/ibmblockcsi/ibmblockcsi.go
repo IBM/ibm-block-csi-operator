@@ -128,6 +128,18 @@ func (c *IBMBlockCSI) GetComponentImage(repository string, tag string) string {
 	return repository + ":" + tag
 }
 
+func (c *IBMBlockCSI) GetCSIControllerImage() string {
+	return c.GetComponentImage(c.Spec.Controller.Repository, c.Spec.Controller.Tag)
+}
+
+func (c *IBMBlockCSI) GetCSINodeImage() string {
+	return c.GetComponentImage(c.Spec.Node.Repository, c.Spec.Node.Tag)
+}
+
+func (c *IBMBlockCSI) GetCallHomeImage() string {
+	return c.GetComponentImage(c.Spec.CallHome.Repository, c.Spec.CallHome.Tag)
+}
+
 func (c *IBMBlockCSI) GetDefaultSidecarImageByName(name string) string {
 	if sidecar, found := config.DefaultSidecarsByName[name]; found {
 		return fmt.Sprintf("%s:%s", sidecar.Repository, sidecar.Tag)

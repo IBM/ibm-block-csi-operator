@@ -106,7 +106,7 @@ func (s *csiNodeSyncer) ensurePodSpec() corev1.PodSpec {
 func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	// node plugin container
 	nodePlugin := s.ensureContainer(nodeContainerName,
-		s.driver.GetComponentImage(s.driver.Spec.Node.Repository, s.driver.Spec.Node.Tag),
+		s.driver.GetCSINodeImage(),
 		[]string{
 			"--csi-endpoint=$(CSI_ENDPOINT)",
 			"--hostname=$(KUBE_NODE_NAME)",

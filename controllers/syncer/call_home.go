@@ -109,7 +109,7 @@ func (s *callHomeSyncer) ensurePodSpec() corev1.PodSpec {
 
 func (s *callHomeSyncer) ensureContainersSpec() []corev1.Container {
 	callHomePlugin := s.ensureContainer(callHomeContainerName,
-		s.driver.GetComponentImage(s.driver.Spec.CallHome.Repository, s.driver.Spec.CallHome.Tag),
+		s.driver.GetCallHomeImage(),
 		[]string{"--csi-endpoint=$(CSI_ENDPOINT)"},
 	)
 

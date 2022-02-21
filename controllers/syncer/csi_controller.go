@@ -113,7 +113,7 @@ func (s *csiControllerSyncer) ensurePodSpec() corev1.PodSpec {
 
 func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	controllerPlugin := s.ensureContainer(controllerContainerName,
-		s.driver.GetComponentImage(s.driver.Spec.Controller.Repository, s.driver.Spec.Controller.Tag),
+		s.driver.GetCSIControllerImage(),
 		[]string{"--csi-endpoint=$(CSI_ENDPOINT)"},
 	)
 
