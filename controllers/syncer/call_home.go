@@ -33,8 +33,8 @@ import (
 
 const (
 	callHomeContainerName = "ibm-block-csi-call-home"
-	secretVolumeName      = "secret-dir"
-	defaultCronSchedule   = "0 0 * *"
+	secretVolumeName      = "call-home-secret-dir"
+	cronSchedule          = "0 0 * *"
 )
 
 type callHomeSyncer struct {
@@ -67,7 +67,7 @@ func (s *callHomeSyncer) SyncFn() error {
 	out := s.obj.(*batchv1.CronJob)
 
 	//Run once a day at midnight
-	out.Spec.Schedule = s.getCallHomeSchedule()
+	out.Spec.Schedule = cronSchedule
 
 	// ensure template
 	out.Spec.JobTemplate.ObjectMeta.Labels = s.driver.GetCallHomePodLabels()
@@ -82,13 +82,6 @@ func (s *callHomeSyncer) SyncFn() error {
 	}
 
 	return nil
-}
-
-func (s *callHomeSyncer) getCallHomeSchedule() string {
-	if s.driver.Spec.CallHome.Schedule == "" {
-		return defaultCronSchedule
-	}
-	return s.driver.Spec.CallHome.Schedule
 }
 
 func (s *callHomeSyncer) ensurePodSpec() corev1.PodSpec {
