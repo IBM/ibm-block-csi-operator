@@ -4,13 +4,13 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   creationTimestamp: null
-  name: ibm-block-csi-operator
   labels:
-    product: ibm-block-csi-driver
-    csi: ibm
-    app.kubernetes.io/name: ibm-block-csi-operator
     app.kubernetes.io/instance: ibm-block-csi-operator
     app.kubernetes.io/managed-by: ibm-block-csi-operator
+    app.kubernetes.io/name: ibm-block-csi-operator
+    csi: ibm
+    product: ibm-block-csi-driver
+  name: ibm-block-csi-operator
 rules:
 - apiGroups:
   - ""
@@ -144,6 +144,40 @@ rules:
   - update
   - watch
 - apiGroups:
+  - replication.storage.openshift.io
+  resources:
+  - volumereplicationclasses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - replication.storage.openshift.io
+  resources:
+  - volumereplications
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - replication.storage.openshift.io
+  resources:
+  - volumereplications/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - replication.storage.openshift.io
+  resources:
+  - volumereplications/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
   - security.openshift.io
   resourceNames:
   - anyuid
@@ -219,41 +253,6 @@ rules:
   verbs:
   - get
   - list
-  - watch
-  - patch
-  - update
-- apiGroups:
-  - replication.storage.openshift.io
-  resources:
-  - volumereplicationclasses
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - replication.storage.openshift.io
-  resources:
-  - volumereplications
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - replication.storage.openshift.io
-  resources:
-  - volumereplications/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - replication.storage.openshift.io
-  resources:
-  - volumereplications/status
-  verbs:
-  - get
   - patch
   - update
   - watch

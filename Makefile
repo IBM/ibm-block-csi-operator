@@ -39,11 +39,11 @@ manifests: controller-gen kustomize## Generate WebhookConfiguration, ClusterRole
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
-CONTROLLER_GEN = $(shell pwd)/bin/controller-gen
+CONTROLLER_GEN = controller-gen
 controller-gen: ## Download controller-gen locally if necessary.
 	$(call go-get-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@v0.4.1)
 
-KUSTOMIZE = $(shell pwd)/bin/kustomize
+KUSTOMIZE = kustomize
 kustomize: ## Download kustomize locally if necessary.
 	$(call go-get-tool,$(KUSTOMIZE),sigs.k8s.io/kustomize/kustomize/v3@v3.8.7)
 
@@ -55,25 +55,42 @@ TMP_DIR=$$(mktemp -d) ;\
 cd $$TMP_DIR ;\
 go mod init tmp ;\
 echo "Downloading $(2)" ;\
-GOBIN=$(PROJECT_DIR)/bin go get $(2) ;\
+go get $(2) ;\
 rm -rf $$TMP_DIR ;\
 }
 endef
 
 # custom
+run_unit_tests_image=docker run --rm -v $(CURDIR):/go/src/github.com/IBM/ibm-block-csi-operator -t operator-unittests
 
 .PHONY: olm-validation
 olm-validation:
 	build/ci/olm_validation.sh
 
+.PHONY: build-unit-tests-image
+build-unit-tests-image:
+	docker build -f build/ci/Dockerfile.unittest -t operator-unittests .
+
+.PHONY: run-unit-tests
+run-unit-tests:
+	$(run_unit_tests_image) make test
+
 .PHONY: test
-test: update
-	hack/check-generated-manifests.sh
+test: check-generated-manifests update
 	ginkgo -r -v -skipPackage tests
 
 .PHONY: update
-update:
+update: kustomize
 	hack/update-all.sh
+
+.PHONY: check-generated-manifests
+check-generated-manifests:
+	hack/check-generated-manifests.sh
+
+.PHONY: update-generated-yamls
+update-generated-yamls:
+	$(run_unit_tests_image) hack/update-config-yamls.sh
+	$(run_unit_tests_image) hack/update-installer.sh
 
 .PHONY: list
 list:

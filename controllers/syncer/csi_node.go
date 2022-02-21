@@ -36,18 +36,16 @@ import (
 )
 
 const (
-	registrationVolumeName           = "registration-dir"
-	nodeContainerName                = "ibm-block-csi-node"
-	nodeDriverRegistrarContainerName = "node-driver-registrar"
-	nodeLivenessProbeContainerName   = "liveness-probe"
+	registrationVolumeName              = "registration-dir"
+	nodeContainerName                   = "ibm-block-csi-node"
+	csiNodeDriverRegistrarContainerName = "csi-node-driver-registrar"
+	nodeLivenessProbeContainerName      = "livenessprobe"
 
-	nodeContainerHealthPortName   = "healthz"
-	nodeContainerHealthPortNumber = 9808
+	nodeContainerHealthPortName          = "healthz"
+	nodeContainerDefaultHealthPortNumber = 9808
 
 	registrationVolumeMountPath = "/registration"
 )
-
-var nodeContainerHealthPort = intstr.FromInt(nodeContainerHealthPortNumber)
 
 type csiNodeSyncer struct {
 	driver *ibmblockcsi.IBMBlockCSI
@@ -119,13 +117,18 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 
 	nodePlugin.Resources = ensureResources("40m", "1000m", "40Mi", "400Mi")
 
+	healthPort := s.driver.Spec.HealthPort
+	if healthPort == 0 {
+		healthPort = nodeContainerDefaultHealthPortNumber
+	}
 	nodePlugin.Ports = ensurePorts(corev1.ContainerPort{
 		Name:          nodeContainerHealthPortName,
-		ContainerPort: nodeContainerHealthPortNumber,
+		ContainerPort: int32(healthPort),
 	})
 
 	nodePlugin.ImagePullPolicy = s.driver.Spec.Node.ImagePullPolicy
 
+	nodeContainerHealthPort := intstr.FromInt(int(healthPort))
 	nodePlugin.LivenessProbe = ensureProbe(10, 3, 10, corev1.Handler{
 		HTTPGet: &corev1.HTTPGetAction{
 			Path:   "/healthz",
@@ -149,7 +152,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	)
 
 	// node driver registrar sidecar
-	registrar := s.ensureContainer(nodeDriverRegistrarContainerName,
+	registrar := s.ensureContainer(csiNodeDriverRegistrarContainerName,
 		s.getCSINodeDriverRegistrarImage(),
 		[]string{
 			"--csi-address=$(ADDRESS)",
@@ -169,10 +172,12 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	registrar.ImagePullPolicy = s.getCSINodeDriverRegistrarPullPolicy()
 
 	// liveness probe sidecar
+	healthPortArg := fmt.Sprintf("--health-port=%v", healthPort)
 	livenessProbe := s.ensureContainer(nodeLivenessProbeContainerName,
 		s.getLivenessProbeImage(),
 		[]string{
 			"--csi-address=/csi/csi.sock",
+			healthPortArg,
 		},
 	)
 	livenessProbe.SecurityContext = &corev1.SecurityContext{AllowPrivilegeEscalation: boolptr.False()}
@@ -226,7 +231,7 @@ func (s *csiNodeSyncer) getEnvFor(name string) []corev1.EnvVar {
 			envVarFromField("KUBE_NODE_NAME", "spec.nodeName"),
 		}
 
-	case nodeDriverRegistrarContainerName:
+	case csiNodeDriverRegistrarContainerName:
 		return []corev1.EnvVar{
 			{
 				Name:  "ADDRESS",
@@ -275,7 +280,7 @@ func (s *csiNodeSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 			},
 		}
 
-	case nodeDriverRegistrarContainerName:
+	case csiNodeDriverRegistrarContainerName:
 		return []corev1.VolumeMount{
 			{
 				Name:      socketVolumeName,

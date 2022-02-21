@@ -44,13 +44,12 @@ const (
 	snapshotterContainerName             = "csi-snapshotter"
 	resizerContainerName                 = "csi-resizer"
 	replicatorContainerName              = "csi-addons-replicator"
-	controllerLivenessProbeContainerName = "liveness-probe"
+	controllerLivenessProbeContainerName = "livenessprobe"
 
-	controllerContainerHealthPortName   = "healthz"
-	controllerContainerHealthPortNumber = 9808
+	controllerContainerHealthPortName          = "healthz"
+	controllerContainerDefaultHealthPortNumber = 9808
 )
 
-var controllerContainerHealthPort = intstr.FromInt(controllerContainerHealthPortNumber)
 var TopologyEnabled = false
 
 type csiControllerSyncer struct {
@@ -120,12 +119,18 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 
 	controllerPlugin.Resources = ensureResources("40m", "800m", "40Mi", "400Mi")
 
+	healthPort := s.driver.Spec.HealthPort
+	if healthPort == 0 {
+		healthPort = controllerContainerDefaultHealthPortNumber
+	}
+
 	controllerPlugin.Ports = ensurePorts(corev1.ContainerPort{
 		Name:          controllerContainerHealthPortName,
-		ContainerPort: controllerContainerHealthPortNumber,
+		ContainerPort: int32(healthPort),
 	})
 	controllerPlugin.ImagePullPolicy = s.driver.Spec.Controller.ImagePullPolicy
 
+	controllerContainerHealthPort := intstr.FromInt(int(healthPort))
 	controllerPlugin.LivenessProbe = ensureProbe(10, 100, 5, corev1.Handler{
 		HTTPGet: &corev1.HTTPGetAction{
 			Path:   "/healthz",
@@ -171,10 +176,12 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	)
 	replicator.ImagePullPolicy = s.getCSIAddonsReplicatorPullPolicy()
 
+	healthPortArg := fmt.Sprintf("--health-port=%v", healthPort)
 	livenessProbe := s.ensureContainer(controllerLivenessProbeContainerName,
 		s.getLivenessProbeImage(),
 		[]string{
 			"--csi-address=/csi/csi.sock",
+			healthPortArg,
 		},
 	)
 	livenessProbe.ImagePullPolicy = s.getLivenessProbePullPolicy()
