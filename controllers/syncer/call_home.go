@@ -34,7 +34,7 @@ import (
 const (
 	callHomeContainerName = "ibm-block-csi-call-home"
 	secretVolumeName      = "call-home-secret-dir"
-	CronSchedule          = "0 0 * *"
+	CronSchedule          = "0 0 * * *"
 )
 
 type callHomeSyncer struct {
