@@ -34,7 +34,7 @@ import (
 const (
 	callHomeContainerName = "ibm-block-csi-call-home"
 	secretVolumeName      = "call-home-secret-dir"
-	CronSchedule          = "0 0 * * *"
+	CronSchedule          = "1 * * * *"
 	jobsHistoryLimit      = int32(1)
 )
 
@@ -86,14 +86,9 @@ func (s *callHomeSyncer) SyncFn() error {
 }
 
 func (s *callHomeSyncer) ensurePodSpec() corev1.PodSpec {
-	fsGroup := config.ControllerUserID
 	return corev1.PodSpec{
-		Containers: s.ensureContainersSpec(),
-		Volumes:    s.ensureVolumes(),
-		SecurityContext: &corev1.PodSecurityContext{
-			FSGroup:   &fsGroup,
-			RunAsUser: &fsGroup,
-		},
+		Containers:         s.ensureContainersSpec(),
+		Volumes:            s.ensureVolumes(),
 		ServiceAccountName: config.GetNameForResource(config.CallHomeServiceAccount, s.driver.Name),
 		Affinity:           s.driver.Spec.CallHome.Affinity,
 		Tolerations:        s.driver.Spec.CallHome.Tolerations,
