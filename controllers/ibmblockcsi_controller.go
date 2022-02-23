@@ -318,9 +318,7 @@ func (r *IBMBlockCSIReconciler) updateStatus(instance *ibmblockcsi.IBMBlockCSI, 
 	}
 
 	callHomeCronJob, err := r.getCallHomeCronJob(instance)
-	if err != nil {
-		logger.Info("failed to get call Home CronJob")
-	} else {
+	if err == nil {
 		err = r.updateCallHomeStatus(instance, callHomeCronJob, logger)
 		if err != nil {
 			logger.Error(err, "failed to delete call home CronJob")
@@ -573,7 +571,7 @@ func (r *IBMBlockCSIReconciler) isNodeReady(node *appsv1.DaemonSet) bool {
 
 func (r *IBMBlockCSIReconciler) updateCallHomeStatus(instance *ibmblockcsi.IBMBlockCSI, callHome *batchv1.CronJob, logger logr.Logger) error {
 	if instance.Spec.CallHome.SecretName == "" {
-		logger.Info("Deleting call home object")
+		logger.Info("deleting call home CronJob")
 		return r.Delete(context.TODO(), callHome)
 	}
 	return nil
