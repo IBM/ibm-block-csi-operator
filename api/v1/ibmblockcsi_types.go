@@ -138,7 +138,6 @@ type IBMBlockCSIStatus struct {
 	Phase           DriverPhase `json:"phase"`
 	ControllerReady bool        `json:"controllerReady"`
 	NodeReady       bool        `json:"nodeReady"`
-	CallHomeReady   bool        `json:"callHomeReady"`
 
 	// Version is the current driver version
 	Version string `json:"version"`

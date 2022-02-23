@@ -1566,8 +1566,6 @@ spec:
           status:
             description: IBMBlockCSIStatus defines the observed state of IBMBlockCSI
             properties:
-              callHomeReady:
-                type: boolean
               controllerReady:
                 type: boolean
               nodeReady:
@@ -1579,7 +1577,6 @@ spec:
                 description: Version is the current driver version
                 type: string
             required:
-            - callHomeReady
             - controllerReady
             - nodeReady
             - phase

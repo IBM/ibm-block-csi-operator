@@ -35,6 +35,7 @@ const (
 	callHomeContainerName = "ibm-block-csi-call-home"
 	secretVolumeName      = "call-home-secret-dir"
 	CronSchedule          = "0 0 * * *"
+	jobsHistoryLimit      = int32(1)
 )
 
 type callHomeSyncer struct {
@@ -66,15 +67,15 @@ func NewCallHomeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblock
 func (s *callHomeSyncer) SyncFn() error {
 	out := s.obj.(*batchv1.CronJob)
 
-	//Run once a day at midnight
+	// "0 0 * * *" - Run once a day at midnight
 	out.Spec.Schedule = CronSchedule
 
 	// ensure template
 	out.Spec.JobTemplate.ObjectMeta.Labels = s.driver.GetCallHomePodLabels()
 	out.Spec.JobTemplate.ObjectMeta.Annotations = s.driver.GetAnnotations("", "")
 	out.Spec.JobTemplate.Spec.Template.ObjectMeta.Labels = s.driver.GetCallHomePodLabels()
-	defaultSuccessfulJobsHistoryLimit := int32(1)
-	out.Spec.SuccessfulJobsHistoryLimit = &defaultSuccessfulJobsHistoryLimit
+	successfulJobsHistoryLimit := jobsHistoryLimit
+	out.Spec.SuccessfulJobsHistoryLimit = &successfulJobsHistoryLimit
 
 	err := mergo.Merge(&out.Spec.JobTemplate.Spec.Template.Spec, s.ensurePodSpec(), mergo.WithTransformers(transformers.PodSpec))
 	if err != nil {

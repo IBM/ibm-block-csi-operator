@@ -35,12 +35,6 @@ rules:
   - list
   - watch
 - apiGroups:
-    - ""
-  resources:
-    - namespaces
-  verbs:
-    - get
-- apiGroups:
     - batch
   resources:
     - cronjobs
