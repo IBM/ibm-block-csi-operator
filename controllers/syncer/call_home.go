@@ -34,9 +34,8 @@ import (
 const (
 	callHomeContainerName = "ibm-block-csi-call-home"
 	secretVolumeName      = "call-home-secret-dir"
-	// CronSchedule runs once a day at midnight
-	CronSchedule     = "0 0 * * *"
-	jobsHistoryLimit = int32(1)
+	CronSchedule          = "0 0 * * *" // runs once a day at midnight
+	jobsHistoryLimit      = int32(1)
 )
 
 type callHomeSyncer struct {
@@ -97,26 +96,17 @@ func (s *callHomeSyncer) ensurePodSpec() corev1.PodSpec {
 }
 
 func (s *callHomeSyncer) ensureContainersSpec() []corev1.Container {
-	callHomePlugin := s.ensureContainer(callHomeContainerName,
+	callHomeContainer := s.ensureContainer(callHomeContainerName,
 		s.driver.GetCallHomeImage(),
-		[]string{"--csi-endpoint=$(CSI_ENDPOINT)"},
+		[]string{""},
 	)
 
-	callHomePlugin.Resources = ensureResources("40m", "800m", "40Mi", "400Mi")
+	callHomeContainer.Resources = ensureResources("40m", "800m", "40Mi", "400Mi")
 
-	healthPort := s.driver.Spec.HealthPort
-	if healthPort == 0 {
-		healthPort = controllerContainerDefaultHealthPortNumber
-	}
-
-	callHomePlugin.Ports = ensurePorts(corev1.ContainerPort{
-		Name:          controllerContainerHealthPortName,
-		ContainerPort: int32(healthPort),
-	})
-	callHomePlugin.ImagePullPolicy = s.driver.Spec.CallHome.ImagePullPolicy
+	callHomeContainer.ImagePullPolicy = s.driver.Spec.CallHome.ImagePullPolicy
 
 	return []corev1.Container{
-		callHomePlugin,
+		callHomeContainer,
 	}
 }
 
@@ -135,12 +125,7 @@ func (s *callHomeSyncer) ensureContainer(name, image string, args []string) core
 }
 
 func (s *callHomeSyncer) getEnv() []corev1.EnvVar {
-
 	return []corev1.EnvVar{
-		{
-			Name:  "CSI_ENDPOINT",
-			Value: config.CSIEndpoint,
-		},
 		{
 			Name:  "CSI_LOGLEVEL",
 			Value: config.DefaultLogLevel,
