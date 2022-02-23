@@ -324,7 +324,7 @@ func (r *IBMBlockCSIReconciler) updateStatus(instance *ibmblockcsi.IBMBlockCSI, 
 
 	instance.Status.ControllerReady = r.isControllerReady(controllerStatefulset)
 	instance.Status.NodeReady = r.isNodeReady(nodeDaemonSet)
-	r.isCallHomeReady(callHomeCronJob, logger)
+	r.isCallHomeReady(callHomeCronJob, instance, logger)
 	phase := csiv1.DriverPhaseNone
 	if instance.Status.ControllerReady && instance.Status.NodeReady {
 		phase = csiv1.DriverPhaseRunning
@@ -568,8 +568,9 @@ func (r *IBMBlockCSIReconciler) isNodeReady(node *appsv1.DaemonSet) bool {
 	return node.Status.DesiredNumberScheduled == node.Status.NumberAvailable
 }
 
-func (r *IBMBlockCSIReconciler) isCallHomeReady(callHome *batchv1.CronJob, logger logr.Logger) bool {
-	logger.Info(fmt.Sprintf("callHome instance: %v", callHome))
+func (r *IBMBlockCSIReconciler) isCallHomeReady(callHome *batchv1.CronJob, instance *ibmblockcsi.IBMBlockCSI, logger logr.Logger) bool {
+	logger.Info(fmt.Sprintf("callHome object: %v", callHome))
+	logger.Info(fmt.Sprintf("callHome instance: %v", instance.Spec.CallHome))
 	return callHome.Spec.Schedule == clustersyncer.CronSchedule
 }
 
