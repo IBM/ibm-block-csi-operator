@@ -34,8 +34,9 @@ import (
 const (
 	callHomeContainerName = "ibm-block-csi-call-home"
 	secretVolumeName      = "call-home-secret-dir"
-	CronSchedule          = "0 0 * * *"
-	jobsHistoryLimit      = int32(1)
+	// CronSchedule - run once a day at midnight
+	CronSchedule     = "0 0 * * *"
+	jobsHistoryLimit = int32(1)
 )
 
 type callHomeSyncer struct {
@@ -67,7 +68,6 @@ func NewCallHomeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblock
 func (s *callHomeSyncer) SyncFn() error {
 	out := s.obj.(*batchv1.CronJob)
 
-	// "0 0 * * *" - Run once a day at midnight
 	out.Spec.Schedule = CronSchedule
 
 	// ensure template
