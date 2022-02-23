@@ -317,8 +317,14 @@ func (r *IBMBlockCSIReconciler) updateStatus(instance *ibmblockcsi.IBMBlockCSI, 
 		return err
 	}
 
+	callHomeCronJob, err := r.getCallHomeCronJob(instance)
+	if err != nil {
+		return err
+	}
+
 	instance.Status.ControllerReady = r.isControllerReady(controllerStatefulset)
 	instance.Status.NodeReady = r.isNodeReady(nodeDaemonSet)
+	r.isCallHomeReady(callHomeCronJob, logger)
 	phase := csiv1.DriverPhaseNone
 	if instance.Status.ControllerReady && instance.Status.NodeReady {
 		phase = csiv1.DriverPhaseRunning
@@ -544,12 +550,27 @@ func (r *IBMBlockCSIReconciler) getNodeDaemonSet(instance *ibmblockcsi.IBMBlockC
 	return node, err
 }
 
+func (r *IBMBlockCSIReconciler) getCallHomeCronJob(instance *ibmblockcsi.IBMBlockCSI) (*batchv1.CronJob, error) {
+	callHome := &batchv1.CronJob{}
+	err := r.Get(context.TODO(), types.NamespacedName{
+		Name:      oconfig.GetNameForResource(oconfig.CallHome, instance.Name),
+		Namespace: instance.Namespace,
+	}, callHome)
+
+	return callHome, err
+}
+
 func (r *IBMBlockCSIReconciler) isControllerReady(controller *appsv1.StatefulSet) bool {
 	return controller.Status.ReadyReplicas == controller.Status.Replicas
 }
 
 func (r *IBMBlockCSIReconciler) isNodeReady(node *appsv1.DaemonSet) bool {
 	return node.Status.DesiredNumberScheduled == node.Status.NumberAvailable
+}
+
+func (r *IBMBlockCSIReconciler) isCallHomeReady(callHome *batchv1.CronJob, logger logr.Logger) bool {
+	logger.Info("callHome instance: %v", callHome)
+	return callHome.Spec.Schedule == clustersyncer.CronSchedule
 }
 
 func (r *IBMBlockCSIReconciler) reconcileClusterRole(instance *ibmblockcsi.IBMBlockCSI) error {
