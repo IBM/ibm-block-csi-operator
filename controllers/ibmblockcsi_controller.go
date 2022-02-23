@@ -319,12 +319,16 @@ func (r *IBMBlockCSIReconciler) updateStatus(instance *ibmblockcsi.IBMBlockCSI, 
 
 	callHomeCronJob, err := r.getCallHomeCronJob(instance)
 	if err != nil {
-		return err
+		logger.Info("failed to get call Home CronJob")
+	} else {
+		err = r.updateCallHomeStatus(instance, callHomeCronJob, logger)
+		if err != nil {
+			logger.Error(err, "failed to delete call home CronJob")
+		}
 	}
 
 	instance.Status.ControllerReady = r.isControllerReady(controllerStatefulset)
 	instance.Status.NodeReady = r.isNodeReady(nodeDaemonSet)
-	r.isCallHomeReady(callHomeCronJob, instance, logger)
 	phase := csiv1.DriverPhaseNone
 	if instance.Status.ControllerReady && instance.Status.NodeReady {
 		phase = csiv1.DriverPhaseRunning
@@ -556,7 +560,6 @@ func (r *IBMBlockCSIReconciler) getCallHomeCronJob(instance *ibmblockcsi.IBMBloc
 		Name:      oconfig.GetNameForResource(oconfig.CallHome, instance.Name),
 		Namespace: instance.Namespace,
 	}, callHome)
-
 	return callHome, err
 }
 
@@ -568,10 +571,12 @@ func (r *IBMBlockCSIReconciler) isNodeReady(node *appsv1.DaemonSet) bool {
 	return node.Status.DesiredNumberScheduled == node.Status.NumberAvailable
 }
 
-func (r *IBMBlockCSIReconciler) isCallHomeReady(callHome *batchv1.CronJob, instance *ibmblockcsi.IBMBlockCSI, logger logr.Logger) bool {
-	logger.Info(fmt.Sprintf("callHome object: %v", callHome))
-	logger.Info(fmt.Sprintf("callHome instance: %v", instance.Spec.CallHome))
-	return callHome.Spec.Schedule == clustersyncer.CronSchedule
+func (r *IBMBlockCSIReconciler) updateCallHomeStatus(instance *ibmblockcsi.IBMBlockCSI, callHome *batchv1.CronJob, logger logr.Logger) error {
+	if instance.Spec.CallHome.SecretName == "" {
+		logger.Info("Deleting call home object")
+		return r.Delete(context.TODO(), callHome)
+	}
+	return nil
 }
 
 func (r *IBMBlockCSIReconciler) reconcileClusterRole(instance *ibmblockcsi.IBMBlockCSI) error {
