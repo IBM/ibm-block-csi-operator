@@ -428,12 +428,14 @@ spec:
                 - list
                 - update
                 - watch
+                - patch
             - apiGroups:
                 - snapshot.storage.k8s.io
               resources:
                 - volumesnapshotcontents/status
               verbs:
                 - update
+                - patch
             - apiGroups:
                 - snapshot.storage.k8s.io
               resources:
