@@ -569,7 +569,7 @@ func (r *IBMBlockCSIReconciler) isNodeReady(node *appsv1.DaemonSet) bool {
 }
 
 func (r *IBMBlockCSIReconciler) isCallHomeReady(callHome *batchv1.CronJob, logger logr.Logger) bool {
-	logger.Info("callHome instance: %v", callHome)
+	logger.Info(fmt.Sprintf("callHome instance: %v", callHome))
 	return callHome.Spec.Schedule == clustersyncer.CronSchedule
 }
 
