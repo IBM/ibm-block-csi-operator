@@ -39,7 +39,6 @@ const (
 
 	ControllerSocketVolumeMountPath                       = "/var/lib/csi/sockets/pluginproxy/"
 	NodeSocketVolumeMountPath                             = "/csi"
-	CallHomeSecretVolumeMountPath                         = "/etc/call-home-secret-dir"
 	ControllerLivenessProbeContainerSocketVolumeMountPath = "/csi"
 	ControllerSocketPath                                  = "/var/lib/csi/sockets/pluginproxy/csi.sock"
 	NodeSocketPath                                        = "/csi/csi.sock"

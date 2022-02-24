@@ -17,6 +17,7 @@
 package syncer
 
 import (
+	csiversion "github.com/IBM/ibm-block-csi-operator/version"
 	"github.com/imdario/mergo"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -33,7 +34,6 @@ import (
 
 const (
 	callHomeContainerName = "ibm-block-csi-call-home"
-	secretVolumeName      = "call-home-secret-dir"
 	CronSchedule          = "0 0 * * *" // runs once a day at midnight
 	jobsHistoryLimit      = int32(1)
 )
@@ -87,7 +87,6 @@ func (s *callHomeSyncer) SyncFn() error {
 func (s *callHomeSyncer) ensurePodSpec() corev1.PodSpec {
 	return corev1.PodSpec{
 		Containers:         s.ensureContainersSpec(),
-		Volumes:            s.ensureVolumes(),
 		ServiceAccountName: config.GetNameForResource(config.CallHomeServiceAccount, s.driver.Name),
 		Affinity:           s.driver.Spec.CallHome.Affinity,
 		Tolerations:        s.driver.Spec.CallHome.Tolerations,
@@ -118,7 +117,6 @@ func (s *callHomeSyncer) ensureContainer(name, image string, args []string) core
 		Image:           image,
 		Args:            args,
 		Env:             s.getEnv(),
-		VolumeMounts:    s.getVolumeMounts(),
 		SecurityContext: sc,
 		Resources:       ensureDefaultResources(),
 	}
@@ -130,24 +128,10 @@ func (s *callHomeSyncer) getEnv() []corev1.EnvVar {
 			Name:  "CSI_LOGLEVEL",
 			Value: config.DefaultLogLevel,
 		},
-	}
-
-}
-
-func (s *callHomeSyncer) getVolumeMounts() []corev1.VolumeMount {
-	return []corev1.VolumeMount{
 		{
-			Name:      secretVolumeName,
-			MountPath: config.CallHomeSecretVolumeMountPath,
+			Name:  "CSI_VERSION",
+			Value: csiversion.Version,
 		},
 	}
 
-}
-
-func (s *callHomeSyncer) ensureVolumes() []corev1.Volume {
-	return []corev1.Volume{
-		ensureVolume(secretVolumeName, corev1.VolumeSource{
-			Secret: &corev1.SecretVolumeSource{SecretName: s.driver.Spec.CallHome.SecretName},
-		}),
-	}
 }
