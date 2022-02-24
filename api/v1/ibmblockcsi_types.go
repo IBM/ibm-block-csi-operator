@@ -120,8 +120,6 @@ type IBMBlockCSICallHomeSpec struct {
 	Repository string `json:"repository"`
 	Tag        string `json:"tag"`
 
-	SecretName string `json:"secretName"`
-
 	// +kubebuilder:validation:Optional
 	ImagePullPolicy corev1.PullPolicy `json:"imagePullPolicy"`
 

@@ -50,7 +50,6 @@ spec:
 #    repository: ibmcom/ibm-block-csi-call-home
 #    tag: "1.9.0"
 #    imagePullPolicy: IfNotPresent
-#    secretName: demo-call-home-secret
 #    affinity:
 #      nodeAffinity:
 #        requiredDuringSchedulingIgnoredDuringExecution:
