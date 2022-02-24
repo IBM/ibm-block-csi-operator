@@ -194,7 +194,7 @@ func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return reconcile.Result{}, err
 	}
 
-	if instance.Spec.CallHome.SecretName != "" {
+	if instance.Spec.CallHome.Repository == "" {
 		callHomeSyncer := clustersyncer.NewCallHomeSyncer(r.Client, r.Scheme, instance)
 		if err := syncer.Sync(context.TODO(), callHomeSyncer, r.Recorder); err != nil {
 			return reconcile.Result{}, err
@@ -570,7 +570,7 @@ func (r *IBMBlockCSIReconciler) isNodeReady(node *appsv1.DaemonSet) bool {
 }
 
 func (r *IBMBlockCSIReconciler) updateCallHomeStatus(instance *ibmblockcsi.IBMBlockCSI, callHome *batchv1.CronJob, logger logr.Logger) error {
-	if instance.Spec.CallHome.SecretName == "" {
+	if instance.Spec.CallHome.Repository == "" {
 		logger.Info("deleting call home CronJob")
 		return r.Delete(context.TODO(), callHome)
 	}
