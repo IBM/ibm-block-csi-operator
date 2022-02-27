@@ -11,12 +11,17 @@ is_private_branch_component_image_exists(){
   image_to_check=$csiblock_docker_registry_username/ibm-block-csi-$driver_component:$branch_image_tag
   is_image_tag_exists=false
   export driver_image_inspect=$(docker manifest inspect $image_to_check &> /dev/null; echo $?)
+  if [ $driver_image_inspect == "0" ]; then
+    echo true
+  else
+    echo false
+  fi
 }
 
 is_controller_image_tag_exists=$(is_private_branch_component_image_exists controller)
 is_node_image_tag_exists=$(is_private_branch_component_image_exists node)
 
-if [ $is_controller_image_tag_exists == "0" ] && [ $is_node_image_tag_exists == "0" ]; then
+if [ $is_controller_image_tag_exists == "true" ] && [ $is_node_image_tag_exists == "true  " ]; then
   driver_images_tag_from_branch=$branch_image_tag
 fi
 
