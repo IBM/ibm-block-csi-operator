@@ -82,14 +82,6 @@ func (c *IBMBlockCSI) setDefaults() bool {
 		changed = true
 	}
 
-	if c.Spec.CallHome.Repository != config.DefaultCr.Spec.CallHome.Repository ||
-		c.Spec.CallHome.Tag != config.DefaultCr.Spec.CallHome.Tag {
-		c.Spec.CallHome.Repository = config.DefaultCr.Spec.CallHome.Repository
-		c.Spec.CallHome.Tag = config.DefaultCr.Spec.CallHome.Tag
-
-		changed = true
-	}
-
 	changed = c.setDefaultSidecars() || changed
 
 	return changed
