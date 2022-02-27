@@ -194,7 +194,7 @@ func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return reconcile.Result{}, err
 	}
 
-	if instance.Spec.CallHome.Repository == "" {
+	if instance.Spec.CallHome.Repository != "" {
 		callHomeSyncer := clustersyncer.NewCallHomeSyncer(r.Client, r.Scheme, instance)
 		if err := syncer.Sync(context.TODO(), callHomeSyncer, r.Recorder); err != nil {
 			return reconcile.Result{}, err
