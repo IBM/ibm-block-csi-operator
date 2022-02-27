@@ -34,7 +34,7 @@ import (
 
 const (
 	callHomeContainerName = "ibm-block-csi-call-home"
-	CronSchedule          = "0 0 * * *" // runs once a day at midnight
+	cronSchedule          = "0 0 * * *" // runs once a day at midnight
 	jobsHistoryLimit      = int32(1)
 )
 
@@ -67,7 +67,7 @@ func NewCallHomeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblock
 func (s *callHomeSyncer) SyncFn() error {
 	out := s.obj.(*batchv1.CronJob)
 
-	out.Spec.Schedule = CronSchedule
+	out.Spec.Schedule = cronSchedule
 
 	// ensure template
 	out.Spec.JobTemplate.ObjectMeta.Labels = s.driver.GetCallHomePodLabels()
@@ -133,5 +133,4 @@ func (s *callHomeSyncer) getEnv() []corev1.EnvVar {
 			Value: csiversion.Version,
 		},
 	}
-
 }

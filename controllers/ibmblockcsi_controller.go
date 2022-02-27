@@ -318,8 +318,8 @@ func (r *IBMBlockCSIReconciler) updateStatus(instance *ibmblockcsi.IBMBlockCSI, 
 	}
 
 	callHomeCronJob, err := r.getCallHomeCronJob(instance)
-	if err == nil {
-		err = r.updateCallHomeStatus(instance, callHomeCronJob, logger)
+	if instance.Spec.CallHome.Repository == "" {
+		err = r.deleteCallHomeCronJob(callHomeCronJob, logger)
 		if err != nil {
 			logger.Error(err, "failed to delete call home CronJob")
 		}
@@ -569,12 +569,9 @@ func (r *IBMBlockCSIReconciler) isNodeReady(node *appsv1.DaemonSet) bool {
 	return node.Status.DesiredNumberScheduled == node.Status.NumberAvailable
 }
 
-func (r *IBMBlockCSIReconciler) updateCallHomeStatus(instance *ibmblockcsi.IBMBlockCSI, callHome *batchv1.CronJob, logger logr.Logger) error {
-	if instance.Spec.CallHome.Repository == "" {
-		logger.Info("deleting call home CronJob")
-		return r.Delete(context.TODO(), callHome)
-	}
-	return nil
+func (r *IBMBlockCSIReconciler) deleteCallHomeCronJob(callHome *batchv1.CronJob, logger logr.Logger) error {
+	logger.Info("deleting call home CronJob")
+	return r.Delete(context.TODO(), callHome)
 }
 
 func (r *IBMBlockCSIReconciler) reconcileClusterRole(instance *ibmblockcsi.IBMBlockCSI) error {
