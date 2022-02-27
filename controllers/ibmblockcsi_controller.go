@@ -318,7 +318,9 @@ func (r *IBMBlockCSIReconciler) updateStatus(instance *ibmblockcsi.IBMBlockCSI, 
 	}
 
 	callHomeCronJob, err := r.getCallHomeCronJob(instance)
-	if instance.Spec.CallHome.Repository == "" {
+	if err != nil {
+		logger.Error(err, "failed to get call home CronJob")
+	} else if instance.Spec.CallHome.Repository == "" {
 		err = r.deleteCallHomeCronJob(callHomeCronJob, logger)
 		if err != nil {
 			logger.Error(err, "failed to delete call home CronJob")
