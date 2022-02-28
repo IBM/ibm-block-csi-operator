@@ -194,7 +194,7 @@ func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return reconcile.Result{}, err
 	}
 
-	if instance.Spec.CallHome.Repository != "" {
+	if r.isCallHomeDefined(instance) {
 		callHomeSyncer := clustersyncer.NewCallHomeSyncer(r.Client, r.Scheme, instance)
 		if err := syncer.Sync(context.TODO(), callHomeSyncer, r.Recorder); err != nil {
 			return reconcile.Result{}, err
@@ -318,12 +318,13 @@ func (r *IBMBlockCSIReconciler) updateStatus(instance *ibmblockcsi.IBMBlockCSI, 
 	}
 
 	callHomeCronJob, err := r.getCallHomeCronJob(instance)
-	if err != nil {
-		logger.Error(err, "failed to get call home CronJob")
-	} else if instance.Spec.CallHome.Repository == "" {
-		err = r.deleteCallHomeCronJob(callHomeCronJob, logger)
+	if err != nil && errors.IsNotFound(err) {
+	} else if err != nil {
+		return err
+	} else if !r.isCallHomeDefined(instance) {
+		err = r.deleteCallHome(instance, callHomeCronJob, logger)
 		if err != nil {
-			logger.Error(err, "failed to delete call home CronJob")
+			return err
 		}
 	}
 
@@ -467,11 +468,16 @@ func (r *IBMBlockCSIReconciler) reconcileServiceAccount(instance *ibmblockcsi.IB
 	controllerServiceAccountName := oconfig.GetNameForResource(oconfig.CSIControllerServiceAccount, instance.Name)
 	nodeServiceAccountName := oconfig.GetNameForResource(oconfig.CSINodeServiceAccount, instance.Name)
 
-	for _, sa := range []*corev1.ServiceAccount{
+	ServiceAccounts := []*corev1.ServiceAccount{
 		controller,
 		node,
-		callHome,
-	} {
+	}
+
+	if r.isCallHomeDefined(instance) {
+		ServiceAccounts = append(ServiceAccounts, callHome)
+	}
+
+	for _, sa := range ServiceAccounts {
 		if err := controllerutil.SetControllerReference(instance.Unwrap(), sa, r.Scheme); err != nil {
 			return err
 		}
@@ -571,9 +577,34 @@ func (r *IBMBlockCSIReconciler) isNodeReady(node *appsv1.DaemonSet) bool {
 	return node.Status.DesiredNumberScheduled == node.Status.NumberAvailable
 }
 
+func (r *IBMBlockCSIReconciler) isCallHomeDefined(instance *ibmblockcsi.IBMBlockCSI) bool {
+	return instance.Spec.CallHome.Repository != ""
+}
+
+func (r *IBMBlockCSIReconciler) deleteCallHome(instance *ibmblockcsi.IBMBlockCSI, callHome *batchv1.CronJob, logger logr.Logger) error {
+	logger.Info("deleting call home clusterRoleBinding")
+	callHomeCRB := instance.GenerateSCCForCallHomeClusterRoleBinding()
+	if err := r.deleteClusterRoleBinding(callHomeCRB); err != nil {
+		return err
+	}
+	logger.Info("deleting call home clusterRole")
+	callHomeCR := instance.GenerateSCCForCallHomeClusterRole()
+	if err := r.deleteClusterRole(callHomeCR); err != nil {
+		return err
+	}
+	logger.Info("deleting call home CronJob")
+	if err := r.deleteCallHomeCronJob(callHome, logger); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *IBMBlockCSIReconciler) deleteCallHomeCronJob(callHome *batchv1.CronJob, logger logr.Logger) error {
 	logger.Info("deleting call home CronJob")
-	return r.Delete(context.TODO(), callHome)
+	if err := r.Delete(context.TODO(), callHome); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *IBMBlockCSIReconciler) reconcileClusterRole(instance *ibmblockcsi.IBMBlockCSI) error {
@@ -618,31 +649,37 @@ func (r *IBMBlockCSIReconciler) deleteClusterRolesAndBindings(instance *ibmblock
 	}
 	return nil
 }
-
 func (r *IBMBlockCSIReconciler) deleteClusterRoles(instance *ibmblockcsi.IBMBlockCSI) error {
-	logger := log.WithName("deleteClusterRoles")
-
 	clusterRoles := r.getClusterRoles(instance)
 
 	for _, cr := range clusterRoles {
-		found := &rbacv1.ClusterRole{}
-		err := r.Get(context.TODO(), types.NamespacedName{
-			Name:      cr.Name,
-			Namespace: cr.Namespace,
-		}, found)
-		if err != nil && errors.IsNotFound(err) {
-			continue
-		} else if err != nil {
-			logger.Error(err, "failed to get ClusterRole", "Name", cr.GetName())
+		if err := r.deleteClusterRole(cr); err != nil {
 			return err
-		} else {
-			logger.Info("deleting ClusterRole", "Name", cr.GetName())
-			if err := r.Delete(context.TODO(), found); err != nil {
-				logger.Error(err, "failed to delete ClusterRole", "Name", cr.GetName())
-				return err
-			}
 		}
 	}
+	return nil
+}
+func (r *IBMBlockCSIReconciler) deleteClusterRole(clusterRole *rbacv1.ClusterRole) error {
+	logger := log.WithName("deleteClusterRoles")
+
+	found := &rbacv1.ClusterRole{}
+	err := r.Get(context.TODO(), types.NamespacedName{
+		Name:      clusterRole.Name,
+		Namespace: clusterRole.Namespace,
+	}, found)
+	if err != nil && errors.IsNotFound(err) {
+		return nil
+	} else if err != nil {
+		logger.Error(err, "failed to get ClusterRole", "Name", clusterRole.GetName())
+		return err
+	} else {
+		logger.Info("deleting ClusterRole", "Name", clusterRole.GetName())
+		if err := r.Delete(context.TODO(), found); err != nil {
+			logger.Error(err, "failed to delete ClusterRole", "Name", clusterRole.GetName())
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -656,7 +693,7 @@ func (r *IBMBlockCSIReconciler) getClusterRoles(instance *ibmblockcsi.IBMBlockCS
 	nodeSCC := instance.GenerateSCCForNodeClusterRole()
 	callHomeSCC := instance.GenerateSCCForCallHomeClusterRole()
 
-	return []*rbacv1.ClusterRole{
+	clusterRoles := []*rbacv1.ClusterRole{
 		externalProvisioner,
 		externalAttacher,
 		externalSnapshotter,
@@ -664,8 +701,13 @@ func (r *IBMBlockCSIReconciler) getClusterRoles(instance *ibmblockcsi.IBMBlockCS
 		csiAddonsReplicator,
 		controllerSCC,
 		nodeSCC,
-		callHomeSCC,
 	}
+
+	if r.isCallHomeDefined(instance) {
+		clusterRoles = append(clusterRoles, callHomeSCC)
+	}
+
+	return clusterRoles
 }
 
 func (r *IBMBlockCSIReconciler) reconcileClusterRoleBinding(instance *ibmblockcsi.IBMBlockCSI) error {
@@ -697,29 +739,36 @@ func (r *IBMBlockCSIReconciler) reconcileClusterRoleBinding(instance *ibmblockcs
 }
 
 func (r *IBMBlockCSIReconciler) deleteClusterRoleBindings(instance *ibmblockcsi.IBMBlockCSI) error {
-	logger := log.WithName("deleteClusterRoleBindings")
-
 	clusterRoleBindings := r.getClusterRoleBindings(instance)
-
 	for _, crb := range clusterRoleBindings {
-		found := &rbacv1.ClusterRoleBinding{}
-		err := r.Get(context.TODO(), types.NamespacedName{
-			Name:      crb.Name,
-			Namespace: crb.Namespace,
-		}, found)
-		if err != nil && errors.IsNotFound(err) {
-			continue
-		} else if err != nil {
-			logger.Error(err, "failed to get ClusterRoleBinding", "Name", crb.GetName())
+		if err := r.deleteClusterRoleBinding(crb); err != nil {
 			return err
-		} else {
-			logger.Info("deleting ClusterRoleBinding", "Name", crb.GetName())
-			if err := r.Delete(context.TODO(), found); err != nil {
-				logger.Error(err, "failed to delete ClusterRoleBinding", "Name", crb.GetName())
-				return err
-			}
 		}
 	}
+	return nil
+}
+
+func (r *IBMBlockCSIReconciler) deleteClusterRoleBinding(clusterRoleBinding *rbacv1.ClusterRoleBinding) error {
+	logger := log.WithName("deleteClusterRoleBindings")
+
+	found := &rbacv1.ClusterRoleBinding{}
+	err := r.Get(context.TODO(), types.NamespacedName{
+		Name:      clusterRoleBinding.Name,
+		Namespace: clusterRoleBinding.Namespace,
+	}, found)
+	if err != nil && errors.IsNotFound(err) {
+		return nil
+	} else if err != nil {
+		logger.Error(err, "failed to get ClusterRoleBinding", "Name", clusterRoleBinding.GetName())
+		return err
+	} else {
+		logger.Info("deleting ClusterRoleBinding", "Name", clusterRoleBinding.GetName())
+		if err := r.Delete(context.TODO(), found); err != nil {
+			logger.Error(err, "failed to delete ClusterRoleBinding", "Name", clusterRoleBinding.GetName())
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -733,7 +782,7 @@ func (r *IBMBlockCSIReconciler) getClusterRoleBindings(instance *ibmblockcsi.IBM
 	nodeSCC := instance.GenerateSCCForNodeClusterRoleBinding()
 	callHomeSCC := instance.GenerateSCCForCallHomeClusterRoleBinding()
 
-	return []*rbacv1.ClusterRoleBinding{
+	clusterRoleBindings := []*rbacv1.ClusterRoleBinding{
 		externalProvisioner,
 		externalAttacher,
 		externalSnapshotter,
@@ -741,8 +790,13 @@ func (r *IBMBlockCSIReconciler) getClusterRoleBindings(instance *ibmblockcsi.IBM
 		csiAddonsReplicator,
 		controllerSCC,
 		nodeSCC,
-		callHomeSCC,
 	}
+
+	if r.isCallHomeDefined(instance) {
+		clusterRoleBindings = append(clusterRoleBindings, callHomeSCC)
+	}
+
+	return clusterRoleBindings
 }
 
 func (r *IBMBlockCSIReconciler) deleteCSIDriver(instance *ibmblockcsi.IBMBlockCSI) error {
