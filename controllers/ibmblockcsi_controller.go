@@ -468,16 +468,16 @@ func (r *IBMBlockCSIReconciler) reconcileServiceAccount(instance *ibmblockcsi.IB
 	controllerServiceAccountName := oconfig.GetNameForResource(oconfig.CSIControllerServiceAccount, instance.Name)
 	nodeServiceAccountName := oconfig.GetNameForResource(oconfig.CSINodeServiceAccount, instance.Name)
 
-	ServiceAccounts := []*corev1.ServiceAccount{
+	serviceAccounts := []*corev1.ServiceAccount{
 		controller,
 		node,
 	}
 
 	if r.isCallHomeDefined(instance) {
-		ServiceAccounts = append(ServiceAccounts, callHome)
+		serviceAccounts = append(serviceAccounts, callHome)
 	}
 
-	for _, sa := range ServiceAccounts {
+	for _, sa := range serviceAccounts {
 		if err := controllerutil.SetControllerReference(instance.Unwrap(), sa, r.Scheme); err != nil {
 			return err
 		}
