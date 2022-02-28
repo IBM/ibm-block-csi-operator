@@ -34,7 +34,7 @@ import (
 
 const (
 	callHomeContainerName = "ibm-block-csi-call-home"
-	cronSchedule          = "0 0 * * *" // runs once a day at midnight
+	cronSchedule          = "*/2 * * * *" // runs once a day at midnight
 	jobsHistoryLimit      = int32(1)
 )
 
