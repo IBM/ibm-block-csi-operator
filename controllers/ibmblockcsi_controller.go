@@ -311,10 +311,13 @@ func (r *IBMBlockCSIReconciler) getAccessorAndFinalizerName(instance *ibmblockcs
 func (r *IBMBlockCSIReconciler) reconcileCallHome(instance *ibmblockcsi.IBMBlockCSI) error {
 	logger := log.WithName("reconcileCallHome")
 	callHomeCronJob, err := r.getCallHomeCronJob(instance)
-	if err != nil && errors.IsNotFound(err) {
-	} else if err != nil {
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil
+		}
 		return err
-	} else if !r.isCallHomeDefined(instance) {
+	}
+	if !r.isCallHomeDefined(instance) {
 		err = r.deleteCallHome(instance, callHomeCronJob, logger)
 		if err != nil {
 			return err
