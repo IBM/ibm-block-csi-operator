@@ -252,6 +252,23 @@ spec:
             - apiGroups:
                 - ""
               resources:
+                - namespaces
+              verbs:
+                - get
+            - apiGroups:
+                - batch
+              resources:
+                - cronjobs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
                 - persistentvolumeclaims
               verbs:
                 - get
