@@ -183,6 +183,10 @@ func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		}
 	}
 
+	if err := r.reconcileCallHome(instance); err != nil {
+		return reconcile.Result{}, err
+	}
+
 	// sync the resources which change over time
 	csiControllerSyncer := clustersyncer.NewCSIControllerSyncer(r.Client, r.Scheme, instance)
 	if err := syncer.Sync(context.TODO(), csiControllerSyncer, r.Recorder); err != nil {
@@ -304,6 +308,21 @@ func (r *IBMBlockCSIReconciler) getAccessorAndFinalizerName(instance *ibmblockcs
 	return accessor, finalizerName, nil
 }
 
+func (r *IBMBlockCSIReconciler) reconcileCallHome(instance *ibmblockcsi.IBMBlockCSI) error {
+	logger := log.WithName("reconcileCallHome")
+	callHomeCronJob, err := r.getCallHomeCronJob(instance)
+	if err != nil && errors.IsNotFound(err) {
+	} else if err != nil {
+		return err
+	} else if !r.isCallHomeDefined(instance) {
+		err = r.deleteCallHome(instance, callHomeCronJob, logger)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (r *IBMBlockCSIReconciler) updateStatus(instance *ibmblockcsi.IBMBlockCSI, originalStatus csiv1.IBMBlockCSIStatus) error {
 	logger := log.WithName("updateStatus")
 	controllerPod := &corev1.Pod{}
@@ -315,17 +334,6 @@ func (r *IBMBlockCSIReconciler) updateStatus(instance *ibmblockcsi.IBMBlockCSI, 
 	nodeDaemonSet, err := r.getNodeDaemonSet(instance)
 	if err != nil {
 		return err
-	}
-
-	callHomeCronJob, err := r.getCallHomeCronJob(instance)
-	if err != nil && errors.IsNotFound(err) {
-	} else if err != nil {
-		return err
-	} else if !r.isCallHomeDefined(instance) {
-		err = r.deleteCallHome(instance, callHomeCronJob, logger)
-		if err != nil {
-			return err
-		}
 	}
 
 	instance.Status.ControllerReady = r.isControllerReady(controllerStatefulset)
