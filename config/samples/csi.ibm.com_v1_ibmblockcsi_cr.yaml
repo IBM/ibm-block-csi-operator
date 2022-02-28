@@ -45,7 +45,7 @@ spec:
                     - s390x
                     - ppc64le
 
-   # callHome is a statefulSet with ibm-block-csi-call-home container
+  # callHome is cronJob
 #  callHome:
 #    repository: ibmcom/ibm-block-csi-call-home
 #    tag: "1.9.0"

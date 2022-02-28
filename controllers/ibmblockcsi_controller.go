@@ -592,6 +592,11 @@ func (r *IBMBlockCSIReconciler) deleteCallHome(instance *ibmblockcsi.IBMBlockCSI
 	if err := r.deleteClusterRole(callHomeCR); err != nil {
 		return err
 	}
+	logger.Info("deleting call home serviceAccount")
+	callHomeSA := instance.GenerateCallHomeServiceAccount()
+	if err := r.deleteServiceAccount(callHomeSA); err != nil {
+		return err
+	}
 	logger.Info("deleting call home CronJob")
 	if err := r.deleteCallHomeCronJob(callHome, logger); err != nil {
 		return err
@@ -649,6 +654,7 @@ func (r *IBMBlockCSIReconciler) deleteClusterRolesAndBindings(instance *ibmblock
 	}
 	return nil
 }
+
 func (r *IBMBlockCSIReconciler) deleteClusterRoles(instance *ibmblockcsi.IBMBlockCSI) error {
 	clusterRoles := r.getClusterRoles(instance)
 
@@ -659,8 +665,9 @@ func (r *IBMBlockCSIReconciler) deleteClusterRoles(instance *ibmblockcsi.IBMBloc
 	}
 	return nil
 }
+
 func (r *IBMBlockCSIReconciler) deleteClusterRole(clusterRole *rbacv1.ClusterRole) error {
-	logger := log.WithName("deleteClusterRoles")
+	logger := log.WithName("deleteClusterRole")
 
 	found := &rbacv1.ClusterRole{}
 	err := r.Get(context.TODO(), types.NamespacedName{
@@ -679,7 +686,28 @@ func (r *IBMBlockCSIReconciler) deleteClusterRole(clusterRole *rbacv1.ClusterRol
 			return err
 		}
 	}
+	return nil
+}
 
+func (r *IBMBlockCSIReconciler) deleteServiceAccount(serviceAccount *corev1.ServiceAccount) error {
+	logger := log.WithName("deleteServiceAccount")
+	found := &corev1.ServiceAccount{}
+	err := r.Get(context.TODO(), types.NamespacedName{
+		Name:      serviceAccount.Name,
+		Namespace: serviceAccount.Namespace,
+	}, found)
+	if err != nil && errors.IsNotFound(err) {
+		return nil
+	} else if err != nil {
+		logger.Error(err, "failed to get ServiceAccount", "Name", serviceAccount.GetName())
+		return err
+	} else {
+		logger.Info("deleting ServiceAccount", "Name", serviceAccount.GetName())
+		if err := r.Delete(context.TODO(), found); err != nil {
+			logger.Error(err, "failed to delete ServiceAccount", "Name", serviceAccount.GetName())
+			return err
+		}
+	}
 	return nil
 }
 
@@ -749,7 +777,7 @@ func (r *IBMBlockCSIReconciler) deleteClusterRoleBindings(instance *ibmblockcsi.
 }
 
 func (r *IBMBlockCSIReconciler) deleteClusterRoleBinding(clusterRoleBinding *rbacv1.ClusterRoleBinding) error {
-	logger := log.WithName("deleteClusterRoleBindings")
+	logger := log.WithName("deleteClusterRoleBinding")
 
 	found := &rbacv1.ClusterRoleBinding{}
 	err := r.Get(context.TODO(), types.NamespacedName{
