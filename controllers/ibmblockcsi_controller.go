@@ -598,14 +598,13 @@ func (r *IBMBlockCSIReconciler) deleteCallHome(instance *ibmblockcsi.IBMBlockCSI
 		return err
 	}
 	logger.Info("deleting call home CronJob")
-	if err := r.deleteCallHomeCronJob(callHome, logger); err != nil {
+	if err := r.deleteCallHomeCronJob(callHome); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *IBMBlockCSIReconciler) deleteCallHomeCronJob(callHome *batchv1.CronJob, logger logr.Logger) error {
-	logger.Info("deleting call home CronJob")
+func (r *IBMBlockCSIReconciler) deleteCallHomeCronJob(callHome *batchv1.CronJob) error {
 	if err := r.Delete(context.TODO(), callHome); err != nil {
 		return err
 	}
