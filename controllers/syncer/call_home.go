@@ -125,10 +125,6 @@ func (s *callHomeSyncer) ensureContainer(name, image string, args []string) core
 func (s *callHomeSyncer) getEnv() []corev1.EnvVar {
 	return []corev1.EnvVar{
 		{
-			Name:  "CSI_LOGLEVEL",
-			Value: config.DefaultLogLevel,
-		},
-		{
 			Name:  "CSI_VERSION",
 			Value: csiversion.Version,
 		},
