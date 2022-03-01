@@ -589,7 +589,7 @@ func (r *IBMBlockCSIReconciler) isNodeReady(node *appsv1.DaemonSet) bool {
 }
 
 func (r *IBMBlockCSIReconciler) isCallHomeDefined(instance *ibmblockcsi.IBMBlockCSI) bool {
-	return instance.Spec.CallHome.Repository != ""
+	return instance.Spec.CallHome.Enable == true
 }
 
 func (r *IBMBlockCSIReconciler) deleteCallHome(instance *ibmblockcsi.IBMBlockCSI, callHome *batchv1.CronJob, logger logr.Logger) error {

@@ -121,6 +121,9 @@ type IBMBlockCSICallHomeSpec struct {
 	Tag        string `json:"tag"`
 
 	// +kubebuilder:validation:Optional
+	Enable bool `json:"enable"`
+
+	// +kubebuilder:validation:Optional
 	ImagePullPolicy corev1.PullPolicy `json:"imagePullPolicy"`
 
 	// +kubebuilder:validation:Optional

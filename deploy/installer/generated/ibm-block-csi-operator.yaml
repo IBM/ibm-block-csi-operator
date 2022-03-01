@@ -502,6 +502,8 @@ spec:
                             type: array
                         type: object
                     type: object
+                  enable:
+                    type: boolean
                   imagePullPolicy:
                     description: PullPolicy describes a policy for if/when to pull a container image
                     type: string

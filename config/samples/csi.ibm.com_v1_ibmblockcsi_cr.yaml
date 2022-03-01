@@ -46,21 +46,22 @@ spec:
                     - ppc64le
 
   # callHome is a cronJob
-#  callHome:
-#    repository: ibmcom/ibm-block-csi-call-home
-#    tag: "1.9.0"
-#    imagePullPolicy: IfNotPresent
-#    affinity:
-#      nodeAffinity:
-#        requiredDuringSchedulingIgnoredDuringExecution:
-#          nodeSelectorTerms:
-#            - matchExpressions:
-#                - key: kubernetes.io/arch
-#                  operator: In
-#                  values:
-#                    - amd64
-#                    - s390x
-#                    - ppc64le
+  callHome:
+    repository: ibmcom/ibm-block-csi-call-home
+    tag: "1.9.0"
+    enable: false
+    imagePullPolicy: IfNotPresent
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/arch
+                  operator: In
+                  values:
+                    - amd64
+                    - s390x
+                    - ppc64le
 
 #    tolerations:
 #    - effect: NoSchedule
