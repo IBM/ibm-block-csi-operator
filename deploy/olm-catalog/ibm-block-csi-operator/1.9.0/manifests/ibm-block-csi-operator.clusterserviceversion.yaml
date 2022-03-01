@@ -72,7 +72,7 @@ metadata:
             "callHome": {
               "repository": "ibmcom/ibm-block-csi-call-home",
               "tag": "1.9.0",
-              "enable": false
+              "enable": false,
               "imagePullPolicy": "IfNotPresent",
               "affinity": {
                 "nodeAffinity": {
