@@ -24,6 +24,7 @@ import (
 	"strings"
 	"time"
 
+	pkg_errors "github.com/pkg/errors"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -33,9 +34,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -201,24 +204,6 @@ func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	return reconcile.Result{}, nil
 }
 
-func getServerVersion() (string, error) {
-	kubeVersion, found := os.LookupEnv(oconfig.ENVKubeVersion)
-	if found {
-		return kubeVersion, nil
-	}
-
-	kubeClient := kubeutil.KubeClient
-
-	serverVersion, err := kubeutil.ServerVersion(kubeClient.Discovery())
-	if err != nil {
-		return serverVersion, err
-	}
-	if strings.HasSuffix(serverVersion, "+") {
-		serverVersion = strings.TrimSuffix(serverVersion, "+")
-	}
-	return serverVersion, nil
-}
-
 // SetupWithManager sets up the controller with the Manager.
 func (r *IBMBlockCSIReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
@@ -235,6 +220,36 @@ func (r *IBMBlockCSIReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(&appsv1.DaemonSet{}).
 		Owns(&corev1.ServiceAccount{}).
 		Complete(r)
+}
+
+func getServerVersion() (string, error) {
+	kubeVersion, found := os.LookupEnv(oconfig.ENVKubeVersion)
+	if found {
+		return kubeVersion, nil
+	}
+
+	clientConfig, err := config.GetConfig()
+	if err != nil {
+		return "", err
+	}
+
+	kubeClient := kubeutil.InitKubeClient(clientConfig)
+
+	serverVersion, err := serverVersion(kubeClient.Discovery())
+	if err != nil {
+		return serverVersion, err
+	}
+	serverVersion = strings.TrimPrefix(serverVersion, "+")
+	return serverVersion, nil
+}
+
+func serverVersion(client discovery.DiscoveryInterface) (string, error) {
+	versionInfo, err := client.ServerVersion()
+	if err != nil {
+		return "", pkg_errors.Wrap(err, "error getting server version")
+	}
+
+	return fmt.Sprintf("%s.%s", versionInfo.Major, versionInfo.Minor), nil
 }
 
 func (r *IBMBlockCSIReconciler) addFinalizerIfNotPresent(instance *ibmblockcsi.IBMBlockCSI) error {
