@@ -78,7 +78,9 @@ run-unit-tests:
 ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
 .PHONY: test
 test: check-generated-manifests update add-envtest-assets
-	ginkgo -r -v
+	mkdir -p ${ENVTEST_ASSETS_DIR}
+	test -f ${ENVTEST_ASSETS_DIR}/setup-envtest.sh || curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v0.8.3/hack/setup-envtest.sh
+	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh; fetch_envtest_tools $(ENVTEST_ASSETS_DIR); setup_envtest_env $(ENVTEST_ASSETS_DIR); ginkgo -r -v
 
 .PHONY: update
 update: kustomize
@@ -92,12 +94,6 @@ check-generated-manifests:
 update-generated-yamls:
 	$(run_unit_tests_image) hack/update-config-yamls.sh
 	$(run_unit_tests_image) hack/update-installer.sh
-
-.PHONY: add-envtest-assets
-add-envtest-assets:
-	mkdir -p ${ENVTEST_ASSETS_DIR}
-	test -f ${ENVTEST_ASSETS_DIR}/setup-envtest.sh || curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v0.8.3/hack/setup-envtest.sh
-	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh; fetch_envtest_tools $(ENVTEST_ASSETS_DIR); setup_envtest_env $(ENVTEST_ASSETS_DIR)
 
 .PHONY: list
 list:
