@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers_test
+package controllers
 
 import (
 	"os"
@@ -24,7 +24,6 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"k8s.io/client-go/kubernetes/scheme"
-	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
@@ -32,7 +31,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
-	"github.com/IBM/ibm-block-csi-operator/controllers"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	//+kubebuilder:scaffold:imports
@@ -43,7 +41,6 @@ import (
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
  
- var cfg *rest.Config
  var k8sClient client.Client
  var testEnv *envtest.Environment
  var kubeVersion = "1.18"
@@ -85,10 +82,10 @@ var _ = BeforeSuite(func() {
 	})
 	Expect(err).ToNot(HaveOccurred())
  
-	err = (&controllers.IBMBlockCSIReconciler{
-		 Client:    k8sClient,
-		 Scheme:    scheme.Scheme,
-		 Namespace: "default",
+	err = (&IBMBlockCSIReconciler{
+		Client:    mgr.GetClient(),
+		Scheme:    mgr.GetScheme(),
+		Namespace: "default",
 	}).SetupWithManager(mgr)
 	Expect(err).ToNot(HaveOccurred())
  

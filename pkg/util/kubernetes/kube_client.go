@@ -28,11 +28,6 @@ var log = logf.Log.WithName("kube_client")
 //var KubeClient = initKubeClient()
 
 func InitKubeClient(clientConfig *rest.Config) *kubernetes.Clientset {
-	//clientConfig, err := config.GetConfig()
-	//if err != nil {
-	//	log.Error(err, "")
-	//	os.Exit(1)
-	//}
 	client, err := kubernetes.NewForConfig(clientConfig)
 	if err != nil {
 		log.Error(err, "")

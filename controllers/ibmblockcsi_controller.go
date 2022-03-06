@@ -52,6 +52,7 @@ import (
 	oversion "github.com/IBM/ibm-block-csi-operator/version"
 	"github.com/go-logr/logr"
 	"github.com/presslabs/controller-util/syncer"
+	"k8s.io/client-go/rest"
 )
 
 // ReconcileTime is the delay between reconciliations
@@ -127,7 +128,6 @@ func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 	r.Scheme.Default(instance.Unwrap())
 	changed := instance.SetDefaults()
-
 	if err := instance.Validate(); err != nil {
 		err = fmt.Errorf("wrong IBMBlockCSI options: %v", err)
 		return reconcile.Result{RequeueAfter: ReconcileTime}, err
@@ -142,7 +142,6 @@ func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		}
 		return reconcile.Result{}, nil
 	}
-
 	if err := r.addFinalizerIfNotPresent(instance); err != nil {
 		return reconcile.Result{}, err
 	}
@@ -228,7 +227,7 @@ func getServerVersion() (string, error) {
 		return kubeVersion, nil
 	}
 
-	clientConfig, err := config.GetConfig()
+	clientConfig, err := GetClientConfig()
 	if err != nil {
 		return "", err
 	}
@@ -241,6 +240,14 @@ func getServerVersion() (string, error) {
 	}
 	serverVersion = strings.TrimPrefix(serverVersion, "+")
 	return serverVersion, nil
+}
+
+func GetClientConfig() (*rest.Config, error) {
+	clientConfig, err := config.GetConfig()
+	if err != nil {
+		return clientConfig, err
+	}
+	return clientConfig, nil
 }
 
 func serverVersion(client discovery.DiscoveryInterface) (string, error) {
