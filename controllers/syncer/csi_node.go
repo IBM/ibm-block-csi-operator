@@ -80,14 +80,13 @@ func (s *csiNodeSyncer) SyncFn(daemonSetRestartedKey string, daemonSetRestartedV
 	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCSINodeSelectorLabels())
 
 	nodeLabels := s.driver.GetCSINodePodLabels()
-	nodeAnnotations := s.driver.GetAnnotations(daemonSetRestartedKey, daemonSetRestartedValue)
 
 	// ensure template
 	out.Spec.Template.ObjectMeta.Labels = nodeLabels
-	out.Spec.Template.ObjectMeta.Annotations = nodeAnnotations
+	out.Spec.Template.ObjectMeta.Annotations = s.driver.GetAnnotations(daemonSetRestartedKey, daemonSetRestartedValue)
 
 	out.ObjectMeta.Labels = nodeLabels
-	out.ObjectMeta.Annotations = nodeAnnotations
+	out.ObjectMeta.Annotations = s.driver.GetAnnotations("", "")
 
 	err := mergo.Merge(&out.Spec.Template.Spec, s.ensurePodSpec(), mergo.WithTransformers(transformers.PodSpec))
 	if err != nil {
