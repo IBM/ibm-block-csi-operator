@@ -25,7 +25,6 @@ import (
 )
 
 var log = logf.Log.WithName("kube_client")
-//var KubeClient = initKubeClient()
 
 func InitKubeClient(clientConfig *rest.Config) *kubernetes.Clientset {
 	client, err := kubernetes.NewForConfig(clientConfig)
