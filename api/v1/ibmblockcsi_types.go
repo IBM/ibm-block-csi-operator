@@ -51,6 +51,7 @@ type CSISidecar struct {
 type IBMBlockCSISpec struct {
 	Controller IBMBlockCSIControllerSpec `json:"controller"`
 	Node       IBMBlockCSINodeSpec       `json:"node"`
+	License    IBMBlockCSILicense        `json:"license"`
 
 	// +kubebuilder:validation:Optional
 	Sidecars []CSISidecar `json:"sidecars,omitempty"`
@@ -110,6 +111,10 @@ type IBMBlockCSINodeSpec struct {
 
 	// +kubebuilder:validation:Optional
 	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
+}
+
+type IBMBlockCSILicense struct {
+	Accept bool `json:"accept"`
 }
 
 // IBMBlockCSIStatus defines the observed state of IBMBlockCSI

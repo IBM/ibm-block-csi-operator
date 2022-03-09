@@ -541,6 +541,13 @@ spec:
                 items:
                   type: string
                 type: array
+              license:
+                properties:
+                  accept:
+                    type: boolean
+                required:
+                - accept
+                type: object
               node:
                 description: IBMBlockCSINodeSpec defines the desired state of IBMBlockCSINode
                 properties:
@@ -1061,6 +1068,7 @@ spec:
                 type: array
             required:
             - controller
+            - license
             - node
             type: object
           status:
