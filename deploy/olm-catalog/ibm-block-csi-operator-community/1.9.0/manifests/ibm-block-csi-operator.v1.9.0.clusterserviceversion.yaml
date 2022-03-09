@@ -178,7 +178,10 @@ spec:
         group: csi.ibm.com
         kind: IBMBlockCSI
         displayName: "IBM block storage CSI driver"
-        description: "Represents a block storage CSI driver"
+        description: |
+          Documentation For additional details regarding install parameters
+          check: https://www.ibm.com/docs/en/stg-block-csi-driver. License By installing this product
+          you accept the license terms http://www.apache.org/licenses/LICENSE-2.0.
         resources:
           - kind: ServiceAccount
             name: ''
@@ -210,6 +213,13 @@ spec:
             path: node.tag
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:text'
+          - description: License Acceptance.
+            displayName: License Acceptance
+            path: license.accept
+            value:
+              - false
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:checkbox'
         statusDescriptors:
           - description: The current status of the driver.
             displayName: Status
