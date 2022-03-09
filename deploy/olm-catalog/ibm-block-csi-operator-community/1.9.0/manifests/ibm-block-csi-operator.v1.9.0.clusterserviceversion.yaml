@@ -213,8 +213,8 @@ spec:
             path: node.tag
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:text'
-          - description: License Acceptance.
-            displayName: License Acceptance
+          - description: License should be accepted by the user.
+            displayName: License
             path: license.accept
             value:
               - false
