@@ -8,4 +8,4 @@ metadata:
     app.kubernetes.io/name: ibm-block-csi-operator
     app.kubernetes.io/instance: ibm-block-csi-operator
     app.kubernetes.io/managed-by: ibm-block-csi-operator
-    release: v1.8.0
+    release: v1.9.0

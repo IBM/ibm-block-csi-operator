@@ -1,15 +1,19 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
-  name: ibm-block-csi-operator.v1.8.0
+  name: ibm-block-csi-operator.v1.9.0
   namespace: placeholder
+  labels:
+    operatorframework.io/arch.amd64: supported
+    operatorframework.io/arch.s390x: supported
+    operatorframework.io/arch.ppc64le: supported
   annotations:
     capabilities: "Seamless Upgrades"
     categories: "Storage,Cloud Provider"
     certified: "true"
-    containerImage: registry.connect.redhat.com/ibm/ibm-block-csi-operator@sha256:df209e133fb5f25aa6d28afe12537a8e963a1ab9fbb2452d4314913ca9a5dde5
-    createdAt: "2021-10-07T11:00:00Z"
-    description: "Run IBM block storage CSI driver on OpenShift."
+    containerImage: ibmcom/ibm-block-csi-operator:1.9.0
+    createdAt: "2021-12-25T11:00:00Z"
+    description: "Run IBM block storage CSI driver."
     repository: https://github.com/IBM/ibm-block-csi-operator
     support: IBM
     alm-examples: >-
@@ -23,7 +27,7 @@ metadata:
           "spec": {
             "controller": {
               "repository": "ibmcom/ibm-block-csi-driver-controller",
-              "tag": "1.8.0",
+              "tag": "1.9.0",
               "imagePullPolicy": "IfNotPresent",
               "affinity": {
                 "nodeAffinity": {
@@ -35,7 +39,9 @@ metadata:
                             "key": "kubernetes.io/arch",
                             "operator": "In",
                             "values": [
-                              "amd64"
+                              "amd64",
+                              "s390x",
+                              "ppc64le"
                             ]
                           }
                         ]
@@ -47,7 +53,7 @@ metadata:
             },
             "node": {
               "repository": "ibmcom/ibm-block-csi-driver-node",
-              "tag": "1.8.0",
+              "tag": "1.9.0",
               "imagePullPolicy": "IfNotPresent",
               "affinity": {
                 "nodeAffinity": {
@@ -59,7 +65,9 @@ metadata:
                             "key": "kubernetes.io/arch",
                             "operator": "In",
                             "values": [
-                              "amd64"
+                              "amd64",
+                              "s390x",
+                              "ppc64le"
                             ]
                           }
                         ]
@@ -73,31 +81,31 @@ metadata:
               {
                 "name": "csi-node-driver-registrar",
                 "repository": "k8s.gcr.io/sig-storage/csi-node-driver-registrar",
-                "tag": "v2.3.0",
+                "tag": "v2.5.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-provisioner",
                 "repository": "k8s.gcr.io/sig-storage/csi-provisioner",
-                "tag": "v2.2.2",
+                "tag": "v3.1.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-attacher",
                 "repository": "k8s.gcr.io/sig-storage/csi-attacher",
-                "tag": "v3.3.0",
+                "tag": "v3.4.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-snapshotter",
                 "repository": "k8s.gcr.io/sig-storage/csi-snapshotter",
-                "tag": "v3.0.3",
+                "tag": "v5.0.1",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-resizer",
                 "repository": "k8s.gcr.io/sig-storage/csi-resizer",
-                "tag": "v1.3.0",
+                "tag": "v1.4.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
@@ -109,7 +117,7 @@ metadata:
               {
                 "name": "livenessprobe",
                 "repository": "k8s.gcr.io/sig-storage/livenessprobe",
-                "tag": "v2.4.0",
+                "tag": "v2.6.0",
                 "imagePullPolicy": "IfNotPresent"
               }
             ]
@@ -131,16 +139,14 @@ spec:
     - CSI
   relatedImages:
     - name: ibm-block-csi-operator
-      image: registry.connect.redhat.com/ibm/ibm-block-csi-operator@sha256:df209e133fb5f25aa6d28afe12537a8e963a1ab9fbb2452d4314913ca9a5dde5
-  version: 1.8.0
-  replaces: ibm-block-csi-operator.v1.6.0
-  skips:
-    - ibm-block-csi-operator.v1.7.0
+      image: ibmcom/ibm-block-csi-operator:1.9.0
+  version: 1.9.0
+  replaces: ibm-block-csi-operator.v1.8.0
   maturity: stable
   maintainers:
     - name: IBM Block CSI Team
       email: csi.block1@il.ibm.com
-  minKubeVersion: 1.20.0
+  minKubeVersion: 1.21.0
   provider:
     name: IBM
   links:
@@ -422,12 +428,14 @@ spec:
                 - list
                 - update
                 - watch
+                - patch
             - apiGroups:
                 - snapshot.storage.k8s.io
               resources:
                 - volumesnapshotcontents/status
               verbs:
                 - update
+                - patch
             - apiGroups:
                 - snapshot.storage.k8s.io
               resources:
@@ -503,11 +511,13 @@ spec:
                               operator: In
                               values:
                                 - amd64
+                                - s390x
+                                - ppc64le
                 containers:
                   - name: ibm-block-csi-operator
                     resources:
                       requests:
-                        memory: 50Mi
+                        memory: 100Mi
                         cpu: 50m
                       limits:
                         memory: 500Mi
@@ -526,7 +536,7 @@ spec:
                       capabilities:
                         drop:
                           - ALL
-                    image: registry.connect.redhat.com/ibm/ibm-block-csi-operator@sha256:df209e133fb5f25aa6d28afe12537a8e963a1ab9fbb2452d4314913ca9a5dde5
+                    image: ibmcom/ibm-block-csi-operator:1.9.0
                     imagePullPolicy: IfNotPresent
                     command:
                       - ibm-block-csi-operator

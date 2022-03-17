@@ -44,7 +44,7 @@ const (
 	snapshotterContainerName             = "csi-snapshotter"
 	resizerContainerName                 = "csi-resizer"
 	replicatorContainerName              = "csi-addons-replicator"
-	controllerLivenessProbeContainerName = "liveness-probe"
+	controllerLivenessProbeContainerName = "livenessprobe"
 
 	controllerContainerHealthPortName          = "healthz"
 	controllerContainerDefaultHealthPortNumber = 9808
@@ -84,9 +84,15 @@ func (s *csiControllerSyncer) SyncFn() error {
 	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCSIControllerSelectorLabels())
 	out.Spec.ServiceName = config.GetNameForResource(config.CSIController, s.driver.Name)
 
+	controllerLabels := s.driver.GetCSIControllerPodLabels()
+	controllerAnnotations := s.driver.GetAnnotations("", "")
+
 	// ensure template
-	out.Spec.Template.ObjectMeta.Labels = s.driver.GetCSIControllerPodLabels()
-	out.Spec.Template.ObjectMeta.Annotations = s.driver.GetAnnotations("", "")
+	out.Spec.Template.ObjectMeta.Labels = controllerLabels
+	out.Spec.Template.ObjectMeta.Annotations = controllerAnnotations
+
+	out.ObjectMeta.Labels = controllerLabels
+	out.ObjectMeta.Annotations = controllerAnnotations
 
 	err := mergo.Merge(&out.Spec.Template.Spec, s.ensurePodSpec(), mergo.WithTransformers(transformers.PodSpec))
 	if err != nil {
