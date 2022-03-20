@@ -37,18 +37,13 @@ import (
 	//+kubebuilder:scaffold:imports
 )
 
-//const controllerName = "ibmblockcsi-controller"
-
-// These tests use Ginkgo (BDD-style Go testing framework). Refer to
-// http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
- 
- var (
+var (
 	k8sClient client.Client
 	testEnv *envtest.Environment
 	kubeVersion = "1.18"
 	cancel context.CancelFunc
 	ctx context.Context
- )
+)
 
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
