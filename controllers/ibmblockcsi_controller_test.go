@@ -34,16 +34,16 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
   
-  var _ = Describe("Controller", func() {
+var _ = Describe("Controller", func() {
   
-	  const timeout = time.Second * 30
-	  const interval = time.Second * 1
-	  var ibc *csiv1.IBMBlockCSI
-	  var ns = "default"
-	  var ibcName = "test-ibc"
-	  var apiVersion = "csi.ibm.com/v1"
-	  var kind = "IBMBlockCSI"
-	  containersImages := map[string]string{
+	const timeout = time.Second * 30
+	const interval = time.Second * 1
+	var ibc *csiv1.IBMBlockCSI
+	var ns = "default"
+	var ibcName = "test-ibc"
+	var apiVersion = "csi.ibm.com/v1"
+	var kind = "IBMBlockCSI"
+	containersImages := map[string]string{
 		"ibm-block-csi-controller":  "fake-controller-repo:fake-controller-tag",
 		"ibm-block-csi-node": 		 "fake-node-repo:fake-node-tag",
 		"csi-provisioner": 			 "fake-provisioner-repo:fake-provisioner-tag",
@@ -55,79 +55,78 @@ import (
 		"csi-node-driver-registrar": "fake-registrar-repo:fake-registrar-tag",
 	}
 
-	  BeforeEach(func() {
-		  ibc = &csiv1.IBMBlockCSI{
-			  TypeMeta: metav1.TypeMeta{
-				  Kind:       kind,
-				  APIVersion: apiVersion,
-			  },
-			  ObjectMeta: metav1.ObjectMeta{
-				  Name:      ibcName,
-				  Namespace: ns,
-			  },
-			  Spec: csiv1.IBMBlockCSISpec{
-				  Controller: csiv1.IBMBlockCSIControllerSpec{
+	BeforeEach(func() {
+		ibc = &csiv1.IBMBlockCSI{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       kind,
+				APIVersion: apiVersion,
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      ibcName,
+				Namespace: ns,
+			},
+			Spec: csiv1.IBMBlockCSISpec{
+				Controller: csiv1.IBMBlockCSIControllerSpec{
 					Repository: strings.Split(containersImages["ibm-block-csi-controller"], ":")[0],
 					Tag:        strings.Split(containersImages["ibm-block-csi-controller"], ":")[1],
-				  },
-				  Node: csiv1.IBMBlockCSINodeSpec{
+				},
+				Node: csiv1.IBMBlockCSINodeSpec{
 					Repository: strings.Split(containersImages["ibm-block-csi-node"], ":")[0],
 					Tag:        strings.Split(containersImages["ibm-block-csi-node"], ":")[1],
-				  },
-				  Sidecars: []csiv1.CSISidecar{
-					{
-						Name:            "csi-node-driver-registrar",
-						Repository:      strings.Split(containersImages["csi-node-driver-registrar"], ":")[0],
-						Tag:             strings.Split(containersImages["csi-node-driver-registrar"], ":")[1],
-						ImagePullPolicy: "IfNotPresent",
-					},
-					{
-					  	Name:            "csi-provisioner",
-					  	Repository:      strings.Split(containersImages["csi-provisioner"], ":")[0],
-					  	Tag:             strings.Split(containersImages["csi-provisioner"], ":")[1],
-					  	ImagePullPolicy: "IfNotPresent",
-					},
-					{
-						Name:            "csi-attacher",
-					  	Repository:      strings.Split(containersImages["csi-attacher"], ":")[0],
-					  	Tag:             strings.Split(containersImages["csi-attacher"], ":")[1],
-					  	ImagePullPolicy: "IfNotPresent",
-					},
-					{
-					  	Name:            "csi-snapshotter",
-					  	Repository:      strings.Split(containersImages["csi-snapshotter"], ":")[0],
-					  	Tag:             strings.Split(containersImages["csi-snapshotter"], ":")[1],
-					  	ImagePullPolicy: "IfNotPresent",
-					},
-					{
-					  	Name:            "csi-resizer",
-					  	Repository:      strings.Split(containersImages["csi-resizer"], ":")[0],
-					  	Tag:             strings.Split(containersImages["csi-resizer"], ":")[1],
-					  	ImagePullPolicy: "IfNotPresent",
-					},
-					{
-						Name:            "csi-addons-replicator",
-						Repository:      strings.Split(containersImages["csi-addons-replicator"], ":")[0],
-						Tag:             strings.Split(containersImages["csi-addons-replicator"], ":")[1],
-						ImagePullPolicy: "IfNotPresent",
-					},
-					{
-						Name:            "livenessprobe",
-						Repository:      strings.Split(containersImages["livenessprobe"], ":")[0],
-						Tag:             strings.Split(containersImages["livenessprobe"], ":")[1],
-						ImagePullPolicy: "IfNotPresent",
-					},
-				  },
-			  },
-		  }
-  
+				},
+				Sidecars: []csiv1.CSISidecar{
+				{
+					Name:            "csi-node-driver-registrar",
+					Repository:      strings.Split(containersImages["csi-node-driver-registrar"], ":")[0],
+					Tag:             strings.Split(containersImages["csi-node-driver-registrar"], ":")[1],
+					ImagePullPolicy: "IfNotPresent",
+				},
+				{
+					Name:            "csi-provisioner",
+					Repository:      strings.Split(containersImages["csi-provisioner"], ":")[0],
+					Tag:             strings.Split(containersImages["csi-provisioner"], ":")[1],
+					ImagePullPolicy: "IfNotPresent",
+				},
+				{
+					Name:            "csi-attacher",
+					Repository:      strings.Split(containersImages["csi-attacher"], ":")[0],
+					Tag:             strings.Split(containersImages["csi-attacher"], ":")[1],
+					ImagePullPolicy: "IfNotPresent",
+				},
+				{
+				  	Name:            "csi-snapshotter",
+				  	Repository:      strings.Split(containersImages["csi-snapshotter"], ":")[0],
+				  	Tag:             strings.Split(containersImages["csi-snapshotter"], ":")[1],
+				  	ImagePullPolicy: "IfNotPresent",
+				},
+				{
+				  	Name:            "csi-resizer",
+				  	Repository:      strings.Split(containersImages["csi-resizer"], ":")[0],
+				  	Tag:             strings.Split(containersImages["csi-resizer"], ":")[1],
+				  	ImagePullPolicy: "IfNotPresent",
+				},
+				{
+					Name:            "csi-addons-replicator",
+					Repository:      strings.Split(containersImages["csi-addons-replicator"], ":")[0],
+					Tag:             strings.Split(containersImages["csi-addons-replicator"], ":")[1],
+					ImagePullPolicy: "IfNotPresent",
+				},
+				{
+					Name:            "livenessprobe",
+					Repository:      strings.Split(containersImages["livenessprobe"], ":")[0],
+					Tag:             strings.Split(containersImages["livenessprobe"], ":")[1],
+					ImagePullPolicy: "IfNotPresent",
+				},
+			    },
+			},
+		}
 	  })
   
-	  Describe("test ibc controller", func() {
-  
-		  Context("create an ibc instance", func() {
-  
-			  It("should create all the relevant objects", func(done Done) {
+	Describe("test ibc controller", func() {
+
+		Context("create an ibc instance", func() {
+
+			It("should create all the relevant objects", func(done Done) {
 				err := k8sClient.Create(context.Background(), ibc)
 				Expect(err).NotTo(HaveOccurred())
 
