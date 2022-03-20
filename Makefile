@@ -76,11 +76,12 @@ run-unit-tests:
 	$(run_unit_tests_image) make test
 
 ENVTEST_ASSETS_DIR=/usr/local/kubebuilder/bin/
+KUBERNETES_VERSION=1.23.1
 .PHONY: test
 test: check-generated-manifests update
 	mkdir -p ${ENVTEST_ASSETS_DIR}
-	setup-envtest use -p path 1.23.1
-	cp /root/.local/share/kubebuilder-envtest/k8s/1.23.1-linux-amd64/* ${ENVTEST_ASSETS_DIR}
+	setup-envtest use -p path ${KUBERNETES_VERSION}
+	cp /root/.local/share/kubebuilder-envtest/k8s/${KUBERNETES_VERSION}-linux-amd64/* ${ENVTEST_ASSETS_DIR}
 	ginkgo -r -v
 
 .PHONY: update
