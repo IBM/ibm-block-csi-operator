@@ -75,12 +75,13 @@ build-unit-tests-image:
 run-unit-tests:
 	$(run_unit_tests_image) make test
 
-ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
+ENVTEST_ASSETS_DIR=/usr/local/kubebuilder/bin/
 .PHONY: test
 test: check-generated-manifests update
 	mkdir -p ${ENVTEST_ASSETS_DIR}
-	test -f ${ENVTEST_ASSETS_DIR}/setup-envtest.sh || curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v0.8.3/hack/setup-envtest.sh
-	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh; fetch_envtest_tools $(ENVTEST_ASSETS_DIR); setup_envtest_env $(ENVTEST_ASSETS_DIR); ginkgo -r -v
+	setup-envtest use -p path 1.23.1
+	cp /root/.local/share/kubebuilder-envtest/k8s/1.23.1-linux-amd64/* ${ENVTEST_ASSETS_DIR}
+	ginkgo -r -v
 
 .PHONY: update
 update: kustomize

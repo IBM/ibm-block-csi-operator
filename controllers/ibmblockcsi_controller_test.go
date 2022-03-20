@@ -19,10 +19,10 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
+	testsutil "github.com/IBM/ibm-block-csi-operator/controllers/util/tests"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -33,7 +33,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 )
-  
+
+var containersImages = testsutil.GetImagesByName()
+
 var _ = Describe("Controller", func() {
   
 	const timeout = time.Second * 30
@@ -43,17 +45,13 @@ var _ = Describe("Controller", func() {
 	var ibcName = "test-ibc"
 	var apiVersion = "csi.ibm.com/v1"
 	var kind = "IBMBlockCSI"
-	containersImages := map[string]string{
-		"ibm-block-csi-controller":  "fake-controller-repo:fake-controller-tag",
-		"ibm-block-csi-node": 		 "fake-node-repo:fake-node-tag",
-		"csi-provisioner": 			 "fake-provisioner-repo:fake-provisioner-tag",
-		"csi-attacher": 			 "fake-attacher-repo:fake-attacher-tag",
-		"csi-snapshotter": 			 "fake-snapshotter-repo:fake-snapshotter-tag",
-		"csi-resizer": 				 "fake-resizer-repo:fake-resizer-tag",
-		"csi-addons-replicator": 	 "fake-replicator-repo:fake-replicator-tag",
-		"livenessprobe": 			 "fake-livenessprobe-repo:fake-livenessprobe-tag",
-		"csi-node-driver-registrar": "fake-registrar-repo:fake-registrar-tag",
-	}
+	var clusterRoles = []config.ResourceName{config.ExternalProvisionerClusterRole, config.ExternalAttacherClusterRole, 
+		config.ExternalSnapshotterClusterRole, config.ExternalResizerClusterRole, config.CSIAddonsReplicatorClusterRole,
+		config.CSIControllerSCCClusterRole, config.CSINodeSCCClusterRole}
+	var	clusterRoleBindings = []config.ResourceName{config.ExternalProvisionerClusterRoleBinding,
+			config.ExternalAttacherClusterRoleBinding, config.ExternalSnapshotterClusterRoleBinding,
+			config.ExternalResizerClusterRoleBinding, config.CSIAddonsReplicatorClusterRoleBinding,
+			config.CSIControllerSCCClusterRoleBinding, config.CSINodeSCCClusterRoleBinding}
 
 	BeforeEach(func() {
 		ibc = &csiv1.IBMBlockCSI{
@@ -65,62 +63,9 @@ var _ = Describe("Controller", func() {
 				Name:      ibcName,
 				Namespace: ns,
 			},
-			Spec: csiv1.IBMBlockCSISpec{
-				Controller: csiv1.IBMBlockCSIControllerSpec{
-					Repository: strings.Split(containersImages["ibm-block-csi-controller"], ":")[0],
-					Tag:        strings.Split(containersImages["ibm-block-csi-controller"], ":")[1],
-				},
-				Node: csiv1.IBMBlockCSINodeSpec{
-					Repository: strings.Split(containersImages["ibm-block-csi-node"], ":")[0],
-					Tag:        strings.Split(containersImages["ibm-block-csi-node"], ":")[1],
-				},
-				Sidecars: []csiv1.CSISidecar{
-				{
-					Name:            "csi-node-driver-registrar",
-					Repository:      strings.Split(containersImages["csi-node-driver-registrar"], ":")[0],
-					Tag:             strings.Split(containersImages["csi-node-driver-registrar"], ":")[1],
-					ImagePullPolicy: "IfNotPresent",
-				},
-				{
-					Name:            "csi-provisioner",
-					Repository:      strings.Split(containersImages["csi-provisioner"], ":")[0],
-					Tag:             strings.Split(containersImages["csi-provisioner"], ":")[1],
-					ImagePullPolicy: "IfNotPresent",
-				},
-				{
-					Name:            "csi-attacher",
-					Repository:      strings.Split(containersImages["csi-attacher"], ":")[0],
-					Tag:             strings.Split(containersImages["csi-attacher"], ":")[1],
-					ImagePullPolicy: "IfNotPresent",
-				},
-				{
-				  	Name:            "csi-snapshotter",
-				  	Repository:      strings.Split(containersImages["csi-snapshotter"], ":")[0],
-				  	Tag:             strings.Split(containersImages["csi-snapshotter"], ":")[1],
-				  	ImagePullPolicy: "IfNotPresent",
-				},
-				{
-				  	Name:            "csi-resizer",
-				  	Repository:      strings.Split(containersImages["csi-resizer"], ":")[0],
-				  	Tag:             strings.Split(containersImages["csi-resizer"], ":")[1],
-				  	ImagePullPolicy: "IfNotPresent",
-				},
-				{
-					Name:            "csi-addons-replicator",
-					Repository:      strings.Split(containersImages["csi-addons-replicator"], ":")[0],
-					Tag:             strings.Split(containersImages["csi-addons-replicator"], ":")[1],
-					ImagePullPolicy: "IfNotPresent",
-				},
-				{
-					Name:            "livenessprobe",
-					Repository:      strings.Split(containersImages["livenessprobe"], ":")[0],
-					Tag:             strings.Split(containersImages["livenessprobe"], ":")[1],
-					ImagePullPolicy: "IfNotPresent",
-				},
-			    },
-			},
+			Spec: testsutil.GetIbmBlockCsiSpec(containersImages),
 		}
-	  })
+	})
   
 	Describe("test ibc controller", func() {
 
@@ -144,98 +89,69 @@ var _ = Describe("Controller", func() {
 
 				By("Getting CSIDriver")
 				cd := &storagev1.CSIDriver{}
-				cdKey := types.NamespacedName{
-				  Name:      config.DriverName,
-				  Namespace: "",
-				}
 				Eventually(func() (*storagev1.CSIDriver, error) {
-				  err := k8sClient.Get(context.Background(), cdKey, cd)
+				  err := k8sClient.Get(context.Background(),
+				  	testsutil.GetResourceKey(config.DriverName, "", ""), cd)
 				  return cd, err
 				}, timeout, interval).ShouldNot(BeNil())
 
 				By("Getting ServiceAccount")
 				sa := &corev1.ServiceAccount{}
-				saKey := types.NamespacedName{
-				  Name:      config.GetNameForResource(config.CSIControllerServiceAccount, found.Name),
-				  Namespace: found.Namespace,
-				}
 				Eventually(func() (*corev1.ServiceAccount, error) {
-				  err := k8sClient.Get(context.Background(), saKey, sa)
+				  err := k8sClient.Get(context.Background(),
+				  	testsutil.GetResourceKey(config.CSIControllerServiceAccount, found.Name, found.Namespace), sa)
 				  return sa, err
 				}, timeout, interval).ShouldNot(BeNil())
 
 				By("Getting ClusterRole")
 				cr := &rbacv1.ClusterRole{}
-				clusterRoles := []config.ResourceName{config.ExternalProvisionerClusterRole, config.ExternalAttacherClusterRole, 
-				config.ExternalSnapshotterClusterRole, config.ExternalResizerClusterRole, config.CSIAddonsReplicatorClusterRole,
-				config.CSIControllerSCCClusterRole, config.CSINodeSCCClusterRole}
-
 				for _, clusterRole := range clusterRoles {
-					crKey := types.NamespacedName{
-						Name:      config.GetNameForResource(clusterRole, found.Name),
-						Namespace: "",
-					}
 					Eventually(func() (*rbacv1.ClusterRole, error) {
-						err := k8sClient.Get(context.Background(), crKey, cr)
+						err := k8sClient.Get(context.Background(),
+							testsutil.GetResourceKey(clusterRole, found.Name, ""), cr)
 						return cr, err
 					}, timeout, interval).ShouldNot(BeNil())
 				}
 
 				By("Getting ClusterRoleBinding")
 				crb := &rbacv1.ClusterRoleBinding{}
-				clusterRoleBindings := []config.ResourceName{config.ExternalProvisionerClusterRoleBinding,
-					config.ExternalAttacherClusterRoleBinding, config.ExternalSnapshotterClusterRoleBinding,
-					config.ExternalResizerClusterRoleBinding, config.CSIAddonsReplicatorClusterRoleBinding,
-					config.CSIControllerSCCClusterRoleBinding, config.CSINodeSCCClusterRoleBinding}
-
 				for _, clusterRoleBinding := range clusterRoleBindings {
-					crbKey := types.NamespacedName{
-						Name:      config.GetNameForResource(clusterRoleBinding, found.Name),
-						Namespace: "",
-					}
 					Eventually(func() (*rbacv1.ClusterRoleBinding, error) {
-						err := k8sClient.Get(context.Background(), crbKey, crb)
+						err := k8sClient.Get(context.Background(),
+							testsutil.GetResourceKey(clusterRoleBinding, found.Name, ""), crb)
 						return crb, err
 					  }, timeout, interval).ShouldNot(BeNil())
 				}
 
 				By("Getting controller StatefulSet")
 				controller := &appsv1.StatefulSet{}
-				controllerKey := types.NamespacedName{
-				  Name:      config.GetNameForResource(config.CSIController, found.Name),
-				  Namespace: found.Namespace,
-				}
 				Eventually(func() (*appsv1.StatefulSet, error) {
-				  err := k8sClient.Get(context.Background(), controllerKey, controller)
+				  err := k8sClient.Get(context.Background(),
+				  	testsutil.GetResourceKey(config.CSIController, found.Name, found.Namespace), controller)
 				  return controller, err
 				}, timeout, interval).ShouldNot(BeNil())
-				Expect(len(controller.Spec.Template.Spec.Containers)).To(BeNumerically(">", 0))
-				for _, container := range controller.Spec.Template.Spec.Containers {
-					image, ok := containersImages[container.Name]
-					Expect(ok).To(BeTrue(), fmt.Sprintf("container %s not found in %s", container.Name, containersImages))
-					Expect(container.Image).To(Equal(image))
-				}
-
+				checkContainersImages(controller.Spec.Template.Spec)
 
 				By("Getting node DaemonSet")
 				node := &appsv1.DaemonSet{}
-				nodeKey := types.NamespacedName{
-				  Name:      config.GetNameForResource(config.CSINode, found.Name),
-				  Namespace: found.Namespace,
-				}
 				Eventually(func() (*appsv1.DaemonSet, error) {
-				  err := k8sClient.Get(context.Background(), nodeKey, node)
+				  err := k8sClient.Get(context.Background(),
+				  	testsutil.GetResourceKey(config.CSINode, found.Name, found.Namespace), node)
 				  return node, err
 				}, timeout, interval).ShouldNot(BeNil())
-				Expect(len(node.Spec.Template.Spec.Containers)).To(BeNumerically(">", 0))
-				for _, container := range node.Spec.Template.Spec.Containers {
-					image, ok := containersImages[container.Name]
-					Expect(ok).To(BeTrue(), fmt.Sprintf("container %s not found in %s", container.Name, containersImages))
-					Expect(container.Image).To(Equal(image))
-				}
+				checkContainersImages(node.Spec.Template.Spec)
 
 				close(done)
 			  }, timeout.Seconds())
-		  })
-	  })
-  })
+		})
+	})
+})
+
+func checkContainersImages(podSpec corev1.PodSpec) {
+	Expect(len(podSpec.Containers)).To(BeNumerically(">", 0))
+	for _, container := range podSpec.Containers {
+		image, ok := containersImages[container.Name]
+		Expect(ok).To(BeTrue(), fmt.Sprintf("container %s not found in %s", container.Name, containersImages))
+		Expect(container.Image).To(Equal(image))
+	}
+}

@@ -22,6 +22,7 @@ WORKDIR $WORKDIR
 COPY Makefile .
 
 RUN go get github.com/onsi/ginkgo/ginkgo@v1.16.4 \
+    && go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest \
     && make kustomize \
     && make controller-gen
 
