@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package envtests
+package envtest
 
 import (
 	"context"

@@ -80,7 +80,7 @@ KUBERNETES_VERSION=1.23.1
 .PHONY: test
 test: check-generated-manifests update
 ifeq (s390x, $(shell hack/get-arch.sh))
-	ginkgo -r -v -skipPackage envtests
+	ginkgo -r -v -skipPackage envtest
 else
 	mkdir -p ${ENVTEST_ASSETS_DIR}
 	setup-envtest use -p path ${KUBERNETES_VERSION}
