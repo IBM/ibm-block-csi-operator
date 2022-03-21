@@ -84,7 +84,7 @@ ifeq (s390x, $(shell hack/get-arch.sh))
 else
 	mkdir -p ${ENVTEST_ASSETS_DIR}
 	setup-envtest use -p path ${KUBERNETES_VERSION}
-	cp /root/.local/share/kubebuilder-envtest/k8s/${KUBERNETES_VERSION}-linux-amd64/* ${ENVTEST_ASSETS_DIR}
+	cp /root/.local/share/kubebuilder-envtest/k8s/${KUBERNETES_VERSION}-linux-$(shell hack/get-arch.sh)/* ${ENVTEST_ASSETS_DIR}
 	ginkgo -r -v
 endif
 
