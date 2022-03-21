@@ -41,7 +41,7 @@ import (
 var (
 	k8sClient client.Client
 	testEnv *envtest.Environment
-	kubeVersion = "1.18"
+	kubeVersion = "dummyKubeVersion"
 	cancel context.CancelFunc
 	ctx context.Context
 )
