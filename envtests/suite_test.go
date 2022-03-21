@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers
+package envtests
 
 import (
 	"context"
@@ -32,6 +32,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
+	"github.com/IBM/ibm-block-csi-operator/controllers"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	//+kubebuilder:scaffold:imports
@@ -84,7 +85,7 @@ var _ = BeforeSuite(func() {
 	})
 	Expect(err).ToNot(HaveOccurred())
 
-	err = (&IBMBlockCSIReconciler{
+	err = (&controllers.IBMBlockCSIReconciler{
 		Client:    mgr.GetClient(),
 		Scheme:    mgr.GetScheme(),
 		Namespace: "default",

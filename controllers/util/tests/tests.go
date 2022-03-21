@@ -162,10 +162,8 @@ func GetResourceKey(resourceName config.ResourceName, csiObjectName string, csiO
 }
 
 func getResourceNameInCluster(resourceName config.ResourceName, csiObjectName string) string{
-	var name string
-	if csiObjectName != "" {
-		name = config.GetNameForResource(resourceName, csiObjectName)
-	} else {
+	name := config.GetNameForResource(resourceName, csiObjectName)
+	if csiObjectName == "" {
 		name = resourceName.String()
 	}
 	return name
