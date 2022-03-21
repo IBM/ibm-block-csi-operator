@@ -238,7 +238,6 @@ func getServerVersion() (string, error) {
 	if err != nil {
 		return serverVersion, err
 	}
-	serverVersion = strings.TrimPrefix(serverVersion, "+")
 	return serverVersion, nil
 }
 

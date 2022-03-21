@@ -23,6 +23,7 @@ import (
 	"strings"
 
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
+	clustersyncer "github.com/IBM/ibm-block-csi-operator/controllers/syncer"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"gopkg.in/yaml.v2"
 	"k8s.io/apimachinery/pkg/types"
@@ -30,8 +31,8 @@ import (
 
 var (
 	relativeCrPath = "../config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml"
-	nodeContainerName = "ibm-block-csi-node"
-	controllerContainerName = "ibm-block-csi-controller"
+	nodeContainerName = clustersyncer.NodeContainerName
+	controllerContainerName = clustersyncer.ControllerContainerName
 )
 
 type crYamlConfig struct {
