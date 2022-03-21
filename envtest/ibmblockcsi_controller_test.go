@@ -41,10 +41,10 @@ var _ = Describe("Controller", func() {
 	const timeout = time.Second * 30
 	const interval = time.Second * 1
 	var ibc *csiv1.IBMBlockCSI
-	var ns = "default"
+	var namespace = testsutil.GetNamespaceFromCrFile()
 	var ibcName = "test-ibc"
-	var apiVersion = "csi.ibm.com/v1"
-	var kind = "IBMBlockCSI"
+	var apiVersion = testsutil.GetApiVersionFromCrFile()
+	var kind = testsutil.GetKindFromCrFile()
 	var clusterRoles = []config.ResourceName{config.ExternalProvisionerClusterRole, config.ExternalAttacherClusterRole, 
 		config.ExternalSnapshotterClusterRole, config.ExternalResizerClusterRole, config.CSIAddonsReplicatorClusterRole,
 		config.CSIControllerSCCClusterRole, config.CSINodeSCCClusterRole}
@@ -61,9 +61,9 @@ var _ = Describe("Controller", func() {
 			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      ibcName,
-				Namespace: ns,
+				Namespace: namespace,
 			},
-			Spec: testsutil.GetIbmBlockCsiSpec(containersImages),
+			Spec: testsutil.GetIBMBlockCsiSpec(containersImages),
 		}
 	})
   
@@ -78,7 +78,7 @@ var _ = Describe("Controller", func() {
 				found := &csiv1.IBMBlockCSI{}
 				key := types.NamespacedName{
 				  Name:      ibcName,
-				  Namespace: ns,
+				  Namespace: namespace,
 				}
 
 				By("Getting IBMBlockCSI object after creation")

@@ -36,6 +36,11 @@ var (
 )
 
 type crYamlConfig struct {
+	ApiVersion string
+	Kind string
+	Metadata struct {
+		Namespace string
+	}
 	Spec struct {
 		Sidecars []imageProperties
 		Controller imageProperties
@@ -56,6 +61,24 @@ func GetImagesByName() map[string]string {
 
 	containersImages = addImagesByNameFromYaml(containersImages, c.getCrYaml())
 	return containersImages
+}
+
+func GetNamespaceFromCrFile() string {
+	var c crYamlConfig
+
+	return c.getCrYaml().Metadata.Namespace
+}
+
+func GetApiVersionFromCrFile() string {
+	var c crYamlConfig
+
+	return c.getCrYaml().ApiVersion
+}
+
+func GetKindFromCrFile() string {
+	var c crYamlConfig
+
+	return c.getCrYaml().Kind
 }
 
 func (c *crYamlConfig) getCrYaml() *crYamlConfig {
@@ -103,29 +126,29 @@ func getImageWithoutForwardSlash(container imageProperties) string {
 	return strings.Replace(image, "/", "-", -1)
 }
 
-func GetIbmBlockCsiSpec(containersImages map[string]string) csiv1.IBMBlockCSISpec {
+func GetIBMBlockCsiSpec(containersImages map[string]string) csiv1.IBMBlockCSISpec {
 	var spec csiv1.IBMBlockCSISpec
-	spec.Controller = addControllerToIbmSpec(spec, containersImages)
-	spec.Node = addNodeToIbmSpec(spec, containersImages)
-	spec.Sidecars = addSidecarsToIbmSpec(spec, containersImages)
+	spec.Controller = addControllerToIBMSpec(spec, containersImages)
+	spec.Node = addNodeToIBMSpec(spec, containersImages)
+	spec.Sidecars = addSidecarsToIBMSpec(spec, containersImages)
 	return spec
 }
 
-func addControllerToIbmSpec(spec csiv1.IBMBlockCSISpec, containersImages map[string]string) csiv1.IBMBlockCSIControllerSpec {
+func addControllerToIBMSpec(spec csiv1.IBMBlockCSISpec, containersImages map[string]string) csiv1.IBMBlockCSIControllerSpec {
 	var controllerSpec csiv1.IBMBlockCSIControllerSpec
 	controllerSpec.Repository = strings.Split(containersImages[controllerContainerName], ":")[0]
 	controllerSpec.Tag = strings.Split(containersImages[controllerContainerName], ":")[1]
 	return controllerSpec
 }
 
-func addNodeToIbmSpec(spec csiv1.IBMBlockCSISpec, containersImages map[string]string) csiv1.IBMBlockCSINodeSpec {
+func addNodeToIBMSpec(spec csiv1.IBMBlockCSISpec, containersImages map[string]string) csiv1.IBMBlockCSINodeSpec {
 	var nodeSpec csiv1.IBMBlockCSINodeSpec
 	nodeSpec.Repository = strings.Split(containersImages[nodeContainerName], ":")[0]
 	nodeSpec.Tag = strings.Split(containersImages[nodeContainerName], ":")[1]
 	return nodeSpec
 }
 
-func addSidecarsToIbmSpec(spec csiv1.IBMBlockCSISpec, containersImages map[string]string) []csiv1.CSISidecar {
+func addSidecarsToIBMSpec(spec csiv1.IBMBlockCSISpec, containersImages map[string]string) []csiv1.CSISidecar {
 	var sidecars []csiv1.CSISidecar
 	for containerName, imageName := range containersImages {
 		if ! isControllerOrNode(containerName) {
@@ -136,7 +159,7 @@ func addSidecarsToIbmSpec(spec csiv1.IBMBlockCSISpec, containersImages map[strin
 }
 
 func isControllerOrNode(containerName string) bool {
-	controllerAndNode := [2]string{controllerContainerName, nodeContainerName}
+	controllerAndNode := []string{controllerContainerName, nodeContainerName}
 	for _, pluginName := range controllerAndNode {
 		if pluginName == containerName {
 			return true
