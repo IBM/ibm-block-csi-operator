@@ -63,7 +63,7 @@ var _ = Describe("Controller", func() {
 				Name:      ibcName,
 				Namespace: namespace,
 			},
-			Spec: testsutil.GetIBMBlockCsiSpec(containersImages),
+			Spec: testsutil.GetIBMBlockCSISpec(containersImages),
 		}
 	})
   

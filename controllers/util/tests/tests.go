@@ -126,7 +126,7 @@ func getImageWithoutForwardSlash(container imageProperties) string {
 	return strings.Replace(image, "/", "-", -1)
 }
 
-func GetIBMBlockCsiSpec(containersImages map[string]string) csiv1.IBMBlockCSISpec {
+func GetIBMBlockCSISpec(containersImages map[string]string) csiv1.IBMBlockCSISpec {
 	var spec csiv1.IBMBlockCSISpec
 	spec.Controller = addControllerToIBMSpec(spec, containersImages)
 	spec.Node = addNodeToIBMSpec(spec, containersImages)
@@ -177,17 +177,17 @@ func getSidecar(containerName string, imageName string) csiv1.CSISidecar {
 	return sidecar
 }
 
-func GetResourceKey(resourceName config.ResourceName, csiObjectName string, csiObjectNamespace string) types.NamespacedName{
+func GetResourceKey(resourceName config.ResourceName, CSIObjectName string, CSIObjectNamespace string) types.NamespacedName{
 	resourceKey := types.NamespacedName{
-	  Name:      getResourceNameInCluster(resourceName, csiObjectName),
-	  Namespace: csiObjectNamespace,
+	  Name:      getResourceNameInCluster(resourceName, CSIObjectName),
+	  Namespace: CSIObjectNamespace,
 	}
 	return resourceKey
 }
 
-func getResourceNameInCluster(resourceName config.ResourceName, csiObjectName string) string{
-	name := config.GetNameForResource(resourceName, csiObjectName)
-	if csiObjectName == "" {
+func getResourceNameInCluster(resourceName config.ResourceName, CSIObjectName string) string{
+	name := config.GetNameForResource(resourceName, CSIObjectName)
+	if CSIObjectName == "" {
 		name = resourceName.String()
 	}
 	return name
