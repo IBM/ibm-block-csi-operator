@@ -145,7 +145,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		},
 	})
 
-	provisionerArgs := []string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s", "--default-fstype=ext4"}
+	provisionerArgs := []string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s", "--default-fstype=ext4", "--retry-interval-max=30s"}
 	if TopologyEnabled {
 		provisionerArgs = append(provisionerArgs, "--feature-gates=Topology=true")
 	}
@@ -187,6 +187,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		s.getLivenessProbeImage(),
 		[]string{
 			"--csi-address=/csi/csi.sock",
+			"--probe-timeout=30s",
 			healthPortArg,
 		},
 	)
