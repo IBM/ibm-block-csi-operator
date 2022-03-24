@@ -234,7 +234,7 @@ func getServerVersion() (string, error) {
 
 	kubeClient := kubeutil.InitKubeClient(clientConfig)
 
-	serverVersion, err := serverVersion(kubeClient.Discovery())
+	serverVersion, err := composeServerVersion(kubeClient.Discovery())
 	if err != nil {
 		return serverVersion, err
 	}
@@ -249,7 +249,7 @@ func GetClientConfig() (*rest.Config, error) {
 	return clientConfig, nil
 }
 
-func serverVersion(client discovery.DiscoveryInterface) (string, error) {
+func composeServerVersion(client discovery.DiscoveryInterface) (string, error) {
 	versionInfo, err := client.ServerVersion()
 	if err != nil {
 		return "", pkg_errors.Wrap(err, "error getting server version")
