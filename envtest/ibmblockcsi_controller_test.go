@@ -43,8 +43,6 @@ var _ = Describe("Controller", func() {
 	var ibc *csiv1.IBMBlockCSI
 	var namespace = testsutil.GetNamespaceFromCrFile()
 	var ibcName = "test-ibc"
-	var apiVersion = testsutil.GetApiVersionFromCrFile()
-	var kind = testsutil.GetKindFromCrFile()
 	var clusterRoles = []config.ResourceName{config.ExternalProvisionerClusterRole, config.ExternalAttacherClusterRole, 
 		config.ExternalSnapshotterClusterRole, config.ExternalResizerClusterRole, config.CSIAddonsReplicatorClusterRole,
 		config.CSIControllerSCCClusterRole, config.CSINodeSCCClusterRole}
@@ -55,10 +53,6 @@ var _ = Describe("Controller", func() {
 
 	BeforeEach(func() {
 		ibc = &csiv1.IBMBlockCSI{
-			TypeMeta: metav1.TypeMeta{
-				Kind:       kind,
-				APIVersion: apiVersion,
-			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      ibcName,
 				Namespace: namespace,

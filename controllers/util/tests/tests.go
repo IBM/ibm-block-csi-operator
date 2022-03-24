@@ -36,8 +36,6 @@ var (
 )
 
 type crYamlConfig struct {
-	ApiVersion string
-	Kind string
 	Metadata struct {
 		Namespace string
 	}
@@ -67,18 +65,6 @@ func GetNamespaceFromCrFile() string {
 	var c crYamlConfig
 
 	return c.getCrYaml().Metadata.Namespace
-}
-
-func GetApiVersionFromCrFile() string {
-	var c crYamlConfig
-
-	return c.getCrYaml().ApiVersion
-}
-
-func GetKindFromCrFile() string {
-	var c crYamlConfig
-
-	return c.getCrYaml().Kind
 }
 
 func (c *crYamlConfig) getCrYaml() *crYamlConfig {
