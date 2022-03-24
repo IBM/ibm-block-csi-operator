@@ -83,7 +83,8 @@ ifeq (s390x, $(shell hack/get-arch.sh))
 	ginkgo -r -v -skipPackage envtest
 else
 	setup-envtest use -p path ${KUBERNETES_VERSION}
-	export KUBEBUILDER_ASSETS=${PATH_TO_KUBEBUILDER}/${KUBERNETES_VERSION}-linux-$(shell hack/get-arch.sh); ginkgo -r -v
+	export KUBEBUILDER_ASSETS=${PATH_TO_KUBEBUILDER}/${KUBERNETES_VERSION}-linux-$(shell hack/get-arch.sh);\
+	ginkgo -r -v
 endif
 
 .PHONY: update
