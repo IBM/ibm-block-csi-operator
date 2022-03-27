@@ -146,6 +146,6 @@ func checkContainersImages(podSpec corev1.PodSpec) {
 	for _, container := range podSpec.Containers {
 		image, ok := containersImages[container.Name]
 		Expect(ok).To(BeTrue(), fmt.Sprintf("container %s not found in %s", container.Name, containersImages))
-		Expect(container.Image).To(Equal(image))
+		Expect(image).To(Equal(container.Image))
 	}
 }
