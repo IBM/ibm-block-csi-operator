@@ -135,6 +135,12 @@ var _ = Describe("Controller", func() {
 				}, timeout, interval).ShouldNot(BeNil())
 				checkContainersImages(node.Spec.Template.Spec)
 
+				By("Checking if all containers were deployed")
+				var containersNameInControllerAndNode []string
+				containersNameInControllerAndNode = addContainersNameInPod(node.Spec.Template.Spec, containersNameInControllerAndNode)
+				containersNameInControllerAndNode = addContainersNameInPod(controller.Spec.Template.Spec, containersNameInControllerAndNode)
+				checkIfContainersInCrExistsInCSI(containersNameInControllerAndNode)
+				
 				close(done)
 			  }, timeout.Seconds())
 		})
@@ -148,4 +154,27 @@ func checkContainersImages(podSpec corev1.PodSpec) {
 		Expect(ok).To(BeTrue(), fmt.Sprintf("container %s not found in %s", container.Name, containersImages))
 		Expect(image).To(Equal(container.Image))
 	}
+}
+
+func addContainersNameInPod(podSpec corev1.PodSpec, containersNames []string) []string {
+	for _, container := range podSpec.Containers {
+		containersNames = append(containersNames, container.Name)
+	}
+	return containersNames
+}
+
+func checkIfContainersInCrExistsInCSI(containersNames []string) {
+	for containerName, _ := range containersImages{
+		Expect(isContainerDeployed(containersNames, containerName)).To(BeTrue(),
+			fmt.Sprintf("container %s not found in CSI deployment", containerName))
+	}
+}
+
+func isContainerDeployed(containersNames []string, wantedContainerName string) bool {
+    for _, containerName := range containersNames {
+        if containerName == wantedContainerName {
+            return true
+        }
+    }
+    return false
 }

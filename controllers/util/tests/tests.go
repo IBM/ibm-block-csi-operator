@@ -92,27 +92,27 @@ func GetNamespaceFromCrFile() string {
 
 func GetIBMBlockCSISpec(containersImages map[string]string) csiv1.IBMBlockCSISpec {
 	var spec csiv1.IBMBlockCSISpec
-	spec.Controller = addControllerToIBMSpec(spec, containersImages)
-	spec.Node = addNodeToIBMSpec(spec, containersImages)
-	spec.Sidecars = addSidecarsToIBMSpec(spec, containersImages)
+	spec.Controller = addControllerToIBMSpec(containersImages)
+	spec.Node = addNodeToIBMSpec(containersImages)
+	spec.Sidecars = addSidecarsToIBMSpec(containersImages)
 	return spec
 }
 
-func addControllerToIBMSpec(spec csiv1.IBMBlockCSISpec, containersImages map[string]string) csiv1.IBMBlockCSIControllerSpec {
+func addControllerToIBMSpec(containersImages map[string]string) csiv1.IBMBlockCSIControllerSpec {
 	var controllerSpec csiv1.IBMBlockCSIControllerSpec
 	controllerSpec.Repository = strings.Split(containersImages[controllerContainerName], ":")[0]
 	controllerSpec.Tag = strings.Split(containersImages[controllerContainerName], ":")[1]
 	return controllerSpec
 }
 
-func addNodeToIBMSpec(spec csiv1.IBMBlockCSISpec, containersImages map[string]string) csiv1.IBMBlockCSINodeSpec {
+func addNodeToIBMSpec(containersImages map[string]string) csiv1.IBMBlockCSINodeSpec {
 	var nodeSpec csiv1.IBMBlockCSINodeSpec
 	nodeSpec.Repository = strings.Split(containersImages[nodeContainerName], ":")[0]
 	nodeSpec.Tag = strings.Split(containersImages[nodeContainerName], ":")[1]
 	return nodeSpec
 }
 
-func addSidecarsToIBMSpec(spec csiv1.IBMBlockCSISpec, containersImages map[string]string) []csiv1.CSISidecar {
+func addSidecarsToIBMSpec(containersImages map[string]string) []csiv1.CSISidecar {
 	var sidecars []csiv1.CSISidecar
 	for containerName, imageName := range containersImages {
 		if ! isControllerOrNode(containerName) {
