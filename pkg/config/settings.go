@@ -45,9 +45,6 @@ const (
 var DefaultCr v1.IBMBlockCSI
 
 var DefaultSidecarsByName map[string]v1.CSISidecar
-var DefaultControllerByName map[string]v1.IBMBlockCSIControllerSpec
-var DefaultNodeByName map[string]v1.IBMBlockCSINodeSpec
-var DefaultNamespace string
 
 var OfficialRegistriesUsernames = sets.NewString(IBMRegistryUsername, K8SRegistryUsername,
 	                                             QuayRegistryUsername, QuayAddonsRegistryUsername,
@@ -65,9 +62,6 @@ func LoadDefaultsOfIBMBlockCSI() error {
 		return err
 	}
 	setDefaultSidecarImageByName()
-	setDefaultControllerImageByName()
-	setDefaultNodeImageByName()
-	DefaultNamespace = DefaultCr.ObjectMeta.Namespace
 
 	return nil
 }
@@ -91,14 +85,4 @@ func setDefaultSidecarImageByName() {
 	for _, sidecar := range DefaultCr.Spec.Sidecars {
 		DefaultSidecarsByName[sidecar.Name] = sidecar
 	}
-}
-
-func setDefaultControllerImageByName() {
-	DefaultControllerByName = make(map[string]v1.IBMBlockCSIControllerSpec)
-	DefaultControllerByName["ibm-block-csi-controller"] = DefaultCr.Spec.Controller
-}
-
-func setDefaultNodeImageByName() {
-	DefaultNodeByName = make(map[string]v1.IBMBlockCSINodeSpec)
-	DefaultNodeByName["ibm-block-csi-node"] = DefaultCr.Spec.Node
 }

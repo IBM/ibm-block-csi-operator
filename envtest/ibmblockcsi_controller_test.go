@@ -46,7 +46,7 @@ var _ = Describe("Controller", func() {
 	var clusterRoles = []config.ResourceName{config.ExternalProvisionerClusterRole, config.ExternalAttacherClusterRole, 
 		config.ExternalSnapshotterClusterRole, config.ExternalResizerClusterRole, config.CSIAddonsReplicatorClusterRole,
 		config.CSIControllerSCCClusterRole, config.CSINodeSCCClusterRole}
-	var	clusterRoleBindings = []config.ResourceName{config.ExternalProvisionerClusterRoleBinding,
+	var clusterRoleBindings = []config.ResourceName{config.ExternalProvisionerClusterRoleBinding,
 			config.ExternalAttacherClusterRoleBinding, config.ExternalSnapshotterClusterRoleBinding,
 			config.ExternalResizerClusterRoleBinding, config.CSIAddonsReplicatorClusterRoleBinding,
 			config.CSIControllerSCCClusterRoleBinding, config.CSINodeSCCClusterRoleBinding}
@@ -142,7 +142,7 @@ var _ = Describe("Controller", func() {
 })
 
 func checkContainersImages(podSpec corev1.PodSpec) {
-	Expect(len(podSpec.Containers)).To(BeNumerically(">", 0))
+	Expect(podSpec.Containers).To(Not(BeEmpty()))
 	for _, container := range podSpec.Containers {
 		image, ok := containersImages[container.Name]
 		Expect(ok).To(BeTrue(), fmt.Sprintf("container %s not found in %s", container.Name, containersImages))

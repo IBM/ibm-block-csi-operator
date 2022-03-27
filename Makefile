@@ -76,14 +76,12 @@ run-unit-tests:
 	$(run_unit_tests_image) make test
 
 KUBERNETES_VERSION=1.23.1
-PATH_TO_KUBEBUILDER=/root/.local/share/kubebuilder-envtest/k8s
 .PHONY: test
 test: check-generated-manifests update
 ifeq (s390x, $(shell hack/get-arch.sh))
 	ginkgo -r -v -skipPackage envtest
 else
-	setup-envtest use -p path ${KUBERNETES_VERSION}
-	export KUBEBUILDER_ASSETS=${PATH_TO_KUBEBUILDER}/${KUBERNETES_VERSION}-linux-$(shell hack/get-arch.sh);\
+	export KUBEBUILDER_ASSETS=$(shell setup-envtest use -p path ${KUBERNETES_VERSION});\
 	ginkgo -r -v
 endif
 

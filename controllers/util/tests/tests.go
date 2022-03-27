@@ -28,24 +28,34 @@ import (
 var (
 	nodeContainerName = clustersyncer.NodeContainerName
 	controllerContainerName = clustersyncer.ControllerContainerName
+	defaultControllerByName map[string]csiv1.IBMBlockCSIControllerSpec
+	defaultNodeByName map[string]csiv1.IBMBlockCSINodeSpec
 )
 var err = config.LoadDefaultsOfIBMBlockCSI()
 
 func GetImagesByName() map[string]string {
 	containersImages := make(map[string]string)
+	setDefaultControllerImageByName()
+	setDefaultNodeImageByName()
 
 	containersImages = addImagesByNameFromYaml(containersImages)
 	return containersImages
 }
 
-func GetNamespaceFromCrFile() string {
-	return config.DefaultNamespace
+func setDefaultControllerImageByName() {
+	defaultControllerByName = make(map[string]csiv1.IBMBlockCSIControllerSpec)
+	defaultControllerByName[controllerContainerName] = config.DefaultCr.Spec.Controller
+}
+
+func setDefaultNodeImageByName() {
+	defaultNodeByName = make(map[string]csiv1.IBMBlockCSINodeSpec)
+	defaultNodeByName[nodeContainerName] = config.DefaultCr.Spec.Node
 }
 
 func addImagesByNameFromYaml(containersImages map[string]string) map[string]string {
 	containersImages = addSideCarsImagesToContainersImagesMap(containersImages, config.DefaultSidecarsByName)
-	containersImages = addNodeImageToContainersImagesMap(containersImages, config.DefaultNodeByName)
-	containersImages = addControllerImageToContainersImagesMap(containersImages, config.DefaultControllerByName)
+	containersImages = addNodeImageToContainersImagesMap(containersImages, defaultNodeByName)
+	containersImages = addControllerImageToContainersImagesMap(containersImages, defaultControllerByName)
 	return containersImages
 }
  
@@ -74,6 +84,10 @@ func addControllerImageToContainersImagesMap(containersImages map[string]string,
 func getImageFromRepositoryAndTag(containerRepository string, containerTag string) string {
 	image := containerRepository + ":" + containerTag
 	return image
+}
+
+func GetNamespaceFromCrFile() string {
+	return config.DefaultCr.ObjectMeta.Namespace
 }
 
 func GetIBMBlockCSISpec(containersImages map[string]string) csiv1.IBMBlockCSISpec {
