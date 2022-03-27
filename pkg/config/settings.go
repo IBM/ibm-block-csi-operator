@@ -45,6 +45,9 @@ const (
 var DefaultCr v1.IBMBlockCSI
 
 var DefaultSidecarsByName map[string]v1.CSISidecar
+var DefaultControllerByName map[string]v1.IBMBlockCSIControllerSpec
+var DefaultNodeByName map[string]v1.IBMBlockCSINodeSpec
+var DefaultNamespace string
 
 var OfficialRegistriesUsernames = sets.NewString(IBMRegistryUsername, K8SRegistryUsername,
 	                                             QuayRegistryUsername, QuayAddonsRegistryUsername,
@@ -57,6 +60,19 @@ func LoadDefaultsOfIBMBlockCSI() error {
 		return fmt.Errorf("environment variable %q was not set", EnvNameCrYaml)
 	}
 
+	err := appendDefaultsFromCrFileToDefaultCrObject(crYamlPath)
+	if err != nil {
+		return err
+	}
+	setDefaultSidecarImageByName()
+	setDefaultControllerImageByName()
+	setDefaultNodeImageByName()
+	DefaultNamespace = DefaultCr.ObjectMeta.Namespace
+
+	return nil
+}
+
+func appendDefaultsFromCrFileToDefaultCrObject(crYamlPath string) error{
 	yamlFile, err := ioutil.ReadFile(crYamlPath)
 	if err != nil {
 		return fmt.Errorf("failed to read file %q: %v", yamlFile, err)
@@ -66,12 +82,23 @@ func LoadDefaultsOfIBMBlockCSI() error {
 	if err != nil {
 		return fmt.Errorf("error unmarshaling yaml: %v", err)
 	}
+	return nil
+}
 
+func setDefaultSidecarImageByName() {
 	DefaultSidecarsByName = make(map[string]v1.CSISidecar)
 
 	for _, sidecar := range DefaultCr.Spec.Sidecars {
 		DefaultSidecarsByName[sidecar.Name] = sidecar
 	}
+}
 
-	return nil
+func setDefaultControllerImageByName() {
+	DefaultControllerByName = make(map[string]v1.IBMBlockCSIControllerSpec)
+	DefaultControllerByName["ibm-block-csi-controller"] = DefaultCr.Spec.Controller
+}
+
+func setDefaultNodeImageByName() {
+	DefaultNodeByName = make(map[string]v1.IBMBlockCSINodeSpec)
+	DefaultNodeByName["ibm-block-csi-node"] = DefaultCr.Spec.Node
 }

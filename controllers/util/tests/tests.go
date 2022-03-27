@@ -17,99 +17,63 @@
 package tests
 
 import (
-	"fmt"
-	"io/ioutil"
-	"os"
 	"strings"
 
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
 	clustersyncer "github.com/IBM/ibm-block-csi-operator/controllers/syncer"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
-	"gopkg.in/yaml.v2"
 	"k8s.io/apimachinery/pkg/types"
 )
 
 var (
-	relativeCrPath = "../config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml"
 	nodeContainerName = clustersyncer.NodeContainerName
 	controllerContainerName = clustersyncer.ControllerContainerName
 )
+var err = config.LoadDefaultsOfIBMBlockCSI()
 
-type crYamlConfig struct {
-	Metadata struct {
-		Namespace string
-	}
-	Spec struct {
-		Sidecars []imageProperties
-		Controller imageProperties
-		Node imageProperties
-	}
-}
-type imageProperties struct {
-	Name string `yaml:"name"`
-
-	Repository string `yaml:"repository"`
-
-	Tag string `yaml:"tag"`
-}
- 
 func GetImagesByName() map[string]string {
-	var c crYamlConfig
 	containersImages := make(map[string]string)
 
-	containersImages = addImagesByNameFromYaml(containersImages, c.getCrYaml())
+	containersImages = addImagesByNameFromYaml(containersImages)
 	return containersImages
 }
 
 func GetNamespaceFromCrFile() string {
-	var c crYamlConfig
-
-	return c.getCrYaml().Metadata.Namespace
+	return config.DefaultNamespace
 }
 
-func (c *crYamlConfig) getCrYaml() *crYamlConfig {
-	yamlFile, err := ioutil.ReadFile(relativeCrPath)
-	if err != nil {
-		fmt.Println("unable to read yaml file, error:", err)
-	 	os.Exit(1)
-	}
-	err = yaml.Unmarshal(yamlFile, c)
-	if err != nil {
-		fmt.Println("unable to decodes yaml file, error:", err)
-	 	os.Exit(1)
-	}
-	 return c
-}
- 
-func addImagesByNameFromYaml(containersImages map[string]string, crYaml *crYamlConfig) map[string]string {
-	containersImages = addSideCarsImagesToContainersImagesMap(containersImages, crYaml)
-	containersImages = addNodeImageToContainersImagesMap(containersImages, crYaml)
-	containersImages = addControllerImageToContainersImagesMap(containersImages, crYaml)
+func addImagesByNameFromYaml(containersImages map[string]string) map[string]string {
+	containersImages = addSideCarsImagesToContainersImagesMap(containersImages, config.DefaultSidecarsByName)
+	containersImages = addNodeImageToContainersImagesMap(containersImages, config.DefaultNodeByName)
+	containersImages = addControllerImageToContainersImagesMap(containersImages, config.DefaultControllerByName)
 	return containersImages
 }
  
-func addSideCarsImagesToContainersImagesMap(containersImages map[string]string, crYaml *crYamlConfig) map[string]string {
-	for _, sidecar := range crYaml.Spec.Sidecars {
-		containersImages[sidecar.Name] = getImageWithoutForwardSlash(sidecar)
+func addSideCarsImagesToContainersImagesMap(containersImages map[string]string,
+		sidecarsImagesByName map[string]csiv1.CSISidecar) map[string]string {
+	for containerName, sidecar := range sidecarsImagesByName {
+		containersImages[containerName] = getImageFromRepositoryAndTag(sidecar.Repository, sidecar.Tag)
 	}
 	return containersImages
 }
 
-func addNodeImageToContainersImagesMap(containersImages map[string]string, crYaml *crYamlConfig) map[string]string {
-	node := crYaml.Spec.Node
-	containersImages[nodeContainerName] = getImageWithoutForwardSlash(node)
+func addNodeImageToContainersImagesMap(containersImages map[string]string,
+		nodeImagesByName map[string]csiv1.IBMBlockCSINodeSpec) map[string]string {
+	node := nodeImagesByName[nodeContainerName]
+	containersImages[nodeContainerName] = getImageFromRepositoryAndTag(node.Repository, node.Tag)
 	return containersImages
 }
 
-func addControllerImageToContainersImagesMap(containersImages map[string]string, crYaml *crYamlConfig) map[string]string {
-	controller := crYaml.Spec.Controller
-	containersImages[controllerContainerName] = getImageWithoutForwardSlash(controller)
+func addControllerImageToContainersImagesMap(containersImages map[string]string,
+		controllerImagesByName map[string]csiv1.IBMBlockCSIControllerSpec) map[string]string {
+	controller := controllerImagesByName[controllerContainerName]
+	containersImages[controllerContainerName] = getImageFromRepositoryAndTag(controller.Repository, controller.Tag)
 	return containersImages
 }
 
-func getImageWithoutForwardSlash(container imageProperties) string {
-	image := container.Repository + ":" + container.Tag
-	return strings.Replace(image, "/", "-", -1)
+func getImageFromRepositoryAndTag(containerRepository string, containerTag string) string {
+	image := containerRepository + ":" + containerTag
+	return image
 }
 
 func GetIBMBlockCSISpec(containersImages map[string]string) csiv1.IBMBlockCSISpec {
