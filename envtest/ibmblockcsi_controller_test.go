@@ -34,14 +34,16 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-var containersImages = testsutil.GetImagesByName()
-
 var _ = Describe("Controller", func() {
-  
+
+	err := config.LoadDefaultsOfIBMBlockCSI()
+	Expect(err).To(BeNil(), fmt.Sprint("can't load defaults of IBM Block CSI"))
+
 	const timeout = time.Second * 30
 	const interval = time.Second * 1
 	var ibc *csiv1.IBMBlockCSI
-	var namespace = testsutil.GetNamespaceFromCrFile()
+	var namespace = config.DefaultCr.ObjectMeta.Namespace
+	var containersImages = testsutil.GetImagesByName(config.DefaultCr, config.DefaultSidecarsByName)
 	var ibcName = "test-ibc"
 	var clusterRoles = []config.ResourceName{config.ExternalProvisionerClusterRole, config.ExternalAttacherClusterRole, 
 		config.ExternalSnapshotterClusterRole, config.ExternalResizerClusterRole, config.CSIAddonsReplicatorClusterRole,
@@ -124,7 +126,7 @@ var _ = Describe("Controller", func() {
 				  	testsutil.GetResourceKey(config.CSIController, found.Name, found.Namespace), controller)
 				  return controller, err
 				}, timeout, interval).ShouldNot(BeNil())
-				checkContainersImages(controller.Spec.Template.Spec)
+				checkContainersImages(controller.Spec.Template.Spec, containersImages)
 
 				By("Getting node DaemonSet")
 				node := &appsv1.DaemonSet{}
@@ -133,13 +135,13 @@ var _ = Describe("Controller", func() {
 				  	testsutil.GetResourceKey(config.CSINode, found.Name, found.Namespace), node)
 				  return node, err
 				}, timeout, interval).ShouldNot(BeNil())
-				checkContainersImages(node.Spec.Template.Spec)
+				checkContainersImages(node.Spec.Template.Spec, containersImages)
 
 				By("Checking if all containers were deployed")
 				var containersNameInControllerAndNode []string
 				containersNameInControllerAndNode = addContainersNameInPod(node.Spec.Template.Spec, containersNameInControllerAndNode)
 				containersNameInControllerAndNode = addContainersNameInPod(controller.Spec.Template.Spec, containersNameInControllerAndNode)
-				checkIfContainersInCrExistsInCSI(containersNameInControllerAndNode)
+				checkIfContainersInCrExistsInCSI(containersNameInControllerAndNode, containersImages)
 				
 				close(done)
 			  }, timeout.Seconds())
@@ -147,7 +149,7 @@ var _ = Describe("Controller", func() {
 	})
 })
 
-func checkContainersImages(podSpec corev1.PodSpec) {
+func checkContainersImages(podSpec corev1.PodSpec, containersImages map[string]string) {
 	Expect(podSpec.Containers).To(Not(BeEmpty()))
 	for _, container := range podSpec.Containers {
 		image, ok := containersImages[container.Name]
@@ -163,7 +165,7 @@ func addContainersNameInPod(podSpec corev1.PodSpec, containersNames []string) []
 	return containersNames
 }
 
-func checkIfContainersInCrExistsInCSI(containersNames []string) {
+func checkIfContainersInCrExistsInCSI(containersNames []string, containersImages map[string]string) {
 	for containerName, _ := range containersImages{
 		Expect(isContainerDeployed(containersNames, containerName)).To(BeTrue(),
 			fmt.Sprintf("container %s not found in CSI deployment", containerName))

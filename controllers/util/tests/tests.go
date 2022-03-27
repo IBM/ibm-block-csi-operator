@@ -28,34 +28,33 @@ import (
 var (
 	nodeContainerName = clustersyncer.NodeContainerName
 	controllerContainerName = clustersyncer.ControllerContainerName
-	defaultControllerByName map[string]csiv1.IBMBlockCSIControllerSpec
-	defaultNodeByName map[string]csiv1.IBMBlockCSINodeSpec
+	controllerByName map[string]csiv1.IBMBlockCSIControllerSpec
+	nodeByName map[string]csiv1.IBMBlockCSINodeSpec
 )
-var err = config.LoadDefaultsOfIBMBlockCSI()
 
-func GetImagesByName() map[string]string {
+func GetImagesByName(defaultCr csiv1.IBMBlockCSI, sidecarsByName map[string]csiv1.CSISidecar) map[string]string {
 	containersImages := make(map[string]string)
-	setDefaultControllerImageByName()
-	setDefaultNodeImageByName()
+	setControllerImageByName(defaultCr)
+	setNodeImageByName(defaultCr)
 
-	containersImages = addImagesByNameFromYaml(containersImages)
+	containersImages = addImagesByNameFromYaml(containersImages, sidecarsByName)
 	return containersImages
 }
 
-func setDefaultControllerImageByName() {
-	defaultControllerByName = make(map[string]csiv1.IBMBlockCSIControllerSpec)
-	defaultControllerByName[controllerContainerName] = config.DefaultCr.Spec.Controller
+func setControllerImageByName(defaultCr csiv1.IBMBlockCSI) {
+	controllerByName = make(map[string]csiv1.IBMBlockCSIControllerSpec)
+	controllerByName[controllerContainerName] = defaultCr.Spec.Controller
 }
 
-func setDefaultNodeImageByName() {
-	defaultNodeByName = make(map[string]csiv1.IBMBlockCSINodeSpec)
-	defaultNodeByName[nodeContainerName] = config.DefaultCr.Spec.Node
+func setNodeImageByName(defaultCr csiv1.IBMBlockCSI) {
+	nodeByName = make(map[string]csiv1.IBMBlockCSINodeSpec)
+	nodeByName[nodeContainerName] = defaultCr.Spec.Node
 }
 
-func addImagesByNameFromYaml(containersImages map[string]string) map[string]string {
-	containersImages = addSideCarsImagesToContainersImagesMap(containersImages, config.DefaultSidecarsByName)
-	containersImages = addNodeImageToContainersImagesMap(containersImages, defaultNodeByName)
-	containersImages = addControllerImageToContainersImagesMap(containersImages, defaultControllerByName)
+func addImagesByNameFromYaml(containersImages map[string]string, sidecarsByName map[string]csiv1.CSISidecar) map[string]string {
+	containersImages = addSideCarsImagesToContainersImagesMap(containersImages, sidecarsByName)
+	containersImages = addNodeImageToContainersImagesMap(containersImages, nodeByName)
+	containersImages = addControllerImageToContainersImagesMap(containersImages, controllerByName)
 	return containersImages
 }
  
@@ -84,10 +83,6 @@ func addControllerImageToContainersImagesMap(containersImages map[string]string,
 func getImageFromRepositoryAndTag(containerRepository string, containerTag string) string {
 	image := containerRepository + ":" + containerTag
 	return image
-}
-
-func GetNamespaceFromCrFile() string {
-	return config.DefaultCr.ObjectMeta.Namespace
 }
 
 func GetIBMBlockCSISpec(containersImages map[string]string) csiv1.IBMBlockCSISpec {
