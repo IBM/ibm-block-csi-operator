@@ -119,7 +119,7 @@ var _ = Describe("Controller", func() {
 				  	testsutil.GetResourceKey(config.CSIController, found.Name, found.Namespace), controller)
 				  return controller, err
 				}, timeout, interval).ShouldNot(BeNil())
-				checkContainersImages(controller.Spec.Template.Spec, containersImages)
+				assertDeployedContainersAreInCR(controller.Spec.Template.Spec, containersImages)
 
 				By("Getting node DaemonSet")
 				node := &appsv1.DaemonSet{}
@@ -128,13 +128,13 @@ var _ = Describe("Controller", func() {
 				  	testsutil.GetResourceKey(config.CSINode, found.Name, found.Namespace), node)
 				  return node, err
 				}, timeout, interval).ShouldNot(BeNil())
-				checkContainersImages(node.Spec.Template.Spec, containersImages)
+				assertDeployedContainersAreInCR(node.Spec.Template.Spec, containersImages)
 
 				By("Checking if all containers were deployed")
 				var containersNameInControllerAndNode []string
 				containersNameInControllerAndNode = addContainersNameInPod(node.Spec.Template.Spec, containersNameInControllerAndNode)
 				containersNameInControllerAndNode = addContainersNameInPod(controller.Spec.Template.Spec, containersNameInControllerAndNode)
-				checkIfContainersInCrExistsInCSI(containersNameInControllerAndNode, containersImages)
+				assertContainersInCRAreDeployed(containersNameInControllerAndNode, containersImages)
 				
 				close(done)
 			  }, timeout.Seconds())
@@ -142,31 +142,31 @@ var _ = Describe("Controller", func() {
 	})
 })
 
-func checkContainersImages(podSpec corev1.PodSpec, containersImages map[string]string) {
-	Expect(podSpec.Containers).To(Not(BeEmpty()))
-	for _, container := range podSpec.Containers {
-		image, ok := containersImages[container.Name]
-		Expect(ok).To(BeTrue(), fmt.Sprintf("container %s not found in %s", container.Name, containersImages))
-		Expect(image).To(Equal(container.Image))
+func assertDeployedContainersAreInCR(deployedPodSpec corev1.PodSpec, containersImagesInCR map[string]string) {
+	Expect(deployedPodSpec.Containers).To(Not(BeEmpty()))
+	for _, deployedContainer := range deployedPodSpec.Containers {
+		image, ok := containersImagesInCR[deployedContainer.Name]
+		Expect(ok).To(BeTrue(), fmt.Sprintf("container %s not found in %s", deployedContainer.Name, containersImagesInCR))
+		Expect(image).To(Equal(deployedContainer.Image))
 	}
 }
 
-func addContainersNameInPod(podSpec corev1.PodSpec, containersNames []string) []string {
-	for _, container := range podSpec.Containers {
-		containersNames = append(containersNames, container.Name)
+func addContainersNameInPod(deployedPodSpec corev1.PodSpec, deployedContainersNames []string) []string {
+	for _, deployedContainer := range deployedPodSpec.Containers {
+		deployedContainersNames = append(deployedContainersNames, deployedContainer.Name)
 	}
-	return containersNames
+	return deployedContainersNames
 }
 
-func checkIfContainersInCrExistsInCSI(containersNames []string, containersImages map[string]string) {
-	for containerName, _ := range containersImages{
-		Expect(isContainerDeployed(containersNames, containerName)).To(BeTrue(),
-			fmt.Sprintf("container %s not found in CSI deployment", containerName))
+func assertContainersInCRAreDeployed(deployedContainersNames []string, containersImagesInCR map[string]string) {
+	for deployedContainerName, _ := range containersImagesInCR{
+		Expect(isContainerDeployed(deployedContainersNames, deployedContainerName)).To(BeTrue(),
+			fmt.Sprintf("container %s not found in CSI deployment", deployedContainerName))
 	}
 }
 
-func isContainerDeployed(containersNames []string, wantedContainerName string) bool {
-    for _, containerName := range containersNames {
+func isContainerDeployed(deployedContainersNames []string, wantedContainerName string) bool {
+    for _, containerName := range deployedContainersNames {
         if containerName == wantedContainerName {
             return true
         }
