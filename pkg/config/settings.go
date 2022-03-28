@@ -57,16 +57,6 @@ func LoadDefaultsOfIBMBlockCSI() error {
 		return fmt.Errorf("environment variable %q was not set", EnvNameCrYaml)
 	}
 
-	err := appendDefaultsFromCrFileToDefaultCrObject(crYamlPath)
-	if err != nil {
-		return err
-	}
-	setDefaultSidecarImageByName()
-
-	return nil
-}
-
-func appendDefaultsFromCrFileToDefaultCrObject(crYamlPath string) error{
 	yamlFile, err := ioutil.ReadFile(crYamlPath)
 	if err != nil {
 		return fmt.Errorf("failed to read file %q: %v", yamlFile, err)
@@ -76,13 +66,12 @@ func appendDefaultsFromCrFileToDefaultCrObject(crYamlPath string) error{
 	if err != nil {
 		return fmt.Errorf("error unmarshaling yaml: %v", err)
 	}
-	return nil
-}
 
-func setDefaultSidecarImageByName() {
 	DefaultSidecarsByName = make(map[string]v1.CSISidecar)
 
 	for _, sidecar := range DefaultCr.Spec.Sidecars {
 		DefaultSidecarsByName[sidecar.Name] = sidecar
 	}
+
+	return nil
 }
