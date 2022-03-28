@@ -30,7 +30,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	storagev1 "k8s.io/api/storage/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 )
 
@@ -44,7 +43,7 @@ var _ = Describe("Controller", func() {
 	var ibc *csiv1.IBMBlockCSI
 	var namespace = config.DefaultCr.ObjectMeta.Namespace
 	var containersImages = testsutil.GetImagesByName(config.DefaultCr, config.DefaultSidecarsByName)
-	var ibcName = "test-ibc"
+	var ibcName = config.DefaultCr.ObjectMeta.Name
 	var clusterRoles = []config.ResourceName{config.ExternalProvisionerClusterRole, config.ExternalAttacherClusterRole, 
 		config.ExternalSnapshotterClusterRole, config.ExternalResizerClusterRole, config.CSIAddonsReplicatorClusterRole,
 		config.CSIControllerSCCClusterRole, config.CSINodeSCCClusterRole}
@@ -54,13 +53,7 @@ var _ = Describe("Controller", func() {
 			config.CSIControllerSCCClusterRoleBinding, config.CSINodeSCCClusterRoleBinding}
 
 	BeforeEach(func() {
-		ibc = &csiv1.IBMBlockCSI{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      ibcName,
-				Namespace: namespace,
-			},
-			Spec: testsutil.GetIBMBlockCSISpec(containersImages),
-		}
+		ibc = &config.DefaultCr
 	})
   
 	Describe("test ibc controller", func() {

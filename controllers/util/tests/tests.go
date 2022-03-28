@@ -17,8 +17,6 @@
 package tests
 
 import (
-	"strings"
-
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
 	clustersyncer "github.com/IBM/ibm-block-csi-operator/controllers/syncer"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
@@ -83,57 +81,6 @@ func addControllerImageToContainersImagesMap(containersImages map[string]string,
 func getImageFromRepositoryAndTag(containerRepository string, containerTag string) string {
 	image := containerRepository + ":" + containerTag
 	return image
-}
-
-func GetIBMBlockCSISpec(containersImages map[string]string) csiv1.IBMBlockCSISpec {
-	var spec csiv1.IBMBlockCSISpec
-	spec.Controller = addControllerToIBMSpec(containersImages)
-	spec.Node = addNodeToIBMSpec(containersImages)
-	spec.Sidecars = addSidecarsToIBMSpec(containersImages)
-	return spec
-}
-
-func addControllerToIBMSpec(containersImages map[string]string) csiv1.IBMBlockCSIControllerSpec {
-	var controllerSpec csiv1.IBMBlockCSIControllerSpec
-	controllerSpec.Repository = strings.Split(containersImages[controllerContainerName], ":")[0]
-	controllerSpec.Tag = strings.Split(containersImages[controllerContainerName], ":")[1]
-	return controllerSpec
-}
-
-func addNodeToIBMSpec(containersImages map[string]string) csiv1.IBMBlockCSINodeSpec {
-	var nodeSpec csiv1.IBMBlockCSINodeSpec
-	nodeSpec.Repository = strings.Split(containersImages[nodeContainerName], ":")[0]
-	nodeSpec.Tag = strings.Split(containersImages[nodeContainerName], ":")[1]
-	return nodeSpec
-}
-
-func addSidecarsToIBMSpec(containersImages map[string]string) []csiv1.CSISidecar {
-	var sidecars []csiv1.CSISidecar
-	for containerName, imageName := range containersImages {
-		if ! isControllerOrNode(containerName) {
-			sidecars = append(sidecars, getSidecar(containerName, imageName))
-		}
-	}
-	return sidecars
-}
-
-func isControllerOrNode(containerName string) bool {
-	controllerAndNode := []string{controllerContainerName, nodeContainerName}
-	for _, pluginName := range controllerAndNode {
-		if pluginName == containerName {
-			return true
-		}
-	}
-	return false
-}
-
-func getSidecar(containerName string, imageName string) csiv1.CSISidecar {
-	var sidecar csiv1.CSISidecar
-	sidecar.Name = containerName
-	sidecar.Repository = strings.Split(imageName, ":")[0]
-	sidecar.Tag = strings.Split(imageName, ":")[1]
-	sidecar.ImagePullPolicy = "IfNotPresent"
-	return sidecar
 }
 
 func GetResourceKey(resourceName config.ResourceName, CSIObjectName string, CSIObjectNamespace string) types.NamespacedName{
