@@ -37,7 +37,7 @@ import (
 
 const (
 	registrationVolumeName              = "registration-dir"
-	nodeContainerName                   = "ibm-block-csi-node"
+	NodeContainerName                   = "ibm-block-csi-node"
 	csiNodeDriverRegistrarContainerName = "csi-node-driver-registrar"
 	nodeLivenessProbeContainerName      = "livenessprobe"
 
@@ -110,7 +110,7 @@ func (s *csiNodeSyncer) ensurePodSpec() corev1.PodSpec {
 
 func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	// node plugin container
-	nodePlugin := s.ensureContainer(nodeContainerName,
+	nodePlugin := s.ensureContainer(NodeContainerName,
 		s.driver.GetCSINodeImage(),
 		[]string{
 			"--csi-endpoint=$(CSI_ENDPOINT)",
@@ -223,7 +223,7 @@ func envVarFromField(name, fieldPath string) corev1.EnvVar {
 func (s *csiNodeSyncer) getEnvFor(name string) []corev1.EnvVar {
 
 	switch name {
-	case nodeContainerName:
+	case NodeContainerName:
 		return []corev1.EnvVar{
 			{
 				Name:  "CSI_ENDPOINT",
@@ -255,7 +255,7 @@ func (s *csiNodeSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 	mountPropagationB := corev1.MountPropagationBidirectional
 
 	switch name {
-	case nodeContainerName:
+	case NodeContainerName:
 		return []corev1.VolumeMount{
 			{
 				Name:      socketVolumeName,
