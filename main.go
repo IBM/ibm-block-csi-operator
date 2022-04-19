@@ -121,7 +121,11 @@ func getWatchNamespace() (string, error) {
 }
 
 func IsTopologyInUse(ctx context.Context) (bool, error) {
-	kubeClient := kubeutil.KubeClient
+	clientConfig, err := controllers.GetClientConfig()
+	if err != nil {
+		return false, err
+	}
+	kubeClient := kubeutil.InitKubeClient(clientConfig)
 	nodes, err := kubeClient.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return false, err
