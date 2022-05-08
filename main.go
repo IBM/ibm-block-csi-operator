@@ -23,20 +23,23 @@ import (
 	"os"
 	"strings"
 
-	"github.com/IBM/ibm-block-csi-operator/controllers/syncer"
-	kubeutil "github.com/IBM/ibm-block-csi-operator/pkg/util/kubernetes"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	operatorConfig "github.com/IBM/ibm-block-csi-operator/pkg/config"
+	"github.com/IBM/ibm-block-csi-operator/controllers/syncer"
+	kubeutil "github.com/IBM/ibm-block-csi-operator/pkg/util/kubernetes"
+
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	operatorConfig "github.com/IBM/ibm-block-csi-operator/pkg/config"
+
+	logf "sigs.k8s.io/controller-runtime/pkg/log"
+
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
 	"github.com/IBM/ibm-block-csi-operator/controllers"
-	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -78,9 +81,9 @@ func main() {
 	}
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:                 scheme,
-		Port:                   9443,
-		Namespace:              namespace,
+		Scheme:    scheme,
+		Port:      9443,
+		Namespace: namespace,
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
@@ -93,6 +96,13 @@ func main() {
 		Namespace: namespace,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "IBMBlockCSI")
+		os.Exit(1)
+	}
+	if err = (&controllers.HostDefinitionReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "HostDefinition")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

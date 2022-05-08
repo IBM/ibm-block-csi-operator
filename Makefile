@@ -34,7 +34,7 @@ help: ## Display this help.
 
 manifests: controller-gen kustomize## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=ibm-block-csi-operator webhook paths="./..." output:crd:artifacts:config=config/crd/bases
-	$(KUSTOMIZE) build config/crd/ -o config/crd/bases/csi.ibm.com_ibmblockcsis.yaml
+#	$(KUSTOMIZE) build config/crd/ -o config/crd/bases/csi.ibm.com_ibmblockcsis.yaml
 
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."

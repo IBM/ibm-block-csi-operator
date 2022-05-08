@@ -1,5 +1,6 @@
 resources:
 - bases/csi.ibm.com_ibmblockcsis.yaml
+- bases/csi.ibm.com_hostdefinitions.yaml
 #+kubebuilder:scaffold:crdkustomizeresource
 
 patchesStrategicMerge:

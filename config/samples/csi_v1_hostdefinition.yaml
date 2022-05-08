@@ -1,0 +1,7 @@
+apiVersion: csi.ibm.com/v1
+kind: HostDefinition
+metadata:
+  name: hostdefinition-sample
+spec:
+  # Add fields here
+  foo: bar
