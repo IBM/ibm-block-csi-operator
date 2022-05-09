@@ -54,7 +54,8 @@ type IBMBlockCSIHostDefinitionSpec struct {
 
 // HostDefinitionStatus defines the observed state of HostDefinition
 type HostDefinitionStatus struct {
-	HostDefinitionReady bool `json:"hostDefinitionReady"`
+	Phase               DriverPhase `json:"phase"`
+	HostDefinitionReady bool        `json:"hostDefinitionReady"`
 
 	// Version is the current driver version
 	Version string `json:"version"`

@@ -70,7 +70,13 @@ func main() {
 
 	err := operatorConfig.LoadDefaultsOfIBMBlockCSI()
 	if err != nil {
-		log.Error(err, "Failed to load default custom resource config")
+		log.Error(err, "Failed to load default IBMBlockCSI custom resource config")
+		os.Exit(1)
+	}
+
+	err = operatorConfig.LoadDefaultsOfHostDefinition()
+	if err != nil {
+		log.Error(err, "Failed to load default HostDefinition custom resource config")
 		os.Exit(1)
 	}
 

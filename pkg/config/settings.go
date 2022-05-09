@@ -27,8 +27,9 @@ import (
 )
 
 const (
-	EnvNameCrYaml string = "CR_YAML"
-	NodeAgentTag         = "1.0.0"
+	EnvNameIBMBlockCSICrYaml    = "IBMBlockCSI_CR_YAML"
+	EnvNameHostDefinitionCrYaml = "HostDefinition_CR_YAML"
+	NodeAgentTag                = "1.0.0"
 
 	DefaultLogLevel  = "DEBUG"
 	ControllerUserID = int64(9999)
@@ -44,22 +45,18 @@ const (
 
 var DefaultCr v1.IBMBlockCSI
 
+var DefaultHostDefinitionCr v1.HostDefinition
+
 var DefaultSidecarsByName map[string]v1.CSISidecar
 
 var OfficialRegistriesUsernames = sets.NewString(IBMRegistryUsername, K8SRegistryUsername,
-	                                             QuayRegistryUsername, QuayAddonsRegistryUsername,
-	                                             RedHatRegistryUsername)
+	QuayRegistryUsername, QuayAddonsRegistryUsername,
+	RedHatRegistryUsername)
 
 func LoadDefaultsOfIBMBlockCSI() error {
-	crYamlPath := os.Getenv(EnvNameCrYaml)
-
-	if crYamlPath == "" {
-		return fmt.Errorf("environment variable %q was not set", EnvNameCrYaml)
-	}
-
-	yamlFile, err := ioutil.ReadFile(crYamlPath)
+	yamlFile, err := getCrYamlFile(EnvNameIBMBlockCSICrYaml)
 	if err != nil {
-		return fmt.Errorf("failed to read file %q: %v", yamlFile, err)
+		return err
 	}
 
 	err = yaml.Unmarshal(yamlFile, &DefaultCr)
@@ -74,4 +71,40 @@ func LoadDefaultsOfIBMBlockCSI() error {
 	}
 
 	return nil
+}
+
+func LoadDefaultsOfHostDefinition() error {
+	yamlFile, err := getCrYamlFile(EnvNameHostDefinitionCrYaml)
+	if err != nil {
+		return err
+	}
+
+	err = yaml.Unmarshal(yamlFile, &DefaultHostDefinitionCr)
+	if err != nil {
+		return fmt.Errorf("error unmarshaling yaml: %v", err)
+	}
+
+	return nil
+}
+
+func getCrYamlFile(crPathEnvVariable string) ([]byte, error) {
+	crYamlPath, err := getCrYamlPath(crPathEnvVariable)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	yamlFile, err := ioutil.ReadFile(crYamlPath)
+	if err != nil {
+		return []byte{}, fmt.Errorf("failed to read file %q: %v", yamlFile, err)
+	}
+	return yamlFile, nil
+}
+
+func getCrYamlPath(crPathEnvVariable string) (string, error) {
+	crYamlPath := os.Getenv(crPathEnvVariable)
+
+	if crYamlPath == "" {
+		return "", fmt.Errorf("environment variable %q was not set", crPathEnvVariable)
+	}
+	return crYamlPath, nil
 }

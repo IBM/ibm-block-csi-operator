@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
+	"github.com/IBM/ibm-block-csi-operator/controllers/internal/common"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	csiversion "github.com/IBM/ibm-block-csi-operator/version"
 	"k8s.io/apimachinery/pkg/labels"
@@ -90,19 +91,12 @@ func (c *IBMBlockCSI) GetAnnotations(daemonSetRestartedKey string, daemonSetRest
 	return labels
 }
 
-// GetSelectorLabels returns labels used in label selectors
-func (c *IBMBlockCSI) GetSelectorLabels(component string) labels.Set {
-	return labels.Set{
-		"app.kubernetes.io/component": component,
-	}
-}
-
 func (c *IBMBlockCSI) GetCSIControllerSelectorLabels() labels.Set {
-	return c.GetSelectorLabels(config.CSIController.String())
+	return common.GetSelectorLabels(config.CSIController.String())
 }
 
 func (c *IBMBlockCSI) GetCSINodeSelectorLabels() labels.Set {
-	return c.GetSelectorLabels(config.CSINode.String())
+	return common.GetSelectorLabels(config.CSINode.String())
 }
 
 func (c *IBMBlockCSI) GetCSIControllerPodLabels() labels.Set {
