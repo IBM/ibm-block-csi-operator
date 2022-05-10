@@ -973,11 +973,14 @@ spec:
             properties:
               hostDefinitionReady:
                 type: boolean
+              phase:
+                type: string
               version:
                 description: Version is the current driver version
                 type: string
             required:
             - hostDefinitionReady
+            - phase
             - version
             type: object
         type: object
