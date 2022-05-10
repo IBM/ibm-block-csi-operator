@@ -39,11 +39,11 @@ import (
 )
 
 var (
-	k8sClient client.Client
-	testEnv *envtest.Environment
+	k8sClient   client.Client
+	testEnv     *envtest.Environment
 	kubeVersion = "dummyKubeVersion"
-	cancel context.CancelFunc
-	ctx context.Context
+	cancel      context.CancelFunc
+	ctx         context.Context
 )
 
 func TestAPIs(t *testing.T) {
@@ -64,8 +64,8 @@ var _ = BeforeSuite(func() {
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{
 		CRDDirectoryPaths:        []string{filepath.Join("..", "config", "crd", "bases")},
-	 	ErrorIfCRDPathMissing:    true,
-	 	AttachControlPlaneOutput: true,
+		ErrorIfCRDPathMissing:    true,
+		AttachControlPlaneOutput: true,
 	}
 
 	cfg, err := testEnv.Start()
@@ -92,6 +92,12 @@ var _ = BeforeSuite(func() {
 	}).SetupWithManager(mgr)
 	Expect(err).ToNot(HaveOccurred())
 
+	err = (&controllers.HostDefinitionReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr)
+	Expect(err).ToNot(HaveOccurred())
+
 	go func() {
 		err = mgr.Start(ctx)
 		Expect(err).ToNot(HaveOccurred())
@@ -99,10 +105,10 @@ var _ = BeforeSuite(func() {
 
 }, 60)
 
- var _ = AfterSuite(func() {
+var _ = AfterSuite(func() {
 	cancel()
 	By("tearing down the test environment")
 	err := testEnv.Stop()
 	Expect(err).NotTo(HaveOccurred())
 	Expect(os.Unsetenv(config.ENVKubeVersion)).To(Succeed())
- })
+})

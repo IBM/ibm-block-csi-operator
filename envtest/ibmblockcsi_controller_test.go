@@ -44,18 +44,18 @@ var _ = Describe("Controller", func() {
 	var namespace = config.DefaultCr.ObjectMeta.Namespace
 	var containersImages = testsutil.GetImagesByName(config.DefaultCr, config.DefaultSidecarsByName)
 	var ibcName = config.DefaultCr.ObjectMeta.Name
-	var clusterRoles = []config.ResourceName{config.ExternalProvisionerClusterRole, config.ExternalAttacherClusterRole, 
+	var clusterRoles = []config.ResourceName{config.ExternalProvisionerClusterRole, config.ExternalAttacherClusterRole,
 		config.ExternalSnapshotterClusterRole, config.ExternalResizerClusterRole, config.CSIAddonsReplicatorClusterRole,
 		config.CSIControllerSCCClusterRole, config.CSINodeSCCClusterRole}
 	var clusterRoleBindings = []config.ResourceName{config.ExternalProvisionerClusterRoleBinding,
-			config.ExternalAttacherClusterRoleBinding, config.ExternalSnapshotterClusterRoleBinding,
-			config.ExternalResizerClusterRoleBinding, config.CSIAddonsReplicatorClusterRoleBinding,
-			config.CSIControllerSCCClusterRoleBinding, config.CSINodeSCCClusterRoleBinding}
+		config.ExternalAttacherClusterRoleBinding, config.ExternalSnapshotterClusterRoleBinding,
+		config.ExternalResizerClusterRoleBinding, config.CSIAddonsReplicatorClusterRoleBinding,
+		config.CSIControllerSCCClusterRoleBinding, config.CSINodeSCCClusterRoleBinding}
 
 	BeforeEach(func() {
 		ibc = &config.DefaultCr
 	})
-  
+
 	Describe("test ibc controller", func() {
 
 		Context("create an ibc instance", func() {
@@ -66,33 +66,33 @@ var _ = Describe("Controller", func() {
 
 				found := &csiv1.IBMBlockCSI{}
 				key := types.NamespacedName{
-				  Name:      ibcName,
-				  Namespace: namespace,
+					Name:      ibcName,
+					Namespace: namespace,
 				}
 
 				By("Getting IBMBlockCSI object after creation")
 				Eventually(func() (*csiv1.IBMBlockCSI, error) {
-				  err := k8sClient.Get(context.Background(), key, found)
-				  return found, err
+					err := k8sClient.Get(context.Background(), key, found)
+					return found, err
 				}, timeout, interval).ShouldNot(BeNil())
 
 				By("Getting CSIDriver")
 				cd := &storagev1.CSIDriver{}
 				Eventually(func() (*storagev1.CSIDriver, error) {
-				  err := k8sClient.Get(context.Background(),
-				  	testsutil.GetResourceKey(config.DriverName, "", ""), cd)
-				  return cd, err
+					err := k8sClient.Get(context.Background(),
+						testsutil.GetResourceKey(config.DriverName, "", ""), cd)
+					return cd, err
 				}, timeout, interval).ShouldNot(BeNil())
 
-				By("Getting ServiceAccount")
+				By("Getting IBMBlockCSI ServiceAccount")
 				sa := &corev1.ServiceAccount{}
 				Eventually(func() (*corev1.ServiceAccount, error) {
-				  err := k8sClient.Get(context.Background(),
-				  	testsutil.GetResourceKey(config.CSIControllerServiceAccount, found.Name, found.Namespace), sa)
-				  return sa, err
+					err := k8sClient.Get(context.Background(),
+						testsutil.GetResourceKey(config.CSIControllerServiceAccount, found.Name, found.Namespace), sa)
+					return sa, err
 				}, timeout, interval).ShouldNot(BeNil())
 
-				By("Getting ClusterRole")
+				By("Getting IBMBlockCSI ClusterRole")
 				cr := &rbacv1.ClusterRole{}
 				for _, clusterRole := range clusterRoles {
 					Eventually(func() (*rbacv1.ClusterRole, error) {
@@ -102,42 +102,42 @@ var _ = Describe("Controller", func() {
 					}, timeout, interval).ShouldNot(BeNil())
 				}
 
-				By("Getting ClusterRoleBinding")
+				By("Getting IBMBlockCSI ClusterRoleBinding")
 				crb := &rbacv1.ClusterRoleBinding{}
 				for _, clusterRoleBinding := range clusterRoleBindings {
 					Eventually(func() (*rbacv1.ClusterRoleBinding, error) {
 						err := k8sClient.Get(context.Background(),
 							testsutil.GetResourceKey(clusterRoleBinding, found.Name, ""), crb)
 						return crb, err
-					  }, timeout, interval).ShouldNot(BeNil())
+					}, timeout, interval).ShouldNot(BeNil())
 				}
 
 				By("Getting controller StatefulSet")
 				controller := &appsv1.StatefulSet{}
 				Eventually(func() (*appsv1.StatefulSet, error) {
-				  err := k8sClient.Get(context.Background(),
-				  	testsutil.GetResourceKey(config.CSIController, found.Name, found.Namespace), controller)
-				  return controller, err
+					err := k8sClient.Get(context.Background(),
+						testsutil.GetResourceKey(config.CSIController, found.Name, found.Namespace), controller)
+					return controller, err
 				}, timeout, interval).ShouldNot(BeNil())
 				assertDeployedContainersAreInCR(controller.Spec.Template.Spec, containersImages)
 
 				By("Getting node DaemonSet")
 				node := &appsv1.DaemonSet{}
 				Eventually(func() (*appsv1.DaemonSet, error) {
-				  err := k8sClient.Get(context.Background(),
-				  	testsutil.GetResourceKey(config.CSINode, found.Name, found.Namespace), node)
-				  return node, err
+					err := k8sClient.Get(context.Background(),
+						testsutil.GetResourceKey(config.CSINode, found.Name, found.Namespace), node)
+					return node, err
 				}, timeout, interval).ShouldNot(BeNil())
 				assertDeployedContainersAreInCR(node.Spec.Template.Spec, containersImages)
 
-				By("Checking if all containers were deployed")
+				By("Checking if all IBMBlockCSI containers were deployed")
 				var containersNameInControllerAndNode []string
 				containersNameInControllerAndNode = addContainersNameInPod(node.Spec.Template.Spec, containersNameInControllerAndNode)
 				containersNameInControllerAndNode = addContainersNameInPod(controller.Spec.Template.Spec, containersNameInControllerAndNode)
 				assertContainersInCRAreDeployed(containersNameInControllerAndNode, containersImages)
-				
+
 				close(done)
-			  }, timeout.Seconds())
+			}, timeout.Seconds())
 		})
 	})
 })
@@ -159,17 +159,17 @@ func addContainersNameInPod(deployedPodSpec corev1.PodSpec, deployedContainersNa
 }
 
 func assertContainersInCRAreDeployed(deployedContainersNames []string, containersImagesInCR map[string]string) {
-	for deployedContainerName, _ := range containersImagesInCR{
+	for deployedContainerName, _ := range containersImagesInCR {
 		Expect(isContainerDeployed(deployedContainersNames, deployedContainerName)).To(BeTrue(),
 			fmt.Sprintf("container %s not found in CSI deployment", deployedContainerName))
 	}
 }
 
 func isContainerDeployed(deployedContainersNames []string, wantedContainerName string) bool {
-    for _, containerName := range deployedContainersNames {
-        if containerName == wantedContainerName {
-            return true
-        }
-    }
-    return false
+	for _, containerName := range deployedContainersNames {
+		if containerName == wantedContainerName {
+			return true
+		}
+	}
+	return false
 }

@@ -40,7 +40,7 @@ type csiHostDefinitionSyncer struct {
 }
 
 func NewCSIHostDefinitionSyncer(c client.Client, scheme *runtime.Scheme, driver *hostdefinition.HostDefinition) syncer.Interface {
-	obj := &appsv1.StatefulSet{
+	obj := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        config.GetNameForResource(config.CSIHostDefinition, driver.Name),
 			Namespace:   driver.Namespace,

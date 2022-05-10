@@ -124,8 +124,8 @@ func (r *HostDefinitionReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 		}
 	}
 
-	csiControllerSyncer := clustersyncer.NewCSIHostDefinitionSyncer(r.Client, r.Scheme, instance)
-	if err := syncer.Sync(context.TODO(), csiControllerSyncer, r.Recorder); err != nil {
+	csiHostDefinitionSyncer := clustersyncer.NewCSIHostDefinitionSyncer(r.Client, r.Scheme, instance)
+	if err := syncer.Sync(context.TODO(), csiHostDefinitionSyncer, r.Recorder); err != nil {
 		return reconcile.Result{}, err
 	}
 
@@ -386,6 +386,9 @@ func (r *HostDefinitionReconciler) reconcileServiceAccount(instance *hostdefinit
 func (r *HostDefinitionReconciler) restartDeployment(logger logr.Logger, instance *hostdefinition.HostDefinition) error {
 	deployment, err := r.getDeployment(instance)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil
+		}
 		return err
 	}
 
@@ -428,7 +431,7 @@ func (r *HostDefinitionReconciler) updateStatus(instance *hostdefinition.HostDef
 	r.updateStatusFields(instance, deployment)
 
 	if !reflect.DeepEqual(originalStatus, instance.Status) {
-		logger.Info("updating IBMBlockCSI status", "name", instance.Name, "from", originalStatus, "to", instance.Status)
+		logger.Info("updating HostDefinition status", "name", instance.Name, "from", originalStatus, "to", instance.Status)
 		sErr := r.Status().Update(context.TODO(), instance.Unwrap())
 		if sErr != nil {
 			return sErr
