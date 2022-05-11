@@ -20,12 +20,14 @@ import (
 	"github.com/IBM/ibm-block-csi-operator/controllers/internal/hostdefinition"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/util/boolptr"
+	csiversion "github.com/IBM/ibm-block-csi-operator/version"
 	"github.com/imdario/mergo"
 	"github.com/presslabs/controller-util/mergo/transformers"
 	"github.com/presslabs/controller-util/syncer"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -39,6 +41,12 @@ type csiHostDefinitionSyncer struct {
 	obj    runtime.Object
 }
 
+var defaultAnnotations = labels.Set{
+	"productID":      config.ProductName,
+	"productName":    config.ProductName,
+	"productVersion": csiversion.Version,
+}
+
 func NewCSIHostDefinitionSyncer(c client.Client, scheme *runtime.Scheme, driver *hostdefinition.HostDefinition) syncer.Interface {
 	obj := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -46,6 +54,16 @@ func NewCSIHostDefinitionSyncer(c client.Client, scheme *runtime.Scheme, driver 
 			Namespace:   driver.Namespace,
 			Annotations: driver.GetAnnotations("", ""),
 			Labels:      driver.GetLabels(),
+		},
+		Spec: appsv1.DeploymentSpec{
+			Selector: metav1.SetAsLabelSelector(driver.GetCSIHostDefinitionSelectorLabels()),
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels:      driver.GetCSIHostDefinitionPodLabels(),
+					Annotations: driver.GetAnnotations("", ""),
+				},
+				Spec: corev1.PodSpec{},
+			},
 		},
 	}
 
@@ -61,17 +79,11 @@ func NewCSIHostDefinitionSyncer(c client.Client, scheme *runtime.Scheme, driver 
 
 func (s *csiHostDefinitionSyncer) SyncFn() error {
 	out := s.obj.(*appsv1.Deployment)
-
 	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCSIHostDefinitionSelectorLabels())
-
 	labels := s.driver.GetCSIHostDefinitionPodLabels()
-	annotations := s.driver.GetAnnotations("", "")
-
 	out.Spec.Template.ObjectMeta.Labels = labels
-	out.Spec.Template.ObjectMeta.Annotations = annotations
-
 	out.ObjectMeta.Labels = labels
-	out.ObjectMeta.Annotations = annotations
+	s.ensureAnnotations(out)
 
 	err := mergo.Merge(&out.Spec.Template.Spec, s.ensurePodSpec(), mergo.WithTransformers(transformers.PodSpec))
 	if err != nil {
@@ -79,6 +91,14 @@ func (s *csiHostDefinitionSyncer) SyncFn() error {
 	}
 
 	return nil
+}
+
+func (s *csiHostDefinitionSyncer) ensureAnnotations(deployment *appsv1.Deployment) {
+	annotations := s.driver.GetAnnotations("", "")
+	for k, _ := range defaultAnnotations {
+		deployment.Spec.Template.ObjectMeta.Annotations[k] = annotations[k]
+		deployment.ObjectMeta.Annotations[k] = annotations[k]
+	}
 }
 
 func (s *csiHostDefinitionSyncer) ensurePodSpec() corev1.PodSpec {
