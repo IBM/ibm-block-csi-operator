@@ -77,7 +77,8 @@ run-unit-tests:
 
 KUBERNETES_VERSION=1.23.1
 .PHONY: test
-test: check-generated-manifests update
+#test: check-generated-manifests update
+test:
 ifeq (s390x, $(shell hack/get-arch.sh))
 	ginkgo -r -v -skipPackage envtest
 else
