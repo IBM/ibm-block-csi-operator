@@ -48,6 +48,19 @@ var defaultAnnotations = labels.Set{
 }
 
 func NewCSIHostDefinitionSyncer(c client.Client, scheme *runtime.Scheme, driver *hostdefinition.HostDefinition) syncer.Interface {
+	obj := getDeploymentSkeleton(driver)
+
+	sync := &csiHostDefinitionSyncer{
+		driver: driver,
+		obj:    obj,
+	}
+
+	return syncer.NewObjectSyncer(config.CSIHostDefinition.String(), driver.Unwrap(), obj, c, func() error {
+		return sync.SyncFn()
+	})
+}
+
+func getDeploymentSkeleton(driver *hostdefinition.HostDefinition) *appsv1.Deployment {
 	obj := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        config.GetNameForResource(config.CSIHostDefinition, driver.Name),
@@ -66,15 +79,7 @@ func NewCSIHostDefinitionSyncer(c client.Client, scheme *runtime.Scheme, driver 
 			},
 		},
 	}
-
-	sync := &csiHostDefinitionSyncer{
-		driver: driver,
-		obj:    obj,
-	}
-
-	return syncer.NewObjectSyncer(config.CSIHostDefinition.String(), driver.Unwrap(), obj, c, func() error {
-		return sync.SyncFn()
-	})
+	return obj
 }
 
 func (s *csiHostDefinitionSyncer) SyncFn() error {
