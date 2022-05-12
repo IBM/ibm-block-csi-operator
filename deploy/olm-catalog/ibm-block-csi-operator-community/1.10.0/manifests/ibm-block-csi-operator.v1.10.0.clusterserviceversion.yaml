@@ -229,6 +229,44 @@ spec:
           - description: The current version of the driver.
             displayName: Version
             path: version
+      - name: hostdefinitions.csi.ibm.com
+        version: v1
+        group: csi.ibm.com
+        kind: HostDefinition
+        displayName: "IBM block storage Host Definition CSI driver"
+        description: "Represents Host Definition for block storage CSI driver"
+        resources:
+          - kind: ServiceAccount
+            name: ''
+            version: v1
+          - kind: Deployment
+            name: ''
+            version: apps/v1
+        specDescriptors:
+          - description: HostDefinition Image Repository.
+            displayName: HostDefinition Image Repository
+            path: hostdefinition.repository
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
+          - description: HostDefinition Image Tag.
+            displayName: HostDefinition Image Tag
+            path: hostdefinition.tag
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
+        statusDescriptors:
+          - description: The current status of host definition.
+            displayName: Status
+            path: phase
+            x-descriptors:
+              - 'urn:alm:descriptor:io.kubernetes.phase'
+          - description: Is the host definition deployment ready?
+            displayName: HostDefinition Ready
+            path: hostdefinitionReady
+            x-descriptors:
+              - 'urn:alm:descriptor:text'
+          - description: The current version of the driver.
+            displayName: Version
+            path: version
   install:
     strategy: deployment
     spec:
