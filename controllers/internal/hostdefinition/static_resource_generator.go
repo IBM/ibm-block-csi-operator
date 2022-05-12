@@ -64,6 +64,11 @@ func (c *HostDefinition) GenerateHostDefinitionClusterRole() *rbacv1.ClusterRole
 				Resources: []string{config.CsiNodesResource},
 				Verbs:     []string{config.VerbGet, config.VerbList, config.VerbWatch},
 			},
+			{
+				APIGroups: []string{config.APIGroup},
+				Resources: []string{config.HostDefinitionResource},
+				Verbs:     []string{config.VerbGet, config.VerbList, config.VerbWatch},
+			},
 		},
 	}
 }

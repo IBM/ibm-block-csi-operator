@@ -32,6 +32,7 @@ const (
 	VerbWatch                 = "watch"
 	StorageApiGroup           = "storage.k8s.io"
 	StorageClassesResource    = "storageclasses"
+	HostDefinitionResource    = "hostdefinitions"
 
 	NodeAgentRepository = "ibmcom/ibm-node-agent"
 
