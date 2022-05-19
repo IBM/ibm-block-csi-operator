@@ -29,7 +29,6 @@ import (
 const (
 	EnvNameIBMBlockCSICrYaml    = "IBMBlockCSI_CR_YAML"
 	EnvNameHostDefinitionCrYaml = "HostDefinition_CR_YAML"
-	NodeAgentTag                = "1.0.0"
 
 	DefaultLogLevel  = "DEBUG"
 	ControllerUserID = int64(9999)

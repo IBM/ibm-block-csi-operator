@@ -11,7 +11,7 @@ metadata:
 spec:
   hostDefinition:
     prefix: ibm_
-    connectivity: iscsi
+    connectivity:
     repository: ibmcom/ibm-block-csi-driver-hostdefinition
     tag: "1.10.0"
     imagePullPolicy: IfNotPresent
