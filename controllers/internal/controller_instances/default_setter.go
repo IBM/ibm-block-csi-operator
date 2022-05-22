@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package ibmblockcsi
+package controller_instances
 
 import (
+	"path"
+
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	corev1 "k8s.io/api/core/v1"
-	"path"
 )
 
 // SetDefaults set defaults if omitted in spec, returns true means CR should be updated on cluster.

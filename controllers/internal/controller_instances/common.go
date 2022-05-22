@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 IBM Corp.
+ * Copyright 2022 IBM Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-package ibmblockcsi
+package controller_instances
 
-// Validate checks if the spec is valid
-// Replace it with kubernetes native default setter when it is available.
-// https://kubernetes.io/docs/tasks/access-kubernetes-api/custom-resources/custom-resource-definitions/#validation
-func (c *IBMBlockCSI) Validate() error {
-	return nil
+import corev1 "k8s.io/api/core/v1"
+
+func getImagePullSecrets(imagePullSecrets []string) []corev1.LocalObjectReference {
+	secrets := []corev1.LocalObjectReference{}
+	if len(imagePullSecrets) > 0 {
+		for _, s := range imagePullSecrets {
+			secrets = append(secrets, corev1.LocalObjectReference{Name: s})
+		}
+	}
+	return secrets
 }

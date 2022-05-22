@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ibmblockcsi
+package controller_instances
 
 import (
 	"fmt"
@@ -23,7 +23,13 @@ import (
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	csiversion "github.com/IBM/ibm-block-csi-operator/version"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
+
+type Instance interface {
+	GetLabels() labels.Set
+	GetObjectKind() schema.ObjectKind
+}
 
 // IBMBlockCSI is the wrapper for csiv1.IBMBlockCSI type
 type IBMBlockCSI struct {

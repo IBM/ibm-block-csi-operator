@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ibmblockcsi_test
+package controller_instances_test
 
 import (
 	"testing"
