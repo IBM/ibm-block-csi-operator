@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controller_instances_test
+package controller_instance_test
 
 import (
 	"testing"

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controller_instances
+package controller_instance
 
 import (
 	"path"
