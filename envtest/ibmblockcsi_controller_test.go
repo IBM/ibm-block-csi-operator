@@ -41,9 +41,9 @@ var _ = Describe("Controller", func() {
 	const timeout = time.Second * 30
 	const interval = time.Second * 1
 	var ibc *csiv1.IBMBlockCSI
-	var namespace = config.DefaultCr.ObjectMeta.Namespace
-	var containersImages = testsutil.GetImagesByName(config.DefaultCr, config.DefaultSidecarsByName)
-	var ibcName = config.DefaultCr.ObjectMeta.Name
+	var namespace = config.DefaultIBMBlockCSICr.ObjectMeta.Namespace
+	var containersImages = testsutil.GetImagesByName(config.DefaultIBMBlockCSICr, config.DefaultSidecarsByName)
+	var ibcName = config.DefaultIBMBlockCSICr.ObjectMeta.Name
 	var clusterRoles = []config.ResourceName{config.ExternalProvisionerClusterRole, config.ExternalAttacherClusterRole,
 		config.ExternalSnapshotterClusterRole, config.ExternalResizerClusterRole, config.CSIAddonsReplicatorClusterRole,
 		config.CSIControllerSCCClusterRole, config.CSINodeSCCClusterRole}
@@ -53,7 +53,7 @@ var _ = Describe("Controller", func() {
 		config.CSIControllerSCCClusterRoleBinding, config.CSINodeSCCClusterRoleBinding}
 
 	BeforeEach(func() {
-		ibc = &config.DefaultCr
+		ibc = &config.DefaultIBMBlockCSICr
 	})
 
 	Describe("test ibc controller", func() {

@@ -42,7 +42,7 @@ const (
 	RedHatRegistryUsername     = "registry.redhat.io/openshift4"
 )
 
-var DefaultCr v1.IBMBlockCSI
+var DefaultIBMBlockCSICr v1.IBMBlockCSI
 
 var DefaultHostDefinitionCr v1.HostDefinition
 
@@ -58,14 +58,14 @@ func LoadDefaultsOfIBMBlockCSI() error {
 		return err
 	}
 
-	err = yaml.Unmarshal(yamlFile, &DefaultCr)
+	err = yaml.Unmarshal(yamlFile, &DefaultIBMBlockCSICr)
 	if err != nil {
 		return fmt.Errorf("error unmarshaling yaml: %v", err)
 	}
 
 	DefaultSidecarsByName = make(map[string]v1.CSISidecar)
 
-	for _, sidecar := range DefaultCr.Spec.Sidecars {
+	for _, sidecar := range DefaultIBMBlockCSICr.Spec.Sidecars {
 		DefaultSidecarsByName[sidecar.Name] = sidecar
 	}
 
