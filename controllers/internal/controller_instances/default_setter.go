@@ -67,18 +67,18 @@ func (c *IBMBlockCSI) isUnofficialRepo(repo string) bool {
 func (c *IBMBlockCSI) setDefaults() bool {
 	var changed = false
 
-	if c.Spec.Controller.Repository != config.DefaultCr.Spec.Controller.Repository ||
-		c.Spec.Controller.Tag != config.DefaultCr.Spec.Controller.Tag {
-		c.Spec.Controller.Repository = config.DefaultCr.Spec.Controller.Repository
-		c.Spec.Controller.Tag = config.DefaultCr.Spec.Controller.Tag
+	if c.Spec.Controller.Repository != config.DefaultIBMBlockCSICr.Spec.Controller.Repository ||
+		c.Spec.Controller.Tag != config.DefaultIBMBlockCSICr.Spec.Controller.Tag {
+		c.Spec.Controller.Repository = config.DefaultIBMBlockCSICr.Spec.Controller.Repository
+		c.Spec.Controller.Tag = config.DefaultIBMBlockCSICr.Spec.Controller.Tag
 
 		changed = true
 	}
 
-	if c.Spec.Node.Repository != config.DefaultCr.Spec.Node.Repository ||
-		c.Spec.Node.Tag != config.DefaultCr.Spec.Node.Tag {
-		c.Spec.Node.Repository = config.DefaultCr.Spec.Node.Repository
-		c.Spec.Node.Tag = config.DefaultCr.Spec.Node.Tag
+	if c.Spec.Node.Repository != config.DefaultIBMBlockCSICr.Spec.Node.Repository ||
+		c.Spec.Node.Tag != config.DefaultIBMBlockCSICr.Spec.Node.Tag {
+		c.Spec.Node.Repository = config.DefaultIBMBlockCSICr.Spec.Node.Repository
+		c.Spec.Node.Tag = config.DefaultIBMBlockCSICr.Spec.Node.Tag
 
 		changed = true
 	}
@@ -102,7 +102,7 @@ func (c *IBMBlockCSI) setDefaultForNilSliceFields() {
 
 func (c *IBMBlockCSI) setDefaultSidecars() bool {
 	var change = false
-	var defaultSidecars = config.DefaultCr.Spec.Sidecars
+	var defaultSidecars = config.DefaultIBMBlockCSICr.Spec.Sidecars
 
 	if len(defaultSidecars) == len(c.Spec.Sidecars) {
 		for _, sidecar := range c.Spec.Sidecars {
