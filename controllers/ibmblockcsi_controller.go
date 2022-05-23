@@ -110,7 +110,7 @@ func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	reqLogger := log.WithValues("Request.Namespace", req.Namespace, "Request.Name", req.Name)
 	reqLogger.Info("Reconciling IBMBlockCSI")
 
-	r.ControllerHelper = common.NewControllerHelper(r.Client)
+	r.ControllerHelper = common.NewControllerHelper(r.Client, log)
 
 	// Fetch the IBMBlockCSI instance
 	instance := controller_instance.New(&csiv1.IBMBlockCSI{}, r.ServerVersion)
@@ -142,14 +142,12 @@ func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		}
 		return reconcile.Result{}, nil
 	}
-	r.ControllerHelper.Logger = log
 	if err := r.ControllerHelper.AddFinalizerIfNotPresent(
 		instance, instance.Unwrap()); err != nil {
 		return reconcile.Result{}, err
 	}
 
 	if !instance.GetDeletionTimestamp().IsZero() {
-		r.ControllerHelper.Logger = log
 		isFinalizerExists, err := r.ControllerHelper.HasFinalizer(instance)
 		if err != nil {
 			return reconcile.Result{}, err
@@ -167,7 +165,6 @@ func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 			return reconcile.Result{}, err
 		}
 
-		r.ControllerHelper.Logger = log
 		if err := r.ControllerHelper.RemoveFinalizer(
 			instance, instance.Unwrap()); err != nil {
 			return reconcile.Result{}, err
@@ -510,10 +507,7 @@ func (r *IBMBlockCSIReconciler) isNodeReady(node *appsv1.DaemonSet) bool {
 }
 
 func (r *IBMBlockCSIReconciler) reconcileClusterRole(instance *controller_instance.IBMBlockCSI) error {
-	logger := log.WithValues("Resource Type", "ClusterRole")
-
 	clusterRoles := r.getClusterRoles(instance)
-	r.ControllerHelper.Logger = logger
 	return r.ControllerHelper.ReconcileClusterRole(clusterRoles)
 }
 
@@ -529,10 +523,7 @@ func (r *IBMBlockCSIReconciler) deleteClusterRolesAndBindings(instance *controll
 }
 
 func (r *IBMBlockCSIReconciler) deleteClusterRoles(instance *controller_instance.IBMBlockCSI) error {
-	logger := log.WithName("deleteClusterRoles")
-
 	clusterRoles := r.getClusterRoles(instance)
-	r.ControllerHelper.Logger = logger
 	return r.ControllerHelper.DeleteClusterRoles(clusterRoles)
 }
 
@@ -557,19 +548,12 @@ func (r *IBMBlockCSIReconciler) getClusterRoles(instance *controller_instance.IB
 }
 
 func (r *IBMBlockCSIReconciler) reconcileClusterRoleBinding(instance *controller_instance.IBMBlockCSI) error {
-	logger := log.WithValues("Resource Type", "ClusterRoleBinding")
-
 	clusterRoleBindings := r.getClusterRoleBindings(instance)
-
-	r.ControllerHelper.Logger = logger
 	return r.ControllerHelper.ReconcileClusterRoleBinding(clusterRoleBindings)
 }
 
 func (r *IBMBlockCSIReconciler) deleteClusterRoleBindings(instance *controller_instance.IBMBlockCSI) error {
-	logger := log.WithName("deleteClusterRoleBindings")
-
 	clusterRoleBindings := r.getClusterRoleBindings(instance)
-	r.ControllerHelper.Logger = logger
 	return r.ControllerHelper.DeleteClusterRoleBindings(clusterRoleBindings)
 }
 

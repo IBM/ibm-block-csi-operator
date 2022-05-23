@@ -35,27 +35,29 @@ import (
 
 type ControllerHelper struct {
 	client.Client
-	Logger logr.Logger
+	Log logr.Logger
 }
 
-func NewControllerHelper(client client.Client) *ControllerHelper {
+func NewControllerHelper(client client.Client, log logr.Logger) *ControllerHelper {
 	return &ControllerHelper{
 		Client: client,
+		Log:    log,
 	}
 }
 
 func (ch *ControllerHelper) DeleteClusterRoleBindings(clusterRoleBindings []*rbacv1.ClusterRoleBinding) error {
+	logger := ch.Log.WithName("deleteClusterRoleBindings")
 	for _, crb := range clusterRoleBindings {
 		found, err := ch.getClusterRoleBinding(crb)
 		if err != nil && errors.IsNotFound(err) {
 			continue
 		} else if err != nil {
-			ch.Logger.Error(err, "failed to get ClusterRoleBinding", "Name", crb.GetName())
+			logger.Error(err, "failed to get ClusterRoleBinding", "Name", crb.GetName())
 			return err
 		} else {
-			ch.Logger.Info("deleting ClusterRoleBinding", "Name", crb.GetName())
+			logger.Info("deleting ClusterRoleBinding", "Name", crb.GetName())
 			if err := ch.Delete(context.TODO(), found); err != nil {
-				ch.Logger.Error(err, "failed to delete ClusterRoleBinding", "Name", crb.GetName())
+				logger.Error(err, "failed to delete ClusterRoleBinding", "Name", crb.GetName())
 				return err
 			}
 		}
@@ -64,20 +66,21 @@ func (ch *ControllerHelper) DeleteClusterRoleBindings(clusterRoleBindings []*rba
 }
 
 func (ch *ControllerHelper) ReconcileClusterRoleBinding(clusterRoleBindings []*rbacv1.ClusterRoleBinding) error {
+	logger := ch.Log.WithValues("Resource Type", "ClusterRoleBinding")
 	for _, crb := range clusterRoleBindings {
 		_, err := ch.getClusterRoleBinding(crb)
 		if err != nil && errors.IsNotFound(err) {
-			ch.Logger.Info("Creating a new ClusterRoleBinding", "Name", crb.GetName())
+			logger.Info("Creating a new ClusterRoleBinding", "Name", crb.GetName())
 			err = ch.Create(context.TODO(), crb)
 			if err != nil {
 				return err
 			}
 		} else if err != nil {
-			ch.Logger.Error(err, "Failed to get ClusterRole", "Name", crb.GetName())
+			logger.Error(err, "Failed to get ClusterRole", "Name", crb.GetName())
 			return err
 		} else {
 			// Resource already exists - don't requeue
-			//ch.Logger.Info("Skip reconcile: ClusterRoleBinding already exists", "Name", crb.GetName())
+			//ch.Log.Info("Skip reconcile: ClusterRoleBinding already exists", "Name", crb.GetName())
 		}
 	}
 	return nil
@@ -93,17 +96,18 @@ func (ch *ControllerHelper) getClusterRoleBinding(crb *rbacv1.ClusterRoleBinding
 }
 
 func (ch *ControllerHelper) DeleteClusterRoles(clusterRoles []*rbacv1.ClusterRole) error {
+	logger := ch.Log.WithName("deleteClusterRoles")
 	for _, cr := range clusterRoles {
 		found, err := ch.getClusterRole(cr)
 		if err != nil && errors.IsNotFound(err) {
 			continue
 		} else if err != nil {
-			ch.Logger.Error(err, "failed to get ClusterRole", "Name", cr.GetName())
+			logger.Error(err, "failed to get ClusterRole", "Name", cr.GetName())
 			return err
 		} else {
-			ch.Logger.Info("deleting ClusterRole", "Name", cr.GetName())
+			logger.Info("deleting ClusterRole", "Name", cr.GetName())
 			if err := ch.Delete(context.TODO(), found); err != nil {
-				ch.Logger.Error(err, "failed to delete ClusterRole", "Name", cr.GetName())
+				logger.Error(err, "failed to delete ClusterRole", "Name", cr.GetName())
 				return err
 			}
 		}
@@ -112,21 +116,22 @@ func (ch *ControllerHelper) DeleteClusterRoles(clusterRoles []*rbacv1.ClusterRol
 }
 
 func (ch *ControllerHelper) ReconcileClusterRole(clusterRoles []*rbacv1.ClusterRole) error {
+	logger := ch.Log.WithValues("Resource Type", "ClusterRole")
 	for _, cr := range clusterRoles {
 		_, err := ch.getClusterRole(cr)
 		if err != nil && errors.IsNotFound(err) {
-			ch.Logger.Info("Creating a new ClusterRole", "Name", cr.GetName())
+			logger.Info("Creating a new ClusterRole", "Name", cr.GetName())
 			err = ch.Create(context.TODO(), cr)
 			if err != nil {
 				return err
 			}
 		} else if err != nil {
-			ch.Logger.Error(err, "Failed to get ClusterRole", "Name", cr.GetName())
+			logger.Error(err, "Failed to get ClusterRole", "Name", cr.GetName())
 			return err
 		} else {
 			err = ch.Update(context.TODO(), cr)
 			if err != nil {
-				ch.Logger.Error(err, "Failed to update ClusterRole", "Name", cr.GetName())
+				logger.Error(err, "Failed to update ClusterRole", "Name", cr.GetName())
 				return err
 			}
 		}
@@ -154,7 +159,7 @@ func (ch *ControllerHelper) HasFinalizer(instance controller_instance.Instance) 
 
 func (ch *ControllerHelper) AddFinalizerIfNotPresent(instance controller_instance.Instance,
 	unwrappedInstance client.Object) error {
-	logger := ch.Logger.WithName("addFinalizerIfNotPresent")
+	logger := ch.Log.WithName("addFinalizerIfNotPresent")
 
 	accessor, finalizerName, err := ch.getAccessorAndFinalizerName(instance)
 	if err != nil {
@@ -175,7 +180,7 @@ func (ch *ControllerHelper) AddFinalizerIfNotPresent(instance controller_instanc
 
 func (ch *ControllerHelper) RemoveFinalizer(instance controller_instance.Instance,
 	unwrappedInstance client.Object) error {
-	logger := ch.Logger.WithName("removeFinalizer")
+	logger := ch.Log.WithName("removeFinalizer")
 
 	accessor, finalizerName, err := ch.getAccessorAndFinalizerName(instance)
 	if err != nil {
@@ -191,7 +196,7 @@ func (ch *ControllerHelper) RemoveFinalizer(instance controller_instance.Instanc
 }
 
 func (ch *ControllerHelper) getAccessorAndFinalizerName(instance controller_instance.Instance) (metav1.Object, string, error) {
-	logger := ch.Logger.WithName("getAccessorAndFinalizerName")
+	logger := ch.Log.WithName("getAccessorAndFinalizerName")
 	lowercaseKind := strings.ToLower(instance.GetObjectKind().GroupVersionKind().Kind)
 	finalizerName := fmt.Sprintf("%s.%s", lowercaseKind, oconfig.APIGroup)
 
