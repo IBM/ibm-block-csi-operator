@@ -33,17 +33,18 @@ import (
 
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
 	"github.com/IBM/ibm-block-csi-operator/controllers"
+	"github.com/IBM/ibm-block-csi-operator/controllers/util/common"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	//+kubebuilder:scaffold:imports
 )
 
 var (
-	k8sClient client.Client
-	testEnv *envtest.Environment
+	k8sClient   client.Client
+	testEnv     *envtest.Environment
 	kubeVersion = "dummyKubeVersion"
-	cancel context.CancelFunc
-	ctx context.Context
+	cancel      context.CancelFunc
+	ctx         context.Context
 )
 
 func TestAPIs(t *testing.T) {
@@ -64,8 +65,8 @@ var _ = BeforeSuite(func() {
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{
 		CRDDirectoryPaths:        []string{filepath.Join("..", "config", "crd", "bases")},
-	 	ErrorIfCRDPathMissing:    true,
-	 	AttachControlPlaneOutput: true,
+		ErrorIfCRDPathMissing:    true,
+		AttachControlPlaneOutput: true,
 	}
 
 	cfg, err := testEnv.Start()
@@ -84,11 +85,13 @@ var _ = BeforeSuite(func() {
 		Scheme: scheme.Scheme,
 	})
 	Expect(err).ToNot(HaveOccurred())
+	controllerHelper := common.NewControllerHelper(mgr.GetClient())
 
 	err = (&controllers.IBMBlockCSIReconciler{
-		Client:    mgr.GetClient(),
-		Scheme:    mgr.GetScheme(),
-		Namespace: "default",
+		Client:           mgr.GetClient(),
+		Scheme:           mgr.GetScheme(),
+		Namespace:        "default",
+		ControllerHelper: controllerHelper,
 	}).SetupWithManager(mgr)
 	Expect(err).ToNot(HaveOccurred())
 
@@ -99,10 +102,10 @@ var _ = BeforeSuite(func() {
 
 }, 60)
 
- var _ = AfterSuite(func() {
+var _ = AfterSuite(func() {
 	cancel()
 	By("tearing down the test environment")
 	err := testEnv.Stop()
 	Expect(err).NotTo(HaveOccurred())
 	Expect(os.Unsetenv(config.ENVKubeVersion)).To(Succeed())
- })
+})

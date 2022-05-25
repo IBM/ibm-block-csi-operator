@@ -38,10 +38,9 @@ type ControllerHelper struct {
 	Log logr.Logger
 }
 
-func NewControllerHelper(client client.Client, log logr.Logger) *ControllerHelper {
+func NewControllerHelper(client client.Client) *ControllerHelper {
 	return &ControllerHelper{
 		Client: client,
-		Log:    log,
 	}
 }
 

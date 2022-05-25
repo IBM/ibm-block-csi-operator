@@ -68,7 +68,6 @@ type IBMBlockCSIReconciler struct {
 	// This client, initialized using mgr.Client() above, is a split client
 	// that reads objects from the cache and writes to the apiserver
 	client.Client
-	Log              logr.Logger
 	Scheme           *runtime.Scheme
 	Namespace        string
 	Recorder         record.EventRecorder
@@ -110,7 +109,7 @@ func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	reqLogger := log.WithValues("Request.Namespace", req.Namespace, "Request.Name", req.Name)
 	reqLogger.Info("Reconciling IBMBlockCSI")
 
-	r.ControllerHelper = common.NewControllerHelper(r.Client, log)
+	r.ControllerHelper.Log = log
 
 	// Fetch the IBMBlockCSI instance
 	instance := controller_instance.New(&csiv1.IBMBlockCSI{}, r.ServerVersion)
