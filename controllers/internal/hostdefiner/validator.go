@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package hostdefinition
+package hostdefiner
 
 // Validate checks if the spec is valid
 // Replace it with kubernetes native default setter when it is available.
 // https://kubernetes.io/docs/tasks/access-kubernetes-api/custom-resources/custom-resource-definitions/#validation
-func (c *HostDefinition) Validate() error {
+func (c *HostDefiner) Validate() error {
 	return nil
 }

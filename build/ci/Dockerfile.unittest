@@ -18,7 +18,7 @@ ENV GO111MODULE=on \
     GOROOT=/usr/local/go \
     WORKDIR=/go/src/github.com/IBM/ibm-block-csi-operator
 ENV IBMBlockCSI_CR_YAML=$WORKDIR/config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml \
-    HostDefinition_CR_YAML=$WORKDIR/config/samples/csi_v1_hostdefinition.yaml
+    HostDefiner_CR_YAML=$WORKDIR/config/samples/csi_v1_hostdefiner.yaml
 WORKDIR $WORKDIR
 RUN go get github.com/onsi/ginkgo/ginkgo@v1.16.4 \
     && go install sigs.k8s.io/controller-runtime/tools/setup-envtest@v0.0.0-20220322150744-c46b410039fd

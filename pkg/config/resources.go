@@ -31,11 +31,11 @@ func (rn ResourceName) String() string {
 const (
 	CSIController                         ResourceName = "csi-controller"
 	CSINode                               ResourceName = "csi-node"
-	CSIHostDefinition                     ResourceName = "csi-hostdefinition"
+	CSIHostDefiner                        ResourceName = "csi-hostdefiner"
 	NodeAgent                             ResourceName = "ibm-node-agent"
 	CSIControllerServiceAccount           ResourceName = "csi-controller-sa"
 	CSINodeServiceAccount                 ResourceName = "csi-node-sa"
-	CSIHostDefinitionServiceAccount       ResourceName = "csi-hostdefinition-sa"
+	CSIHostDefinerServiceAccount          ResourceName = "csi-hostdefiner-sa"
 	ExternalProvisionerClusterRole        ResourceName = "external-provisioner-clusterrole"
 	ExternalProvisionerClusterRoleBinding ResourceName = "external-provisioner-clusterrolebinding"
 	ExternalAttacherClusterRole           ResourceName = "external-attacher-clusterrole"
@@ -50,8 +50,8 @@ const (
 	CSIControllerSCCClusterRoleBinding    ResourceName = "csi-controller-scc-clusterrolebinding"
 	CSINodeSCCClusterRole                 ResourceName = "csi-node-scc-clusterrole"
 	CSINodeSCCClusterRoleBinding          ResourceName = "csi-node-scc-clusterrolebinding"
-	CSIHostDefinitionClusterRole          ResourceName = "csi-hostdefinition-clusterrole"
-	CSIHostDefinitionClusterRoleBinding   ResourceName = "csi-hostdefinition-clusterrolebinding"
+	CSIHostDefinerClusterRole             ResourceName = "csi-hostdefiner-clusterrole"
+	CSIHostDefinerClusterRoleBinding      ResourceName = "csi-hostdefiner-clusterrolebinding"
 )
 
 // GetNameForResource returns the name of a resource for a CSI driver
@@ -66,7 +66,7 @@ func GetNameForResource(name ResourceName, driverName string) string {
 	case CSINodeServiceAccount:
 		return fmt.Sprintf("%s-node-sa", driverName)
 	default:
-		if strings.Contains(name.String(), "hostdefinition") {
+		if strings.Contains(name.String(), "hostdefiner") {
 			return fmt.Sprintf("%s-%s", driverName, strings.ReplaceAll(name.String(), "csi-", ""))
 		}
 		return fmt.Sprintf("%s-%s", driverName, name)

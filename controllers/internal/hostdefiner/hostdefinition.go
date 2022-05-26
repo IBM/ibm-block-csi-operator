@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hostdefinition
+package hostdefiner
 
 import (
 	"fmt"
@@ -26,25 +26,25 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 )
 
-type HostDefinition struct {
-	*csiv1.HostDefinition
+type HostDefiner struct {
+	*csiv1.HostDefiner
 }
 
-func New(c *csiv1.HostDefinition) *HostDefinition {
-	return &HostDefinition{
-		HostDefinition: c,
+func New(c *csiv1.HostDefiner) *HostDefiner {
+	return &HostDefiner{
+		HostDefiner: c,
 	}
 }
 
-func (c *HostDefinition) Unwrap() *csiv1.HostDefinition {
-	return c.HostDefinition
+func (c *HostDefiner) Unwrap() *csiv1.HostDefiner {
+	return c.HostDefiner
 }
 
-func (c *HostDefinition) GetCSIHostDefinitionPodLabels() labels.Set {
-	return labels.Merge(c.GetLabels(), c.GetCSIHostDefinitionSelectorLabels())
+func (c *HostDefiner) GetCSIHostDefinerPodLabels() labels.Set {
+	return labels.Merge(c.GetLabels(), c.GetCSIHostDefinerSelectorLabels())
 }
 
-func (c *HostDefinition) GetLabels() labels.Set {
+func (c *HostDefiner) GetLabels() labels.Set {
 	labels := labels.Set{
 		"app.kubernetes.io/name":       config.ProductName,
 		"app.kubernetes.io/instance":   c.Name,
@@ -66,11 +66,11 @@ func (c *HostDefinition) GetLabels() labels.Set {
 	return labels
 }
 
-func (c *HostDefinition) GetCSIHostDefinitionSelectorLabels() labels.Set {
-	return common.GetSelectorLabels(config.CSIHostDefinition.String())
+func (c *HostDefiner) GetCSIHostDefinerSelectorLabels() labels.Set {
+	return common.GetSelectorLabels(config.CSIHostDefiner.String())
 }
 
-func (c *HostDefinition) GetAnnotations(daemonSetRestartedKey string, daemonSetRestartedValue string) labels.Set {
+func (c *HostDefiner) GetAnnotations(daemonSetRestartedKey string, daemonSetRestartedValue string) labels.Set {
 	labels := labels.Set{
 		"productID":      config.ProductName,
 		"productName":    config.ProductName,
@@ -92,9 +92,9 @@ func (c *HostDefinition) GetAnnotations(daemonSetRestartedKey string, daemonSetR
 	return labels
 }
 
-func (c *HostDefinition) GetCSIHostDefinitionImage() string {
-	if c.Spec.HostDefinition.Tag == "" {
-		return c.Spec.HostDefinition.Repository
+func (c *HostDefiner) GetCSIHostDefinerImage() string {
+	if c.Spec.HostDefiner.Tag == "" {
+		return c.Spec.HostDefiner.Repository
 	}
-	return c.Spec.HostDefinition.Repository + ":" + c.Spec.HostDefinition.Tag
+	return c.Spec.HostDefiner.Repository + ":" + c.Spec.HostDefiner.Tag
 }

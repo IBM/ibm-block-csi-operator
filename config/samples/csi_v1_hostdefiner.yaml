@@ -1,5 +1,5 @@
 apiVersion: csi.ibm.com/v1
-kind: HostDefinition
+kind: HostDefiner
 metadata:
   name: ibm-block-csi
   namespace: default
@@ -9,10 +9,10 @@ metadata:
     app.kubernetes.io/managed-by: ibm-block-csi-operator
     release: v1.10.0
 spec:
-  hostDefinition:
+  hostDefiner:
     prefix: ibm_
     connectivity:
-    repository: ibmcom/ibm-block-csi-driver-hostdefinition
+    repository: ibmcom/ibm-block-csi-driver-hostdefiner
     tag: "1.10.0"
     imagePullPolicy: IfNotPresent
     affinity:

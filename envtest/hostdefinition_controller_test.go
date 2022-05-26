@@ -34,20 +34,20 @@ import (
 
 var _ = Describe("Controller", func() {
 
-	err := config.LoadDefaultsOfHostDefinition()
+	err := config.LoadDefaultsOfHostDefiner()
 	Expect(err).To(BeNil(), fmt.Sprint("can't load defaults of Host Definition"))
 
 	const timeout = time.Second * 30
 	const interval = time.Second * 1
-	var hostDefinition *csiv1.HostDefinition
-	var namespace = config.DefaultHostDefinitionCr.ObjectMeta.Namespace
-	var containersImages = testsutil.GetHostDefinitionImagesByName(config.DefaultHostDefinitionCr)
-	var hdName = config.DefaultHostDefinitionCr.ObjectMeta.Name
-	var clusterRoles = []config.ResourceName{config.CSIHostDefinitionClusterRole}
-	var clusterRoleBindings = []config.ResourceName{config.CSIHostDefinitionClusterRoleBinding}
+	var hostDefiner *csiv1.HostDefiner
+	var namespace = config.DefaultHostDefinerCr.ObjectMeta.Namespace
+	var containersImages = testsutil.GetHostDefinerImagesByName(config.DefaultHostDefinerCr)
+	var hdName = config.DefaultHostDefinerCr.ObjectMeta.Name
+	var clusterRoles = []config.ResourceName{config.CSIHostDefinerClusterRole}
+	var clusterRoleBindings = []config.ResourceName{config.CSIHostDefinerClusterRoleBinding}
 
 	BeforeEach(func() {
-		hostDefinition = &config.DefaultHostDefinitionCr
+		hostDefiner = &config.DefaultHostDefinerCr
 	})
 
 	Describe("test host definition controller", func() {
@@ -55,30 +55,30 @@ var _ = Describe("Controller", func() {
 		Context("create an host definition instance", func() {
 
 			It("should create all the relevant objects", func(done Done) {
-				err := k8sClient.Create(context.Background(), hostDefinition)
+				err := k8sClient.Create(context.Background(), hostDefiner)
 				Expect(err).NotTo(HaveOccurred())
 
-				found := &csiv1.HostDefinition{}
+				found := &csiv1.HostDefiner{}
 				key := types.NamespacedName{
 					Name:      hdName,
 					Namespace: namespace,
 				}
 
-				By("Getting HostDefinition object after creation")
-				Eventually(func() (*csiv1.HostDefinition, error) {
+				By("Getting HostDefiner object after creation")
+				Eventually(func() (*csiv1.HostDefiner, error) {
 					err := k8sClient.Get(context.Background(), key, found)
 					return found, err
 				}, timeout, interval).ShouldNot(BeNil())
 
-				By("Getting HostDefinition ServiceAccount")
+				By("Getting HostDefiner ServiceAccount")
 				sa := &corev1.ServiceAccount{}
 				Eventually(func() (*corev1.ServiceAccount, error) {
 					err := k8sClient.Get(context.Background(),
-						testsutil.GetResourceKey(config.CSIHostDefinitionServiceAccount, found.Name, found.Namespace), sa)
+						testsutil.GetResourceKey(config.CSIHostDefinerServiceAccount, found.Name, found.Namespace), sa)
 					return sa, err
 				}, timeout, interval).ShouldNot(BeNil())
 
-				By("Getting HostDefinition ClusterRole")
+				By("Getting HostDefiner ClusterRole")
 				cr := &rbacv1.ClusterRole{}
 				for _, clusterRole := range clusterRoles {
 					Eventually(func() (*rbacv1.ClusterRole, error) {
@@ -88,7 +88,7 @@ var _ = Describe("Controller", func() {
 					}, timeout, interval).ShouldNot(BeNil())
 				}
 
-				By("Getting HostDefinition ClusterRoleBinding")
+				By("Getting HostDefiner ClusterRoleBinding")
 				crb := &rbacv1.ClusterRoleBinding{}
 				for _, clusterRoleBinding := range clusterRoleBindings {
 					Eventually(func() (*rbacv1.ClusterRoleBinding, error) {
@@ -98,16 +98,16 @@ var _ = Describe("Controller", func() {
 					}, timeout, interval).ShouldNot(BeNil())
 				}
 
-				By("Getting HostDefinition deployment")
+				By("Getting HostDefiner deployment")
 				deployment := &appsv1.Deployment{}
 				Eventually(func() (*appsv1.Deployment, error) {
 					err := k8sClient.Get(context.Background(),
-						testsutil.GetResourceKey(config.CSIHostDefinition, found.Name, found.Namespace), deployment)
+						testsutil.GetResourceKey(config.CSIHostDefiner, found.Name, found.Namespace), deployment)
 					return deployment, err
 				}, timeout, interval).ShouldNot(BeNil())
 				assertDeployedContainersAreInCR(deployment.Spec.Template.Spec, containersImages)
 
-				By("Checking if all HostDefinition containers were deployed")
+				By("Checking if all HostDefiner containers were deployed")
 				var containersNameInControllerAndNode []string
 				containersNameInControllerAndNode = addContainersNameInPod(deployment.Spec.Template.Spec, containersNameInControllerAndNode)
 				assertContainersInCRAreDeployed(containersNameInControllerAndNode, containersImages)

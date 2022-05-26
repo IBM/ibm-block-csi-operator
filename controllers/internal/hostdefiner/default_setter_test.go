@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package hostdefinition_test
+package hostdefiner_test
 
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
-	. "github.com/IBM/ibm-block-csi-operator/controllers/internal/hostdefinition"
+	. "github.com/IBM/ibm-block-csi-operator/controllers/internal/hostdefiner"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 )
 
 var _ = Describe("DefaultSetter", func() {
-	var hd = &csiv1.HostDefinition{}
+	var hd = &csiv1.HostDefiner{}
 	var hdWrapper = New(hd)
 	var changed bool
 
 	It("should have a host definition cr yaml configured", func() {
-		err := config.LoadDefaultsOfHostDefinition()
+		err := config.LoadDefaultsOfHostDefiner()
 		Expect(err).To(BeNil())
 	})
 
@@ -45,48 +45,48 @@ var _ = Describe("DefaultSetter", func() {
 
 			It("should set right host definition defaults", func() {
 				Expect(changed).To(BeTrue())
-				Expect(hd.Spec.HostDefinition.Repository).To(Equal(config.DefaultHostDefinitionCr.Spec.HostDefinition.Repository))
-				Expect(hd.Spec.HostDefinition.Tag).To(Equal(config.DefaultHostDefinitionCr.Spec.HostDefinition.Tag))
+				Expect(hd.Spec.HostDefiner.Repository).To(Equal(config.DefaultHostDefinerCr.Spec.HostDefiner.Repository))
+				Expect(hd.Spec.HostDefiner.Tag).To(Equal(config.DefaultHostDefinerCr.Spec.HostDefiner.Tag))
 			})
 		})
 
 		Context("only host definition repository is unofficial", func() {
 
 			BeforeEach(func() {
-				hd = &csiv1.HostDefinition{
-					Spec: csiv1.HostDefinitionSpec{
-						HostDefinition: csiv1.IBMBlockCSIHostDefinitionSpec{
+				hd = &csiv1.HostDefiner{
+					Spec: csiv1.HostDefinerSpec{
+						HostDefiner: csiv1.IBMBlockCSIHostDefinerSpec{
 							Repository: "test",
 						},
 					},
 				}
-				hdWrapper.HostDefinition = hd
+				hdWrapper.HostDefiner = hd
 			})
 
 			It("should not set any defaults", func() {
 				Expect(changed).To(BeFalse())
-				Expect(hd.Spec.HostDefinition.Repository).To(Equal("test"))
-				Expect(hd.Spec.HostDefinition.Tag).To(Equal(""))
+				Expect(hd.Spec.HostDefiner.Repository).To(Equal("test"))
+				Expect(hd.Spec.HostDefiner.Tag).To(Equal(""))
 			})
 		})
 
 		Context("only host definition tag is set", func() {
 
 			BeforeEach(func() {
-				hd = &csiv1.HostDefinition{
-					Spec: csiv1.HostDefinitionSpec{
-						HostDefinition: csiv1.IBMBlockCSIHostDefinitionSpec{
+				hd = &csiv1.HostDefiner{
+					Spec: csiv1.HostDefinerSpec{
+						HostDefiner: csiv1.IBMBlockCSIHostDefinerSpec{
 							Tag: "test",
 						},
 					},
 				}
-				hdWrapper.HostDefinition = hd
+				hdWrapper.HostDefiner = hd
 			})
 
 			It("should set right defaults", func() {
 				Expect(changed).To(BeTrue())
-				Expect(hd.Spec.HostDefinition.Repository).To(Equal(config.DefaultHostDefinitionCr.Spec.HostDefinition.Repository))
-				Expect(hd.Spec.HostDefinition.Tag).NotTo(Equal("test"))
+				Expect(hd.Spec.HostDefiner.Repository).To(Equal(config.DefaultHostDefinerCr.Spec.HostDefiner.Repository))
+				Expect(hd.Spec.HostDefiner.Tag).NotTo(Equal("test"))
 			})
 		})
 
@@ -98,8 +98,8 @@ var _ = Describe("DefaultSetter", func() {
 
 			It("should do nothing", func() {
 				Expect(changed).To(BeFalse())
-				Expect(hd.Spec.HostDefinition.Repository).To(Equal(config.DefaultHostDefinitionCr.Spec.HostDefinition.Repository))
-				Expect(hd.Spec.HostDefinition.Tag).To(Equal(config.DefaultHostDefinitionCr.Spec.HostDefinition.Tag))
+				Expect(hd.Spec.HostDefiner.Repository).To(Equal(config.DefaultHostDefinerCr.Spec.HostDefiner.Repository))
+				Expect(hd.Spec.HostDefiner.Tag).To(Equal(config.DefaultHostDefinerCr.Spec.HostDefiner.Tag))
 			})
 		})
 

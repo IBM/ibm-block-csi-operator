@@ -18,7 +18,7 @@
 base_path=config/crd/bases/
 generated_crd_file_name_prefix=apiextensions.k8s.io_v1_customresourcedefinition_
 api_group=csi.ibm.com
-kinds=(hostdefinitions ibmblockcsis)
+kinds=(hostdefiners ibmblockcsis)
 kustomize build config/crd/ -o ${base_path}
 for kind in ${kinds[@]}; do
     mv ${base_path}${generated_crd_file_name_prefix}${kind}.${api_group}.yaml ${base_path}${api_group}_${kind}.yaml

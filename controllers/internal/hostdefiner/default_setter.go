@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hostdefinition
+package hostdefiner
 
 import (
 	"path"
@@ -24,26 +24,26 @@ import (
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 )
 
-func (c *HostDefinition) SetDefaults() bool {
+func (c *HostDefiner) SetDefaults() bool {
 
 	c.setDefaultForNilSliceFields()
 
-	if c.isUnofficialRepo(c.Spec.HostDefinition.Repository) {
+	if c.isUnofficialRepo(c.Spec.HostDefiner.Repository) {
 		return false
 	}
 	return c.setDefaults()
 }
 
-func (c *HostDefinition) setDefaultForNilSliceFields() {
+func (c *HostDefiner) setDefaultForNilSliceFields() {
 	if c.Spec.ImagePullSecrets == nil {
 		c.Spec.ImagePullSecrets = []string{}
 	}
-	if c.Spec.HostDefinition.Tolerations == nil {
-		c.Spec.HostDefinition.Tolerations = []corev1.Toleration{}
+	if c.Spec.HostDefiner.Tolerations == nil {
+		c.Spec.HostDefiner.Tolerations = []corev1.Toleration{}
 	}
 }
 
-func (c *HostDefinition) isUnofficialRepo(repo string) bool {
+func (c *HostDefiner) isUnofficialRepo(repo string) bool {
 	if repo != "" {
 		var registryUsername = path.Dir(repo)
 		if !config.OfficialRegistriesUsernames.Has(registryUsername) {
@@ -53,13 +53,13 @@ func (c *HostDefinition) isUnofficialRepo(repo string) bool {
 	return false
 }
 
-func (c *HostDefinition) setDefaults() bool {
+func (c *HostDefiner) setDefaults() bool {
 	var changed = false
 
-	if c.Spec.HostDefinition.Repository != config.DefaultHostDefinitionCr.Spec.HostDefinition.Repository ||
-		c.Spec.HostDefinition.Tag != config.DefaultHostDefinitionCr.Spec.HostDefinition.Tag {
-		c.Spec.HostDefinition.Repository = config.DefaultHostDefinitionCr.Spec.HostDefinition.Repository
-		c.Spec.HostDefinition.Tag = config.DefaultHostDefinitionCr.Spec.HostDefinition.Tag
+	if c.Spec.HostDefiner.Repository != config.DefaultHostDefinerCr.Spec.HostDefiner.Repository ||
+		c.Spec.HostDefiner.Tag != config.DefaultHostDefinerCr.Spec.HostDefiner.Tag {
+		c.Spec.HostDefiner.Repository = config.DefaultHostDefinerCr.Spec.HostDefiner.Repository
+		c.Spec.HostDefiner.Tag = config.DefaultHostDefinerCr.Spec.HostDefiner.Tag
 
 		changed = true
 	}

@@ -23,7 +23,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/IBM/ibm-block-csi-operator/controllers/internal/hostdefinition"
+	"github.com/IBM/ibm-block-csi-operator/controllers/internal/hostdefiner"
 	clustersyncer "github.com/IBM/ibm-block-csi-operator/controllers/syncer"
 	"github.com/IBM/ibm-block-csi-operator/controllers/util"
 	oconfig "github.com/IBM/ibm-block-csi-operator/pkg/config"
@@ -48,21 +48,21 @@ import (
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
 )
 
-var hostDefinitionLog = logf.Log.WithName("hostdefinition_controller")
+var hostDefinerLog = logf.Log.WithName("hostdefiner_controller")
 
-type hostDefinitionReconciler func(instance *hostdefinition.HostDefinition) error
+type hostDefinerReconciler func(instance *hostdefiner.HostDefiner) error
 
-type HostDefinitionReconciler struct {
+type HostDefinerReconciler struct {
 	client.Client
 	Scheme   *runtime.Scheme
 	Recorder record.EventRecorder
 }
 
-func (r *HostDefinitionReconciler) Reconcile(ctx context.Context, req ctrl.Request) (reconcile.Result, error) {
-	reqLogger := hostDefinitionLog.WithValues("Request.Namespace", req.Namespace, "Request.Name", req.Name)
-	reqLogger.Info("Reconciling HostDefinition")
+func (r *HostDefinerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (reconcile.Result, error) {
+	reqLogger := hostDefinerLog.WithValues("Request.Namespace", req.Namespace, "Request.Name", req.Name)
+	reqLogger.Info("Reconciling HostDefiner")
 
-	instance := hostdefinition.New(&csiv1.HostDefinition{})
+	instance := hostdefiner.New(&csiv1.HostDefiner{})
 	err := r.Get(context.TODO(), req.NamespacedName, instance.Unwrap())
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -78,13 +78,13 @@ func (r *HostDefinitionReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	r.Scheme.Default(instance.Unwrap())
 	changed := instance.SetDefaults()
 	if err := instance.Validate(); err != nil {
-		err = fmt.Errorf("wrong HostDefinition options: %v", err)
+		err = fmt.Errorf("wrong HostDefiner options: %v", err)
 		return reconcile.Result{RequeueAfter: ReconcileTime}, err
 	}
 	if changed {
 		err = r.Update(context.TODO(), instance.Unwrap())
 		if err != nil {
-			err = fmt.Errorf("failed to update HostDefinition CR: %v", err)
+			err = fmt.Errorf("failed to update HostDefiner CR: %v", err)
 			return reconcile.Result{}, err
 		}
 		return reconcile.Result{}, nil
@@ -114,7 +114,7 @@ func (r *HostDefinitionReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	}
 	originalStatus := *instance.Status.DeepCopy()
 
-	for _, rec := range []hostDefinitionReconciler{
+	for _, rec := range []hostDefinerReconciler{
 		r.reconcileServiceAccount,
 		r.reconcileClusterRole,
 		r.reconcileClusterRoleBinding,
@@ -124,8 +124,8 @@ func (r *HostDefinitionReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 		}
 	}
 
-	csiHostDefinitionSyncer := clustersyncer.NewCSIHostDefinitionSyncer(r.Client, r.Scheme, instance)
-	if err := syncer.Sync(context.TODO(), csiHostDefinitionSyncer, r.Recorder); err != nil {
+	csiHostDefinerSyncer := clustersyncer.NewCSIHostDefinerSyncer(r.Client, r.Scheme, instance)
+	if err := syncer.Sync(context.TODO(), csiHostDefinerSyncer, r.Recorder); err != nil {
 		return reconcile.Result{}, err
 	}
 
@@ -136,16 +136,16 @@ func (r *HostDefinitionReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	return reconcile.Result{}, nil
 }
 
-func (r *HostDefinitionReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *HostDefinerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&csiv1.HostDefinition{}).
+		For(&csiv1.HostDefiner{}).
 		Owns(&appsv1.Deployment{}).
 		Owns(&corev1.ServiceAccount{}).
 		Complete(r)
 }
 
-func (r *HostDefinitionReconciler) addFinalizerIfNotPresent(instance *hostdefinition.HostDefinition) error {
-	logger := hostDefinitionLog.WithName("addFinalizerIfNotPresent")
+func (r *HostDefinerReconciler) addFinalizerIfNotPresent(instance *hostdefiner.HostDefiner) error {
+	logger := hostDefinerLog.WithName("addFinalizerIfNotPresent")
 
 	accessor, finalizerName, err := r.getAccessorAndFinalizerName(instance)
 	if err != nil {
@@ -164,7 +164,7 @@ func (r *HostDefinitionReconciler) addFinalizerIfNotPresent(instance *hostdefini
 	return nil
 }
 
-func (r *HostDefinitionReconciler) hasFinalizer(instance *hostdefinition.HostDefinition) (bool, error) {
+func (r *HostDefinerReconciler) hasFinalizer(instance *hostdefiner.HostDefiner) (bool, error) {
 	accessor, finalizerName, err := r.getAccessorAndFinalizerName(instance)
 	if err != nil {
 		return false, err
@@ -173,8 +173,8 @@ func (r *HostDefinitionReconciler) hasFinalizer(instance *hostdefinition.HostDef
 	return util.Contains(accessor.GetFinalizers(), finalizerName), nil
 }
 
-func (r *HostDefinitionReconciler) removeFinalizer(instance *hostdefinition.HostDefinition) error {
-	logger := hostDefinitionLog.WithName("removeFinalizer")
+func (r *HostDefinerReconciler) removeFinalizer(instance *hostdefiner.HostDefiner) error {
+	logger := hostDefinerLog.WithName("removeFinalizer")
 
 	accessor, finalizerName, err := r.getAccessorAndFinalizerName(instance)
 	if err != nil {
@@ -189,8 +189,8 @@ func (r *HostDefinitionReconciler) removeFinalizer(instance *hostdefinition.Host
 	return nil
 }
 
-func (r *HostDefinitionReconciler) getAccessorAndFinalizerName(instance *hostdefinition.HostDefinition) (metav1.Object, string, error) {
-	logger := hostDefinitionLog.WithName("getAccessorAndFinalizerName")
+func (r *HostDefinerReconciler) getAccessorAndFinalizerName(instance *hostdefiner.HostDefiner) (metav1.Object, string, error) {
+	logger := hostDefinerLog.WithName("getAccessorAndFinalizerName")
 	lowercaseKind := strings.ToLower(instance.GetObjectKind().GroupVersionKind().Kind)
 	finalizerName := fmt.Sprintf("%s.%s", lowercaseKind, oconfig.APIGroup)
 
@@ -202,7 +202,7 @@ func (r *HostDefinitionReconciler) getAccessorAndFinalizerName(instance *hostdef
 	return accessor, finalizerName, nil
 }
 
-func (r *HostDefinitionReconciler) deleteClusterRolesAndBindings(instance *hostdefinition.HostDefinition) error {
+func (r *HostDefinerReconciler) deleteClusterRolesAndBindings(instance *hostdefiner.HostDefiner) error {
 	if err := r.deleteClusterRoleBindings(instance); err != nil {
 		return err
 	}
@@ -213,8 +213,8 @@ func (r *HostDefinitionReconciler) deleteClusterRolesAndBindings(instance *hostd
 	return nil
 }
 
-func (r *HostDefinitionReconciler) reconcileClusterRoleBinding(instance *hostdefinition.HostDefinition) error {
-	logger := hostDefinitionLog.WithValues("Resource Type", "ClusterRoleBinding")
+func (r *HostDefinerReconciler) reconcileClusterRoleBinding(instance *hostdefiner.HostDefiner) error {
+	logger := hostDefinerLog.WithValues("Resource Type", "ClusterRoleBinding")
 
 	clusterRoleBindings := r.getClusterRoleBindings(instance)
 
@@ -241,8 +241,8 @@ func (r *HostDefinitionReconciler) reconcileClusterRoleBinding(instance *hostdef
 	return nil
 }
 
-func (r *HostDefinitionReconciler) deleteClusterRoleBindings(instance *hostdefinition.HostDefinition) error {
-	logger := hostDefinitionLog.WithName("deleteClusterRoleBindings")
+func (r *HostDefinerReconciler) deleteClusterRoleBindings(instance *hostdefiner.HostDefiner) error {
+	logger := hostDefinerLog.WithName("deleteClusterRoleBindings")
 
 	clusterRoleBindings := r.getClusterRoleBindings(instance)
 
@@ -268,16 +268,16 @@ func (r *HostDefinitionReconciler) deleteClusterRoleBindings(instance *hostdefin
 	return nil
 }
 
-func (r *HostDefinitionReconciler) getClusterRoleBindings(instance *hostdefinition.HostDefinition) []*rbacv1.ClusterRoleBinding {
-	hostdefinition := instance.GenerateHostDefinitionClusterRoleBinding()
+func (r *HostDefinerReconciler) getClusterRoleBindings(instance *hostdefiner.HostDefiner) []*rbacv1.ClusterRoleBinding {
+	hostdefiner := instance.GenerateHostDefinerClusterRoleBinding()
 
 	return []*rbacv1.ClusterRoleBinding{
-		hostdefinition,
+		hostdefiner,
 	}
 }
 
-func (r *HostDefinitionReconciler) reconcileClusterRole(instance *hostdefinition.HostDefinition) error {
-	logger := hostDefinitionLog.WithValues("Resource Type", "ClusterRole")
+func (r *HostDefinerReconciler) reconcileClusterRole(instance *hostdefiner.HostDefiner) error {
+	logger := hostDefinerLog.WithValues("Resource Type", "ClusterRole")
 
 	clusterRoles := r.getClusterRoles(instance)
 
@@ -308,8 +308,8 @@ func (r *HostDefinitionReconciler) reconcileClusterRole(instance *hostdefinition
 	return nil
 }
 
-func (r *HostDefinitionReconciler) deleteClusterRoles(instance *hostdefinition.HostDefinition) error {
-	logger := hostDefinitionLog.WithName("deleteClusterRoles")
+func (r *HostDefinerReconciler) deleteClusterRoles(instance *hostdefiner.HostDefiner) error {
+	logger := hostDefinerLog.WithName("deleteClusterRoles")
 
 	clusterRoles := r.getClusterRoles(instance)
 
@@ -335,21 +335,21 @@ func (r *HostDefinitionReconciler) deleteClusterRoles(instance *hostdefinition.H
 	return nil
 }
 
-func (r *HostDefinitionReconciler) getClusterRoles(instance *hostdefinition.HostDefinition) []*rbacv1.ClusterRole {
-	hostdefinition := instance.GenerateHostDefinitionClusterRole()
+func (r *HostDefinerReconciler) getClusterRoles(instance *hostdefiner.HostDefiner) []*rbacv1.ClusterRole {
+	hostdefiner := instance.GenerateHostDefinerClusterRole()
 
 	return []*rbacv1.ClusterRole{
-		hostdefinition,
+		hostdefiner,
 	}
 }
 
-func (r *HostDefinitionReconciler) reconcileServiceAccount(instance *hostdefinition.HostDefinition) error {
-	logger := hostDefinitionLog.WithValues("Resource Type", "ServiceAccount")
+func (r *HostDefinerReconciler) reconcileServiceAccount(instance *hostdefiner.HostDefiner) error {
+	logger := hostDefinerLog.WithValues("Resource Type", "ServiceAccount")
 
-	hostDefinition := instance.GenerateServiceAccount()
+	hostDefiner := instance.GenerateServiceAccount()
 
 	for _, sa := range []*corev1.ServiceAccount{
-		hostDefinition,
+		hostDefiner,
 	} {
 		if err := controllerutil.SetControllerReference(instance.Unwrap(), sa, r.Scheme); err != nil {
 			return err
@@ -383,7 +383,7 @@ func (r *HostDefinitionReconciler) reconcileServiceAccount(instance *hostdefinit
 	return nil
 }
 
-func (r *HostDefinitionReconciler) restartDeployment(logger logr.Logger, instance *hostdefinition.HostDefinition) error {
+func (r *HostDefinerReconciler) restartDeployment(logger logr.Logger, instance *hostdefiner.HostDefiner) error {
 	deployment, err := r.getDeployment(instance)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -392,10 +392,10 @@ func (r *HostDefinitionReconciler) restartDeployment(logger logr.Logger, instanc
 		return err
 	}
 
-	logger.Info("hostDefinition requires restart",
+	logger.Info("hostDefiner requires restart",
 		"ReadyReplicas", deployment.Status.ReadyReplicas,
 		"Replicas", deployment.Status.Replicas)
-	logger.Info("restarting csi hostDefinition")
+	logger.Info("restarting csi hostDefiner")
 
 	err = r.rolloutRestartDeployment(deployment)
 	if err != nil {
@@ -404,24 +404,24 @@ func (r *HostDefinitionReconciler) restartDeployment(logger logr.Logger, instanc
 	return nil
 }
 
-func (r *HostDefinitionReconciler) getDeployment(instance *hostdefinition.HostDefinition) (*appsv1.Deployment, error) {
+func (r *HostDefinerReconciler) getDeployment(instance *hostdefiner.HostDefiner) (*appsv1.Deployment, error) {
 	deployment := &appsv1.Deployment{}
 	err := r.Get(context.TODO(), types.NamespacedName{
-		Name:      oconfig.GetNameForResource(oconfig.CSIHostDefinition, instance.Name),
+		Name:      oconfig.GetNameForResource(oconfig.CSIHostDefiner, instance.Name),
 		Namespace: instance.Namespace,
 	}, deployment)
 
 	return deployment, err
 }
 
-func (r *HostDefinitionReconciler) rolloutRestartDeployment(deployment *appsv1.Deployment) error {
+func (r *HostDefinerReconciler) rolloutRestartDeployment(deployment *appsv1.Deployment) error {
 	restartedAt := fmt.Sprintf("%s/restartedAt", oconfig.APIGroup)
 	timestamp := time.Now().String()
 	deployment.Spec.Template.ObjectMeta.Annotations[restartedAt] = timestamp
 	return r.Update(context.TODO(), deployment)
 }
 
-func (r *HostDefinitionReconciler) updateStatus(instance *hostdefinition.HostDefinition, originalStatus csiv1.HostDefinitionStatus) error {
+func (r *HostDefinerReconciler) updateStatus(instance *hostdefiner.HostDefiner, originalStatus csiv1.HostDefinerStatus) error {
 	logger := log.WithName("updateStatus")
 	deployment, err := r.getDeployment(instance)
 	if err != nil {
@@ -431,7 +431,7 @@ func (r *HostDefinitionReconciler) updateStatus(instance *hostdefinition.HostDef
 	r.updateStatusFields(instance, deployment)
 
 	if !reflect.DeepEqual(originalStatus, instance.Status) {
-		logger.Info("updating HostDefinition status", "name", instance.Name, "from", originalStatus, "to", instance.Status)
+		logger.Info("updating HostDefiner status", "name", instance.Name, "from", originalStatus, "to", instance.Status)
 		sErr := r.Status().Update(context.TODO(), instance.Unwrap())
 		if sErr != nil {
 			return sErr
@@ -441,16 +441,16 @@ func (r *HostDefinitionReconciler) updateStatus(instance *hostdefinition.HostDef
 	return nil
 }
 
-func (r *HostDefinitionReconciler) updateStatusFields(instance *hostdefinition.HostDefinition, deployment *appsv1.Deployment) {
-	instance.Status.HostDefinitionReady = r.isReady(deployment)
+func (r *HostDefinerReconciler) updateStatusFields(instance *hostdefiner.HostDefiner, deployment *appsv1.Deployment) {
+	instance.Status.HostDefinerReady = r.isReady(deployment)
 	phase := csiv1.DriverPhaseCreating
-	if instance.Status.HostDefinitionReady {
+	if instance.Status.HostDefinerReady {
 		phase = csiv1.DriverPhaseRunning
 	}
 	instance.Status.Phase = phase
 	instance.Status.Version = oversion.DriverVersion
 }
 
-func (r *HostDefinitionReconciler) isReady(deployment *appsv1.Deployment) bool {
+func (r *HostDefinerReconciler) isReady(deployment *appsv1.Deployment) bool {
 	return deployment.Status.ReadyReplicas == deployment.Status.Replicas
 }

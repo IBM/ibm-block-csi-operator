@@ -11,20 +11,20 @@ metadata:
     csi: ibm
     product: ibm-block-csi-driver
     release: v1.10.0
-  name: hostdefinitions.csi.ibm.com
+  name: hostdefiners.csi.ibm.com
 spec:
   group: csi.ibm.com
   names:
-    kind: HostDefinition
-    listKind: HostDefinitionList
-    plural: hostdefinitions
-    singular: hostdefinition
+    kind: HostDefiner
+    listKind: HostDefinerList
+    plural: hostdefiners
+    singular: hostdefiner
   scope: Namespaced
   versions:
   - name: v1
     schema:
       openAPIV3Schema:
-        description: HostDefinition is the Schema for the hostdefinitions API
+        description: HostDefiner is the Schema for the hostdefiners API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
@@ -35,10 +35,10 @@ spec:
           metadata:
             type: object
           spec:
-            description: HostDefinitionSpec defines the desired state of HostDefinition
+            description: HostDefinerSpec defines the desired state of HostDefiner
             properties:
-              hostDefinition:
-                description: IBMBlockCSIHostDefinitionSpec defines the observed state of HostDefinition
+              hostDefiner:
+                description: IBMBlockCSIHostDefinerSpec defines the observed state of HostDefiner
                 properties:
                   affinity:
                     description: Affinity is a group of affinity scheduling rules.
@@ -543,12 +543,12 @@ spec:
                   type: string
                 type: array
             required:
-            - hostDefinition
+            - hostDefiner
             type: object
           status:
-            description: HostDefinitionStatus defines the observed state of HostDefinition
+            description: HostDefinerStatus defines the observed state of HostDefiner
             properties:
-              hostDefinitionReady:
+              hostDefinerReady:
                 type: boolean
               phase:
                 type: string
@@ -556,7 +556,7 @@ spec:
                 description: Version is the current driver version
                 type: string
             required:
-            - hostDefinitionReady
+            - hostDefinerReady
             - phase
             - version
             type: object

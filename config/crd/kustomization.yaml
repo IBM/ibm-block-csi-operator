@@ -7,6 +7,6 @@ commonLabels:
   release: v1.10.0
 resources:
 - bases/csi.ibm.com_ibmblockcsis.yaml
-- bases/csi.ibm.com_hostdefinitions.yaml
+- bases/csi.ibm.com_hostdefiners.yaml
 #+kubebuilder:scaffold:crdkustomizeresource
 

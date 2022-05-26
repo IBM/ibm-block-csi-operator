@@ -17,7 +17,7 @@
 package syncer
 
 import (
-	"github.com/IBM/ibm-block-csi-operator/controllers/internal/hostdefinition"
+	"github.com/IBM/ibm-block-csi-operator/controllers/internal/hostdefiner"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/util/boolptr"
 	csiversion "github.com/IBM/ibm-block-csi-operator/version"
@@ -33,11 +33,11 @@ import (
 )
 
 const (
-	HostDefinitionContainerName = "ibm-block-csi-hostdefinition"
+	HostDefinerContainerName = "ibm-block-csi-hostdefiner"
 )
 
-type csiHostDefinitionSyncer struct {
-	driver *hostdefinition.HostDefinition
+type csiHostDefinerSyncer struct {
+	driver *hostdefiner.HostDefiner
 	obj    runtime.Object
 }
 
@@ -47,32 +47,32 @@ var defaultAnnotations = labels.Set{
 	"productVersion": csiversion.Version,
 }
 
-func NewCSIHostDefinitionSyncer(c client.Client, scheme *runtime.Scheme, driver *hostdefinition.HostDefinition) syncer.Interface {
+func NewCSIHostDefinerSyncer(c client.Client, scheme *runtime.Scheme, driver *hostdefiner.HostDefiner) syncer.Interface {
 	obj := getDeploymentSkeleton(driver)
 
-	sync := &csiHostDefinitionSyncer{
+	sync := &csiHostDefinerSyncer{
 		driver: driver,
 		obj:    obj,
 	}
 
-	return syncer.NewObjectSyncer(config.CSIHostDefinition.String(), driver.Unwrap(), obj, c, func() error {
+	return syncer.NewObjectSyncer(config.CSIHostDefiner.String(), driver.Unwrap(), obj, c, func() error {
 		return sync.SyncFn()
 	})
 }
 
-func getDeploymentSkeleton(driver *hostdefinition.HostDefinition) *appsv1.Deployment {
+func getDeploymentSkeleton(driver *hostdefiner.HostDefiner) *appsv1.Deployment {
 	obj := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:        config.GetNameForResource(config.CSIHostDefinition, driver.Name),
+			Name:        config.GetNameForResource(config.CSIHostDefiner, driver.Name),
 			Namespace:   driver.Namespace,
 			Annotations: driver.GetAnnotations("", ""),
 			Labels:      driver.GetLabels(),
 		},
 		Spec: appsv1.DeploymentSpec{
-			Selector: metav1.SetAsLabelSelector(driver.GetCSIHostDefinitionSelectorLabels()),
+			Selector: metav1.SetAsLabelSelector(driver.GetCSIHostDefinerSelectorLabels()),
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
-					Labels:      driver.GetCSIHostDefinitionPodLabels(),
+					Labels:      driver.GetCSIHostDefinerPodLabels(),
 					Annotations: driver.GetAnnotations("", ""),
 				},
 				Spec: corev1.PodSpec{},
@@ -82,10 +82,10 @@ func getDeploymentSkeleton(driver *hostdefinition.HostDefinition) *appsv1.Deploy
 	return obj
 }
 
-func (s *csiHostDefinitionSyncer) SyncFn() error {
+func (s *csiHostDefinerSyncer) SyncFn() error {
 	out := s.obj.(*appsv1.Deployment)
-	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCSIHostDefinitionSelectorLabels())
-	labels := s.driver.GetCSIHostDefinitionPodLabels()
+	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCSIHostDefinerSelectorLabels())
+	labels := s.driver.GetCSIHostDefinerPodLabels()
 	out.Spec.Template.ObjectMeta.Labels = labels
 	out.ObjectMeta.Labels = labels
 	s.ensureAnnotations(out)
@@ -98,7 +98,7 @@ func (s *csiHostDefinitionSyncer) SyncFn() error {
 	return nil
 }
 
-func (s *csiHostDefinitionSyncer) ensureAnnotations(deployment *appsv1.Deployment) {
+func (s *csiHostDefinerSyncer) ensureAnnotations(deployment *appsv1.Deployment) {
 	annotations := s.driver.GetAnnotations("", "")
 	for k, _ := range defaultAnnotations {
 		deployment.Spec.Template.ObjectMeta.Annotations[k] = annotations[k]
@@ -106,31 +106,31 @@ func (s *csiHostDefinitionSyncer) ensureAnnotations(deployment *appsv1.Deploymen
 	}
 }
 
-func (s *csiHostDefinitionSyncer) ensurePodSpec() corev1.PodSpec {
+func (s *csiHostDefinerSyncer) ensurePodSpec() corev1.PodSpec {
 	return corev1.PodSpec{
 		Containers:         s.ensureContainersSpec(),
-		Affinity:           s.driver.Spec.HostDefinition.Affinity,
-		Tolerations:        s.driver.Spec.HostDefinition.Tolerations,
-		ServiceAccountName: config.GetNameForResource(config.CSIHostDefinitionServiceAccount, s.driver.Name),
+		Affinity:           s.driver.Spec.HostDefiner.Affinity,
+		Tolerations:        s.driver.Spec.HostDefiner.Tolerations,
+		ServiceAccountName: config.GetNameForResource(config.CSIHostDefinerServiceAccount, s.driver.Name),
 	}
 }
 
-func (s *csiHostDefinitionSyncer) ensureContainersSpec() []corev1.Container {
-	hostDefinitionPlugin := s.ensureContainer(HostDefinitionContainerName,
-		s.driver.GetCSIHostDefinitionImage(),
+func (s *csiHostDefinerSyncer) ensureContainersSpec() []corev1.Container {
+	hostDefinerPlugin := s.ensureContainer(HostDefinerContainerName,
+		s.driver.GetCSIHostDefinerImage(),
 		[]string{},
 	)
 
-	hostDefinitionPlugin.Resources = ensureResources("40m", "800m", "40Mi", "400Mi")
+	hostDefinerPlugin.Resources = ensureResources("40m", "800m", "40Mi", "400Mi")
 
-	hostDefinitionPlugin.ImagePullPolicy = s.driver.Spec.HostDefinition.ImagePullPolicy
+	hostDefinerPlugin.ImagePullPolicy = s.driver.Spec.HostDefiner.ImagePullPolicy
 
 	return []corev1.Container{
-		hostDefinitionPlugin,
+		hostDefinerPlugin,
 	}
 }
 
-func (s *csiHostDefinitionSyncer) ensureContainer(name, image string, args []string) corev1.Container {
+func (s *csiHostDefinerSyncer) ensureContainer(name, image string, args []string) corev1.Container {
 	sc := &corev1.SecurityContext{AllowPrivilegeEscalation: boolptr.False()}
 	fillSecurityContextCapabilities(sc)
 	return corev1.Container{

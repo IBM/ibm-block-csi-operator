@@ -27,8 +27,8 @@ import (
 )
 
 const (
-	EnvNameIBMBlockCSICrYaml    = "IBMBlockCSI_CR_YAML"
-	EnvNameHostDefinitionCrYaml = "HostDefinition_CR_YAML"
+	EnvNameIBMBlockCSICrYaml = "IBMBlockCSI_CR_YAML"
+	EnvNameHostDefinerCrYaml = "HostDefiner_CR_YAML"
 
 	DefaultLogLevel  = "DEBUG"
 	ControllerUserID = int64(9999)
@@ -44,7 +44,7 @@ const (
 
 var DefaultIBMBlockCSICr v1.IBMBlockCSI
 
-var DefaultHostDefinitionCr v1.HostDefinition
+var DefaultHostDefinerCr v1.HostDefiner
 
 var DefaultSidecarsByName map[string]v1.CSISidecar
 
@@ -72,13 +72,13 @@ func LoadDefaultsOfIBMBlockCSI() error {
 	return nil
 }
 
-func LoadDefaultsOfHostDefinition() error {
-	yamlFile, err := getCrYamlFile(EnvNameHostDefinitionCrYaml)
+func LoadDefaultsOfHostDefiner() error {
+	yamlFile, err := getCrYamlFile(EnvNameHostDefinerCrYaml)
 	if err != nil {
 		return err
 	}
 
-	err = yaml.Unmarshal(yamlFile, &DefaultHostDefinitionCr)
+	err = yaml.Unmarshal(yamlFile, &DefaultHostDefinerCr)
 	if err != nil {
 		return fmt.Errorf("error unmarshaling yaml: %v", err)
 	}

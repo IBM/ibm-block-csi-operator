@@ -74,9 +74,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = operatorConfig.LoadDefaultsOfHostDefinition()
+	err = operatorConfig.LoadDefaultsOfHostDefiner()
 	if err != nil {
-		log.Error(err, "Failed to load default HostDefinition custom resource config")
+		log.Error(err, "Failed to load default HostDefiner custom resource config")
 		os.Exit(1)
 	}
 
@@ -104,11 +104,11 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "IBMBlockCSI")
 		os.Exit(1)
 	}
-	if err = (&controllers.HostDefinitionReconciler{
+	if err = (&controllers.HostDefinerReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "HostDefinition")
+		setupLog.Error(err, "unable to create controller", "controller", "HostDefiner")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hostdefinition
+package hostdefiner
 
 import (
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
@@ -23,30 +23,30 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (c *HostDefinition) GenerateHostDefinitionClusterRoleBinding() *rbacv1.ClusterRoleBinding {
+func (c *HostDefiner) GenerateHostDefinerClusterRoleBinding() *rbacv1.ClusterRoleBinding {
 	return &rbacv1.ClusterRoleBinding{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: config.GetNameForResource(config.CSIHostDefinitionClusterRoleBinding, c.Name),
+			Name: config.GetNameForResource(config.CSIHostDefinerClusterRoleBinding, c.Name),
 		},
 		Subjects: []rbacv1.Subject{
 			{
 				Kind:      "ServiceAccount",
-				Name:      config.GetNameForResource(config.CSIHostDefinitionServiceAccount, c.Name),
+				Name:      config.GetNameForResource(config.CSIHostDefinerServiceAccount, c.Name),
 				Namespace: c.Namespace,
 			},
 		},
 		RoleRef: rbacv1.RoleRef{
 			Kind:     "ClusterRole",
-			Name:     config.GetNameForResource(config.CSIHostDefinitionClusterRole, c.Name),
+			Name:     config.GetNameForResource(config.CSIHostDefinerClusterRole, c.Name),
 			APIGroup: config.RbacAuthorizationApiGroup,
 		},
 	}
 }
 
-func (c *HostDefinition) GenerateHostDefinitionClusterRole() *rbacv1.ClusterRole {
+func (c *HostDefiner) GenerateHostDefinerClusterRole() *rbacv1.ClusterRole {
 	return &rbacv1.ClusterRole{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: config.GetNameForResource(config.CSIHostDefinitionClusterRole, c.Name),
+			Name: config.GetNameForResource(config.CSIHostDefinerClusterRole, c.Name),
 		},
 		Rules: []rbacv1.PolicyRule{
 			{
@@ -66,14 +66,14 @@ func (c *HostDefinition) GenerateHostDefinitionClusterRole() *rbacv1.ClusterRole
 			},
 			{
 				APIGroups: []string{config.APIGroup},
-				Resources: []string{config.HostDefinitionResource},
+				Resources: []string{config.HostDefinerResource},
 				Verbs:     []string{config.VerbGet, config.VerbList, config.VerbWatch},
 			},
 		},
 	}
 }
 
-func (c *HostDefinition) GenerateServiceAccount() *corev1.ServiceAccount {
+func (c *HostDefiner) GenerateServiceAccount() *corev1.ServiceAccount {
 	secrets := []corev1.LocalObjectReference{}
 	if len(c.Spec.ImagePullSecrets) > 0 {
 		for _, s := range c.Spec.ImagePullSecrets {
@@ -83,7 +83,7 @@ func (c *HostDefinition) GenerateServiceAccount() *corev1.ServiceAccount {
 
 	return &corev1.ServiceAccount{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      config.GetNameForResource(config.CSIHostDefinitionServiceAccount, c.Name),
+			Name:      config.GetNameForResource(config.CSIHostDefinerServiceAccount, c.Name),
 			Namespace: c.Namespace,
 			Labels:    c.GetLabels(),
 		},

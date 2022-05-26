@@ -24,15 +24,15 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-// HostDefinitionSpec defines the desired state of HostDefinition
-type HostDefinitionSpec struct {
-	HostDefinition IBMBlockCSIHostDefinitionSpec `json:"hostDefinition"`
+// HostDefinerSpec defines the desired state of HostDefiner
+type HostDefinerSpec struct {
+	HostDefiner IBMBlockCSIHostDefinerSpec `json:"hostDefiner"`
 
 	ImagePullSecrets []string `json:"imagePullSecrets,omitempty"`
 }
 
-// IBMBlockCSIHostDefinitionSpec defines the observed state of HostDefinition
-type IBMBlockCSIHostDefinitionSpec struct {
+// IBMBlockCSIHostDefinerSpec defines the observed state of HostDefiner
+type IBMBlockCSIHostDefinerSpec struct {
 	Repository string `json:"repository"`
 	Tag        string `json:"tag"`
 
@@ -52,10 +52,10 @@ type IBMBlockCSIHostDefinitionSpec struct {
 	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
 }
 
-// HostDefinitionStatus defines the observed state of HostDefinition
-type HostDefinitionStatus struct {
-	Phase               DriverPhase `json:"phase"`
-	HostDefinitionReady bool        `json:"hostDefinitionReady"`
+// HostDefinerStatus defines the observed state of HostDefiner
+type HostDefinerStatus struct {
+	Phase            DriverPhase `json:"phase"`
+	HostDefinerReady bool        `json:"hostDefinerReady"`
 
 	// Version is the current driver version
 	Version string `json:"version"`
@@ -64,24 +64,24 @@ type HostDefinitionStatus struct {
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 
-// HostDefinition is the Schema for the hostdefinitions API
-type HostDefinition struct {
+// HostDefiner is the Schema for the hostdefiners API
+type HostDefiner struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   HostDefinitionSpec   `json:"spec,omitempty"`
-	Status HostDefinitionStatus `json:"status,omitempty"`
+	Spec   HostDefinerSpec   `json:"spec,omitempty"`
+	Status HostDefinerStatus `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 
-// HostDefinitionList contains a list of HostDefinition
-type HostDefinitionList struct {
+// HostDefinerList contains a list of HostDefiner
+type HostDefinerList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []HostDefinition `json:"items"`
+	Items           []HostDefiner `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&HostDefinition{}, &HostDefinitionList{})
+	SchemeBuilder.Register(&HostDefiner{}, &HostDefinerList{})
 }

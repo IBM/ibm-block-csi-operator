@@ -24,19 +24,19 @@ import (
 )
 
 var (
-	nodeContainerName           = clustersyncer.NodeContainerName
-	controllerContainerName     = clustersyncer.ControllerContainerName
-	hostDefinitionContainerName = clustersyncer.HostDefinitionContainerName
-	controllerByName            map[string]csiv1.IBMBlockCSIControllerSpec
-	nodeByName                  map[string]csiv1.IBMBlockCSINodeSpec
-	hostDefinitionByName        map[string]csiv1.IBMBlockCSIHostDefinitionSpec
+	nodeContainerName        = clustersyncer.NodeContainerName
+	controllerContainerName  = clustersyncer.ControllerContainerName
+	hostDefinerContainerName = clustersyncer.HostDefinerContainerName
+	controllerByName         map[string]csiv1.IBMBlockCSIControllerSpec
+	nodeByName               map[string]csiv1.IBMBlockCSINodeSpec
+	hostDefinerByName        map[string]csiv1.IBMBlockCSIHostDefinerSpec
 )
 
-func GetHostDefinitionImagesByName(hostDefinitionCr csiv1.HostDefinition) map[string]string {
+func GetHostDefinerImagesByName(hostDefinerCr csiv1.HostDefiner) map[string]string {
 	containersImages := make(map[string]string)
-	setHostDefinitionDeploymentImageByName(hostDefinitionCr)
+	setHostDefinerDeploymentImageByName(hostDefinerCr)
 
-	containersImages = addHostDefinitionDeploymentImageToContainersImagesMap(containersImages, hostDefinitionByName)
+	containersImages = addHostDefinerDeploymentImageToContainersImagesMap(containersImages, hostDefinerByName)
 	return containersImages
 }
 
@@ -59,9 +59,9 @@ func setNodeImageByName(defaultCr csiv1.IBMBlockCSI) {
 	nodeByName[nodeContainerName] = defaultCr.Spec.Node
 }
 
-func setHostDefinitionDeploymentImageByName(hostDefinitionCr csiv1.HostDefinition) {
-	hostDefinitionByName = make(map[string]csiv1.IBMBlockCSIHostDefinitionSpec)
-	hostDefinitionByName[hostDefinitionContainerName] = hostDefinitionCr.Spec.HostDefinition
+func setHostDefinerDeploymentImageByName(hostDefinerCr csiv1.HostDefiner) {
+	hostDefinerByName = make(map[string]csiv1.IBMBlockCSIHostDefinerSpec)
+	hostDefinerByName[hostDefinerContainerName] = hostDefinerCr.Spec.HostDefiner
 }
 
 func addImagesByNameFromYaml(containersImages map[string]string, sidecarsByName map[string]csiv1.CSISidecar) map[string]string {
@@ -93,10 +93,10 @@ func addControllerImageToContainersImagesMap(containersImages map[string]string,
 	return containersImages
 }
 
-func addHostDefinitionDeploymentImageToContainersImagesMap(containersImages map[string]string,
-	hostDefinitionImagesByName map[string]csiv1.IBMBlockCSIHostDefinitionSpec) map[string]string {
-	hostDefinition := hostDefinitionImagesByName[hostDefinitionContainerName]
-	containersImages[hostDefinitionContainerName] = getImageFromRepositoryAndTag(hostDefinition.Repository, hostDefinition.Tag)
+func addHostDefinerDeploymentImageToContainersImagesMap(containersImages map[string]string,
+	hostDefinerImagesByName map[string]csiv1.IBMBlockCSIHostDefinerSpec) map[string]string {
+	hostDefiner := hostDefinerImagesByName[hostDefinerContainerName]
+	containersImages[hostDefinerContainerName] = getImageFromRepositoryAndTag(hostDefiner.Repository, hostDefiner.Tag)
 	return containersImages
 }
 
