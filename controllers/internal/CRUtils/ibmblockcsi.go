@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controller_instance
+package CRUtils
 
 import (
 	"fmt"

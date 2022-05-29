@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/IBM/ibm-block-csi-operator/controllers/internal/controller_instance"
+	"github.com/IBM/ibm-block-csi-operator/controllers/internal/CRUtils"
 	"github.com/IBM/ibm-block-csi-operator/controllers/util"
 	oconfig "github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/go-logr/logr"
@@ -147,7 +147,7 @@ func (ch *ControllerHelper) getClusterRole(cr *rbacv1.ClusterRole) (*rbacv1.Clus
 	return found, err
 }
 
-func (ch *ControllerHelper) HasFinalizer(instance controller_instance.Instance) (bool, error) {
+func (ch *ControllerHelper) HasFinalizer(instance CRUtils.Instance) (bool, error) {
 	accessor, finalizerName, err := ch.getAccessorAndFinalizerName(instance)
 	if err != nil {
 		return false, err
@@ -156,7 +156,7 @@ func (ch *ControllerHelper) HasFinalizer(instance controller_instance.Instance) 
 	return util.Contains(accessor.GetFinalizers(), finalizerName), nil
 }
 
-func (ch *ControllerHelper) AddFinalizerIfNotPresent(instance controller_instance.Instance,
+func (ch *ControllerHelper) AddFinalizerIfNotPresent(instance CRUtils.Instance,
 	unwrappedInstance client.Object) error {
 	logger := ch.Log.WithName("addFinalizerIfNotPresent")
 
@@ -177,7 +177,7 @@ func (ch *ControllerHelper) AddFinalizerIfNotPresent(instance controller_instanc
 	return nil
 }
 
-func (ch *ControllerHelper) RemoveFinalizer(instance controller_instance.Instance,
+func (ch *ControllerHelper) RemoveFinalizer(instance CRUtils.Instance,
 	unwrappedInstance client.Object) error {
 	logger := ch.Log.WithName("removeFinalizer")
 
@@ -194,7 +194,7 @@ func (ch *ControllerHelper) RemoveFinalizer(instance controller_instance.Instanc
 	return nil
 }
 
-func (ch *ControllerHelper) getAccessorAndFinalizerName(instance controller_instance.Instance) (metav1.Object, string, error) {
+func (ch *ControllerHelper) getAccessorAndFinalizerName(instance CRUtils.Instance) (metav1.Object, string, error) {
 	logger := ch.Log.WithName("getAccessorAndFinalizerName")
 	lowercaseKind := strings.ToLower(instance.GetObjectKind().GroupVersionKind().Kind)
 	finalizerName := fmt.Sprintf("%s.%s", lowercaseKind, oconfig.APIGroup)

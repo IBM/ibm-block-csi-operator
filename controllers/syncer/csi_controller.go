@@ -29,7 +29,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
-	"github.com/IBM/ibm-block-csi-operator/controllers/internal/controller_instance"
+	"github.com/IBM/ibm-block-csi-operator/controllers/internal/CRUtils"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/util/boolptr"
 	"github.com/presslabs/controller-util/mergo/transformers"
@@ -53,12 +53,12 @@ const (
 var TopologyEnabled = false
 
 type csiControllerSyncer struct {
-	driver *controller_instance.IBMBlockCSI
+	driver *CRUtils.IBMBlockCSI
 	obj    runtime.Object
 }
 
 // NewCSIControllerSyncer returns a syncer for CSI controller
-func NewCSIControllerSyncer(c client.Client, scheme *runtime.Scheme, driver *controller_instance.IBMBlockCSI) syncer.Interface {
+func NewCSIControllerSyncer(c client.Client, scheme *runtime.Scheme, driver *CRUtils.IBMBlockCSI) syncer.Interface {
 	obj := &appsv1.StatefulSet{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        config.GetNameForResource(config.CSIController, driver.Name),
@@ -419,7 +419,7 @@ func ensureVolume(name string, source corev1.VolumeSource) corev1.Volume {
 	}
 }
 
-func getSidecarByName(driver *controller_instance.IBMBlockCSI, name string) *csiv1.CSISidecar {
+func getSidecarByName(driver *CRUtils.IBMBlockCSI, name string) *csiv1.CSISidecar {
 	for _, sidecar := range driver.Spec.Sidecars {
 		if sidecar.Name == name {
 			return &sidecar

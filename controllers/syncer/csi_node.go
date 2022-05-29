@@ -28,7 +28,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
-	"github.com/IBM/ibm-block-csi-operator/controllers/internal/controller_instance"
+	"github.com/IBM/ibm-block-csi-operator/controllers/internal/CRUtils"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/util/boolptr"
 	"github.com/presslabs/controller-util/mergo/transformers"
@@ -48,12 +48,12 @@ const (
 )
 
 type csiNodeSyncer struct {
-	driver *controller_instance.IBMBlockCSI
+	driver *CRUtils.IBMBlockCSI
 	obj    runtime.Object
 }
 
 // NewCSINodeSyncer returns a syncer for CSI node
-func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *controller_instance.IBMBlockCSI,
+func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *CRUtils.IBMBlockCSI,
 	daemonSetRestartedKey string, daemonSetRestartedValue string) syncer.Interface {
 	obj := &appsv1.DaemonSet{
 		ObjectMeta: metav1.ObjectMeta{

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controller_instance_test
+package CRUtils_test
 
 import (
 	"testing"
