@@ -137,7 +137,29 @@ func (s *csiHostDefinerSyncer) ensureContainer(name, image string, args []string
 		Name:            name,
 		Image:           image,
 		Args:            args,
+		Env:             s.getEnv(),
 		SecurityContext: sc,
 		Resources:       ensureDefaultResources(),
 	}
+}
+
+func (s *csiHostDefinerSyncer) getEnv() []corev1.EnvVar {
+	return []corev1.EnvVar{
+		{
+			Name:  "PREFIX",
+			Value: s.getPrefix(),
+		},
+		{
+			Name:  "CONNECTION",
+			Value: s.getConnection(),
+		},
+	}
+}
+
+func (s *csiHostDefinerSyncer) getPrefix() string {
+	return s.driver.Spec.HostDefiner.Prefix
+}
+
+func (s *csiHostDefinerSyncer) getConnection() string {
+	return s.driver.Spec.HostDefiner.Connectivity
 }

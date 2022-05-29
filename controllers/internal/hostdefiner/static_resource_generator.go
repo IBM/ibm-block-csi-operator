@@ -69,6 +69,11 @@ func (c *HostDefiner) GenerateHostDefinerClusterRole() *rbacv1.ClusterRole {
 				Resources: []string{config.HostDefinerResource},
 				Verbs:     []string{config.VerbGet, config.VerbList, config.VerbWatch},
 			},
+			{
+				APIGroups: []string{config.APIGroup},
+				Resources: []string{config.HostDefinitionResource},
+				Verbs:     []string{"*"},
+			},
 		},
 	}
 }

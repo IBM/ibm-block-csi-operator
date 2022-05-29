@@ -33,6 +33,7 @@ const (
 	StorageApiGroup           = "storage.k8s.io"
 	StorageClassesResource    = "storageclasses"
 	HostDefinerResource       = "hostdefiners"
+	HostDefinitionResource    = "hostdefinitions"
 
 	NodeAgentRepository = "ibmcom/ibm-node-agent"
 
