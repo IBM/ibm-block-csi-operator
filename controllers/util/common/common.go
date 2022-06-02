@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/IBM/ibm-block-csi-operator/controllers/internal/CRUtils"
+	CRUtils "github.com/IBM/ibm-block-csi-operator/controllers/internal/crutils"
 	"github.com/IBM/ibm-block-csi-operator/controllers/util"
 	oconfig "github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/go-logr/logr"
@@ -45,7 +45,7 @@ func NewControllerHelper(client client.Client) *ControllerHelper {
 }
 
 func (ch *ControllerHelper) DeleteClusterRoleBindings(clusterRoleBindings []*rbacv1.ClusterRoleBinding) error {
-	logger := ch.Log.WithName("deleteClusterRoleBindings")
+	logger := ch.Log.WithName("DeleteClusterRoleBindings")
 	for _, crb := range clusterRoleBindings {
 		found, err := ch.getClusterRoleBinding(crb)
 		if err != nil && errors.IsNotFound(err) {
@@ -95,7 +95,7 @@ func (ch *ControllerHelper) getClusterRoleBinding(crb *rbacv1.ClusterRoleBinding
 }
 
 func (ch *ControllerHelper) DeleteClusterRoles(clusterRoles []*rbacv1.ClusterRole) error {
-	logger := ch.Log.WithName("deleteClusterRoles")
+	logger := ch.Log.WithName("DeleteClusterRoles")
 	for _, cr := range clusterRoles {
 		found, err := ch.getClusterRole(cr)
 		if err != nil && errors.IsNotFound(err) {
@@ -158,7 +158,7 @@ func (ch *ControllerHelper) HasFinalizer(instance CRUtils.Instance) (bool, error
 
 func (ch *ControllerHelper) AddFinalizerIfNotPresent(instance CRUtils.Instance,
 	unwrappedInstance client.Object) error {
-	logger := ch.Log.WithName("addFinalizerIfNotPresent")
+	logger := ch.Log.WithName("AddFinalizerIfNotPresent")
 
 	accessor, finalizerName, err := ch.getAccessorAndFinalizerName(instance)
 	if err != nil {
@@ -179,7 +179,7 @@ func (ch *ControllerHelper) AddFinalizerIfNotPresent(instance CRUtils.Instance,
 
 func (ch *ControllerHelper) RemoveFinalizer(instance CRUtils.Instance,
 	unwrappedInstance client.Object) error {
-	logger := ch.Log.WithName("removeFinalizer")
+	logger := ch.Log.WithName("RemoveFinalizer")
 
 	accessor, finalizerName, err := ch.getAccessorAndFinalizerName(instance)
 	if err != nil {
@@ -195,7 +195,7 @@ func (ch *ControllerHelper) RemoveFinalizer(instance CRUtils.Instance,
 }
 
 func (ch *ControllerHelper) getAccessorAndFinalizerName(instance CRUtils.Instance) (metav1.Object, string, error) {
-	logger := ch.Log.WithName("getAccessorAndFinalizerName")
+	logger := ch.Log.WithName("GetAccessorAndFinalizerName")
 	lowercaseKind := strings.ToLower(instance.GetObjectKind().GroupVersionKind().Kind)
 	finalizerName := fmt.Sprintf("%s.%s", lowercaseKind, oconfig.APIGroup)
 

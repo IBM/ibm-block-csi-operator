@@ -21,7 +21,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
-	. "github.com/IBM/ibm-block-csi-operator/controllers/internal/CRUtils"
+	. "github.com/IBM/ibm-block-csi-operator/controllers/internal/crutils"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 )
 

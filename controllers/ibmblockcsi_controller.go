@@ -42,7 +42,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
-	"github.com/IBM/ibm-block-csi-operator/controllers/internal/CRUtils"
+	CRUtils "github.com/IBM/ibm-block-csi-operator/controllers/internal/crutils"
 	clustersyncer "github.com/IBM/ibm-block-csi-operator/controllers/syncer"
 	oconfig "github.com/IBM/ibm-block-csi-operator/pkg/config"
 	kubeutil "github.com/IBM/ibm-block-csi-operator/pkg/util/kubernetes"
