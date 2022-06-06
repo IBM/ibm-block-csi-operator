@@ -195,7 +195,7 @@ func (ch *ControllerHelper) RemoveFinalizer(instance CRUtils.Instance,
 }
 
 func (ch *ControllerHelper) getAccessorAndFinalizerName(instance CRUtils.Instance) (metav1.Object, string, error) {
-	logger := ch.Log.WithName("GetAccessorAndFinalizerName")
+	logger := ch.Log.WithName("getAccessorAndFinalizerName")
 	lowercaseKind := strings.ToLower(instance.GetObjectKind().GroupVersionKind().Kind)
 	finalizerName := fmt.Sprintf("%s.%s", lowercaseKind, oconfig.APIGroup)
 
