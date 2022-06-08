@@ -169,13 +169,13 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 
 	snapshotter := s.ensureContainer(snapshotterContainerName,
 		s.getCSISnapshotterImage(),
-		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=100s"},
+		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=120s"},
 	)
 	snapshotter.ImagePullPolicy = s.getCSISnapshotterPullPolicy()
 
 	resizer := s.ensureContainer(resizerContainerName,
 		s.getCSIResizerImage(),
-		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=100s"},
+		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s"},
 	)
 	resizer.ImagePullPolicy = s.getCSIResizerPullPolicy()
 
@@ -184,7 +184,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	replicator := s.ensureContainer(replicatorContainerName,
 		s.getCSIAddonsReplicatorImage(),
 		[]string{leaderElectionNamespaceFlag, driverNameFlag,
-			"--csi-address=$(ADDRESS)", "--zap-log-level=5", "--rpc-timeout=100s"},
+			"--csi-address=$(ADDRESS)", "--zap-log-level=5", "--rpc-timeout=30s"},
 	)
 	replicator.ImagePullPolicy = s.getCSIAddonsReplicatorPullPolicy()
 
