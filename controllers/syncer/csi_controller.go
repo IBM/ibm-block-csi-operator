@@ -38,13 +38,13 @@ import (
 
 const (
 	socketVolumeName                     = "socket-dir"
-	controllerContainerName              = "ibm-block-csi-controller"
+	ControllerContainerName              = "ibm-block-csi-controller"
 	provisionerContainerName             = "csi-provisioner"
 	attacherContainerName                = "csi-attacher"
 	snapshotterContainerName             = "csi-snapshotter"
 	resizerContainerName                 = "csi-resizer"
 	replicatorContainerName              = "csi-addons-replicator"
-	controllerLivenessProbeContainerName = "liveness-probe"
+	controllerLivenessProbeContainerName = "livenessprobe"
 
 	controllerContainerHealthPortName          = "healthz"
 	controllerContainerDefaultHealthPortNumber = 9808
@@ -84,9 +84,15 @@ func (s *csiControllerSyncer) SyncFn() error {
 	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCSIControllerSelectorLabels())
 	out.Spec.ServiceName = config.GetNameForResource(config.CSIController, s.driver.Name)
 
+	controllerLabels := s.driver.GetCSIControllerPodLabels()
+	controllerAnnotations := s.driver.GetAnnotations("", "")
+
 	// ensure template
-	out.Spec.Template.ObjectMeta.Labels = s.driver.GetCSIControllerPodLabels()
-	out.Spec.Template.ObjectMeta.Annotations = s.driver.GetAnnotations("", "")
+	out.Spec.Template.ObjectMeta.Labels = controllerLabels
+	out.Spec.Template.ObjectMeta.Annotations = controllerAnnotations
+
+	out.ObjectMeta.Labels = controllerLabels
+	out.ObjectMeta.Annotations = controllerAnnotations
 
 	err := mergo.Merge(&out.Spec.Template.Spec, s.ensurePodSpec(), mergo.WithTransformers(transformers.PodSpec))
 	if err != nil {
@@ -112,7 +118,7 @@ func (s *csiControllerSyncer) ensurePodSpec() corev1.PodSpec {
 }
 
 func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
-	controllerPlugin := s.ensureContainer(controllerContainerName,
+	controllerPlugin := s.ensureContainer(ControllerContainerName,
 		s.driver.GetCSIControllerImage(),
 		[]string{"--csi-endpoint=$(CSI_ENDPOINT)"},
 	)
@@ -275,7 +281,7 @@ func (s *csiControllerSyncer) envVarFromSecret(sctName, name, key string, opt bo
 func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 
 	switch name {
-	case controllerContainerName:
+	case ControllerContainerName:
 		return []corev1.EnvVar{
 			{
 				Name:  "CSI_ENDPOINT",
@@ -301,7 +307,7 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 
 func (s *csiControllerSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 	switch name {
-	case controllerContainerName, provisionerContainerName, attacherContainerName, snapshotterContainerName,
+	case ControllerContainerName, provisionerContainerName, attacherContainerName, snapshotterContainerName,
 		resizerContainerName, replicatorContainerName:
 		return []corev1.VolumeMount{
 			{

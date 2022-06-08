@@ -36,10 +36,10 @@ import (
 )
 
 const (
-	registrationVolumeName           = "registration-dir"
-	nodeContainerName                = "ibm-block-csi-node"
-	nodeDriverRegistrarContainerName = "node-driver-registrar"
-	nodeLivenessProbeContainerName   = "liveness-probe"
+	registrationVolumeName              = "registration-dir"
+	NodeContainerName                   = "ibm-block-csi-node"
+	csiNodeDriverRegistrarContainerName = "csi-node-driver-registrar"
+	nodeLivenessProbeContainerName      = "livenessprobe"
 
 	nodeContainerHealthPortName          = "healthz"
 	nodeContainerDefaultHealthPortNumber = 9808
@@ -79,9 +79,14 @@ func (s *csiNodeSyncer) SyncFn(daemonSetRestartedKey string, daemonSetRestartedV
 
 	out.Spec.Selector = metav1.SetAsLabelSelector(s.driver.GetCSINodeSelectorLabels())
 
+	nodeLabels := s.driver.GetCSINodePodLabels()
+
 	// ensure template
-	out.Spec.Template.ObjectMeta.Labels = s.driver.GetCSINodePodLabels()
+	out.Spec.Template.ObjectMeta.Labels = nodeLabels
 	out.Spec.Template.ObjectMeta.Annotations = s.driver.GetAnnotations(daemonSetRestartedKey, daemonSetRestartedValue)
+
+	out.ObjectMeta.Labels = nodeLabels
+	out.ObjectMeta.Annotations = s.driver.GetAnnotations("", "")
 
 	err := mergo.Merge(&out.Spec.Template.Spec, s.ensurePodSpec(), mergo.WithTransformers(transformers.PodSpec))
 	if err != nil {
@@ -105,7 +110,7 @@ func (s *csiNodeSyncer) ensurePodSpec() corev1.PodSpec {
 
 func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	// node plugin container
-	nodePlugin := s.ensureContainer(nodeContainerName,
+	nodePlugin := s.ensureContainer(NodeContainerName,
 		s.driver.GetCSINodeImage(),
 		[]string{
 			"--csi-endpoint=$(CSI_ENDPOINT)",
@@ -152,7 +157,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	)
 
 	// node driver registrar sidecar
-	registrar := s.ensureContainer(nodeDriverRegistrarContainerName,
+	registrar := s.ensureContainer(csiNodeDriverRegistrarContainerName,
 		s.getCSINodeDriverRegistrarImage(),
 		[]string{
 			"--csi-address=$(ADDRESS)",
@@ -218,7 +223,7 @@ func envVarFromField(name, fieldPath string) corev1.EnvVar {
 func (s *csiNodeSyncer) getEnvFor(name string) []corev1.EnvVar {
 
 	switch name {
-	case nodeContainerName:
+	case NodeContainerName:
 		return []corev1.EnvVar{
 			{
 				Name:  "CSI_ENDPOINT",
@@ -231,7 +236,7 @@ func (s *csiNodeSyncer) getEnvFor(name string) []corev1.EnvVar {
 			envVarFromField("KUBE_NODE_NAME", "spec.nodeName"),
 		}
 
-	case nodeDriverRegistrarContainerName:
+	case csiNodeDriverRegistrarContainerName:
 		return []corev1.EnvVar{
 			{
 				Name:  "ADDRESS",
@@ -250,7 +255,7 @@ func (s *csiNodeSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 	mountPropagationB := corev1.MountPropagationBidirectional
 
 	switch name {
-	case nodeContainerName:
+	case NodeContainerName:
 		return []corev1.VolumeMount{
 			{
 				Name:      socketVolumeName,
@@ -280,7 +285,7 @@ func (s *csiNodeSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 			},
 		}
 
-	case nodeDriverRegistrarContainerName:
+	case csiNodeDriverRegistrarContainerName:
 		return []corev1.VolumeMount{
 			{
 				Name:      socketVolumeName,

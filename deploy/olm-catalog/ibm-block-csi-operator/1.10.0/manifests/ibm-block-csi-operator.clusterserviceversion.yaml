@@ -1,15 +1,15 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
-  name: ibm-block-csi-operator.v1.9.0
+  name: ibm-block-csi-operator.v1.10.0
   namespace: placeholder
   annotations:
     capabilities: "Seamless Upgrades"
-    olm.skipRange: '>=1.6.0 <1.9.0'
+    olm.skipRange: '>=1.6.0 <1.10.0'
     categories: "Storage,Cloud Provider"
     certified: "true"
-    containerImage: registry.connect.redhat.com/ibm/ibm-block-csi-operator@sha256:49e631f495b2a66f96141da71ffc15cde67c3493fce31bdfd86544ef5c854277
-    createdAt: "2021-12-25T11:00:00Z"
+    containerImage: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.10.0
+    createdAt: "2022-03-31T11:00:00Z"
     description: "Run IBM block storage CSI driver on OpenShift."
     repository: https://github.com/IBM/ibm-block-csi-operator
     support: IBM
@@ -24,7 +24,7 @@ metadata:
           "spec": {
             "controller": {
               "repository": "ibmcom/ibm-block-csi-driver-controller",
-              "tag": "1.9.0",
+              "tag": "1.10.0",
               "imagePullPolicy": "IfNotPresent",
               "affinity": {
                 "nodeAffinity": {
@@ -48,7 +48,7 @@ metadata:
             },
             "node": {
               "repository": "ibmcom/ibm-block-csi-driver-node",
-              "tag": "1.9.0",
+              "tag": "1.10.0",
               "imagePullPolicy": "IfNotPresent",
               "affinity": {
                 "nodeAffinity": {
@@ -132,13 +132,13 @@ spec:
     - CSI
   relatedImages:
     - name: ibm-block-csi-operator
-      image: registry.connect.redhat.com/ibm/ibm-block-csi-operator@sha256:49e631f495b2a66f96141da71ffc15cde67c3493fce31bdfd86544ef5c854277
-  version: 1.9.0
+      image: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.10.0
+  version: 1.10.0
   maturity: stable
   maintainers:
     - name: IBM Block CSI Team
       email: csi.block1@il.ibm.com
-  minKubeVersion: 1.21.0
+  minKubeVersion: 1.22.0
   provider:
     name: IBM
   links:
@@ -526,7 +526,7 @@ spec:
                       capabilities:
                         drop:
                           - ALL
-                    image: registry.connect.redhat.com/ibm/ibm-block-csi-operator@sha256:49e631f495b2a66f96141da71ffc15cde67c3493fce31bdfd86544ef5c854277
+                    image: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.10.0
                     imagePullPolicy: IfNotPresent
                     command:
                       - ibm-block-csi-operator

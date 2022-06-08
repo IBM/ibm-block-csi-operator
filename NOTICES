@@ -5,7 +5,7 @@ This file details additional third party software license agreements
 and third party notices and information that are required 
 to be reproduced for the following programs:
    
-Operator for IBM Block Storage CSI Driver version 1.8.0
+Operator for IBM Block Storage CSI Driver version 1.9.0
 
 
 
@@ -24,15 +24,14 @@ section and not the terms of the license agreement for the Program.
 The following are Separately Licensed Code:
 
 prometheus version 1.8.2
-Red Hat Universal Base Image 7
+Red Hat Universal Base Image 8
 Red Hat Universal Base Image - Minimal 8
-
 
 
 @@@@@@@@@@@@
 ===========================================================================
 THE FOLLOWING TERMS AND CONDITIONS APPLY to Red Hat Universal
-Base Image 7 software:
+Base Image 8 software:
 ---------------------------------------------------------------------------
 
 END USER LICENSE AGREEMENT
@@ -186,7 +185,7 @@ property of their respective owners.
 
 
 ===========================================================================
-END OF TERMS AND CONDITIONS FOR Red Hat Universal Base Image 7
+END OF TERMS AND CONDITIONS FOR Red Hat Universal Base Image 8
 ===========================================================================
 
 
@@ -359,7 +358,7 @@ GNU General Public License 2.0: THE FOLLOWING TERMS AND CONDITIONS
 APPLY to the listed components below which are licensed under the GNU
 General Public License 2.0:
 
-Portions of Red Hat Universal Base Image 7
+Portions of Red Hat Universal Base Image 8
 Portions of Red Hat Universal Base Image - Minimal 8
 
 ---------------------------------------------------------------------------
@@ -718,7 +717,7 @@ GNU General Public License 3.0: THE FOLLOWING TERMS AND CONDITIONS
 APPLY to the listed components below which are licensed under the GNU
 General Public License 3.0:
 
-Portions of Red Hat Universal Base Image 7
+Portions of Red Hat Universal Base Image 8
 Portions of Red Hat Universal Base Image - Minimal 8
 
 ---------------------------------------------------------------------------
@@ -2277,7 +2276,7 @@ End of GNU GPL Version 3.0 License
 
 ===========================================================================
 END OF TERMS AND CONDITIONS FOR SEPARATELY LICENSED CODE for Operator for
-IBM Block Storage CSI Driver version 1.8.0
+IBM Block Storage CSI Driver version 1.9.0
 ===========================================================================
 
 
@@ -2288,7 +2287,7 @@ IBM Block Storage CSI Driver version 1.8.0
 
 GNU GPL and / or LGPL Source Code for:
 
-Operator for IBM Block Storage CSI Driver 1.8.0
+Operator for IBM Block Storage CSI Driver 1.9.0
 
 ===========================================================================
 
@@ -2304,10 +2303,10 @@ General Public License 2.0.
 ===========================================================================
 
     Red Hat Universal Base Image - Miminal 8
-    Red Hat Universal Base Image 7
+    Red Hat Universal Base Image 8
 
 Source code to any of the above-listed packages distributed with
-Operator for IBM Block Storage CSI Driver 1.8.0 is available at the
+Operator for IBM Block Storage CSI Driver 1.9.0 is available at the
 website below, when a URL is provided, or by sending a request to the
 following address or email:
 
@@ -2333,10 +2332,10 @@ General Public License 3.0.
 ===========================================================================
 
     Red Hat Universal Base Image - Minimal 8
-    Red Hat Universal Base Image 7
+    Red Hat Universal Base Image 8
 
 Source code to any of the above-listed packages distributed with
-Operator for IBM Block Storage CSI Driver 1.8.0 is available at the
+Operator for IBM Block Storage CSI Driver 1.9.0 is available at the
 website below, when a URL is provided, or by sending a request to the
 following address or email:
 
@@ -2364,7 +2363,7 @@ under the GNU Lesser General Public License 3.0.
     Prometheus version 1.8.2
 
 Source code to any of the above-listed packages distributed with
-Operator for IBM Block Storage CSI Driver 1.8.0 is available at the
+Operator for IBM Block Storage CSI Driver 1.9.0 is available at the
 website below, when a URL is provided, or by sending a request to the
 following address or email:
 
@@ -2419,7 +2418,7 @@ client-go version 0.18.0
 code-generator-kubernetes version 1.13.1
 controller-runtime version 0.6.2
 controller-tools version 0.1.11
-controller-util commit fc080f9
+controller-util 0.3.0
 gengo commit e17681d
 grpc version 1.27.0
 kube-openapi version v0.0.0-20200121204235-bf4fb3bd569c
@@ -3287,8 +3286,8 @@ END OF gomega version 1.10.1 NOTICES AND INFORMATION
 
 @@@@@@@@@@@@
 ===========================================================================
-mergo version 0.3.9: The Program includes mergo version 0.3.9 software.
-IBM obtained the mergo version 0.3.9 software under the terms and
+mergo version 0.3.7: The Program includes mergo version 0.3.7 software.
+IBM obtained the mergo version 0.3.7 software under the terms and
 conditions of the following license(s):
 ---------------------------------------------------------------------------
 
@@ -3324,7 +3323,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ===========================================================================
-END OF mergo version 0.3.9 NOTICES AND INFORMATION
+END OF mergo version 0.3.7 NOTICES AND INFORMATION
 ===========================================================================
 
 
@@ -5161,6 +5160,6 @@ END OF thrift NOTICES AND INFORMATION
 
 ===========================================================================
 END OF NOTICES AND INFORMATION FOR Operator for IBM Block
-Storage CSI Driver 1.8.0
+Storage CSI Driver 1.9.0
 ===========================================================================
 
