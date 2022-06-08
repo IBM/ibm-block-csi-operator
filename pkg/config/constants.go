@@ -27,6 +27,7 @@ const (
 	RbacAuthorizationApiGroup = "rbac.authorization.k8s.io"
 	CsiNodesResource          = "csinodes"
 	SecretsResource           = "secrets"
+	PodsResource              = "pods"
 	VerbGet                   = "get"
 	VerbList                  = "list"
 	VerbWatch                 = "watch"
