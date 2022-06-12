@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package CRUtils
+package crutils
 
 import (
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"

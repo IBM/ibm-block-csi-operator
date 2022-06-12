@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package CRUtils
+package crutils
 
 // Validate checks if the spec is valid
 // Replace it with kubernetes native default setter when it is available.

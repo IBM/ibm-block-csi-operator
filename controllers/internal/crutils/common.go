@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package CRUtils
+package crutils
 
 import (
 	corev1 "k8s.io/api/core/v1"

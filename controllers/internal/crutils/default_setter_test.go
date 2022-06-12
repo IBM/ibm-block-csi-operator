@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package CRUtils_test
+package crutils_test
 
 import (
 	. "github.com/onsi/ginkgo"
