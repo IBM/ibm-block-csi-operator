@@ -374,9 +374,6 @@ func (r *HostDefinerReconciler) reconcileServiceAccount(instance *hostdefiner.Ho
 		} else if err != nil {
 			logger.Error(err, "Failed to get ServiceAccount", "Name", sa.GetName())
 			return err
-		} else {
-			// Resource already exists - don't requeue
-			//logger.Info("Skip reconcile: ServiceAccount already exists", "Namespace", sa.GetNamespace(), "Name", sa.GetName())
 		}
 	}
 
