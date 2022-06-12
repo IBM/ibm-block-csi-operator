@@ -10,8 +10,8 @@ metadata:
     release: v1.10.0
 spec:
   hostDefiner:
-    prefix: ibm_
-    connectivity:
+    #prefix:
+    #connectivityType:
     repository: ibmcom/ibm-block-csi-driver-hostdefiner
     tag: "1.10.0"
     imagePullPolicy: IfNotPresent

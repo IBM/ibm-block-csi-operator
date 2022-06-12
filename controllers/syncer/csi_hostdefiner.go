@@ -150,8 +150,8 @@ func (s *csiHostDefinerSyncer) getEnv() []corev1.EnvVar {
 			Value: s.getPrefix(),
 		},
 		{
-			Name:  "CONNECTION",
-			Value: s.getConnection(),
+			Name:  "CONNECTIVITY",
+			Value: s.getConnectivityType(),
 		},
 	}
 }
@@ -160,6 +160,6 @@ func (s *csiHostDefinerSyncer) getPrefix() string {
 	return s.driver.Spec.HostDefiner.Prefix
 }
 
-func (s *csiHostDefinerSyncer) getConnection() string {
-	return s.driver.Spec.HostDefiner.Connectivity
+func (s *csiHostDefinerSyncer) getConnectivityType() string {
+	return s.driver.Spec.HostDefiner.ConnectivityType
 }

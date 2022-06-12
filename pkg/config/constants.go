@@ -23,7 +23,6 @@ const (
 	Name                      = "ibm-block-csi-operator"
 	DriverName                = "block.csi.ibm.com"
 	ProductName               = "ibm-block-csi-driver"
-	Masterlabel               = "node-role.kubernetes.io/master"
 	RbacAuthorizationApiGroup = "rbac.authorization.k8s.io"
 	CsiNodesResource          = "csinodes"
 	SecretsResource           = "secrets"
@@ -36,12 +35,7 @@ const (
 	HostDefinerResource       = "hostdefiners"
 	HostDefinitionResource    = "hostdefinitions"
 
-	NodeAgentRepository = "ibmcom/ibm-node-agent"
-
-	ENVIscsiAgentPort = "ISCSI_AGENT_PORT"
-	ENVEndpoint       = "ENDPOINT"
-	ENVNodeName       = "NODE_NAME"
-	ENVKubeVersion    = "KUBE_VERSION"
+	ENVKubeVersion = "KUBE_VERSION"
 
 	CSINodeDriverRegistrar = "csi-node-driver-registrar"
 	CSIProvisioner         = "csi-provisioner"

@@ -40,7 +40,7 @@ type IBMBlockCSIHostDefinerSpec struct {
 	Prefix string `json:"prefix"`
 
 	// +kubebuilder:validation:Optional
-	Connectivity string `json:"connectivity"`
+	ConnectivityType string `json:"connectivityType"`
 
 	// +kubebuilder:validation:Optional
 	ImagePullPolicy corev1.PullPolicy `json:"imagePullPolicy"`
