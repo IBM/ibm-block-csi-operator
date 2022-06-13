@@ -34,9 +34,6 @@ spec:
     - jsonPath: .spec.hostDefinition.hostNameInStorage
       name: Host
       type: string
-    - jsonPath: .spec.hostDefinition.connectivityPorts
-      name: Ports
-      type: string
     - jsonPath: .spec.hostDefinition.message
       name: Message
       type: string
