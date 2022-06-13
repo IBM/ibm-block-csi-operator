@@ -70,7 +70,6 @@ type HostDefinitionStatus struct {
 // +kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.spec.hostDefinition.phase`
 // +kubebuilder:printcolumn:name="Storage",type=string,JSONPath=`.spec.hostDefinition.storageServer`
 // +kubebuilder:printcolumn:name="Host",type=string,JSONPath=`.spec.hostDefinition.hostNameInStorage`
-// +kubebuilder:printcolumn:name="Ports",type=string,JSONPath=`.spec.hostDefinition.connectivityPorts`
 // +kubebuilder:printcolumn:name="Message",type=string,JSONPath=`.spec.hostDefinition.message`
 type HostDefinition struct {
 	metav1.TypeMeta   `json:",inline"`
