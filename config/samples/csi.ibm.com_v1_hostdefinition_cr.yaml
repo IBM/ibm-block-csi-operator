@@ -1,0 +1,19 @@
+apiVersion: csi.ibm.com/v1
+kind: HostDefinition
+metadata:
+  name: ibm-block-csi
+  labels:
+    app.kubernetes.io/name: ibm-block-csi
+    app.kubernetes.io/instance: ibm-block-csi
+    app.kubernetes.io/managed-by: ibm-block-csi-operator
+    release: v1.10.0
+spec:
+  hostDefinition:
+    storageServer: demo-storageServer
+    hostNameInStorage: demo-hostNameInStorage
+    secretName: demo-secret
+    secretNamespace: default
+    connectvityType:   #Optional
+    connectivityPorts: #Optional
+    retryVerifying:    #Optional, Default: false
+    action:            #Optional, Default: Create

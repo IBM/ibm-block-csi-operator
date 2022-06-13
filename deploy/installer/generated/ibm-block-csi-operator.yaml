@@ -85,9 +85,6 @@ spec:
                 - secretNamespace
                 - storageServer
                 type: object
-              imagePullSecrets:
-                description: PullPolicy describes a policy for if/when to pull a container image
-                type: string
             required:
             - hostDefinition
             type: object

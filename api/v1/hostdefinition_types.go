@@ -17,7 +17,6 @@
 package v1
 
 import (
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -27,9 +26,6 @@ import (
 // HostDefinitionSpec defines the desired state of HostDefinition
 type HostDefinitionSpec struct {
 	HostDefinition IBMBlockCSIHostDefinitionSpec `json:"hostDefinition"`
-
-	// +kubebuilder:validation:Optional
-	ImagePullSecrets corev1.PullPolicy `json:"imagePullSecrets,omitempty"`
 }
 
 // IBMBlockCSIHostDefinitionSpec defines the observed state of HostDefinition
