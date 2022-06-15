@@ -25,7 +25,7 @@ spec:
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
-    - jsonPath: .spec.hostDefinition.phase
+    - jsonPath: .status.phase
       name: Phase
       type: string
     - jsonPath: .spec.hostDefinition.storageServer
@@ -33,9 +33,6 @@ spec:
       type: string
     - jsonPath: .spec.hostDefinition.hostNameInStorage
       name: Host
-      type: string
-    - jsonPath: .spec.hostDefinition.message
-      name: Message
       type: string
     name: v1
     schema:
@@ -56,19 +53,11 @@ spec:
               hostDefinition:
                 description: IBMBlockCSIHostDefinitionSpec defines the observed state of HostDefinition
                 properties:
-                  action:
-                    default: Create
-                    type: string
                   connectivityPorts:
                     type: string
                   connectvityType:
                     type: string
                   hostNameInStorage:
-                    type: string
-                  message:
-                    type: string
-                  phase:
-                    default: Pending
                     type: string
                   retryVerifying:
                     default: false

@@ -36,20 +36,12 @@ type IBMBlockCSIHostDefinitionSpec struct {
 	SecretNamespace   string `json:"secretNamespace"`
 
 	// +kubebuilder:validation:Optional
-	Message string `json:"message"`
-	// +kubebuilder:validation:Optional
 	ConnectvityType string `json:"connectvityType"`
 	// +kubebuilder:validation:Optional
 	ConnectivityPorts string `json:"connectivityPorts"`
 	// +kubebuilder:validation:Optional
-	// +kubebuilder:default:=Pending
-	Phase string `json:"phase"`
-	// +kubebuilder:validation:Optional
 	// +kubebuilder:default:=false
 	RetryVerifying bool `json:"retryVerifying"`
-	// +kubebuilder:validation:Optional
-	// +kubebuilder:default:=Create
-	Action string `json:"action"`
 }
 
 // HostDefinitionStatus defines the observed state of HostDefinition
@@ -63,10 +55,9 @@ type HostDefinitionStatus struct {
 
 // HostDefinition is the Schema for the hostdefinitions API
 // +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
-// +kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.spec.hostDefinition.phase`
+// +kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 // +kubebuilder:printcolumn:name="Storage",type=string,JSONPath=`.spec.hostDefinition.storageServer`
 // +kubebuilder:printcolumn:name="Host",type=string,JSONPath=`.spec.hostDefinition.hostNameInStorage`
-// +kubebuilder:printcolumn:name="Message",type=string,JSONPath=`.spec.hostDefinition.message`
 type HostDefinition struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
