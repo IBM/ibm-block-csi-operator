@@ -12,7 +12,7 @@ spec:
   hostDefiner:
     #prefix:
     #connectivityType:
-    repository: ibmcom/ibm-block-csi-driver-hostdefiner
+    repository: ibmcom/ibm-block-csi-host-definer
     tag: "1.10.0"
     imagePullPolicy: IfNotPresent
     affinity:
