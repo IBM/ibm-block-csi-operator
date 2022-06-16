@@ -11,9 +11,9 @@ spec:
   hostDefinition:
     storageServer: demo-storageServer
     hostNameInStorage: demo-hostNameInStorage
-    secretName: demo-secret
-    secretNamespace: default
-    connectvityType:   #Optional
-    connectivityPorts: #Optional
-    retryVerifying:    #Optional, Default: false
-    action:            #Optional, Default: Create
+    #secretName: demo-secret
+    #secretNamespace: default
+    #connectvityType:   
+    #connectivityPorts: 
+    #retryVerifying:     Default: false
+    #action:             Default: Create
