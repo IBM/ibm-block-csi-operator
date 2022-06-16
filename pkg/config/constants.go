@@ -30,11 +30,13 @@ const (
 	VerbGet                      = "get"
 	VerbList                     = "list"
 	VerbWatch                    = "watch"
+	VerbCreate                   = "create"
 	StorageApiGroup              = "storage.k8s.io"
 	StorageClassesResource       = "storageclasses"
 	HostDefinerResource          = "hostdefiners"
 	HostDefinitionResource       = "hostdefinitions"
 	HostDefinitionStatusResource = "hostdefinitions/status"
+	EventsResource               = "events"
 
 	ENVKubeVersion = "KUBE_VERSION"
 
