@@ -54,10 +54,26 @@ spec:
                 description: IBMBlockCSIHostDefinitionSpec defines the observed state of HostDefinition
                 properties:
                   connectivityPorts:
-                    type: string
+                    description: ConnectivityPorts defines the ports of the hostDefinition
+                    properties:
+                      fc:
+                        items:
+                          type: string
+                        type: array
+                      iscsi:
+                        items:
+                          type: string
+                        type: array
+                      nvme:
+                        items:
+                          type: string
+                        type: array
+                    type: object
                   connectvityType:
                     type: string
                   hostNameInStorage:
+                    type: string
+                  managementAddress:
                     type: string
                   retryVerifying:
                     default: false
@@ -66,11 +82,9 @@ spec:
                     type: string
                   secretNamespace:
                     type: string
-                  storageServer:
-                    type: string
                 required:
                 - hostNameInStorage
-                - storageServer
+                - managementAddress
                 type: object
             required:
             - hostDefinition

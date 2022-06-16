@@ -30,7 +30,7 @@ type HostDefinitionSpec struct {
 
 // IBMBlockCSIHostDefinitionSpec defines the observed state of HostDefinition
 type IBMBlockCSIHostDefinitionSpec struct {
-	StorageServer     string `json:"storageServer"`
+	ManagementAddress string `json:"managementAddress"`
 	HostNameInStorage string `json:"hostNameInStorage"`
 
 	// +kubebuilder:validation:Optional
@@ -40,10 +40,20 @@ type IBMBlockCSIHostDefinitionSpec struct {
 	// +kubebuilder:validation:Optional
 	ConnectvityType string `json:"connectvityType"`
 	// +kubebuilder:validation:Optional
-	ConnectivityPorts string `json:"connectivityPorts"`
+	ConnectivityPorts ConnectivityPorts `json:"connectivityPorts"`
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:default:=false
 	RetryVerifying bool `json:"retryVerifying"`
+}
+
+// ConnectivityPorts defines the ports of the hostDefinition
+type ConnectivityPorts struct {
+	// +kubebuilder:validation:Optional
+	Iscsi []string `json:"iscsi"`
+	// +kubebuilder:validation:Optional
+	Fc []string `json:"fc"`
+	// +kubebuilder:validation:Optional
+	Nvme []string `json:"nvme"`
 }
 
 // HostDefinitionStatus defines the observed state of HostDefinition

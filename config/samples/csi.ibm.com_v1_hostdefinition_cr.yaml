@@ -9,11 +9,21 @@ metadata:
     release: v1.10.0
 spec:
   hostDefinition:
-    storageServer: demo-storageServer
+    managementAddress: demo-management-address
     hostNameInStorage: demo-hostNameInStorage
+    #connectivityPorts:
+    #  iscsi:
+    #    - iqn1
+    #    - iqn2
+    #  fcOverScsi:
+    #    - wwn1
+    #    - wn2
+    #  nvme:
+    #    - nqn1
+    #    - nqn2
     #secretName: demo-secret
     #secretNamespace: default
-    #connectvityType:   
-    #connectivityPorts: 
+    #connectvityType:
+    #connectivityPorts:
     #retryVerifying:     Default: false
     #action:             Default: Create
