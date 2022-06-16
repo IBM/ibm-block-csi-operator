@@ -15,7 +15,7 @@ spec:
     #  iscsi:
     #    - iqn1
     #    - iqn2
-    #  fcOverScsi:
+    #  fc:
     #    - wwn1
     #    - wn2
     #  nvme:
