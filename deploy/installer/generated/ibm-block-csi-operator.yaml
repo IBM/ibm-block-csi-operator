@@ -70,8 +70,6 @@ spec:
                     type: string
                 required:
                 - hostNameInStorage
-                - secretName
-                - secretNamespace
                 - storageServer
                 type: object
             required:

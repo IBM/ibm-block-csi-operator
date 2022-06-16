@@ -32,9 +32,11 @@ type HostDefinitionSpec struct {
 type IBMBlockCSIHostDefinitionSpec struct {
 	StorageServer     string `json:"storageServer"`
 	HostNameInStorage string `json:"hostNameInStorage"`
-	SecretName        string `json:"secretName"`
-	SecretNamespace   string `json:"secretNamespace"`
 
+	// +kubebuilder:validation:Optional
+	SecretName string `json:"secretName"`
+	// +kubebuilder:validation:Optional
+	SecretNamespace string `json:"secretNamespace"`
 	// +kubebuilder:validation:Optional
 	ConnectvityType string `json:"connectvityType"`
 	// +kubebuilder:validation:Optional
