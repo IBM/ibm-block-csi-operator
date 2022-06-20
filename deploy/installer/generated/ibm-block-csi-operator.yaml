@@ -28,7 +28,7 @@ spec:
     - jsonPath: .status.phase
       name: Phase
       type: string
-    - jsonPath: .spec.hostDefinition.storageServer
+    - jsonPath: .spec.hostDefinition.managementAddress
       name: Storage
       type: string
     - jsonPath: .spec.hostDefinition.hostNameInStorage
@@ -69,15 +69,12 @@ spec:
                           type: string
                         type: array
                     type: object
-                  connectvityType:
+                  connectivityType:
                     type: string
                   hostNameInStorage:
                     type: string
                   managementAddress:
                     type: string
-                  retryVerifying:
-                    default: false
-                    type: boolean
                   secretName:
                     type: string
                   secretNamespace:

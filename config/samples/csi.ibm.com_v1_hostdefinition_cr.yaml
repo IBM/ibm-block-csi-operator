@@ -23,7 +23,6 @@ spec:
     #    - nqn2
     #secretName: demo-secret
     #secretNamespace: default
-    #connectvityType:
+    #connectivityType:
     #connectivityPorts:
-    #retryVerifying:     Default: false
     #action:             Default: Create

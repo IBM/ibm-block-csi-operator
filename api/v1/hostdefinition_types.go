@@ -38,12 +38,9 @@ type IBMBlockCSIHostDefinitionSpec struct {
 	// +kubebuilder:validation:Optional
 	SecretNamespace string `json:"secretNamespace"`
 	// +kubebuilder:validation:Optional
-	ConnectvityType string `json:"connectvityType"`
+	ConnectivityType string `json:"connectivityType"`
 	// +kubebuilder:validation:Optional
 	ConnectivityPorts ConnectivityPorts `json:"connectivityPorts"`
-	// +kubebuilder:validation:Optional
-	// +kubebuilder:default:=false
-	RetryVerifying bool `json:"retryVerifying"`
 }
 
 // ConnectivityPorts defines the ports of the hostDefinition
@@ -68,7 +65,7 @@ type HostDefinitionStatus struct {
 // HostDefinition is the Schema for the hostdefinitions API
 // +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
 // +kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
-// +kubebuilder:printcolumn:name="Storage",type=string,JSONPath=`.spec.hostDefinition.storageServer`
+// +kubebuilder:printcolumn:name="Storage",type=string,JSONPath=`.spec.hostDefinition.managementAddress`
 // +kubebuilder:printcolumn:name="Host",type=string,JSONPath=`.spec.hostDefinition.hostNameInStorage`
 type HostDefinition struct {
 	metav1.TypeMeta   `json:",inline"`
