@@ -38,18 +38,20 @@ type IBMBlockCSIHostDefinerSpec struct {
 
 	// +kubebuilder:validation:Optional
 	Prefix string `json:"prefix"`
-
 	// +kubebuilder:validation:Optional
 	ConnectivityType string `json:"connectivityType"`
-
 	// +kubebuilder:validation:Optional
 	ImagePullPolicy corev1.PullPolicy `json:"imagePullPolicy"`
-
 	// +kubebuilder:validation:Optional
 	Affinity *corev1.Affinity `json:"affinity,omitempty"`
-
 	// +kubebuilder:validation:Optional
 	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:default:=true
+	AllowDelete bool `json:"allowDelete,omitempty"`
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:default:=false
+	DynamicNodeLabeling bool `json:"dynamicNodeLabeling,omitempty"`
 }
 
 // HostDefinerStatus defines the observed state of HostDefiner

@@ -12,6 +12,8 @@ spec:
   hostDefiner:
     #prefix:
     #connectivityType:
+    #allowDelete:         #Default true
+    #dynamicNodeLabeling: #Default false
     repository: ibmcom/ibm-block-csi-host-definer
     tag: "1.10.0"
     imagePullPolicy: IfNotPresent
