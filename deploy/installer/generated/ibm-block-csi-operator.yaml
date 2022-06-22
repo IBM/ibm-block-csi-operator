@@ -31,8 +31,8 @@ spec:
     - jsonPath: .spec.hostDefinition.managementAddress
       name: Storage
       type: string
-    - jsonPath: .spec.hostDefinition.hostNameInStorage
-      name: Host
+    - jsonPath: .spec.hostDefinition.nodeName
+      name: Node
       type: string
     name: v1
     schema:
@@ -53,35 +53,17 @@ spec:
               hostDefinition:
                 description: IBMBlockCSIHostDefinitionSpec defines the observed state of HostDefinition
                 properties:
-                  connectivityPorts:
-                    description: ConnectivityPorts defines the ports of the hostDefinition
-                    properties:
-                      fc:
-                        items:
-                          type: string
-                        type: array
-                      iscsi:
-                        items:
-                          type: string
-                        type: array
-                      nvme:
-                        items:
-                          type: string
-                        type: array
-                    type: object
-                  connectivityType:
-                    type: string
-                  hostNameInStorage:
-                    type: string
                   managementAddress:
+                    type: string
+                  nodeName:
                     type: string
                   secretName:
                     type: string
                   secretNamespace:
                     type: string
                 required:
-                - hostNameInStorage
                 - managementAddress
+                - nodeName
                 type: object
             required:
             - hostDefinition

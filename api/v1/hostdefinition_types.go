@@ -31,26 +31,12 @@ type HostDefinitionSpec struct {
 // IBMBlockCSIHostDefinitionSpec defines the observed state of HostDefinition
 type IBMBlockCSIHostDefinitionSpec struct {
 	ManagementAddress string `json:"managementAddress"`
-	HostNameInStorage string `json:"hostNameInStorage"`
+	NodeName          string `json:"nodeName"`
 
 	// +kubebuilder:validation:Optional
 	SecretName string `json:"secretName"`
 	// +kubebuilder:validation:Optional
 	SecretNamespace string `json:"secretNamespace"`
-	// +kubebuilder:validation:Optional
-	ConnectivityType string `json:"connectivityType"`
-	// +kubebuilder:validation:Optional
-	ConnectivityPorts ConnectivityPorts `json:"connectivityPorts"`
-}
-
-// ConnectivityPorts defines the ports of the hostDefinition
-type ConnectivityPorts struct {
-	// +kubebuilder:validation:Optional
-	Iscsi []string `json:"iscsi"`
-	// +kubebuilder:validation:Optional
-	Fc []string `json:"fc"`
-	// +kubebuilder:validation:Optional
-	Nvme []string `json:"nvme"`
 }
 
 // HostDefinitionStatus defines the observed state of HostDefinition
@@ -66,7 +52,7 @@ type HostDefinitionStatus struct {
 // +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
 // +kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 // +kubebuilder:printcolumn:name="Storage",type=string,JSONPath=`.spec.hostDefinition.managementAddress`
-// +kubebuilder:printcolumn:name="Host",type=string,JSONPath=`.spec.hostDefinition.hostNameInStorage`
+// +kubebuilder:printcolumn:name="Node",type=string,JSONPath=`.spec.hostDefinition.nodeName`
 type HostDefinition struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
