@@ -55,6 +55,8 @@ spec:
                 properties:
                   managementAddress:
                     type: string
+                  nodeId:
+                    type: string
                   nodeName:
                     type: string
                   secretName:

@@ -37,6 +37,8 @@ type IBMBlockCSIHostDefinitionSpec struct {
 	SecretName string `json:"secretName"`
 	// +kubebuilder:validation:Optional
 	SecretNamespace string `json:"secretNamespace"`
+	// +kubebuilder:validation:Optional
+	NodeId string `json:"nodeId"`
 }
 
 // HostDefinitionStatus defines the observed state of HostDefinition
