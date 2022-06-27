@@ -30,8 +30,8 @@ type Instance interface {
 func getImagePullSecrets(imagePullSecrets []string) []corev1.LocalObjectReference {
 	secrets := []corev1.LocalObjectReference{}
 	if len(imagePullSecrets) > 0 {
-		for _, s := range imagePullSecrets {
-			secrets = append(secrets, corev1.LocalObjectReference{Name: s})
+		for _, secretName := range imagePullSecrets {
+			secrets = append(secrets, corev1.LocalObjectReference{Name: secretName})
 		}
 	}
 	return secrets
