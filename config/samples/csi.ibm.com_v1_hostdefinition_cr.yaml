@@ -11,5 +11,6 @@ spec:
   hostDefinition:
     managementAddress: demo-management-address
     nodeName: demo-nodeName
+    #nodeId: demo-nodeId
     #secretName: demo-secret
     #secretNamespace: default

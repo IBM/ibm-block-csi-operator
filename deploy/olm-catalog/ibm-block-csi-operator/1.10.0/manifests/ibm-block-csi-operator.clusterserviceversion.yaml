@@ -228,21 +228,16 @@ spec:
         displayName: "IBM block storage Host Definition CSI driver"
         description: "Represents Host Definition for block storage CSI driver"
         specDescriptors:
-          - description: HostDefinition phase.
-            displayName: HostDefinition phase
-            path: hostdefinition.phase
+          - description: HostDefinition node name.
+            displayName: HostDefinition node name
+            path: hostdefiner.nodeName
             x-descriptors:
-              - 'urn:alm:descriptor:com.tectonic.ui:text'
-          - description: HostDefinition HostName In Storage.
-            displayName: HostDefinition Host In Storage
-            path: hostdefiner.hostNameInStorage
+              - "urn:alm:descriptor:com.tectonic.ui:text"
+          - description: HostDefinition management address.
+            displayName: HostDefinition management address
+            path: hostdefiner.managementAddress
             x-descriptors:
-              - 'urn:alm:descriptor:com.tectonic.ui:text'
-          - description: HostDefinition Storage Server.
-            displayName: HostDefinition Storage Server
-            path: hostdefiner.storageServer
-            x-descriptors:
-              - 'urn:alm:descriptor:com.tectonic.ui:text'
+              - "urn:alm:descriptor:com.tectonic.ui:text"
         statusDescriptors:
           - description: The current status of host definition.
             displayName: Status
