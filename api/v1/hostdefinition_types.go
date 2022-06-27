@@ -25,11 +25,11 @@ import (
 
 // HostDefinitionSpec defines the desired state of HostDefinition
 type HostDefinitionSpec struct {
-	HostDefinition IBMBlockCSIHostDefinitionSpec `json:"hostDefinition"`
+	HostDefinition Definition `json:"hostDefinition"`
 }
 
-// IBMBlockCSIHostDefinitionSpec defines the observed state of HostDefinition
-type IBMBlockCSIHostDefinitionSpec struct {
+// Definition defines the observed state of HostDefinition
+type Definition struct {
 	ManagementAddress string `json:"managementAddress"`
 	NodeName          string `json:"nodeName"`
 
@@ -41,7 +41,7 @@ type IBMBlockCSIHostDefinitionSpec struct {
 	NodeId string `json:"nodeId"`
 }
 
-// HostDefinitionStatus defines the observed state of HostDefinition
+// HostDefinitionStatus shows the status of the host on the storage
 type HostDefinitionStatus struct {
 	Phase DriverPhase `json:"phase"`
 }

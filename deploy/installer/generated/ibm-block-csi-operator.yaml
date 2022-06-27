@@ -51,7 +51,7 @@ spec:
             description: HostDefinitionSpec defines the desired state of HostDefinition
             properties:
               hostDefinition:
-                description: IBMBlockCSIHostDefinitionSpec defines the observed state of HostDefinition
+                description: Definition defines the observed state of HostDefinition
                 properties:
                   managementAddress:
                     type: string
@@ -71,7 +71,7 @@ spec:
             - hostDefinition
             type: object
           status:
-            description: HostDefinitionStatus defines the observed state of HostDefinition
+            description: HostDefinitionStatus shows the status of the host on the storage
             properties:
               phase:
                 type: string
