@@ -145,7 +145,13 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		},
 	})
 
-	provisionerArgs := []string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s", "--default-fstype=ext4"}
+	provisionerArgs := []string{
+		"--csi-address=$(ADDRESS)",
+		"--v=5",
+		"--timeout=120s",
+		"--default-fstype=ext4",
+		"--worker-threads=10",
+	}
 	if TopologyEnabled {
 		provisionerArgs = append(provisionerArgs, "--feature-gates=Topology=true")
 	}
@@ -163,7 +169,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 
 	snapshotter := s.ensureContainer(snapshotterContainerName,
 		s.getCSISnapshotterImage(),
-		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s"},
+		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=120s"},
 	)
 	snapshotter.ImagePullPolicy = s.getCSISnapshotterPullPolicy()
 
