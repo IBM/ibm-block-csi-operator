@@ -392,7 +392,7 @@ func (r *HostDefinerReconciler) restartDeployment(logger logr.Logger, instance *
 	logger.Info("hostDefiner requires restart",
 		"ReadyReplicas", deployment.Status.ReadyReplicas,
 		"Replicas", deployment.Status.Replicas)
-	logger.Info("restarting csi hostDefiner")
+	logger.Info("restarting hostDefiner")
 
 	err = r.rolloutRestartDeployment(deployment)
 	if err != nil {

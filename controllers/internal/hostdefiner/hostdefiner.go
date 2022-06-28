@@ -70,7 +70,7 @@ func (c *HostDefiner) GetHostDefinerSelectorLabels() labels.Set {
 	return common.GetSelectorLabels(config.HostDefiner.String())
 }
 
-func (c *HostDefiner) GetAnnotations(daemonSetRestartedKey string, daemonSetRestartedValue string) labels.Set {
+func (c *HostDefiner) GetAnnotations() labels.Set {
 	labels := labels.Set{
 		"productID":      config.ProductName,
 		"productName":    config.ProductName,
@@ -83,10 +83,6 @@ func (c *HostDefiner) GetAnnotations(daemonSetRestartedKey string, daemonSetRest
 				labels[k] = v
 			}
 		}
-	}
-
-	if !labels.Has(daemonSetRestartedKey) && daemonSetRestartedKey != "" {
-		labels[daemonSetRestartedKey] = daemonSetRestartedValue
 	}
 
 	return labels

@@ -46,7 +46,7 @@ func (c *HostDefiner) setDefaultForNilSliceFields() {
 func (c *HostDefiner) isUnofficialRepo(repo string) bool {
 	if repo != "" {
 		var registryUsername = path.Dir(repo)
-		if !config.OfficialRegistriesUsernames.Has(registryUsername) {
+		if registryUsername != config.IBMRegistryUsername {
 			return true
 		}
 	}

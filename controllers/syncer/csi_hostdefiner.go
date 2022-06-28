@@ -35,7 +35,7 @@ import (
 )
 
 const (
-	HostDefinerContainerName = "ibm-block-csi-hostdefiner"
+	HostDefinerContainerName = "ibm-block-csi-host-definer"
 )
 
 type hostDefinerSyncer struct {
@@ -67,7 +67,7 @@ func getDeploymentSkeleton(driver *hostdefiner.HostDefiner) *appsv1.Deployment {
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        config.GetNameForResource(config.HostDefiner, driver.Name),
 			Namespace:   driver.Namespace,
-			Annotations: driver.GetAnnotations("", ""),
+			Annotations: driver.GetAnnotations(),
 			Labels:      driver.GetLabels(),
 		},
 		Spec: appsv1.DeploymentSpec{
@@ -75,7 +75,7 @@ func getDeploymentSkeleton(driver *hostdefiner.HostDefiner) *appsv1.Deployment {
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels:      driver.GetHostDefinerPodLabels(),
-					Annotations: driver.GetAnnotations("", ""),
+					Annotations: driver.GetAnnotations(),
 				},
 				Spec: corev1.PodSpec{},
 			},
@@ -101,7 +101,7 @@ func (s *hostDefinerSyncer) SyncFn() error {
 }
 
 func (s *hostDefinerSyncer) ensureAnnotations(deployment *appsv1.Deployment) {
-	annotations := s.driver.GetAnnotations("", "")
+	annotations := s.driver.GetAnnotations()
 	for k, _ := range defaultAnnotations {
 		deployment.Spec.Template.ObjectMeta.Annotations[k] = annotations[k]
 		deployment.ObjectMeta.Annotations[k] = annotations[k]

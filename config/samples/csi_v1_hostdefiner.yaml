@@ -1,10 +1,10 @@
 apiVersion: csi.ibm.com/v1
 kind: HostDefiner
 metadata:
-  name: ibm-block-csi
+  name: host-definer
   namespace: default
   labels:
-    app.kubernetes.io/name: ibm-block-csi
+    app.kubernetes.io/name: host-definer
     app.kubernetes.io/instance: ibm-block-csi
     app.kubernetes.io/managed-by: ibm-block-csi-operator
     release: v1.10.0

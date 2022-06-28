@@ -225,8 +225,8 @@ spec:
         version: v1
         group: csi.ibm.com
         kind: HostDefiner
-        displayName: "IBM block storage Host Definition CSI driver"
-        description: "Represents Host Definition for block storage CSI driver"
+        displayName: "IBM block storage CSI Host Definer driver"
+        description: "Represents Host Definer for block storage CSI driver"
         resources:
           - kind: ServiceAccount
             name: ''
