@@ -115,6 +115,39 @@ metadata:
               }
             ]
           }
+        },
+        {
+          "apiVersion": "csi.ibm.com/v1",
+          "kind": "HostDefiner",
+          "metadata": {
+            "name": "host-definer"
+          },
+          "spec": {
+            "hostDefiner": {
+              "repository": "ibmcom/ibm-block-csi-host-definer",
+              "tag": "1.10.0",
+              "imagePullPolicy": "IfNotPresent",
+              "affinity": {
+                "nodeAffinity": {
+                  "requiredDuringSchedulingIgnoredDuringExecution": {
+                    "nodeSelectorTerms": [
+                      {
+                        "matchExpressions": [
+                          {
+                            "key": "kubernetes.io/arch",
+                            "operator": "In",
+                            "values": [
+                              "amd64"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
         }
       ]
 spec:
