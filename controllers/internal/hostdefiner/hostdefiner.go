@@ -40,8 +40,8 @@ func (c *HostDefiner) Unwrap() *csiv1.HostDefiner {
 	return c.HostDefiner
 }
 
-func (c *HostDefiner) GetCSIHostDefinerPodLabels() labels.Set {
-	return labels.Merge(c.GetLabels(), c.GetCSIHostDefinerSelectorLabels())
+func (c *HostDefiner) GetHostDefinerPodLabels() labels.Set {
+	return labels.Merge(c.GetLabels(), c.GetHostDefinerSelectorLabels())
 }
 
 func (c *HostDefiner) GetLabels() labels.Set {
@@ -66,8 +66,8 @@ func (c *HostDefiner) GetLabels() labels.Set {
 	return labels
 }
 
-func (c *HostDefiner) GetCSIHostDefinerSelectorLabels() labels.Set {
-	return common.GetSelectorLabels(config.CSIHostDefiner.String())
+func (c *HostDefiner) GetHostDefinerSelectorLabels() labels.Set {
+	return common.GetSelectorLabels(config.HostDefiner.String())
 }
 
 func (c *HostDefiner) GetAnnotations(daemonSetRestartedKey string, daemonSetRestartedValue string) labels.Set {
@@ -92,7 +92,7 @@ func (c *HostDefiner) GetAnnotations(daemonSetRestartedKey string, daemonSetRest
 	return labels
 }
 
-func (c *HostDefiner) GetCSIHostDefinerImage() string {
+func (c *HostDefiner) GetHostDefinerImage() string {
 	if c.Spec.HostDefiner.Tag == "" {
 		return c.Spec.HostDefiner.Repository
 	}

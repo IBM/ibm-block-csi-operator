@@ -124,8 +124,8 @@ func (r *HostDefinerReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		}
 	}
 
-	csiHostDefinerSyncer := clustersyncer.NewCSIHostDefinerSyncer(r.Client, r.Scheme, instance)
-	if err := syncer.Sync(context.TODO(), csiHostDefinerSyncer, r.Recorder); err != nil {
+	hostDefinerSyncer := clustersyncer.NewHostDefinerSyncer(r.Client, r.Scheme, instance)
+	if err := syncer.Sync(context.TODO(), hostDefinerSyncer, r.Recorder); err != nil {
 		return reconcile.Result{}, err
 	}
 
@@ -404,7 +404,7 @@ func (r *HostDefinerReconciler) restartDeployment(logger logr.Logger, instance *
 func (r *HostDefinerReconciler) getDeployment(instance *hostdefiner.HostDefiner) (*appsv1.Deployment, error) {
 	deployment := &appsv1.Deployment{}
 	err := r.Get(context.TODO(), types.NamespacedName{
-		Name:      oconfig.GetNameForResource(oconfig.CSIHostDefiner, instance.Name),
+		Name:      oconfig.GetNameForResource(oconfig.HostDefiner, instance.Name),
 		Namespace: instance.Namespace,
 	}, deployment)
 

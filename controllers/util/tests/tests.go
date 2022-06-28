@@ -29,7 +29,7 @@ var (
 	hostDefinerContainerName = clustersyncer.HostDefinerContainerName
 	controllerByName         map[string]csiv1.IBMBlockCSIControllerSpec
 	nodeByName               map[string]csiv1.IBMBlockCSINodeSpec
-	hostDefinerByName        map[string]csiv1.IBMBlockCSIHostDefinerSpec
+	hostDefinerByName        map[string]csiv1.IBMBlockHostDefinerSpec
 )
 
 func GetHostDefinerImagesByName(hostDefinerCr csiv1.HostDefiner) map[string]string {
@@ -60,7 +60,7 @@ func setNodeImageByName(defaultCr csiv1.IBMBlockCSI) {
 }
 
 func setHostDefinerDeploymentImageByName(hostDefinerCr csiv1.HostDefiner) {
-	hostDefinerByName = make(map[string]csiv1.IBMBlockCSIHostDefinerSpec)
+	hostDefinerByName = make(map[string]csiv1.IBMBlockHostDefinerSpec)
 	hostDefinerByName[hostDefinerContainerName] = hostDefinerCr.Spec.HostDefiner
 }
 
@@ -94,7 +94,7 @@ func addControllerImageToContainersImagesMap(containersImages map[string]string,
 }
 
 func addHostDefinerDeploymentImageToContainersImagesMap(containersImages map[string]string,
-	hostDefinerImagesByName map[string]csiv1.IBMBlockCSIHostDefinerSpec) map[string]string {
+	hostDefinerImagesByName map[string]csiv1.IBMBlockHostDefinerSpec) map[string]string {
 	hostDefiner := hostDefinerImagesByName[hostDefinerContainerName]
 	containersImages[hostDefinerContainerName] = getImageFromRepositoryAndTag(hostDefiner.Repository, hostDefiner.Tag)
 	return containersImages

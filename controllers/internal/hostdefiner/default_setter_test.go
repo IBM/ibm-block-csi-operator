@@ -55,7 +55,7 @@ var _ = Describe("DefaultSetter", func() {
 			BeforeEach(func() {
 				hd = &csiv1.HostDefiner{
 					Spec: csiv1.HostDefinerSpec{
-						HostDefiner: csiv1.IBMBlockCSIHostDefinerSpec{
+						HostDefiner: csiv1.IBMBlockHostDefinerSpec{
 							Repository: "test",
 						},
 					},
@@ -75,7 +75,7 @@ var _ = Describe("DefaultSetter", func() {
 			BeforeEach(func() {
 				hd = &csiv1.HostDefiner{
 					Spec: csiv1.HostDefinerSpec{
-						HostDefiner: csiv1.IBMBlockCSIHostDefinerSpec{
+						HostDefiner: csiv1.IBMBlockHostDefinerSpec{
 							Tag: "test",
 						},
 					},

@@ -26,13 +26,13 @@ import (
 
 // HostDefinerSpec defines the desired state of HostDefiner
 type HostDefinerSpec struct {
-	HostDefiner IBMBlockCSIHostDefinerSpec `json:"hostDefiner"`
+	HostDefiner IBMBlockHostDefinerSpec `json:"hostDefiner"`
 
 	ImagePullSecrets []string `json:"imagePullSecrets,omitempty"`
 }
 
-// IBMBlockCSIHostDefinerSpec defines the observed state of HostDefiner
-type IBMBlockCSIHostDefinerSpec struct {
+// IBMBlockHostDefinerSpec defines the observed state of HostDefiner
+type IBMBlockHostDefinerSpec struct {
 	Repository string `json:"repository"`
 	Tag        string `json:"tag"`
 

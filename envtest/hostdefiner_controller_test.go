@@ -43,8 +43,8 @@ var _ = Describe("Controller", func() {
 	var namespace = config.DefaultHostDefinerCr.ObjectMeta.Namespace
 	var containersImages = testsutil.GetHostDefinerImagesByName(config.DefaultHostDefinerCr)
 	var hdName = config.DefaultHostDefinerCr.ObjectMeta.Name
-	var clusterRoles = []config.ResourceName{config.CSIHostDefinerClusterRole}
-	var clusterRoleBindings = []config.ResourceName{config.CSIHostDefinerClusterRoleBinding}
+	var clusterRoles = []config.ResourceName{config.HostDefinerClusterRole}
+	var clusterRoleBindings = []config.ResourceName{config.HostDefinerClusterRoleBinding}
 
 	BeforeEach(func() {
 		hostDefiner = &config.DefaultHostDefinerCr
@@ -74,7 +74,7 @@ var _ = Describe("Controller", func() {
 				sa := &corev1.ServiceAccount{}
 				Eventually(func() (*corev1.ServiceAccount, error) {
 					err := k8sClient.Get(context.Background(),
-						testsutil.GetResourceKey(config.CSIHostDefinerServiceAccount, found.Name, found.Namespace), sa)
+						testsutil.GetResourceKey(config.HostDefinerServiceAccount, found.Name, found.Namespace), sa)
 					return sa, err
 				}, timeout, interval).ShouldNot(BeNil())
 
@@ -102,7 +102,7 @@ var _ = Describe("Controller", func() {
 				deployment := &appsv1.Deployment{}
 				Eventually(func() (*appsv1.Deployment, error) {
 					err := k8sClient.Get(context.Background(),
-						testsutil.GetResourceKey(config.CSIHostDefiner, found.Name, found.Namespace), deployment)
+						testsutil.GetResourceKey(config.HostDefiner, found.Name, found.Namespace), deployment)
 					return deployment, err
 				}, timeout, interval).ShouldNot(BeNil())
 				assertDeployedContainersAreInCR(deployment.Spec.Template.Spec, containersImages)

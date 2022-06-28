@@ -26,18 +26,18 @@ import (
 func (c *HostDefiner) GenerateHostDefinerClusterRoleBinding() *rbacv1.ClusterRoleBinding {
 	return &rbacv1.ClusterRoleBinding{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: config.GetNameForResource(config.CSIHostDefinerClusterRoleBinding, c.Name),
+			Name: config.GetNameForResource(config.HostDefinerClusterRoleBinding, c.Name),
 		},
 		Subjects: []rbacv1.Subject{
 			{
 				Kind:      "ServiceAccount",
-				Name:      config.GetNameForResource(config.CSIHostDefinerServiceAccount, c.Name),
+				Name:      config.GetNameForResource(config.HostDefinerServiceAccount, c.Name),
 				Namespace: c.Namespace,
 			},
 		},
 		RoleRef: rbacv1.RoleRef{
 			Kind:     "ClusterRole",
-			Name:     config.GetNameForResource(config.CSIHostDefinerClusterRole, c.Name),
+			Name:     config.GetNameForResource(config.HostDefinerClusterRole, c.Name),
 			APIGroup: config.RbacAuthorizationApiGroup,
 		},
 	}
@@ -46,7 +46,7 @@ func (c *HostDefiner) GenerateHostDefinerClusterRoleBinding() *rbacv1.ClusterRol
 func (c *HostDefiner) GenerateHostDefinerClusterRole() *rbacv1.ClusterRole {
 	return &rbacv1.ClusterRole{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: config.GetNameForResource(config.CSIHostDefinerClusterRole, c.Name),
+			Name: config.GetNameForResource(config.HostDefinerClusterRole, c.Name),
 		},
 		Rules: []rbacv1.PolicyRule{
 			{
@@ -108,7 +108,7 @@ func (c *HostDefiner) GenerateServiceAccount() *corev1.ServiceAccount {
 
 	return &corev1.ServiceAccount{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      config.GetNameForResource(config.CSIHostDefinerServiceAccount, c.Name),
+			Name:      config.GetNameForResource(config.HostDefinerServiceAccount, c.Name),
 			Namespace: c.Namespace,
 			Labels:    c.GetLabels(),
 		},
