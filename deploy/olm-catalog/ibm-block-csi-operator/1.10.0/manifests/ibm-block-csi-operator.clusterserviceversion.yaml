@@ -121,7 +121,9 @@ spec:
   displayName: "IBM block storage CSI driver operator"
   description: |
     The Container Storage Interface (CSI) Driver for IBM block storage systems enables container orchestrators such as Kubernetes to manage the life cycle of persistent storage.
+
     This is the official operator to deploy and manage IBM block storage CSI driver.
+
     For compatibility, prerequisites, release notes, and other user information, see [IBM block storage CSI driver documentation](https://www.ibm.com/docs/en/stg-block-csi-driver).
 
   keywords:
@@ -560,4 +562,3 @@ spec:
                             fieldPath: metadata.name
                       - name: OPERATOR_NAME
                         value: "ibm-block-csi-operator"
-
