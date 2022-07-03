@@ -82,7 +82,9 @@ func (r *HostDefinerReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return reconcile.Result{RequeueAfter: ReconcileTime}, err
 	}
 	if changed {
-		err = r.Update(context.TODO(), instance.Unwrap())
+		patchJson := []byte(fmt.Sprintf(`{"spec":{"hostDefiner":{"repository": "%s","tag": "%s"}}}`,
+			instance.Spec.HostDefiner.Repository, instance.Spec.HostDefiner.Tag))
+		err := r.patchCr(patchJson, instance)
 		if err != nil {
 			err = fmt.Errorf("failed to update HostDefiner CR: %v", err)
 			return reconcile.Result{}, err
@@ -154,12 +156,20 @@ func (r *HostDefinerReconciler) addFinalizerIfNotPresent(instance *hostdefiner.H
 
 	if !util.Contains(accessor.GetFinalizers(), finalizerName) {
 		logger.Info("adding", "finalizer", finalizerName, "on", accessor.GetName())
-		accessor.SetFinalizers(append(accessor.GetFinalizers(), finalizerName))
-
-		if err := r.Update(context.TODO(), instance.Unwrap()); err != nil {
+		patchJson := []byte(fmt.Sprintf(`{"metadata":{"finalizers":["%s"]}}`, finalizerName))
+		err := r.patchCr(patchJson, instance)
+		if err != nil {
 			logger.Error(err, "failed to add", "finalizer", finalizerName, "on", accessor.GetName())
 			return err
 		}
+	}
+	return nil
+}
+
+func (r *HostDefinerReconciler) patchCr(patchJson []byte, instance *hostdefiner.HostDefiner) error {
+	patch := client.RawPatch(types.MergePatchType, patchJson)
+	if err := r.Patch(context.TODO(), instance.Unwrap(), patch); err != nil {
+		return err
 	}
 	return nil
 }

@@ -152,7 +152,7 @@ func (s *hostDefinerSyncer) getEnv() []corev1.EnvVar {
 			Value: s.driver.Spec.HostDefiner.Prefix,
 		},
 		{
-			Name:  "CONNECTIVITY",
+			Name:  "CONNECTIVITY_TYPE",
 			Value: s.driver.Spec.HostDefiner.ConnectivityType,
 		},
 		{
