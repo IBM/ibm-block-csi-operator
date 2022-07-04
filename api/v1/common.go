@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package hostdefiner
+package v1
 
-// Validate checks if the spec is valid
-// Replace it with kubernetes native default setter when it is available.
-// https://kubernetes.io/docs/tasks/access-kubernetes-api/custom-resources/custom-resource-definitions/#validation
-func (c *HostDefiner) Validate() error {
-	return nil
-}
+type DriverPhase string
+
+const (
+	DriverPhaseNone     DriverPhase = ""
+	DriverPhaseCreating DriverPhase = "Creating"
+	DriverPhaseRunning  DriverPhase = "Running"
+	DriverPhaseFailed   DriverPhase = "Failed"
+)

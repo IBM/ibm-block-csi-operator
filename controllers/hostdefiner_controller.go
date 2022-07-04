@@ -77,10 +77,6 @@ func (r *HostDefinerReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 	r.Scheme.Default(instance.Unwrap())
 	changed := instance.SetDefaults()
-	if err := instance.Validate(); err != nil {
-		err = fmt.Errorf("wrong HostDefiner options: %v", err)
-		return reconcile.Result{RequeueAfter: ReconcileTime}, err
-	}
 	if changed {
 		patchJson := []byte(fmt.Sprintf(`{"spec":{"hostDefiner":{"repository": "%s","tag": "%s"}}}`,
 			instance.Spec.HostDefiner.Repository, instance.Spec.HostDefiner.Tag))

@@ -10,10 +10,10 @@ metadata:
     release: v1.10.0
 spec:
   hostDefiner:
-    #prefix:
-    #connectivityType:
-    #allowDelete:         #Default true
-    #dynamicNodeLabeling: #Default false
+#   prefix:
+#   connectivityType:
+#   allowDelete:         #Default true
+#   dynamicNodeLabeling: #Default false
     repository: ibmcom/ibm-block-csi-host-definer
     tag: "1.10.0"
     imagePullPolicy: IfNotPresent
