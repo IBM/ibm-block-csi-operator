@@ -33,12 +33,14 @@ const (
 	VerbCreate                   = "create"
 	VerbPatch                    = "patch"
 	StorageApiGroup              = "storage.k8s.io"
+	AppsApiGroup                 = "apps"
 	StorageClassesResource       = "storageclasses"
 	HostDefinerResource          = "hostdefiners"
 	HostDefinitionResource       = "hostdefinitions"
 	HostDefinitionStatusResource = "hostdefinitions/status"
 	EventsResource               = "events"
 	NodesResource                = "nodes"
+	DaemonSetResource            = "daemonsets"
 
 	ENVKubeVersion = "KUBE_VERSION"
 
