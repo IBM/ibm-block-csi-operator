@@ -226,7 +226,7 @@ spec:
         group: csi.ibm.com
         kind: HostDefinition
         displayName: "IBM block storage Host Definition CSI driver"
-        description: "Represents Host Definition for block storage CSI driver"
+        description: "Represents a Host Definition for IBM block storage CSI driver"
         specDescriptors:
           - description: HostDefinition node name.
             displayName: HostDefinition node name

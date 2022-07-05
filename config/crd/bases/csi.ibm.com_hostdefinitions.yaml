@@ -71,7 +71,7 @@ spec:
             - hostDefinition
             type: object
           status:
-            description: HostDefinitionStatus shows the status of the host on the storage
+            description: HostDefinitionStatus defines the status of the host definition on the storage
             properties:
               phase:
                 type: string

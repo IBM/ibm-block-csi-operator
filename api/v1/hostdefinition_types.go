@@ -41,7 +41,7 @@ type Definition struct {
 	NodeId string `json:"nodeId"`
 }
 
-// HostDefinitionStatus shows the status of the host on the storage
+// HostDefinitionStatus defines the status of the host definition on the storage
 type HostDefinitionStatus struct {
 	Phase DriverPhase `json:"phase"`
 }
