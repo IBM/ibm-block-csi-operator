@@ -95,6 +95,12 @@ var _ = BeforeSuite(func() {
 	}).SetupWithManager(mgr)
 	Expect(err).ToNot(HaveOccurred())
 
+	err = (&controllers.HostDefinerReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr)
+	Expect(err).ToNot(HaveOccurred())
+
 	go func() {
 		err = mgr.Start(ctx)
 		Expect(err).ToNot(HaveOccurred())

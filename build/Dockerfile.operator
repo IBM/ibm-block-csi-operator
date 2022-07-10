@@ -44,14 +44,17 @@ LABEL name="Operator for IBM block storage CSI driver" \
 ENV OPERATOR=/usr/local/bin/ibm-block-csi-operator \
     USER_UID=1001 \
     USER_NAME=ibm-block-csi-operator \
-    CR_YAML=/usr/local/etc/csi.ibm.com_v1_ibmblockcsi_cr.yaml
+    IBMBlockCSI_CR_YAML=/usr/local/etc/csi.ibm.com_v1_ibmblockcsi_cr.yaml \
+    HostDefiner_CR_YAML=/usr/local/etc/csi_v1_hostdefiner_cr.yaml
 
 COPY build/health_check.sh .
 RUN chmod 777 ./health_check.sh
 COPY ./LICENSE /licenses/
 COPY ./NOTICES /licenses/
-COPY ./config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml ${CR_YAML}
-RUN chmod 0444 ${CR_YAML}
+COPY ./config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml ${IBMBlockCSI_CR_YAML}
+COPY ./config/samples/csi_v1_hostdefiner_cr.yaml ${HostDefiner_CR_YAML}
+RUN chmod 0444 ${IBMBlockCSI_CR_YAML} \
+    && chmod 0444 ${HostDefiner_CR_YAML}
 
 # install operator binary
 COPY --from=0 /go/src/github.com/IBM/ibm-block-csi-operator/build/_output/bin/ibm-block-csi-operator ${OPERATOR}

@@ -84,7 +84,7 @@ var _ = Describe("Controller", func() {
 					return cd, err
 				}, timeout, interval).ShouldNot(BeNil())
 
-				By("Getting ServiceAccount")
+				By("Getting IBMBlockCSI ServiceAccount")
 				sa := &corev1.ServiceAccount{}
 				Eventually(func() (*corev1.ServiceAccount, error) {
 					err := k8sClient.Get(context.Background(),
@@ -92,7 +92,7 @@ var _ = Describe("Controller", func() {
 					return sa, err
 				}, timeout, interval).ShouldNot(BeNil())
 
-				By("Getting ClusterRole")
+				By("Getting IBMBlockCSI ClusterRole")
 				cr := &rbacv1.ClusterRole{}
 				for _, clusterRole := range clusterRoles {
 					Eventually(func() (*rbacv1.ClusterRole, error) {
@@ -102,7 +102,7 @@ var _ = Describe("Controller", func() {
 					}, timeout, interval).ShouldNot(BeNil())
 				}
 
-				By("Getting ClusterRoleBinding")
+				By("Getting IBMBlockCSI ClusterRoleBinding")
 				crb := &rbacv1.ClusterRoleBinding{}
 				for _, clusterRoleBinding := range clusterRoleBindings {
 					Eventually(func() (*rbacv1.ClusterRoleBinding, error) {
@@ -130,7 +130,7 @@ var _ = Describe("Controller", func() {
 				}, timeout, interval).ShouldNot(BeNil())
 				assertDeployedContainersAreInCR(node.Spec.Template.Spec, containersImages)
 
-				By("Checking if all containers were deployed")
+				By("Checking if all IBMBlockCSI containers were deployed")
 				var containersNameInControllerAndNode []string
 				containersNameInControllerAndNode = addContainersNameInPod(node.Spec.Template.Spec, containersNameInControllerAndNode)
 				containersNameInControllerAndNode = addContainersNameInPod(controller.Spec.Template.Spec, containersNameInControllerAndNode)

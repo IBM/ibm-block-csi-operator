@@ -23,21 +23,24 @@ import (
 	"os"
 	"strings"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/IBM/ibm-block-csi-operator/controllers/syncer"
 	"github.com/IBM/ibm-block-csi-operator/controllers/util/common"
 	kubeutil "github.com/IBM/ibm-block-csi-operator/pkg/util/kubernetes"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	operatorConfig "github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	operatorConfig "github.com/IBM/ibm-block-csi-operator/pkg/config"
+
+	logf "sigs.k8s.io/controller-runtime/pkg/log"
+
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
 	"github.com/IBM/ibm-block-csi-operator/controllers"
-	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -68,7 +71,13 @@ func main() {
 
 	err := operatorConfig.LoadDefaultsOfIBMBlockCSI()
 	if err != nil {
-		log.Error(err, "Failed to load default custom resource config")
+		log.Error(err, "Failed to load default IBMBlockCSI custom resource config")
+		os.Exit(1)
+	}
+
+	err = operatorConfig.LoadDefaultsOfHostDefiner()
+	if err != nil {
+		log.Error(err, "Failed to load default HostDefiner custom resource config")
 		os.Exit(1)
 	}
 
@@ -96,6 +105,13 @@ func main() {
 		ControllerHelper: controllerHelper,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "IBMBlockCSI")
+		os.Exit(1)
+	}
+	if err = (&controllers.HostDefinerReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "HostDefiner")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

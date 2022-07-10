@@ -16,4 +16,13 @@ resources:
   kind: IBMBlockCSI
   path: github.com/IBM/ibm-block-csi-operator/api/v1
   version: v1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: ibm.com
+  group: csi
+  kind: HostDefiner
+  path: github.com/IBM/ibm-block-csi-operator/api/v1
+  version: v1
 version: "3"
