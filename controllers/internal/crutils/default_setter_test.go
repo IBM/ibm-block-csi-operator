@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package ibmblockcsi_test
+package crutils_test
 
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
-	. "github.com/IBM/ibm-block-csi-operator/controllers/internal/ibmblockcsi"
+	. "github.com/IBM/ibm-block-csi-operator/controllers/internal/crutils"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 )
 

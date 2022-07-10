@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-package ibmblockcsi_test
+package crutils
 
-import (
-	"testing"
-
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-)
-
-func TestIbmblockcsi(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "Ibmblockcsi Suite")
+// Validate checks if the spec is valid
+// Replace it with kubernetes native default setter when it is available.
+// https://kubernetes.io/docs/tasks/access-kubernetes-api/custom-resources/custom-resource-definitions/#validation
+func (c *IBMBlockCSI) Validate() error {
+	return nil
 }
