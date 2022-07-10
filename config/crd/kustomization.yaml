@@ -8,5 +8,6 @@ commonLabels:
   
 resources:
 - bases/csi.ibm.com_ibmblockcsis.yaml
+- bases/csi.ibm.com_hostdefiners.yaml
 - bases/csi.ibm.com_hostdefinitions.yaml
 #+kubebuilder:scaffold:crdkustomizeresource
