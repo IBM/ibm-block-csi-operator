@@ -33,6 +33,7 @@ import (
 
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
 	"github.com/IBM/ibm-block-csi-operator/controllers"
+	"github.com/IBM/ibm-block-csi-operator/controllers/util/common"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	//+kubebuilder:scaffold:imports
@@ -84,11 +85,13 @@ var _ = BeforeSuite(func() {
 		Scheme: scheme.Scheme,
 	})
 	Expect(err).ToNot(HaveOccurred())
+	controllerHelper := common.NewControllerHelper(mgr.GetClient())
 
 	err = (&controllers.IBMBlockCSIReconciler{
-		Client:    mgr.GetClient(),
-		Scheme:    mgr.GetScheme(),
-		Namespace: "default",
+		Client:           mgr.GetClient(),
+		Scheme:           mgr.GetScheme(),
+		Namespace:        "default",
+		ControllerHelper: controllerHelper,
 	}).SetupWithManager(mgr)
 	Expect(err).ToNot(HaveOccurred())
 

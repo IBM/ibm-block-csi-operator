@@ -26,6 +26,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/IBM/ibm-block-csi-operator/controllers/syncer"
+	"github.com/IBM/ibm-block-csi-operator/controllers/util/common"
 	kubeutil "github.com/IBM/ibm-block-csi-operator/pkg/util/kubernetes"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -95,11 +96,13 @@ func main() {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
+	controllerHelper := common.NewControllerHelper(mgr.GetClient())
 
 	if err = (&controllers.IBMBlockCSIReconciler{
-		Client:    mgr.GetClient(),
-		Scheme:    mgr.GetScheme(),
-		Namespace: namespace,
+		Client:           mgr.GetClient(),
+		Scheme:           mgr.GetScheme(),
+		Namespace:        namespace,
+		ControllerHelper: controllerHelper,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "IBMBlockCSI")
 		os.Exit(1)

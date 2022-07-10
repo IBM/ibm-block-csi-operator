@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ibmblockcsi
+package crutils
 
 import (
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
@@ -73,34 +73,18 @@ func (c *IBMBlockCSI) GenerateCSIDriver() *storagev1.CSIDriver {
 }
 
 func (c *IBMBlockCSI) GenerateControllerServiceAccount() *corev1.ServiceAccount {
-	secrets := []corev1.LocalObjectReference{}
-	if len(c.Spec.ImagePullSecrets) > 0 {
-		for _, s := range c.Spec.ImagePullSecrets {
-			secrets = append(secrets, corev1.LocalObjectReference{Name: s})
-		}
-	}
-
-	return &corev1.ServiceAccount{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      config.GetNameForResource(config.CSIControllerServiceAccount, c.Name),
-			Namespace: c.Namespace,
-			Labels:    c.GetLabels(),
-		},
-		ImagePullSecrets: secrets,
-	}
+	return getServiceAccount(c, config.CSIControllerServiceAccount)
 }
 
 func (c *IBMBlockCSI) GenerateNodeServiceAccount() *corev1.ServiceAccount {
-	secrets := []corev1.LocalObjectReference{}
-	if len(c.Spec.ImagePullSecrets) > 0 {
-		for _, s := range c.Spec.ImagePullSecrets {
-			secrets = append(secrets, corev1.LocalObjectReference{Name: s})
-		}
-	}
+	return getServiceAccount(c, config.CSINodeServiceAccount)
+}
 
+func getServiceAccount(c *IBMBlockCSI, serviceAccountResourceName config.ResourceName) *corev1.ServiceAccount {
+	secrets := getImagePullSecrets(c.Spec.ImagePullSecrets)
 	return &corev1.ServiceAccount{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      config.GetNameForResource(config.CSINodeServiceAccount, c.Name),
+			Name:      config.GetNameForResource(serviceAccountResourceName, c.Name),
 			Namespace: c.Namespace,
 			Labels:    c.GetLabels(),
 		},
