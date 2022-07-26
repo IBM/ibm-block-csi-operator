@@ -118,6 +118,18 @@ metadata:
         },
         {
           "apiVersion": "csi.ibm.com/v1",
+          "kind": "HostDefinition",
+          "metadata": {
+            "name": "host-definition"
+          },
+          "spec": {
+            "hostDefinition": {
+              "nodeName": "node-name"
+            }
+          }
+        },
+        {
+          "apiVersion": "csi.ibm.com/v1",
           "kind": "HostDefiner",
           "metadata": {
             "name": "host-definer"
@@ -256,6 +268,23 @@ spec:
           - description: The current version of the driver.
             displayName: Version
             path: version
+      - name: hostdefinitions.csi.ibm.com
+        version: v1
+        group: csi.ibm.com
+        kind: HostDefinition
+        displayName: "IBM block storage Host Definition"
+        description: "Represents a Host Definition for IBM block storage"
+        specDescriptors:
+          - description: HostDefinition node name.
+            displayName: HostDefinition node name
+            path: hostdefiner.nodeName
+            x-descriptors:
+              - "urn:alm:descriptor:com.tectonic.ui:text"
+          - description: HostDefinition management address.
+            displayName: HostDefinition management address
+            path: hostdefiner.managementAddress
+            x-descriptors:
+              - "urn:alm:descriptor:com.tectonic.ui:text"
       - name: hostdefiners.csi.ibm.com
         version: v1
         group: csi.ibm.com
