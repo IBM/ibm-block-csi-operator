@@ -21,34 +21,35 @@ import (
 	"fmt"
 	"os"
 	"reflect"
-	"strings"
 	"time"
 
+	"github.com/IBM/ibm-block-csi-operator/controllers/internal/crutils"
+	"github.com/IBM/ibm-block-csi-operator/controllers/util/common"
+	pkg_errors "github.com/pkg/errors"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	storagev1 "k8s.io/api/storage/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/api/meta"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
-	"github.com/IBM/ibm-block-csi-operator/controllers/internal/ibmblockcsi"
 	clustersyncer "github.com/IBM/ibm-block-csi-operator/controllers/syncer"
-	"github.com/IBM/ibm-block-csi-operator/controllers/util"
 	oconfig "github.com/IBM/ibm-block-csi-operator/pkg/config"
 	kubeutil "github.com/IBM/ibm-block-csi-operator/pkg/util/kubernetes"
 	oversion "github.com/IBM/ibm-block-csi-operator/version"
 	"github.com/go-logr/logr"
 	"github.com/presslabs/controller-util/syncer"
+	"k8s.io/client-go/rest"
 )
 
 // ReconcileTime is the delay between reconciliations
@@ -60,18 +61,18 @@ var daemonSetRestartedValue = ""
 
 var log = logf.Log.WithName("ibmblockcsi_controller")
 
-type reconciler func(instance *ibmblockcsi.IBMBlockCSI) error
+type reconciler func(instance *crutils.IBMBlockCSI) error
 
 // IBMBlockCSIReconciler reconciles a IBMBlockCSI object
 type IBMBlockCSIReconciler struct {
 	// This client, initialized using mgr.Client() above, is a split client
 	// that reads objects from the cache and writes to the apiserver
 	client.Client
-	Log           logr.Logger
-	Scheme        *runtime.Scheme
-	Namespace     string
-	Recorder      record.EventRecorder
-	ServerVersion string
+	Scheme           *runtime.Scheme
+	Namespace        string
+	Recorder         record.EventRecorder
+	ServerVersion    string
+	ControllerHelper *common.ControllerHelper
 }
 
 // the rbac rule requires an empty row at the end to render
@@ -108,8 +109,10 @@ func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	reqLogger := log.WithValues("Request.Namespace", req.Namespace, "Request.Name", req.Name)
 	reqLogger.Info("Reconciling IBMBlockCSI")
 
+	r.ControllerHelper.Log = log
+
 	// Fetch the IBMBlockCSI instance
-	instance := ibmblockcsi.New(&csiv1.IBMBlockCSI{}, r.ServerVersion)
+	instance := crutils.New(&csiv1.IBMBlockCSI{}, r.ServerVersion)
 	err := r.Get(context.TODO(), req.NamespacedName, instance.Unwrap())
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -124,7 +127,6 @@ func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 	r.Scheme.Default(instance.Unwrap())
 	changed := instance.SetDefaults()
-
 	if err := instance.Validate(); err != nil {
 		err = fmt.Errorf("wrong IBMBlockCSI options: %v", err)
 		return reconcile.Result{RequeueAfter: ReconcileTime}, err
@@ -139,13 +141,13 @@ func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		}
 		return reconcile.Result{}, nil
 	}
-
-	if err := r.addFinalizerIfNotPresent(instance); err != nil {
+	if err := r.ControllerHelper.AddFinalizerIfNotPresent(
+		instance, instance.Unwrap()); err != nil {
 		return reconcile.Result{}, err
 	}
 
 	if !instance.GetDeletionTimestamp().IsZero() {
-		isFinalizerExists, err := r.hasFinalizer(instance)
+		isFinalizerExists, err := r.ControllerHelper.HasFinalizer(instance)
 		if err != nil {
 			return reconcile.Result{}, err
 		}
@@ -162,7 +164,8 @@ func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 			return reconcile.Result{}, err
 		}
 
-		if err := r.removeFinalizer(instance); err != nil {
+		if err := r.ControllerHelper.RemoveFinalizer(
+			instance, instance.Unwrap()); err != nil {
 			return reconcile.Result{}, err
 		}
 		return reconcile.Result{}, nil
@@ -201,24 +204,6 @@ func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	return reconcile.Result{}, nil
 }
 
-func getServerVersion() (string, error) {
-	kubeVersion, found := os.LookupEnv(oconfig.ENVKubeVersion)
-	if found {
-		return kubeVersion, nil
-	}
-
-	kubeClient := kubeutil.KubeClient
-
-	serverVersion, err := kubeutil.ServerVersion(kubeClient.Discovery())
-	if err != nil {
-		return serverVersion, err
-	}
-	if strings.HasSuffix(serverVersion, "+") {
-		serverVersion = strings.TrimSuffix(serverVersion, "+")
-	}
-	return serverVersion, nil
-}
-
 // SetupWithManager sets up the controller with the Manager.
 func (r *IBMBlockCSIReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
@@ -237,65 +222,44 @@ func (r *IBMBlockCSIReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func (r *IBMBlockCSIReconciler) addFinalizerIfNotPresent(instance *ibmblockcsi.IBMBlockCSI) error {
-	logger := log.WithName("addFinalizerIfNotPresent")
+func getServerVersion() (string, error) {
+	kubeVersion, found := os.LookupEnv(oconfig.ENVKubeVersion)
+	if found {
+		return kubeVersion, nil
+	}
 
-	accessor, finalizerName, err := r.getAccessorAndFinalizerName(instance)
+	clientConfig, err := GetClientConfig()
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	if !util.Contains(accessor.GetFinalizers(), finalizerName) {
-		logger.Info("adding", "finalizer", finalizerName, "on", accessor.GetName())
-		accessor.SetFinalizers(append(accessor.GetFinalizers(), finalizerName))
+	kubeClient := kubeutil.InitKubeClient(clientConfig)
 
-		if err := r.Update(context.TODO(), instance.Unwrap()); err != nil {
-			logger.Error(err, "failed to add", "finalizer", finalizerName, "on", accessor.GetName())
-			return err
-		}
+	serverVersion, err := composeServerVersion(kubeClient.Discovery())
+	if err != nil {
+		return serverVersion, err
 	}
-	return nil
+	return serverVersion, nil
 }
 
-func (r *IBMBlockCSIReconciler) hasFinalizer(instance *ibmblockcsi.IBMBlockCSI) (bool, error) {
-	accessor, finalizerName, err := r.getAccessorAndFinalizerName(instance)
+func GetClientConfig() (*rest.Config, error) {
+	clientConfig, err := config.GetConfig()
 	if err != nil {
-		return false, err
+		return clientConfig, err
 	}
-
-	return util.Contains(accessor.GetFinalizers(), finalizerName), nil
+	return clientConfig, nil
 }
 
-func (r *IBMBlockCSIReconciler) removeFinalizer(instance *ibmblockcsi.IBMBlockCSI) error {
-	logger := log.WithName("removeFinalizer")
-
-	accessor, finalizerName, err := r.getAccessorAndFinalizerName(instance)
+func composeServerVersion(client discovery.DiscoveryInterface) (string, error) {
+	versionInfo, err := client.ServerVersion()
 	if err != nil {
-		return err
+		return "", pkg_errors.Wrap(err, "error getting server version")
 	}
 
-	accessor.SetFinalizers(util.Remove(accessor.GetFinalizers(), finalizerName))
-	if err := r.Update(context.TODO(), instance.Unwrap()); err != nil {
-		logger.Error(err, "failed to remove", "finalizer", finalizerName, "from", accessor.GetName())
-		return err
-	}
-	return nil
+	return fmt.Sprintf("%s.%s", versionInfo.Major, versionInfo.Minor), nil
 }
 
-func (r *IBMBlockCSIReconciler) getAccessorAndFinalizerName(instance *ibmblockcsi.IBMBlockCSI) (metav1.Object, string, error) {
-	logger := log.WithName("getAccessorAndFinalizerName")
-	lowercaseKind := strings.ToLower(instance.GetObjectKind().GroupVersionKind().Kind)
-	finalizerName := fmt.Sprintf("%s.%s", lowercaseKind, oconfig.APIGroup)
-
-	accessor, err := meta.Accessor(instance)
-	if err != nil {
-		logger.Error(err, "failed to get meta information of instance")
-		return nil, "", err
-	}
-	return accessor, finalizerName, nil
-}
-
-func (r *IBMBlockCSIReconciler) updateStatus(instance *ibmblockcsi.IBMBlockCSI, originalStatus csiv1.IBMBlockCSIStatus) error {
+func (r *IBMBlockCSIReconciler) updateStatus(instance *crutils.IBMBlockCSI, originalStatus csiv1.IBMBlockCSIStatus) error {
 	logger := log.WithName("updateStatus")
 	controllerPod := &corev1.Pod{}
 	controllerStatefulset, err := r.getControllerStatefulSet(instance)
@@ -361,7 +325,7 @@ func (r *IBMBlockCSIReconciler) areAllPodImagesSynced(controllerStatefulset *app
 	return true
 }
 
-func (r *IBMBlockCSIReconciler) restartControllerPod(logger logr.Logger, instance *ibmblockcsi.IBMBlockCSI) error {
+func (r *IBMBlockCSIReconciler) restartControllerPod(logger logr.Logger, instance *crutils.IBMBlockCSI) error {
 	controllerPod := &corev1.Pod{}
 	controllerStatefulset, err := r.getControllerStatefulSet(instance)
 	if err != nil {
@@ -413,7 +377,7 @@ func (r *IBMBlockCSIReconciler) rolloutRestartNode(node *appsv1.DaemonSet) error
 	return r.Update(context.TODO(), node)
 }
 
-func (r *IBMBlockCSIReconciler) reconcileCSIDriver(instance *ibmblockcsi.IBMBlockCSI) error {
+func (r *IBMBlockCSIReconciler) reconcileCSIDriver(instance *crutils.IBMBlockCSI) error {
 	logger := log.WithValues("Resource Type", "CSIDriver")
 
 	cd := instance.GenerateCSIDriver()
@@ -438,7 +402,7 @@ func (r *IBMBlockCSIReconciler) reconcileCSIDriver(instance *ibmblockcsi.IBMBloc
 	return nil
 }
 
-func (r *IBMBlockCSIReconciler) reconcileServiceAccount(instance *ibmblockcsi.IBMBlockCSI) error {
+func (r *IBMBlockCSIReconciler) reconcileServiceAccount(instance *crutils.IBMBlockCSI) error {
 	logger := log.WithValues("Resource Type", "ServiceAccount")
 
 	controller := instance.GenerateControllerServiceAccount()
@@ -513,7 +477,7 @@ func (r *IBMBlockCSIReconciler) getRestartedAtAnnotation(Annotations map[string]
 	return "", ""
 }
 
-func (r *IBMBlockCSIReconciler) getControllerStatefulSet(instance *ibmblockcsi.IBMBlockCSI) (*appsv1.StatefulSet, error) {
+func (r *IBMBlockCSIReconciler) getControllerStatefulSet(instance *crutils.IBMBlockCSI) (*appsv1.StatefulSet, error) {
 	controllerStatefulset := &appsv1.StatefulSet{}
 	err := r.Get(context.TODO(), types.NamespacedName{
 		Name:      oconfig.GetNameForResource(oconfig.CSIController, instance.Name),
@@ -523,7 +487,7 @@ func (r *IBMBlockCSIReconciler) getControllerStatefulSet(instance *ibmblockcsi.I
 	return controllerStatefulset, err
 }
 
-func (r *IBMBlockCSIReconciler) getNodeDaemonSet(instance *ibmblockcsi.IBMBlockCSI) (*appsv1.DaemonSet, error) {
+func (r *IBMBlockCSIReconciler) getNodeDaemonSet(instance *crutils.IBMBlockCSI) (*appsv1.DaemonSet, error) {
 	node := &appsv1.DaemonSet{}
 	err := r.Get(context.TODO(), types.NamespacedName{
 		Name:      oconfig.GetNameForResource(oconfig.CSINode, instance.Name),
@@ -541,39 +505,12 @@ func (r *IBMBlockCSIReconciler) isNodeReady(node *appsv1.DaemonSet) bool {
 	return node.Status.DesiredNumberScheduled == node.Status.NumberAvailable
 }
 
-func (r *IBMBlockCSIReconciler) reconcileClusterRole(instance *ibmblockcsi.IBMBlockCSI) error {
-	logger := log.WithValues("Resource Type", "ClusterRole")
-
+func (r *IBMBlockCSIReconciler) reconcileClusterRole(instance *crutils.IBMBlockCSI) error {
 	clusterRoles := r.getClusterRoles(instance)
-
-	for _, cr := range clusterRoles {
-		found := &rbacv1.ClusterRole{}
-		err := r.Get(context.TODO(), types.NamespacedName{
-			Name:      cr.Name,
-			Namespace: cr.Namespace,
-		}, found)
-		if err != nil && errors.IsNotFound(err) {
-			logger.Info("Creating a new ClusterRole", "Name", cr.GetName())
-			err = r.Create(context.TODO(), cr)
-			if err != nil {
-				return err
-			}
-		} else if err != nil {
-			logger.Error(err, "Failed to get ClusterRole", "Name", cr.GetName())
-			return err
-		} else {
-			err = r.Update(context.TODO(), cr)
-			if err != nil {
-				logger.Error(err, "Failed to update ClusterRole", "Name", cr.GetName())
-				return err
-			}
-		}
-	}
-
-	return nil
+	return r.ControllerHelper.ReconcileClusterRole(clusterRoles)
 }
 
-func (r *IBMBlockCSIReconciler) deleteClusterRolesAndBindings(instance *ibmblockcsi.IBMBlockCSI) error {
+func (r *IBMBlockCSIReconciler) deleteClusterRolesAndBindings(instance *crutils.IBMBlockCSI) error {
 	if err := r.deleteClusterRoleBindings(instance); err != nil {
 		return err
 	}
@@ -584,34 +521,12 @@ func (r *IBMBlockCSIReconciler) deleteClusterRolesAndBindings(instance *ibmblock
 	return nil
 }
 
-func (r *IBMBlockCSIReconciler) deleteClusterRoles(instance *ibmblockcsi.IBMBlockCSI) error {
-	logger := log.WithName("deleteClusterRoles")
-
+func (r *IBMBlockCSIReconciler) deleteClusterRoles(instance *crutils.IBMBlockCSI) error {
 	clusterRoles := r.getClusterRoles(instance)
-
-	for _, cr := range clusterRoles {
-		found := &rbacv1.ClusterRole{}
-		err := r.Get(context.TODO(), types.NamespacedName{
-			Name:      cr.Name,
-			Namespace: cr.Namespace,
-		}, found)
-		if err != nil && errors.IsNotFound(err) {
-			continue
-		} else if err != nil {
-			logger.Error(err, "failed to get ClusterRole", "Name", cr.GetName())
-			return err
-		} else {
-			logger.Info("deleting ClusterRole", "Name", cr.GetName())
-			if err := r.Delete(context.TODO(), found); err != nil {
-				logger.Error(err, "failed to delete ClusterRole", "Name", cr.GetName())
-				return err
-			}
-		}
-	}
-	return nil
+	return r.ControllerHelper.DeleteClusterRoles(clusterRoles)
 }
 
-func (r *IBMBlockCSIReconciler) getClusterRoles(instance *ibmblockcsi.IBMBlockCSI) []*rbacv1.ClusterRole {
+func (r *IBMBlockCSIReconciler) getClusterRoles(instance *crutils.IBMBlockCSI) []*rbacv1.ClusterRole {
 	externalProvisioner := instance.GenerateExternalProvisionerClusterRole()
 	externalAttacher := instance.GenerateExternalAttacherClusterRole()
 	externalSnapshotter := instance.GenerateExternalSnapshotterClusterRole()
@@ -631,62 +546,17 @@ func (r *IBMBlockCSIReconciler) getClusterRoles(instance *ibmblockcsi.IBMBlockCS
 	}
 }
 
-func (r *IBMBlockCSIReconciler) reconcileClusterRoleBinding(instance *ibmblockcsi.IBMBlockCSI) error {
-	logger := log.WithValues("Resource Type", "ClusterRoleBinding")
-
+func (r *IBMBlockCSIReconciler) reconcileClusterRoleBinding(instance *crutils.IBMBlockCSI) error {
 	clusterRoleBindings := r.getClusterRoleBindings(instance)
-
-	for _, crb := range clusterRoleBindings {
-		found := &rbacv1.ClusterRoleBinding{}
-		err := r.Get(context.TODO(), types.NamespacedName{
-			Name:      crb.Name,
-			Namespace: crb.Namespace,
-		}, found)
-		if err != nil && errors.IsNotFound(err) {
-			logger.Info("Creating a new ClusterRoleBinding", "Name", crb.GetName())
-			err = r.Create(context.TODO(), crb)
-			if err != nil {
-				return err
-			}
-		} else if err != nil {
-			logger.Error(err, "Failed to get ClusterRole", "Name", crb.GetName())
-			return err
-		} else {
-			// Resource already exists - don't requeue
-			//logger.Info("Skip reconcile: ClusterRoleBinding already exists", "Name", crb.GetName())
-		}
-	}
-	return nil
+	return r.ControllerHelper.ReconcileClusterRoleBinding(clusterRoleBindings)
 }
 
-func (r *IBMBlockCSIReconciler) deleteClusterRoleBindings(instance *ibmblockcsi.IBMBlockCSI) error {
-	logger := log.WithName("deleteClusterRoleBindings")
-
+func (r *IBMBlockCSIReconciler) deleteClusterRoleBindings(instance *crutils.IBMBlockCSI) error {
 	clusterRoleBindings := r.getClusterRoleBindings(instance)
-
-	for _, crb := range clusterRoleBindings {
-		found := &rbacv1.ClusterRoleBinding{}
-		err := r.Get(context.TODO(), types.NamespacedName{
-			Name:      crb.Name,
-			Namespace: crb.Namespace,
-		}, found)
-		if err != nil && errors.IsNotFound(err) {
-			continue
-		} else if err != nil {
-			logger.Error(err, "failed to get ClusterRoleBinding", "Name", crb.GetName())
-			return err
-		} else {
-			logger.Info("deleting ClusterRoleBinding", "Name", crb.GetName())
-			if err := r.Delete(context.TODO(), found); err != nil {
-				logger.Error(err, "failed to delete ClusterRoleBinding", "Name", crb.GetName())
-				return err
-			}
-		}
-	}
-	return nil
+	return r.ControllerHelper.DeleteClusterRoleBindings(clusterRoleBindings)
 }
 
-func (r *IBMBlockCSIReconciler) getClusterRoleBindings(instance *ibmblockcsi.IBMBlockCSI) []*rbacv1.ClusterRoleBinding {
+func (r *IBMBlockCSIReconciler) getClusterRoleBindings(instance *crutils.IBMBlockCSI) []*rbacv1.ClusterRoleBinding {
 	externalProvisioner := instance.GenerateExternalProvisionerClusterRoleBinding()
 	externalAttacher := instance.GenerateExternalAttacherClusterRoleBinding()
 	externalSnapshotter := instance.GenerateExternalSnapshotterClusterRoleBinding()
@@ -706,7 +576,7 @@ func (r *IBMBlockCSIReconciler) getClusterRoleBindings(instance *ibmblockcsi.IBM
 	}
 }
 
-func (r *IBMBlockCSIReconciler) deleteCSIDriver(instance *ibmblockcsi.IBMBlockCSI) error {
+func (r *IBMBlockCSIReconciler) deleteCSIDriver(instance *crutils.IBMBlockCSI) error {
 	logger := log.WithName("deleteCSIDriver")
 
 	csiDriver := instance.GenerateCSIDriver()

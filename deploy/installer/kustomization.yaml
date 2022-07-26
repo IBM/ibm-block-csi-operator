@@ -3,6 +3,8 @@ kind: Kustomization
 
 resources:
 - config/crd/bases/csi.ibm.com_ibmblockcsis.yaml
+- config/crd/bases/csi.ibm.com_hostdefinitions.yaml
+- config/crd/bases/csi.ibm.com_hostdefiners.yaml
 - config/rbac/service_account.yaml
 - config/rbac/role.yaml
 - config/rbac/role_binding.yaml

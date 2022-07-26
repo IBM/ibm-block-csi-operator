@@ -28,7 +28,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
-	"github.com/IBM/ibm-block-csi-operator/controllers/internal/ibmblockcsi"
+	"github.com/IBM/ibm-block-csi-operator/controllers/internal/crutils"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/util/boolptr"
 	"github.com/presslabs/controller-util/mergo/transformers"
@@ -37,7 +37,7 @@ import (
 
 const (
 	registrationVolumeName              = "registration-dir"
-	nodeContainerName                   = "ibm-block-csi-node"
+	NodeContainerName                   = "ibm-block-csi-node"
 	csiNodeDriverRegistrarContainerName = "csi-node-driver-registrar"
 	nodeLivenessProbeContainerName      = "livenessprobe"
 
@@ -48,12 +48,12 @@ const (
 )
 
 type csiNodeSyncer struct {
-	driver *ibmblockcsi.IBMBlockCSI
+	driver *crutils.IBMBlockCSI
 	obj    runtime.Object
 }
 
 // NewCSINodeSyncer returns a syncer for CSI node
-func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockcsi.IBMBlockCSI,
+func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *crutils.IBMBlockCSI,
 	daemonSetRestartedKey string, daemonSetRestartedValue string) syncer.Interface {
 	obj := &appsv1.DaemonSet{
 		ObjectMeta: metav1.ObjectMeta{
@@ -110,7 +110,7 @@ func (s *csiNodeSyncer) ensurePodSpec() corev1.PodSpec {
 
 func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	// node plugin container
-	nodePlugin := s.ensureContainer(nodeContainerName,
+	nodePlugin := s.ensureContainer(NodeContainerName,
 		s.driver.GetCSINodeImage(),
 		[]string{
 			"--csi-endpoint=$(CSI_ENDPOINT)",
@@ -223,7 +223,7 @@ func envVarFromField(name, fieldPath string) corev1.EnvVar {
 func (s *csiNodeSyncer) getEnvFor(name string) []corev1.EnvVar {
 
 	switch name {
-	case nodeContainerName:
+	case NodeContainerName:
 		return []corev1.EnvVar{
 			{
 				Name:  "CSI_ENDPOINT",
@@ -255,7 +255,7 @@ func (s *csiNodeSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 	mountPropagationB := corev1.MountPropagationBidirectional
 
 	switch name {
-	case nodeContainerName:
+	case NodeContainerName:
 		return []corev1.VolumeMount{
 			{
 				Name:      socketVolumeName,

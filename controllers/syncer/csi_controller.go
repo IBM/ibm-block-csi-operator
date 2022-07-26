@@ -29,7 +29,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
-	"github.com/IBM/ibm-block-csi-operator/controllers/internal/ibmblockcsi"
+	"github.com/IBM/ibm-block-csi-operator/controllers/internal/crutils"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/util/boolptr"
 	"github.com/presslabs/controller-util/mergo/transformers"
@@ -38,7 +38,7 @@ import (
 
 const (
 	socketVolumeName                     = "socket-dir"
-	controllerContainerName              = "ibm-block-csi-controller"
+	ControllerContainerName              = "ibm-block-csi-controller"
 	provisionerContainerName             = "csi-provisioner"
 	attacherContainerName                = "csi-attacher"
 	snapshotterContainerName             = "csi-snapshotter"
@@ -53,12 +53,12 @@ const (
 var TopologyEnabled = false
 
 type csiControllerSyncer struct {
-	driver *ibmblockcsi.IBMBlockCSI
+	driver *crutils.IBMBlockCSI
 	obj    runtime.Object
 }
 
 // NewCSIControllerSyncer returns a syncer for CSI controller
-func NewCSIControllerSyncer(c client.Client, scheme *runtime.Scheme, driver *ibmblockcsi.IBMBlockCSI) syncer.Interface {
+func NewCSIControllerSyncer(c client.Client, scheme *runtime.Scheme, driver *crutils.IBMBlockCSI) syncer.Interface {
 	obj := &appsv1.StatefulSet{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        config.GetNameForResource(config.CSIController, driver.Name),
@@ -118,7 +118,7 @@ func (s *csiControllerSyncer) ensurePodSpec() corev1.PodSpec {
 }
 
 func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
-	controllerPlugin := s.ensureContainer(controllerContainerName,
+	controllerPlugin := s.ensureContainer(ControllerContainerName,
 		s.driver.GetCSIControllerImage(),
 		[]string{"--csi-endpoint=$(CSI_ENDPOINT)"},
 	)
@@ -145,7 +145,13 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		},
 	})
 
-	provisionerArgs := []string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s", "--default-fstype=ext4"}
+	provisionerArgs := []string{
+		"--csi-address=$(ADDRESS)",
+		"--v=5",
+		"--timeout=120s",
+		"--default-fstype=ext4",
+		"--worker-threads=10",
+	}
 	if TopologyEnabled {
 		provisionerArgs = append(provisionerArgs, "--feature-gates=Topology=true")
 	}
@@ -163,7 +169,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 
 	snapshotter := s.ensureContainer(snapshotterContainerName,
 		s.getCSISnapshotterImage(),
-		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s"},
+		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=120s"},
 	)
 	snapshotter.ImagePullPolicy = s.getCSISnapshotterPullPolicy()
 
@@ -275,7 +281,7 @@ func (s *csiControllerSyncer) envVarFromSecret(sctName, name, key string, opt bo
 func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 
 	switch name {
-	case controllerContainerName:
+	case ControllerContainerName:
 		return []corev1.EnvVar{
 			{
 				Name:  "CSI_ENDPOINT",
@@ -301,7 +307,7 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 
 func (s *csiControllerSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 	switch name {
-	case controllerContainerName, provisionerContainerName, attacherContainerName, snapshotterContainerName,
+	case ControllerContainerName, provisionerContainerName, attacherContainerName, snapshotterContainerName,
 		resizerContainerName, replicatorContainerName:
 		return []corev1.VolumeMount{
 			{
@@ -419,7 +425,7 @@ func ensureVolume(name string, source corev1.VolumeSource) corev1.Volume {
 	}
 }
 
-func getSidecarByName(driver *ibmblockcsi.IBMBlockCSI, name string) *csiv1.CSISidecar {
+func getSidecarByName(driver *crutils.IBMBlockCSI, name string) *csiv1.CSISidecar {
 	for _, sidecar := range driver.Spec.Sidecars {
 		if sidecar.Name == name {
 			return &sidecar

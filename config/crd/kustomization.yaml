@@ -1,6 +1,13 @@
+commonLabels:
+  product: ibm-block-csi-driver
+  csi: ibm
+  app.kubernetes.io/name: ibm-block-csi-operator
+  app.kubernetes.io/instance: ibm-block-csi-operator
+  app.kubernetes.io/managed-by: ibm-block-csi-operator
+  release: v1.10.0
+  
 resources:
 - bases/csi.ibm.com_ibmblockcsis.yaml
+- bases/csi.ibm.com_hostdefiners.yaml
+- bases/csi.ibm.com_hostdefinitions.yaml
 #+kubebuilder:scaffold:crdkustomizeresource
-
-patchesStrategicMerge:
-- patches/labels_patch.yaml

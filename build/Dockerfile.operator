@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM golang:1.15.14
+FROM golang:1.16.14
 
 WORKDIR /go/src/github.com/IBM/ibm-block-csi-operator/
 COPY . .
@@ -24,10 +24,10 @@ RUN CGO_ENABLED=1 GOOS=linux go build \
 	main.go
 
 
-FROM registry.access.redhat.com/ubi8/ubi-minimal:8.5-230.1645809059
+FROM registry.access.redhat.com/ubi8/ubi-minimal:8.6-854
 MAINTAINER IBM Storage
 
-ARG VERSION=1.9.0
+ARG VERSION=1.10.0
 ARG BUILD_NUMBER=0
 
 ###Required Labels
@@ -44,14 +44,17 @@ LABEL name="Operator for IBM block storage CSI driver" \
 ENV OPERATOR=/usr/local/bin/ibm-block-csi-operator \
     USER_UID=1001 \
     USER_NAME=ibm-block-csi-operator \
-    CR_YAML=/usr/local/etc/csi.ibm.com_v1_ibmblockcsi_cr.yaml
+    IBMBlockCSI_CR_YAML=/usr/local/etc/csi.ibm.com_v1_ibmblockcsi_cr.yaml \
+    HostDefiner_CR_YAML=/usr/local/etc/csi_v1_hostdefiner_cr.yaml
 
 COPY build/health_check.sh .
 RUN chmod 777 ./health_check.sh
 COPY ./LICENSE /licenses/
 COPY ./NOTICES /licenses/
-COPY ./config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml ${CR_YAML}
-RUN chmod 0444 ${CR_YAML}
+COPY ./config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml ${IBMBlockCSI_CR_YAML}
+COPY ./config/samples/csi_v1_hostdefiner_cr.yaml ${HostDefiner_CR_YAML}
+RUN chmod 0444 ${IBMBlockCSI_CR_YAML} \
+    && chmod 0444 ${HostDefiner_CR_YAML}
 
 # install operator binary
 COPY --from=0 /go/src/github.com/IBM/ibm-block-csi-operator/build/_output/bin/ibm-block-csi-operator ${OPERATOR}

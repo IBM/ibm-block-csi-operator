@@ -21,15 +21,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type DriverPhase string
-
-const (
-	DriverPhaseNone     DriverPhase = ""
-	DriverPhaseCreating DriverPhase = "Creating"
-	DriverPhaseRunning  DriverPhase = "Running"
-	DriverPhaseFailed   DriverPhase = "Failed"
-)
-
 type CSISidecar struct {
 	// The name of the csi sidecar image
 	Name string `json:"name"`
