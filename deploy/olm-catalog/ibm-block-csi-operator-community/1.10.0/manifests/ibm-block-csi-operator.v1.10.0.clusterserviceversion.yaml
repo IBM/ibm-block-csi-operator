@@ -630,12 +630,12 @@ spec:
                         cpu: 100m
                     readinessProbe:
                       exec:
-                        command: [ "./health_check.sh" ]
+                        command: ["./health_check.sh"]
                       initialDelaySeconds: 3
                       periodSeconds: 1
                     livenessProbe:
                       exec:
-                        command: [ "./health_check.sh" ]
+                        command: ["./health_check.sh"]
                       initialDelaySeconds: 10
                       periodSeconds: 30
                     securityContext:
