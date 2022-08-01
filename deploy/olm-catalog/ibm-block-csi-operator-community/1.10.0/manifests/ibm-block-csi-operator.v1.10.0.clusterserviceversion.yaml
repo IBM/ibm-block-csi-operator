@@ -125,6 +125,18 @@ metadata:
         },
         {
           "apiVersion": "csi.ibm.com/v1",
+          "kind": "HostDefinition",
+          "metadata": {
+            "name": "host-definition"
+          },
+          "spec": {
+            "hostDefinition": {
+              "nodeName": "node-name"
+            }
+          }
+        },
+        {
+          "apiVersion": "csi.ibm.com/v1",
           "kind": "HostDefiner",
           "metadata": {
             "name": "host-definer"
