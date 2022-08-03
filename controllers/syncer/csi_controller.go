@@ -89,10 +89,9 @@ func (s *csiControllerSyncer) SyncFn() error {
 
 	// ensure template
 	out.Spec.Template.ObjectMeta.Labels = controllerLabels
-	out.Spec.Template.ObjectMeta.Annotations = controllerAnnotations
 
 	out.ObjectMeta.Labels = controllerLabels
-	out.ObjectMeta.Annotations = controllerAnnotations
+	ensureAnnotations(&out.Spec.Template.ObjectMeta, &out.ObjectMeta, controllerAnnotations)
 
 	err := mergo.Merge(&out.Spec.Template.Spec, s.ensurePodSpec(), mergo.WithTransformers(transformers.PodSpec))
 	if err != nil {
