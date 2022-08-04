@@ -274,9 +274,9 @@ func (r *IBMBlockCSIReconciler) updateStatus(instance *crutils.IBMBlockCSI, orig
 
 	instance.Status.ControllerReady = r.isControllerReady(controllerStatefulset)
 	instance.Status.NodeReady = r.isNodeReady(nodeDaemonSet)
-	phase := csiv1.DriverPhaseNone
+	phase := csiv1.ProductPhaseNone
 	if instance.Status.ControllerReady && instance.Status.NodeReady {
-		phase = csiv1.DriverPhaseRunning
+		phase = csiv1.ProductPhaseRunning
 	} else {
 		if !instance.Status.ControllerReady {
 			err := r.getControllerPod(controllerStatefulset, controllerPod)
@@ -289,7 +289,7 @@ func (r *IBMBlockCSIReconciler) updateStatus(instance *crutils.IBMBlockCSI, orig
 				r.restartControllerPodfromStatefulSet(logger, controllerStatefulset, controllerPod)
 			}
 		}
-		phase = csiv1.DriverPhaseCreating
+		phase = csiv1.ProductPhaseCreating
 	}
 	instance.Status.Phase = phase
 	instance.Status.Version = oversion.DriverVersion

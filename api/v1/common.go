@@ -16,11 +16,11 @@
 
 package v1
 
-type DriverPhase string
+type ProductPhase string
 
 const (
-	DriverPhaseNone     DriverPhase = ""
-	DriverPhaseCreating DriverPhase = "Creating"
-	DriverPhaseRunning  DriverPhase = "Running"
-	DriverPhaseFailed   DriverPhase = "Failed"
+	ProductPhaseNone     ProductPhase = ""
+	ProductPhaseCreating ProductPhase = "Creating"
+	ProductPhaseRunning  ProductPhase = "Running"
+	ProductPhaseFailed   ProductPhase = "Failed"
 )

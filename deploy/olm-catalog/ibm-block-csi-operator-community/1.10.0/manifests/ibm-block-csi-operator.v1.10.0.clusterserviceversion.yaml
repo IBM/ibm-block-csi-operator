@@ -299,7 +299,7 @@ spec:
         version: v1
         group: csi.ibm.com
         kind: HostDefiner
-        displayName: "IBM block storage CSI Host Definer driver"
+        displayName: "IBM block storage Host Definer"
         description: "Represents Host Definer for block storage CSI driver"
         resources:
           - kind: ServiceAccount
