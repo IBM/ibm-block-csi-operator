@@ -62,6 +62,16 @@ func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *crutils.I
 			Annotations: driver.GetAnnotations(daemonSetRestartedKey, daemonSetRestartedValue),
 			Labels:      driver.GetLabels(),
 		},
+		Spec: appsv1.DaemonSetSpec{
+			Selector: metav1.SetAsLabelSelector(driver.GetCSINodeSelectorLabels()),
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels:      driver.GetCSINodePodLabels(),
+					Annotations: driver.GetAnnotations(daemonSetRestartedKey, daemonSetRestartedValue),
+				},
+				Spec: corev1.PodSpec{},
+			},
+		},
 	}
 
 	sync := &csiNodeSyncer{

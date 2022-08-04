@@ -29,8 +29,7 @@ var defaultAnnotations = labels.Set{
 	"productVersion": csiversion.Version,
 }
 
-func ensureAnnotations(templateObjectMeta *metav1.ObjectMeta, objectMeta *metav1.ObjectMeta,
-	annotations labels.Set) {
+func ensureAnnotations(templateObjectMeta *metav1.ObjectMeta, objectMeta *metav1.ObjectMeta, annotations labels.Set) {
 	for k := range defaultAnnotations {
 		templateObjectMeta.Annotations[k] = annotations[k]
 		objectMeta.Annotations[k] = annotations[k]

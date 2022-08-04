@@ -66,6 +66,16 @@ func NewCSIControllerSyncer(c client.Client, scheme *runtime.Scheme, driver *cru
 			Annotations: driver.GetAnnotations("", ""),
 			Labels:      driver.GetLabels(),
 		},
+		Spec: appsv1.StatefulSetSpec{
+			Selector: metav1.SetAsLabelSelector(driver.GetCSIControllerSelectorLabels()),
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels:      driver.GetCSIControllerPodLabels(),
+					Annotations: driver.GetAnnotations("", ""),
+				},
+				Spec: corev1.PodSpec{},
+			},
+		},
 	}
 
 	sync := &csiControllerSyncer{
