@@ -83,10 +83,10 @@ func (s *csiNodeSyncer) SyncFn(daemonSetRestartedKey string, daemonSetRestartedV
 
 	// ensure template
 	out.Spec.Template.ObjectMeta.Labels = nodeLabels
-	controllerAnnotations := s.driver.GetAnnotations(daemonSetRestartedKey, daemonSetRestartedValue)
+	nodeAnnotations := s.driver.GetAnnotations(daemonSetRestartedKey, daemonSetRestartedValue)
 
 	out.ObjectMeta.Labels = nodeLabels
-	ensureAnnotations(&out.Spec.Template.ObjectMeta, &out.ObjectMeta, controllerAnnotations)
+	ensureAnnotations(&out.Spec.Template.ObjectMeta, &out.ObjectMeta, nodeAnnotations)
 
 	err := mergo.Merge(&out.Spec.Template.Spec, s.ensurePodSpec(), mergo.WithTransformers(transformers.PodSpec))
 	if err != nil {
