@@ -17,20 +17,18 @@
 package syncer
 
 import (
-	"github.com/IBM/ibm-block-csi-operator/pkg/config"
-	csiversion "github.com/IBM/ibm-block-csi-operator/version"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 )
 
-var defaultAnnotations = labels.Set{
-	"productID":      config.ProductName,
-	"productName":    config.ProductName,
-	"productVersion": csiversion.Version,
+var defaultAnnotations = []string{
+	"productID",
+	"productName",
+	"productVersion",
 }
 
 func ensureAnnotations(templateObjectMeta *metav1.ObjectMeta, objectMeta *metav1.ObjectMeta, annotations labels.Set) {
-	for k := range defaultAnnotations {
+	for _, k := range defaultAnnotations {
 		templateObjectMeta.Annotations[k] = annotations[k]
 		objectMeta.Annotations[k] = annotations[k]
 	}
