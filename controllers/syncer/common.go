@@ -28,8 +28,8 @@ var defaultAnnotations = []string{
 }
 
 func ensureAnnotations(templateObjectMeta *metav1.ObjectMeta, objectMeta *metav1.ObjectMeta, annotations labels.Set) {
-	for _, k := range defaultAnnotations {
-		templateObjectMeta.Annotations[k] = annotations[k]
-		objectMeta.Annotations[k] = annotations[k]
+	for _, s := range defaultAnnotations {
+		templateObjectMeta.Annotations[s] = annotations[s]
+		objectMeta.Annotations[s] = annotations[s]
 	}
 }
