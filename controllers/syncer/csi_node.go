@@ -62,6 +62,16 @@ func NewCSINodeSyncer(c client.Client, scheme *runtime.Scheme, driver *crutils.I
 			Annotations: driver.GetAnnotations(daemonSetRestartedKey, daemonSetRestartedValue),
 			Labels:      driver.GetLabels(),
 		},
+		Spec: appsv1.DaemonSetSpec{
+			Selector: metav1.SetAsLabelSelector(driver.GetCSINodeSelectorLabels()),
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels:      driver.GetCSINodePodLabels(),
+					Annotations: driver.GetAnnotations(daemonSetRestartedKey, daemonSetRestartedValue),
+				},
+				Spec: corev1.PodSpec{},
+			},
+		},
 	}
 
 	sync := &csiNodeSyncer{
@@ -83,10 +93,10 @@ func (s *csiNodeSyncer) SyncFn(daemonSetRestartedKey string, daemonSetRestartedV
 
 	// ensure template
 	out.Spec.Template.ObjectMeta.Labels = nodeLabels
-	out.Spec.Template.ObjectMeta.Annotations = s.driver.GetAnnotations(daemonSetRestartedKey, daemonSetRestartedValue)
+	nodeAnnotations := s.driver.GetAnnotations(daemonSetRestartedKey, daemonSetRestartedValue)
 
 	out.ObjectMeta.Labels = nodeLabels
-	out.ObjectMeta.Annotations = s.driver.GetAnnotations("", "")
+	ensureAnnotations(&out.Spec.Template.ObjectMeta, &out.ObjectMeta, nodeAnnotations)
 
 	err := mergo.Merge(&out.Spec.Template.Spec, s.ensurePodSpec(), mergo.WithTransformers(transformers.PodSpec))
 	if err != nil {
