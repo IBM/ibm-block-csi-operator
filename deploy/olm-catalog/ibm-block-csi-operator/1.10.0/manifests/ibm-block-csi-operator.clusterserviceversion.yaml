@@ -310,12 +310,12 @@ spec:
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:text'
         statusDescriptors:
-          - description: The current status of host definition.
+          - description: The current status of the host definer.
             displayName: Status
             path: phase
             x-descriptors:
               - 'urn:alm:descriptor:io.kubernetes.phase'
-          - description: Is the host definition deployment ready?
+          - description: Is the host definer deployment ready?
             displayName: HostDefiner Ready
             path: hostdefinerReady
             x-descriptors:

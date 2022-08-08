@@ -22,14 +22,12 @@ import (
 	"github.com/IBM/ibm-block-csi-operator/controllers/internal/hostdefiner"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/util/boolptr"
-	csiversion "github.com/IBM/ibm-block-csi-operator/version"
 	"github.com/imdario/mergo"
 	"github.com/presslabs/controller-util/mergo/transformers"
 	"github.com/presslabs/controller-util/syncer"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -41,12 +39,6 @@ const (
 type hostDefinerSyncer struct {
 	driver *hostdefiner.HostDefiner
 	obj    runtime.Object
-}
-
-var defaultAnnotations = labels.Set{
-	"productID":      config.ProductName,
-	"productName":    config.ProductName,
-	"productVersion": csiversion.Version,
 }
 
 func NewHostDefinerSyncer(c client.Client, scheme *runtime.Scheme, driver *hostdefiner.HostDefiner) syncer.Interface {
@@ -90,7 +82,7 @@ func (s *hostDefinerSyncer) SyncFn() error {
 	labels := s.driver.GetHostDefinerPodLabels()
 	out.Spec.Template.ObjectMeta.Labels = labels
 	out.ObjectMeta.Labels = labels
-	s.ensureAnnotations(out)
+	ensureAnnotations(&out.Spec.Template.ObjectMeta, &out.ObjectMeta, s.driver.GetAnnotations())
 
 	err := mergo.Merge(&out.Spec.Template.Spec, s.ensurePodSpec(), mergo.WithTransformers(transformers.PodSpec))
 	if err != nil {
@@ -98,14 +90,6 @@ func (s *hostDefinerSyncer) SyncFn() error {
 	}
 
 	return nil
-}
-
-func (s *hostDefinerSyncer) ensureAnnotations(deployment *appsv1.Deployment) {
-	annotations := s.driver.GetAnnotations()
-	for k, _ := range defaultAnnotations {
-		deployment.Spec.Template.ObjectMeta.Annotations[k] = annotations[k]
-		deployment.ObjectMeta.Annotations[k] = annotations[k]
-	}
 }
 
 func (s *hostDefinerSyncer) ensurePodSpec() corev1.PodSpec {
