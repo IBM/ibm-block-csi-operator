@@ -49,6 +49,7 @@ function push_arch_images_and_create_manifest_for_app() {
 operator_envs="in_OPERATOR_IMAGE_AMD64 out_OPERATOR_IMAGE_AMD64 in_OPERATOR_IMAGE_PPC64LE out_OPERATOR_IMAGE_PPC64LE in_OPERATOR_IMAGE_S390X out_OPERATOR_IMAGE_S390X out_OPERATOR_IMAGE_MULTIARCH"
 controller_envs="in_CONTROLLER_IMAGE_AMD64 out_CONTROLLER_IMAGE_AMD64 in_CONTROLLER_IMAGE_PPC64LE out_CONTROLLER_IMAGE_PPC64LE in_CONTROLLER_IMAGE_S390X out_CONTROLLER_IMAGE_S390X out_CONTROLLER_IMAGE_MULTIARCH"
 node_envs="in_NODE_IMAGE_AMD64 out_NODE_IMAGE_AMD64 in_NODE_IMAGE_PPC64LE out_NODE_IMAGE_PPC64LE in_NODE_IMAGE_S390X out_NODE_IMAGE_S390X out_NODE_IMAGE_MULTIARCH"
+hostdefiner_envs="in_HOST_DEFINER_IMAGE_AMD64 out_HOST_DEFINER_IMAGE_AMD64 in_HOST_DEFINER_IMAGE_PPC64LE out_HOST_DEFINER_IMAGE_PPC64LE in_HOST_DEFINER_IMAGE_S390X out_HOST_DEFINER_IMAGE_S390X out_HOST_DEFINER_IMAGE_MULTIARCH"
 
 HELPER_PUSH_IMAGE=./helper_to_push_docker_image.sh
 HELPER_PUSH_MANIFEST=./helper_to_push_docker_manifest.sh
@@ -56,7 +57,7 @@ HELPER_PUSH_MANIFEST=./helper_to_push_docker_manifest.sh
 date
 # Validations
 [ -f $HELPER_PUSH_IMAGE -a -f $HELPER_PUSH_MANIFEST ] && : || exit 1
-for expected_env in $operator_envs $controller_envs $node_envs; do
+for expected_env in $operator_envs $controller_envs $node_envs $hostdefiner_envs; do
   [ -z "$(printenv $expected_env)" ] && {
     echo "Error: expected env [$expected_env] does not exist. Please set it first."
     exit 1
@@ -69,6 +70,7 @@ echo "TAG_LATEST=$TAG_LATEST"
 push_arch_images_and_create_manifest_for_app "operator"   $in_OPERATOR_IMAGE_AMD64    $out_OPERATOR_IMAGE_AMD64    $in_OPERATOR_IMAGE_PPC64LE    $out_OPERATOR_IMAGE_PPC64LE    $in_OPERATOR_IMAGE_S390X    $out_OPERATOR_IMAGE_S390X    $out_OPERATOR_IMAGE_MULTIARCH    $TAG_LATEST
 push_arch_images_and_create_manifest_for_app "controller" $in_CONTROLLER_IMAGE_AMD64  $out_CONTROLLER_IMAGE_AMD64  $in_CONTROLLER_IMAGE_PPC64LE  $out_CONTROLLER_IMAGE_PPC64LE  $in_CONTROLLER_IMAGE_S390X  $out_CONTROLLER_IMAGE_S390X  $out_CONTROLLER_IMAGE_MULTIARCH  $TAG_LATEST
 push_arch_images_and_create_manifest_for_app "node"       $in_NODE_IMAGE_AMD64        $out_NODE_IMAGE_AMD64        $in_NODE_IMAGE_PPC64LE        $out_NODE_IMAGE_PPC64LE        $in_NODE_IMAGE_S390X        $out_NODE_IMAGE_S390X        $out_NODE_IMAGE_MULTIARCH        $TAG_LATEST
+push_arch_images_and_create_manifest_for_app "hostdefiner"       $in_HOST_DEFINER_IMAGE_AMD64        $out_HOST_DEFINER_IMAGE_AMD64        $in_HOST_DEFINER_IMAGE_PPC64LE        $out_HOST_DEFINER_IMAGE_PPC64LE        $in_HOST_DEFINER_IMAGE_S390X        $out_HOST_DEFINER_IMAGE_S390X        $out_HOST_DEFINER_IMAGE_MULTIARCH        $TAG_LATEST
 
 date
 echo "######################################"
@@ -78,3 +80,4 @@ echo "######################################"
 echo $out_OPERATOR_IMAGE_MULTIARCH
 echo $out_CONTROLLER_IMAGE_MULTIARCH
 echo $out_NODE_IMAGE_MULTIARCH
+echo $out_HOST_DEFINER_IMAGE_MULTIARCH
