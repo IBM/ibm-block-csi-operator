@@ -66,6 +66,16 @@ func NewCSIControllerSyncer(c client.Client, scheme *runtime.Scheme, driver *cru
 			Annotations: driver.GetAnnotations("", ""),
 			Labels:      driver.GetLabels(),
 		},
+		Spec: appsv1.StatefulSetSpec{
+			Selector: metav1.SetAsLabelSelector(driver.GetCSIControllerSelectorLabels()),
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels:      driver.GetCSIControllerPodLabels(),
+					Annotations: driver.GetAnnotations("", ""),
+				},
+				Spec: corev1.PodSpec{},
+			},
+		},
 	}
 
 	sync := &csiControllerSyncer{
@@ -89,10 +99,9 @@ func (s *csiControllerSyncer) SyncFn() error {
 
 	// ensure template
 	out.Spec.Template.ObjectMeta.Labels = controllerLabels
-	out.Spec.Template.ObjectMeta.Annotations = controllerAnnotations
 
 	out.ObjectMeta.Labels = controllerLabels
-	out.ObjectMeta.Annotations = controllerAnnotations
+	ensureAnnotations(&out.Spec.Template.ObjectMeta, &out.ObjectMeta, controllerAnnotations)
 
 	err := mergo.Merge(&out.Spec.Template.Spec, s.ensurePodSpec(), mergo.WithTransformers(transformers.PodSpec))
 	if err != nil {
