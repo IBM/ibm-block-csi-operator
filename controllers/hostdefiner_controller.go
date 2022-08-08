@@ -446,9 +446,9 @@ func (r *HostDefinerReconciler) updateStatus(instance *hostdefiner.HostDefiner, 
 
 func (r *HostDefinerReconciler) updateStatusFields(instance *hostdefiner.HostDefiner, deployment *appsv1.Deployment) {
 	instance.Status.HostDefinerReady = r.isReady(deployment)
-	phase := csiv1.ProductPhaseCreating
+	phase := csiv1.DriverPhaseCreating
 	if instance.Status.HostDefinerReady {
-		phase = csiv1.ProductPhaseRunning
+		phase = csiv1.DriverPhaseRunning
 	}
 	instance.Status.Phase = phase
 	instance.Status.Version = oversion.DriverVersion

@@ -42,7 +42,7 @@ type Definition struct {
 
 // HostDefinitionStatus defines the status of the host definition on the storage
 type HostDefinitionStatus struct {
-	Phase ProductPhase `json:"phase"`
+	Phase DriverPhase `json:"phase"`
 }
 
 //+kubebuilder:object:root=true

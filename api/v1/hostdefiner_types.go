@@ -56,8 +56,8 @@ type IBMBlockHostDefinerSpec struct {
 
 // HostDefinerStatus defines the observed state of HostDefiner
 type HostDefinerStatus struct {
-	Phase            ProductPhase `json:"phase"`
-	HostDefinerReady bool         `json:"hostDefinerReady"`
+	Phase            DriverPhase `json:"phase"`
+	HostDefinerReady bool        `json:"hostDefinerReady"`
 
 	// Version is the current driver version
 	Version string `json:"version"`

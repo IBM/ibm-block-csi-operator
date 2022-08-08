@@ -106,9 +106,9 @@ type IBMBlockCSINodeSpec struct {
 // IBMBlockCSIStatus defines the observed state of IBMBlockCSI
 type IBMBlockCSIStatus struct {
 	// Phase is the driver running phase
-	Phase           ProductPhase `json:"phase"`
-	ControllerReady bool         `json:"controllerReady"`
-	NodeReady       bool         `json:"nodeReady"`
+	Phase           DriverPhase `json:"phase"`
+	ControllerReady bool        `json:"controllerReady"`
+	NodeReady       bool        `json:"nodeReady"`
 
 	// Version is the current driver version
 	Version string `json:"version"`
