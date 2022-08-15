@@ -30,24 +30,24 @@ type HostDefiner struct {
 	*csiv1.HostDefiner
 }
 
-func New(c *csiv1.HostDefiner) *HostDefiner {
+func New(hd *csiv1.HostDefiner) *HostDefiner {
 	return &HostDefiner{
-		HostDefiner: c,
+		HostDefiner: hd,
 	}
 }
 
-func (c *HostDefiner) Unwrap() *csiv1.HostDefiner {
-	return c.HostDefiner
+func (hd *HostDefiner) Unwrap() *csiv1.HostDefiner {
+	return hd.HostDefiner
 }
 
-func (c *HostDefiner) GetHostDefinerPodLabels() labels.Set {
-	return labels.Merge(c.GetLabels(), c.GetHostDefinerSelectorLabels())
+func (hd *HostDefiner) GetHostDefinerPodLabels() labels.Set {
+	return labels.Merge(hd.GetLabels(), hd.GetHostDefinerSelectorLabels())
 }
 
-func (c *HostDefiner) GetLabels() labels.Set {
+func (hd *HostDefiner) GetLabels() labels.Set {
 	labels := labels.Set{
 		"app.kubernetes.io/name":       config.ProductName,
-		"app.kubernetes.io/instance":   c.Name,
+		"app.kubernetes.io/instance":   hd.Name,
 		"app.kubernetes.io/version":    csiversion.Version,
 		"app.kubernetes.io/managed-by": config.Name,
 		"csi":                          "ibm",
@@ -55,8 +55,8 @@ func (c *HostDefiner) GetLabels() labels.Set {
 		"release":                      fmt.Sprintf("v%s", csiversion.Version),
 	}
 
-	if c.Labels != nil {
-		for k, v := range c.Labels {
+	if hd.Labels != nil {
+		for k, v := range hd.Labels {
 			if !labels.Has(k) {
 				labels[k] = v
 			}
@@ -66,19 +66,19 @@ func (c *HostDefiner) GetLabels() labels.Set {
 	return labels
 }
 
-func (c *HostDefiner) GetHostDefinerSelectorLabels() labels.Set {
+func (hd *HostDefiner) GetHostDefinerSelectorLabels() labels.Set {
 	return common.GetSelectorLabels(config.HostDefiner.String())
 }
 
-func (c *HostDefiner) GetAnnotations() labels.Set {
+func (hd *HostDefiner) GetAnnotations() labels.Set {
 	labels := labels.Set{
 		"productID":      config.ProductName,
 		"productName":    config.ProductName,
 		"productVersion": csiversion.Version,
 	}
 
-	if c.Annotations != nil {
-		for k, v := range c.Annotations {
+	if hd.Annotations != nil {
+		for k, v := range hd.Annotations {
 			if !labels.Has(k) {
 				labels[k] = v
 			}
@@ -88,9 +88,9 @@ func (c *HostDefiner) GetAnnotations() labels.Set {
 	return labels
 }
 
-func (c *HostDefiner) GetHostDefinerImage() string {
-	if c.Spec.HostDefiner.Tag == "" {
-		return c.Spec.HostDefiner.Repository
+func (hd *HostDefiner) GetHostDefinerImage() string {
+	if hd.Spec.HostDefiner.Tag == "" {
+		return hd.Spec.HostDefiner.Repository
 	}
-	return c.Spec.HostDefiner.Repository + ":" + c.Spec.HostDefiner.Tag
+	return hd.Spec.HostDefiner.Repository + ":" + hd.Spec.HostDefiner.Tag
 }
