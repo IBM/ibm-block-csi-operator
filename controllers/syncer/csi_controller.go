@@ -48,6 +48,9 @@ const (
 	replicatorContainerName              = "csi-addons-replicator"
 	controllerLivenessProbeContainerName = "livenessprobe"
 
+	commonMaxWorkersFlag  = "--worker-threads"
+	resizerMaxWorkersFlag = "--workers"
+
 	controllerContainerHealthPortName          = "healthz"
 	controllerContainerDefaultHealthPortNumber = 9808
 )
@@ -155,10 +158,8 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 			Scheme: corev1.URISchemeHTTP,
 		},
 	})
-	cpuCount := os.NumCPU()
-	maxWorkers := math.Min(float64(cpuCount), 32) / 2
-	maxWorkersWithMin := int(math.Max(maxWorkers, 2))
-	maxWorkersFlag := fmt.Sprintf("--worker-threads=%d", maxWorkersWithMin)
+
+	maxWorkersFlag := getCommonMaxWorkersFlag()
 
 	provisionerArgs := []string{
 		"--csi-address=$(ADDRESS)",
@@ -199,7 +200,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 			"--csi-address=$(ADDRESS)",
 			"--v=5",
 			"--timeout=30s",
-			fmt.Sprintf("--workers=%d", maxWorkersWithMin),
+			getResizerMaxWorkersFlag(),
 		},
 	)
 	resizer.ImagePullPolicy = s.getCSIResizerPullPolicy()
@@ -457,4 +458,23 @@ func getSidecarByName(driver *crutils.IBMBlockCSI, name string) *csiv1.CSISideca
 		}
 	}
 	return nil
+}
+
+func getMaxWorkersCount() int {
+	cpuCount := os.NumCPU()
+	maxWorkers := math.Min(float64(cpuCount), 32) / 2
+	return int(math.Max(maxWorkers, 2))
+}
+
+func getMaxWorkersFlag(flag string) string {
+	maxWorkersCount := getMaxWorkersCount()
+	return fmt.Sprintf("%s=%d", flag, maxWorkersCount)
+}
+
+func getCommonMaxWorkersFlag() string {
+	return getMaxWorkersFlag(commonMaxWorkersFlag)
+}
+
+func getResizerMaxWorkersFlag() string {
+	return getMaxWorkersFlag(resizerMaxWorkersFlag)
 }
