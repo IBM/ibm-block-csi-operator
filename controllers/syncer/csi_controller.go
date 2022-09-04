@@ -18,6 +18,8 @@ package syncer
 
 import (
 	"fmt"
+	"math"
+	os "runtime"
 
 	"github.com/imdario/mergo"
 	appsv1 "k8s.io/api/apps/v1"
@@ -45,6 +47,9 @@ const (
 	resizerContainerName                 = "csi-resizer"
 	replicatorContainerName              = "csi-addons-replicator"
 	controllerLivenessProbeContainerName = "livenessprobe"
+
+	commonMaxWorkersFlag  = "--worker-threads"
+	resizerMaxWorkersFlag = "--workers"
 
 	controllerContainerHealthPortName          = "healthz"
 	controllerContainerDefaultHealthPortNumber = 9808
@@ -154,12 +159,14 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		},
 	})
 
+	maxWorkersFlag := getCommonMaxWorkersFlag()
+
 	provisionerArgs := []string{
 		"--csi-address=$(ADDRESS)",
 		"--v=5",
 		"--timeout=120s",
 		"--default-fstype=ext4",
-		"--worker-threads=10",
+		maxWorkersFlag,
 	}
 	if TopologyEnabled {
 		provisionerArgs = append(provisionerArgs, "--feature-gates=Topology=true")
@@ -172,19 +179,29 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 
 	attacher := s.ensureContainer(attacherContainerName,
 		s.getCSIAttacherImage(),
-		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=180s"},
+		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=180s", maxWorkersFlag},
 	)
 	attacher.ImagePullPolicy = s.getCSIAttacherPullPolicy()
 
 	snapshotter := s.ensureContainer(snapshotterContainerName,
 		s.getCSISnapshotterImage(),
-		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=120s"},
+		[]string{
+			"--csi-address=$(ADDRESS)",
+			"--v=5",
+			"--timeout=120s",
+			maxWorkersFlag,
+		},
 	)
 	snapshotter.ImagePullPolicy = s.getCSISnapshotterPullPolicy()
 
 	resizer := s.ensureContainer(resizerContainerName,
 		s.getCSIResizerImage(),
-		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s"},
+		[]string{
+			"--csi-address=$(ADDRESS)",
+			"--v=5",
+			"--timeout=30s",
+			getResizerMaxWorkersFlag(),
+		},
 	)
 	resizer.ImagePullPolicy = s.getCSIResizerPullPolicy()
 
@@ -441,4 +458,23 @@ func getSidecarByName(driver *crutils.IBMBlockCSI, name string) *csiv1.CSISideca
 		}
 	}
 	return nil
+}
+
+func getMaxWorkersCount() int {
+	cpuCount := os.NumCPU()
+	maxWorkers := math.Min(float64(cpuCount), 32) / 2
+	return int(math.Max(maxWorkers, 2))
+}
+
+func getMaxWorkersFlag(flag string) string {
+	maxWorkersCount := getMaxWorkersCount()
+	return fmt.Sprintf("%s=%d", flag, maxWorkersCount)
+}
+
+func getCommonMaxWorkersFlag() string {
+	return getMaxWorkersFlag(commonMaxWorkersFlag)
+}
+
+func getResizerMaxWorkersFlag() string {
+	return getMaxWorkersFlag(resizerMaxWorkersFlag)
 }
