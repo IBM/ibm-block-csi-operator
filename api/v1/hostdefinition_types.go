@@ -38,6 +38,14 @@ type Definition struct {
 	SecretNamespace string `json:"secretNamespace"`
 	// +kubebuilder:validation:Optional
 	NodeId string `json:"nodeId"`
+	// +kubebuilder:validation:Optional
+	ConnectivityType string `json:"connectivityType"`
+	// +kubebuilder:validation:Optional
+	Ports []string `json:"ports"`
+	// +kubebuilder:validation:Optional
+	NodeNameOnStorage string `json:"nodeNameOnStorage"`
+	// +kubebuilder:validation:Optional
+	IOGroups []string `json:"ioGroups"`
 }
 
 // HostDefinitionStatus defines the status of the host definition on the storage
