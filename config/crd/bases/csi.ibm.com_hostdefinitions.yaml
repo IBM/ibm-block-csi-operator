@@ -50,10 +50,22 @@ spec:
               hostDefinition:
                 description: Definition defines the observed state of HostDefinition
                 properties:
+                  connectivityType:
+                    type: string
+                  ioGroups:
+                    items:
+                      type: string
+                    type: array
                   nodeId:
                     type: string
                   nodeName:
                     type: string
+                  nodeNameOnStorage:
+                    type: string
+                  ports:
+                    items:
+                      type: string
+                    type: array
                   secretName:
                     type: string
                   secretNamespace:
