@@ -24,7 +24,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	csiv1 "github.com/example/memcached-operator/api/v1"
+	csiv1 "github.com/IBM/volume-group-operator/api/v1"
 )
 
 // VolumeGroupReconciler reconciles a VolumeGroup object

@@ -5,7 +5,7 @@ plugins:
   manifests.sdk.operatorframework.io/v2: {}
   scorecard.sdk.operatorframework.io/v2: {}
 projectName: operator
-repo: github.com/example/memcached-operator
+repo: github.com/IBM/volume-group-operator
 resources:
 - api:
     crdVersion: v1
@@ -14,7 +14,7 @@ resources:
   domain: ibm.com
   group: csi
   kind: VolumeGroup
-  path: github.com/example/memcached-operator/api/v1
+  path: github.com/IBM/volume-group-operator/api/v1
   version: v1
 - api:
     crdVersion: v1
@@ -22,7 +22,7 @@ resources:
   domain: ibm.com
   group: csi
   kind: VolumeGroupClass
-  path: github.com/example/memcached-operator/api/v1
+  path: github.com/IBM/volume-group-operator/api/v1
   version: v1
 - api:
     crdVersion: v1
@@ -30,6 +30,6 @@ resources:
   domain: ibm.com
   group: csi
   kind: VolumeGroupContent
-  path: github.com/example/memcached-operator/api/v1
+  path: github.com/IBM/volume-group-operator/api/v1
   version: v1
 version: "3"

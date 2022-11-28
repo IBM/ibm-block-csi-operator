@@ -1,4 +1,4 @@
-module github.com/example/memcached-operator
+module github.com/IBM/volume-group-operator
 
 go 1.19
 
