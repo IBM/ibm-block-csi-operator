@@ -16,4 +16,12 @@ resources:
   kind: VolumeGroup
   path: github.com/example/memcached-operator/api/v1
   version: v1
+- api:
+    crdVersion: v1
+    namespaced: true
+  domain: ibm.com
+  group: csi
+  kind: VolumeGroupClass
+  path: github.com/example/memcached-operator/api/v1
+  version: v1
 version: "3"
