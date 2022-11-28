@@ -54,7 +54,7 @@ spec:
                     type: string
                   ioGroups:
                     items:
-                      type: string
+                      type: integer
                     type: array
                   nodeId:
                     type: string
