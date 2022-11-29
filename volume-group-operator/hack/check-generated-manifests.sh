@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-project_dirname=ibm-block-csi-operator
+project_dirname=volume-group-operator
 cd ..
 cp -r $project_dirname ./$project_dirname-expected
 cd $project_dirname-expected/
