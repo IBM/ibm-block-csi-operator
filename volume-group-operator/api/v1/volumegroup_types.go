@@ -17,68 +17,36 @@ limitations under the License.
 package v1
 
 import (
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// VolumeGroupSpec describes the common attributes of group storage devices
-// and allows a Source for provider-specific attributes
+// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
+// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+
+// VolumeGroupSpec defines the desired state of VolumeGroup
 type VolumeGroupSpec struct {
-	// +optional
-	VolumeGroupClassName *string `json:"volumeGroupClassName,omitempty"`
+	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
+	// Important: Run "make" to regenerate code after modifying this file
 
-	// Source has the information about where the group is created from.
-	Source VolumeGroupSource `json:"source"`
-}
-
-// VolumeGroupSource contains several options.
-// OneOf the options must be defined.
-type VolumeGroupSource struct {
-	// +optional
-	// Pre-provisioned VolumeGroup
-	VolumeGroupContentName *string `json:"volumeGroupContentName,omitempty"`
-
-	// +optional
-	// Dynamically provisioned VolumeGroup
-	// A label query over persistent volume claims to be added to the volume group.
-	// This labelSelector will be used to match the label added to a PVC.
-	// In Phase 1, when the label is added to PVC, the PVC will be added to the matching group.
-	// In Phase 2, this labelSelector will be used to find all PVCs with matching label and add them to the group when the group is being created.
-	Selector *metav1.LabelSelector `json:"selector,omitempty"`
+	// Foo is an example field of VolumeGroup. Edit volumegroup_types.go to remove/update
+	Foo string `json:"foo,omitempty"`
 }
 
 // VolumeGroupStatus defines the observed state of VolumeGroup
 type VolumeGroupStatus struct {
-	// +optional
-	BoundVolumeGroupContentName *string `json:"boundVolumeGroupContentName,omitempty"`
-
-	// +optional
-	GroupCreationTime *metav1.Time `json:"groupCreationTime,omitempty"`
-
-	// A list of persistent volume claims
-	// +optional
-	PVCList []corev1.PersistentVolumeClaim `json:"pvcList,omitempty"`
-
-	// +optional
-	Ready *bool `json:"ready,omitempty"`
-
-	// Last error encountered during group creation
-	// +optional
-	Error *VolumeGroupError `json:"error,omitempty"`
+	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
+	// Important: Run "make" to regenerate code after modifying this file
 }
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 
-// VolumeGroup is a user's request for a group of volumes
+// VolumeGroup is the Schema for the volumegroups API
 type VolumeGroup struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec defines the volume group requested by a user
-	Spec VolumeGroupSpec `json:"spec,omitempty"`
-	// Status represents the current information about a volume group
-	// +optional
+	Spec   VolumeGroupSpec   `json:"spec,omitempty"`
 	Status VolumeGroupStatus `json:"status,omitempty"`
 }
 

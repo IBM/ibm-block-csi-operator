@@ -5,29 +5,29 @@ metadata:
   creationTimestamp: null
   name: manager-role
 rules:
-- apiGroups:
-  - csi.ibm.com
-  resources:
-  - volumegroups
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - csi.ibm.com
-  resources:
-  - volumegroups/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - csi.ibm.com
-  resources:
-  - volumegroups/status
-  verbs:
-  - get
-  - patch
-  - update
+  - apiGroups:
+      - csi.ibm.com
+    resources:
+      - volumegroups
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - csi.ibm.com
+    resources:
+      - volumegroups/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - csi.ibm.com
+    resources:
+      - volumegroups/status
+    verbs:
+      - get
+      - patch
+      - update
