@@ -8,6 +8,58 @@ rules:
 - apiGroups:
   - csi.ibm.com
   resources:
+  - volumegroupclasses
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - csi.ibm.com
+  resources:
+  - volumegroupclasses/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - csi.ibm.com
+  resources:
+  - volumegroupclasses/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - csi.ibm.com
+  resources:
+  - volumegroupcontents
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - csi.ibm.com
+  resources:
+  - volumegroupcontents/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - csi.ibm.com
+  resources:
+  - volumegroupcontents/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - csi.ibm.com
+  resources:
   - volumegroups
   verbs:
   - create
