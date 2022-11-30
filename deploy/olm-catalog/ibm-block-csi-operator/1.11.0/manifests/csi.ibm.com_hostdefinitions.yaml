@@ -32,7 +32,7 @@ spec:
       name: Node
       type: string
     - jsonPath: .spec.hostDefinition.managementAddress
-      name: ManagementAddress
+      name: Management_Address
       type: string
     name: v1
     schema:

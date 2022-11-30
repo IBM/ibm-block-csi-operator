@@ -62,7 +62,7 @@ type HostDefinitionStatus struct {
 // +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
 // +kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 // +kubebuilder:printcolumn:name="Node",type=string,JSONPath=`.spec.hostDefinition.nodeName`
-// +kubebuilder:printcolumn:name="ManagementAddress",type=string,JSONPath=`.spec.hostDefinition.managementAddress`
+// +kubebuilder:printcolumn:name="Management_Address",type=string,JSONPath=`.spec.hostDefinition.managementAddress`
 type HostDefinition struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
