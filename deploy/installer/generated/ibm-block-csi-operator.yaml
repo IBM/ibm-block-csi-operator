@@ -611,6 +611,9 @@ spec:
     - jsonPath: .spec.hostDefinition.nodeName
       name: Node
       type: string
+    - jsonPath: .spec.hostDefinition.managementAddress
+      name: ManagementAddress
+      type: string
     name: v1
     schema:
       openAPIV3Schema:
@@ -636,6 +639,8 @@ spec:
                     items:
                       type: integer
                     type: array
+                  managementAddress:
+                    type: string
                   nodeId:
                     type: string
                   nodeName:
@@ -651,6 +656,7 @@ spec:
                   secretNamespace:
                     type: string
                 required:
+                - managementAddress
                 - nodeName
                 type: object
             required:
