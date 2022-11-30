@@ -3,17 +3,14 @@ kind: ClusterRoleBinding
 metadata:
   labels:
     app.kubernetes.io/name: clusterrolebinding
-    app.kubernetes.io/instance: manager-rolebinding
-    app.kubernetes.io/component: rbac
-    app.kubernetes.io/created-by: volume-group-operator
-    app.kubernetes.io/part-of: volume-group-operator
-    app.kubernetes.io/managed-by: kustomize
-  name: manager-rolebinding
+    app.kubernetes.io/instance: volume-group-operator
+    app.kubernetes.io/managed-by: volume-group-operator
+  name: volume-group-operator
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: manager-role
+  name: volume-group-operator
 subjects:
   - kind: ServiceAccount
-    name: controller-manager
-    namespace: system
+    name: volume-group-operator
+    namespace: default
