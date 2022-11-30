@@ -20,24 +20,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
-// VolumeGroupClassSpec defines the desired state of VolumeGroupClass
-type VolumeGroupClassSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
-	// Foo is an example field of VolumeGroupClass. Edit volumegroupclass_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
-}
-
-// VolumeGroupClassStatus defines the observed state of VolumeGroupClass
-type VolumeGroupClassStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-}
-
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 
@@ -46,8 +28,22 @@ type VolumeGroupClass struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   VolumeGroupClassSpec   `json:"spec,omitempty"`
-	Status VolumeGroupClassStatus `json:"status,omitempty"`
+	// Driver is the driver expected to handle this VolumeGroupClass.
+	Driver string `json:"driver"`
+
+	// Parameters hold parameters for the driver.
+	// These values are opaque to the system and are passed directly
+	// to the driver.
+	// +optional
+	Parameters map[string]string `json:"parameters,omitempty"`
+
+	// +optional
+	VolumeGroupDeletionPolicy *VolumeGroupDeletionPolicy `json:"volumeGroupDeletionPolicy,omitempty"`
+
+	// This field specifies whether group snapshot is supported.
+	// The default is false.
+	// +optional
+	SupportVolumeGroupSnapshot *bool `json:"supportVolumeGroupSnapshot,omitempty"`
 }
 
 //+kubebuilder:object:root=true

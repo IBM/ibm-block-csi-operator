@@ -17,25 +17,68 @@ limitations under the License.
 package v1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
 // VolumeGroupContentSpec defines the desired state of VolumeGroupContent
 type VolumeGroupContentSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// +optional
+	VolumeGroupClassName *string `json:"volumeGroupClassName,omitempty"`
 
-	// Foo is an example field of VolumeGroupContent. Edit volumegroupcontent_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// +optional
+	// VolumeGroupRef is part of a bi-directional binding between VolumeGroup and VolumeGroupContent.
+	VolumeGroupRef *corev1.ObjectReference `json:"volumeGroupRef,omitempty"`
+
+	// +optional
+	Source *VolumeGroupContentSource `json:"source,omitempty"`
+
+	// +optional
+	VolumeGroupDeletionPolicy *VolumeGroupDeletionPolicy `json:"volumeGroupDeletionPolicy,omitempty"`
+
+	// This field specifies whether group snapshot is supported.
+	// The default is false.
+	// +optional
+	SupportVolumeGroupSnapshot *bool `json:"supportVolumeGroupSnapshot,omitempty"`
+
+	// VolumeGroupSecretRef is a reference to the secret object containing
+	// sensitive information to pass to the CSI driver to complete the CSI
+	// calls for VolumeGroups.
+	// This field is optional, and may be empty if no secret is required. If the
+	// secret object contains more than one secret, all secrets are passed.
+	// +optional
+	VolumeGroupSecretRef *corev1.SecretReference `json:"volumeGroupSecretRef,omitempty"`
+}
+
+// VolumeGroupContentSource
+type VolumeGroupContentSource struct {
+	Driver string `json:"driver"`
+
+	// VolumeGroupHandle is the unique volume group name returned by the
+	// CSI volume plugin’s CreateVolumeGroup to refer to the volume group on
+	// all subsequent calls.
+	VolumeGroupHandle string `json:"volumeGroupHandle"`
+
+	// +optional
+	// Attributes of the volume group to publish.
+	VolumeGroupAttributes map[string]string `json:"volumeGroupAttributes,omitempty"`
 }
 
 // VolumeGroupContentStatus defines the observed state of VolumeGroupContent
 type VolumeGroupContentStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// +optional
+	GroupCreationTime *metav1.Time `json:"groupCreationTime,omitempty"`
+
+	// A list of persistent volumes
+	// +optional
+	PVList []corev1.PersistentVolume `json:"pvcList,omitempty"`
+
+	// +optional
+	Ready *bool `json:"ready,omitempty"`
+
+	// Last error encountered during group creation
+	// +optional
+	Error *VolumeGroupError `json:"error,omitempty"`
 }
 
 //+kubebuilder:object:root=true
@@ -46,7 +89,10 @@ type VolumeGroupContent struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   VolumeGroupContentSpec   `json:"spec,omitempty"`
+	// Spec defines the volume group requested by a user
+	Spec VolumeGroupContentSpec `json:"spec,omitempty"`
+	// Status represents the current information about a volume group
+	// +optional
 	Status VolumeGroupContentStatus `json:"status,omitempty"`
 }
 
