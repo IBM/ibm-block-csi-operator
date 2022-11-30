@@ -36,12 +36,11 @@ type VolumeGroupReconciler struct {
 //+kubebuilder:rbac:groups=csi.ibm.com,resources=volumegroups,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=csi.ibm.com,resources=volumegroups/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=csi.ibm.com,resources=volumegroups/finalizers,verbs=update
-//+kubebuilder:rbac:groups=csi.ibm.com,resources=volumegroupclasses,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=csi.ibm.com,resources=volumegroupclasses/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=csi.ibm.com,resources=volumegroupclasses/finalizers,verbs=update
-//+kubebuilder:rbac:groups=csi.ibm.com,resources=volumegroupcontents,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=csi.ibm.com,resources=volumegroupcontents/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=csi.ibm.com,resources=volumegroupcontents/finalizers,verbs=update
+//+kubebuilder:rbac:groups=csi.ibm.com,resources=volumegroupclasses,verbs=get;list;watch
+//+kubebuilder:rbac:groups=csi.ibm.com,resources=volumegroupcontents,verbs=get;list;watch
+//+kubebuilder:rbac:groups="",resources=persistentvolumeclaims,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups="",resources=persistentvolumeclaims/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups="",resources=persistentvolumeclaims/finalizers,verbs=update
 
 func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
