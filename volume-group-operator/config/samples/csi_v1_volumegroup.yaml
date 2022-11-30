@@ -1,0 +1,12 @@
+apiVersion: csi.ibm.com/v1
+kind: VolumeGroup
+metadata:
+  labels:
+    app.kubernetes.io/name: volumegroup
+    app.kubernetes.io/instance: volumegroup-sample
+    app.kubernetes.io/part-of: volume-group-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: volume-group-operator
+  name: volumegroup-sample
+spec:
+# TODO(user): Add fields here

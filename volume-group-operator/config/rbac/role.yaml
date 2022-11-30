@@ -1,0 +1,33 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: volume-group-operator
+rules:
+  - apiGroups:
+      - csi.ibm.com
+    resources:
+      - volumegroups
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - csi.ibm.com
+    resources:
+      - volumegroups/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - csi.ibm.com
+    resources:
+      - volumegroups/status
+    verbs:
+      - get
+      - patch
+      - update
