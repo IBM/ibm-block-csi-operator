@@ -1,0 +1,16 @@
+FROM golang:1.19
+
+ENV GO111MODULE=on \
+    GOROOT=/usr/local/go \
+    WORKDIR=/go/src/github.com/IBM/volume-group-operator
+WORKDIR $WORKDIR
+RUN go install github.com/onsi/ginkgo/v2/ginkgo@v2.1.4 \
+    && go install sigs.k8s.io/controller-runtime/tools/setup-envtest@v0.0.0-20220322150744-c46b410039fd
+COPY Makefile .
+
+RUN make kustomize \
+    && make controller-gen
+
+COPY . .
+
+CMD ["make", "test"]
