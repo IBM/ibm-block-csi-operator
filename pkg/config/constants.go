@@ -50,6 +50,7 @@ const (
 	CSISnapshotter         = "csi-snapshotter"
 	CSIResizer             = "csi-resizer"
 	CSIAddonsReplicator    = "csi-addons-replicator"
+	CSIVolumeGroup         = "csi-volume-group"
 	LivenessProbe          = "livenessprobe"
 
 	ControllerSocketVolumeMountPath                       = "/var/lib/csi/sockets/pluginproxy/"

@@ -397,6 +397,62 @@ func (c *IBMBlockCSI) GenerateCSIAddonsReplicatorClusterRoleBinding() *rbacv1.Cl
 	}
 }
 
+
+func (c *IBMBlockCSI) GenerateVolumeGroupClusterRole() *rbacv1.ClusterRole {
+	return &rbacv1.ClusterRole{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: config.GetNameForResource(config.CSIAddonsReplicatorClusterRole, c.Name),
+		},
+		Rules: []rbacv1.PolicyRule{
+			{
+				APIGroups: []string{replicationStorageOpenshiftApiGroup},
+				Resources: []string{volumeReplicationClassesResource},
+				Verbs:     []string{verbGet, verbList, verbWatch},
+			},
+			{
+				APIGroups: []string{replicationStorageOpenshiftApiGroup},
+				Resources: []string{volumeReplicationsResource},
+				Verbs:     []string{verbCreate, verbDelete, verbGet, verbList, verbPatch, verbUpdate, verbWatch},
+			},
+			{
+				APIGroups: []string{replicationStorageOpenshiftApiGroup},
+				Resources: []string{volumeReplicationsFinalizersResource},
+				Verbs:     []string{verbUpdate},
+			},
+			{
+				APIGroups: []string{replicationStorageOpenshiftApiGroup},
+				Resources: []string{volumeReplicationsStatusResource},
+				Verbs:     []string{verbGet, verbPatch, verbUpdate},
+			},
+			{
+				APIGroups: []string{""},
+				Resources: []string{secretsResource},
+				Verbs:     []string{verbGet},
+			},
+		},
+	}
+}
+
+func (c *IBMBlockCSI) GenerateVolumeGroupClusterRoleBinding() *rbacv1.ClusterRoleBinding {
+	return &rbacv1.ClusterRoleBinding{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: config.GetNameForResource(config.CSIAddonsReplicatorClusterRoleBinding, c.Name),
+		},
+		Subjects: []rbacv1.Subject{
+			{
+				Kind:      "ServiceAccount",
+				Name:      config.GetNameForResource(config.CSIControllerServiceAccount, c.Name),
+				Namespace: c.Namespace,
+			},
+		},
+		RoleRef: rbacv1.RoleRef{
+			Kind:     "ClusterRole",
+			Name:     config.GetNameForResource(config.CSIAddonsReplicatorClusterRole, c.Name),
+			APIGroup: rbacAuthorizationApiGroup,
+		},
+	}
+}
+
 func (c *IBMBlockCSI) GenerateSCCForControllerClusterRole() *rbacv1.ClusterRole {
 	return &rbacv1.ClusterRole{
 		ObjectMeta: metav1.ObjectMeta{

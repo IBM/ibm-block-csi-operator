@@ -532,6 +532,7 @@ func (r *IBMBlockCSIReconciler) getClusterRoles(instance *crutils.IBMBlockCSI) [
 	externalSnapshotter := instance.GenerateExternalSnapshotterClusterRole()
 	externalResizer := instance.GenerateExternalResizerClusterRole()
 	csiAddonsReplicator := instance.GenerateCSIAddonsReplicatorClusterRole()
+	volumeGroup := instance.GenerateVolumeGroupClusterRole()
 	controllerSCC := instance.GenerateSCCForControllerClusterRole()
 	nodeSCC := instance.GenerateSCCForNodeClusterRole()
 
@@ -541,6 +542,7 @@ func (r *IBMBlockCSIReconciler) getClusterRoles(instance *crutils.IBMBlockCSI) [
 		externalSnapshotter,
 		externalResizer,
 		csiAddonsReplicator,
+		volumeGroup,
 		controllerSCC,
 		nodeSCC,
 	}
@@ -562,6 +564,7 @@ func (r *IBMBlockCSIReconciler) getClusterRoleBindings(instance *crutils.IBMBloc
 	externalSnapshotter := instance.GenerateExternalSnapshotterClusterRoleBinding()
 	externalResizer := instance.GenerateExternalResizerClusterRoleBinding()
 	csiAddonsReplicator := instance.GenerateCSIAddonsReplicatorClusterRoleBinding()
+	volumeGroup := instance.GenerateVolumeGroupClusterRoleBinding()
 	controllerSCC := instance.GenerateSCCForControllerClusterRoleBinding()
 	nodeSCC := instance.GenerateSCCForNodeClusterRoleBinding()
 
@@ -571,6 +574,7 @@ func (r *IBMBlockCSIReconciler) getClusterRoleBindings(instance *crutils.IBMBloc
 		externalSnapshotter,
 		externalResizer,
 		csiAddonsReplicator,
+		volumeGroup,
 		controllerSCC,
 		nodeSCC,
 	}
