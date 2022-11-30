@@ -1,27 +1,11 @@
-# This kustomization.yaml is not intended to be run by itself,
-# since it depends on service name and namespace that are out of this kustomize package.
-# It should be run by config/default
+commonLabels:
+  app.kubernetes.io/name: volume-group-operator
+  app.kubernetes.io/instance: volume-group-operator
+  app.kubernetes.io/managed-by: volume-group-operator
+  release: v1.11.0
+
 resources:
   - bases/csi.ibm.com_volumegroups.yaml
   - bases/csi.ibm.com_volumegroupclasses.yaml
   - bases/csi.ibm.com_volumegroupcontents.yaml
 #+kubebuilder:scaffold:crdkustomizeresource
-
-patchesStrategicMerge:
-# [WEBHOOK] To enable webhook, uncomment all the sections with [WEBHOOK] prefix.
-# patches here are for enabling the conversion webhook for each CRD
-#- patches/webhook_in_volumegroups.yaml
-#- patches/webhook_in_volumegroupclasses.yaml
-#- patches/webhook_in_volumegroupcontents.yaml
-#+kubebuilder:scaffold:crdkustomizewebhookpatch
-
-# [CERTMANAGER] To enable cert-manager, uncomment all the sections with [CERTMANAGER] prefix.
-# patches here are for enabling the CA injection for each CRD
-#- patches/cainjection_in_volumegroups.yaml
-#- patches/cainjection_in_volumegroupclasses.yaml
-#- patches/cainjection_in_volumegroupcontents.yaml
-#+kubebuilder:scaffold:crdkustomizecainjectionpatch
-
-# the following config is for teaching kustomize how to do kustomization for CRDs.
-configurations:
-  - kustomizeconfig.yaml
