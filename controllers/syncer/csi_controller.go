@@ -216,10 +216,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	replicator.ImagePullPolicy = s.getCSIAddonsReplicatorPullPolicy()
 
 	volumegroup := s.ensureContainer(volumeGroupContainerName,
-		s.getCSIVolumeGroupImage(),
-		[]string{leaderElectionNamespaceFlag, driverNameFlag,
-			"--csi-address=$(ADDRESS)", "--zap-log-level=5", "--rpc-timeout=30s, --health-probe-bind-address=9995"},
-	)
+		s.getCSIVolumeGroupImage(),[]string{})
 	volumegroup.ImagePullPolicy = s.getCSIVolumeGroupPullPolicy()
 
 
@@ -240,6 +237,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		snapshotter,
 		resizer,
 		replicator,
+		volumegroup,
 		livenessProbe,
 	}
 }
@@ -406,6 +404,10 @@ func (s *csiControllerSyncer) getCSIAddonsReplicatorImage() string {
 	return s.getSidecarImageByName(config.CSIAddonsReplicator)
 }
 
+func (s *csiControllerSyncer) getCSIVolumeGroupImage() string {
+	return s.getSidecarImageByName(config.CSIVolumeGroup)
+}
+
 func (s *csiControllerSyncer) getSidecarPullPolicy(sidecarName string) corev1.PullPolicy {
 	sidecar := s.getSidecarByName(sidecarName)
 	if sidecar != nil && sidecar.ImagePullPolicy != "" {
@@ -436,6 +438,10 @@ func (s *csiControllerSyncer) getCSIResizerPullPolicy() corev1.PullPolicy {
 
 func (s *csiControllerSyncer) getCSIAddonsReplicatorPullPolicy() corev1.PullPolicy {
 	return s.getSidecarPullPolicy(config.CSIAddonsReplicator)
+}
+
+func (s *csiControllerSyncer) getCSIVolumeGroupPullPolicy() corev1.PullPolicy {
+	return s.getSidecarPullPolicy(config.CSIVolumeGroup)
 }
 
 func ensurePorts(ports ...corev1.ContainerPort) []corev1.ContainerPort {
