@@ -28,6 +28,7 @@ import (
 const (
 	snapshotStorageApiGroup                  string = "snapshot.storage.k8s.io"
 	securityOpenshiftApiGroup                string = "security.openshift.io"
+	volumeGroupApiGroup                      string = "csi.ibm.com"
 	storageApiGroup                          string = "storage.k8s.io"
 	rbacAuthorizationApiGroup                string = "rbac.authorization.k8s.io"
 	replicationStorageOpenshiftApiGroup      string = "replication.storage.openshift.io"
@@ -410,34 +411,34 @@ func (c *IBMBlockCSI) GenerateVolumeGroupClusterRole() *rbacv1.ClusterRole {
 		},
 		Rules: []rbacv1.PolicyRule{
 			{
-				APIGroups: []string{""},
+				APIGroups: []string{volumeGroupApiGroup},
 				Resources: []string{volumeGroupsResources},
 				Verbs:     []string{verbGet, verbList, verbWatch, verbCreate, verbUpdate, verbPatch, verbDelete},
 			},
 			{
-				APIGroups: []string{""},
+				APIGroups: []string{volumeGroupApiGroup},
 				Resources: []string{volumeGroupsStatusResource},
 				Verbs:     []string{verbGet, verbUpdate, verbPatch},
 			},
 			{
-				APIGroups: []string{""},
+				APIGroups: []string{volumeGroupApiGroup},
 				Resources: []string{volumeGroupsFinalizersResource},
 				Verbs:     []string{verbUpdate},
 			},
 			{
-				APIGroups: []string{""},
-				Resources: []string{volumeGroupsResources},
-				Verbs:     []string{verbGet, verbList, verbWatch, verbCreate, verbUpdate, verbPatch, verbDelete},
-			},
-			{
-				APIGroups: []string{""},
+				APIGroups: []string{volumeGroupApiGroup},
 				Resources: []string{volumeGroupClassesResource},
 				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 			{
-				APIGroups: []string{""},
+				APIGroups: []string{volumeGroupApiGroup},
 				Resources: []string{volumeCroupContentsResource},
 				Verbs:     []string{verbGet, verbList, verbWatch},
+			},
+			{
+				APIGroups: []string{""},
+				Resources: []string{persistentVolumeClaimsResource},
+				Verbs:     []string{verbGet, verbList, verbWatch, verbUpdate, verbPatch},
 			},
 			{
 				APIGroups: []string{""},
@@ -448,21 +449,6 @@ func (c *IBMBlockCSI) GenerateVolumeGroupClusterRole() *rbacv1.ClusterRole {
 				APIGroups: []string{""},
 				Resources: []string{persistentVolumeClaimsFinalizersResource},
 				Verbs:     []string{verbUpdate},
-			},
-			{
-				APIGroups: []string{replicationStorageOpenshiftApiGroup},
-				Resources: []string{volumeReplicationsFinalizersResource},
-				Verbs:     []string{verbUpdate},
-			},
-			{
-				APIGroups: []string{replicationStorageOpenshiftApiGroup},
-				Resources: []string{volumeReplicationsStatusResource},
-				Verbs:     []string{verbGet, verbPatch, verbUpdate},
-			},
-			{
-				APIGroups: []string{""},
-				Resources: []string{secretsResource},
-				Verbs:     []string{verbGet},
 			},
 		},
 	}
