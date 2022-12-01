@@ -46,6 +46,7 @@ const (
 	snapshotterContainerName             = "csi-snapshotter"
 	resizerContainerName                 = "csi-resizer"
 	replicatorContainerName              = "csi-addons-replicator"
+	volumeGroupContainerName             = "csi-volume-group"
 	controllerLivenessProbeContainerName = "livenessprobe"
 
 	commonMaxWorkersFlag  = "--worker-threads"
@@ -214,6 +215,11 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	)
 	replicator.ImagePullPolicy = s.getCSIAddonsReplicatorPullPolicy()
 
+	volumegroup := s.ensureContainer(volumeGroupContainerName,
+		s.getCSIVolumeGroupImage(),[]string{})
+	volumegroup.ImagePullPolicy = s.getCSIVolumeGroupPullPolicy()
+
+
 	healthPortArg := fmt.Sprintf("--health-port=%v", healthPort)
 	livenessProbe := s.ensureContainer(controllerLivenessProbeContainerName,
 		s.getLivenessProbeImage(),
@@ -231,6 +237,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		snapshotter,
 		resizer,
 		replicator,
+		volumegroup,
 		livenessProbe,
 	}
 }
@@ -395,6 +402,10 @@ func (s *csiControllerSyncer) getCSIResizerImage() string {
 
 func (s *csiControllerSyncer) getCSIAddonsReplicatorImage() string {
 	return s.getSidecarImageByName(config.CSIAddonsReplicator)
+}
+
+func (s *csiControllerSyncer) getCSIVolumeGroupImage() string {
+	return s.getSidecarImageByName(config.CSIVolumeGroup)
 }
 
 func (s *csiControllerSyncer) getSidecarPullPolicy(sidecarName string) corev1.PullPolicy {
