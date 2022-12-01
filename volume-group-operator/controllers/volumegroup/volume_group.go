@@ -14,22 +14,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package replication
+package volumegroup
 
-import ()
+import (
+	"github.com/IBM/volume-group-operator/pkg/client"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+)
 
-// Replication represents the instance of a single replication operation.
+// VolumeGroup represents the instance of a single volume group operation.
 type VolumeGroup struct {
 	Params CommonRequestParameters
 }
 
-// Response is the response of a replication operation.
+// Response is the response of a volume group operation.
 type Response struct {
 	Response interface{}
 	Error    error
 }
 
-// CommonRequestParameters holds the common parameters across replication operations.
+// CommonRequestParameters holds the common parameters across volume group operations.
 type CommonRequestParameters struct {
 	Name          string
 	VolumeGroupID string

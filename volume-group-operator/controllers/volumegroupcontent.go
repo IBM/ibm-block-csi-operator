@@ -33,48 +33,70 @@ func (r VolumeGroupReconciler) getVolumeGroupContentSource(logger logr.Logger, r
 }
 
 // createVolumeGroupContent saves VolumeGroupContentSource on cluster.
-func (r *VolumeGroupReconciler) createVolumeGroupContent(logger logr.Logger, instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupClass, resp *volumegroup.Response, secretName string, secretNamespace string, groupCreationTime *metav1.Time, ready *bool) error {
-	VGC := &volumegroupv1.VolumeGroupContent{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: fmt.Sprintf("%s-%s", instance.Name, "content"),
-		},
-		Spec: volumegroupv1.VolumeGroupContentSpec{
-			VolumeGroupClassName: instance.Spec.VolumeGroupClassName,
-			VolumeGroupRef: &corev1.ObjectReference{
-				Kind:            instance.Kind,
-				Namespace:       instance.Namespace,
-				Name:            instance.Name,
-				UID:             instance.UID,
-				APIVersion:      instance.APIVersion,
-				ResourceVersion: instance.ResourceVersion,
-			},
-			Source: &volumegroupv1.VolumeGroupContentSource{
-				Driver:                vgcObj.Driver,
-				VolumeGroupHandle:     resp.VolumeGroup.volume_group_id,
-				VolumeGroupAttributes: resp.VolumeGroup.volume_group_context,
-			},
-			VolumeGroupSecretRef: &corev1.SecretReference{
-				Name:      secretName,
-				Namespace: secretNamespace,
-			},
-		},
-		Status: volumegroupv1.VolumeGroupContentStatus{
-			GroupCreationTime: groupCreationTime,
-			PVList:            []corev1.PersistentVolume{},
-			Ready:             ready,
-		},
-	}
-
-	err := r.Client.Create(context.TODO(), VGC, nil)
+func (r *VolumeGroupReconciler) createVolumeGroupContent(logger logr.Logger, instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupContent) error {
+	err := r.Client.Create(context.TODO(), vgcObj, nil)
 	if err != nil {
 		logger.Error(err, "VolumeGroupContent not found", "VolumeGroupContent Name")
 		return err
 	}
 
 	// Validate PVC in bound state
-	if *VGC.Status.Ready != true {
+	if *vgcObj.Status.Ready != true {
 		return fmt.Errorf("VolumeGroupContentSource %q is not Ready", instance.Name)
 	}
 
 	return nil
+}
+
+func (r *VolumeGroupReconciler) generateVolumeGroupContent(instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupClass, resp *volumegroup.Response, secretName string, secretNamespace string, groupCreationTime *metav1.Time, ready *bool) *volumegroupv1.VolumeGroupContent {
+	return &volumegroupv1.VolumeGroupContent{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: fmt.Sprintf("%s-%s", instance.Name, "content"),
+		},
+		Spec:   r.generateVolumeGroupContentSpec(instance, vgcObj, resp, secretName, secretNamespace),
+		Status: r.generateVolumeGroupContentStatus(groupCreationTime, ready),
+	}
+}
+
+func (r *VolumeGroupReconciler) generateVolumeGroupContentStatus(groupCreationTime *metav1.Time, ready *bool) volumegroupv1.VolumeGroupContentStatus {
+	return volumegroupv1.VolumeGroupContentStatus{
+		GroupCreationTime: groupCreationTime,
+		PVList:            []corev1.PersistentVolume{},
+		Ready:             ready,
+	}
+}
+
+func (r *VolumeGroupReconciler) generateVolumeGroupContentSpec(instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupClass, resp *volumegroup.Response, secretName string, secretNamespace string) volumegroupv1.VolumeGroupContentSpec {
+	return volumegroupv1.VolumeGroupContentSpec{
+		VolumeGroupClassName: instance.Spec.VolumeGroupClassName,
+		VolumeGroupRef:       r.generateObjectReference(instance),
+		Source:               r.generateVolumeGroupContentSource(vgcObj, resp),
+		VolumeGroupSecretRef: r.generateSecretReference(secretName, secretNamespace),
+	}
+}
+
+func (r *VolumeGroupReconciler) generateObjectReference(instance *volumegroupv1.VolumeGroup) *corev1.ObjectReference {
+	return &corev1.ObjectReference{
+		Kind:            instance.Kind,
+		Namespace:       instance.Namespace,
+		Name:            instance.Name,
+		UID:             instance.UID,
+		APIVersion:      instance.APIVersion,
+		ResourceVersion: instance.ResourceVersion,
+	}
+}
+
+func (r *VolumeGroupReconciler) generateSecretReference(secretName string, secretNamespace string) *corev1.SecretReference {
+	return &corev1.SecretReference{
+		Name:      secretName,
+		Namespace: secretNamespace,
+	}
+}
+
+func (r *VolumeGroupReconciler) generateVolumeGroupContentSource(vgcObj *volumegroupv1.VolumeGroupClass, resp *volumegroup.Response) *volumegroupv1.VolumeGroupContentSource {
+	return &volumegroupv1.VolumeGroupContentSource{
+		Driver:                vgcObj.Driver,
+		VolumeGroupHandle:     resp.Response.VolumeGroup.VolumeGroupId,
+		VolumeGroupAttributes: resp.Response.VolumeGroup.VolumeGroupContext,
+	}
 }
