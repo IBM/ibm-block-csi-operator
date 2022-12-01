@@ -67,10 +67,15 @@ type VolumeGroupStatus struct {
 	Error *VolumeGroupError `json:"error,omitempty"`
 }
 
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-
 // VolumeGroup is a user's request for a group of volumes
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:resource:scope=Namespaced,shortName=vg
+// +kubebuilder:printcolumn:name="Ready",type=boolean,JSONPath=`.status.ready`
+// +kubebuilder:printcolumn:name="VolumeGroupClass",type=string,JSONPath=`.spec.VolumeGroupClassName`
+// +kubebuilder:printcolumn:name="VolumeGroupContent",type=string,JSONPath=`.status.BoundVolumeGroupContentName`
+// +kubebuilder:printcolumn:name="CreationTime",type=date,JSONPath=`.status.GroupCreationTime`
+// +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 type VolumeGroup struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
