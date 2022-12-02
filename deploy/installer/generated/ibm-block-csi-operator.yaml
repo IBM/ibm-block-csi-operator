@@ -1831,12 +1831,21 @@ rules:
   - list
   - update
   - watch
+  - patch
 - apiGroups:
   - ""
   resources:
   - persistentvolumeclaims/status
   verbs:
+  - get
+  - update
   - patch
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims/finalizers
+  verbs:
+  - update
 - apiGroups:
   - ""
   resources:
