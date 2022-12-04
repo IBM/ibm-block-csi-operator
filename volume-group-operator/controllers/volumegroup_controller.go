@@ -19,6 +19,7 @@ package controllers
 import (
 	"context"
 	"github.com/IBM/volume-group-operator/controllers/volumegroup"
+	"github.com/container-storage-interface/spec/lib/go/csi"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -145,7 +146,7 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 		return reconcile.Result{}, err
 	}
-	volumeGroupName := "" //TODO
+	volumeGroupName := "testing" //TODO
 	// create volume group group on every reconcile
 	resp := r.createVolumeGroup(logger, volumeGroupName, parameters, secret)
 	if resp.Error != nil {
@@ -220,11 +221,18 @@ func (r *VolumeGroupReconciler) deleteVolumeGroup(logger logr.Logger, volumeGrou
 		Secrets:       secrets,
 	}
 
-	volumeGroup := volumegroup.VolumeGroup{
-		Params: c,
+	logger.Info("create volume request with parameters:", c)
+	response := csi.DeleteVolumeGroupResponse{}
+	resp := volumegroup.Response{
+		Response: response,
+		Error:    nil,
 	}
 
-	resp := volumeGroup.Delete()
+	//volumeGroup := volumegroup.VolumeGroup{
+	//	Params: c,
+	//}
+	//
+	//resp := volumeGroup.Delete()
 
 	if resp.Error != nil {
 		//if isKnownError := resp.HasKnownGRPCError(disableReplicationKnownErrors); isKnownError {
@@ -248,11 +256,22 @@ func (r *VolumeGroupReconciler) createVolumeGroup(logger logr.Logger, volumeGrou
 		Secrets:    secrets,
 	}
 
-	volumeGroup := volumegroup.VolumeGroup{
-		Params: c,
+	//volumeGroup := volumegroup.VolumeGroup{
+	//	Params: c,
+	//}
+
+	logger.Info("create volume request with parameters:", c)
+	response := csi.CreateVolumeGroupResponse{
+		VolumeGroup: &csi.VolumeGroup{
+			VolumeGroupId: volumeGroupName,
+		},
+	}
+	resp := volumegroup.Response{
+		Response: response,
+		Error:    nil,
 	}
 
-	resp := volumeGroup.Create()
+	//resp := volumeGroup.Create()
 
 	if resp.Error != nil {
 		//if isKnownError := resp.HasKnownGRPCError(disableReplicationKnownErrors); isKnownError {
@@ -262,10 +281,10 @@ func (r *VolumeGroupReconciler) createVolumeGroup(logger logr.Logger, volumeGrou
 		//}
 		logger.Error(resp.Error, "failed to create volume group")
 
-		return resp
+		return &resp
 	}
 
-	return resp
+	return &resp
 }
 
 func getCurrentTime() *metav1.Time {
