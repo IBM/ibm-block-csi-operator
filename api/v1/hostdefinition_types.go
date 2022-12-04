@@ -45,7 +45,7 @@ type Definition struct {
 	// +kubebuilder:validation:Optional
 	NodeNameOnStorage string `json:"nodeNameOnStorage"`
 	// +kubebuilder:validation:Optional
-	IOGroups []string `json:"ioGroups"`
+	IOGroups []int `json:"ioGroups"`
 }
 
 // HostDefinitionStatus defines the status of the host definition on the storage

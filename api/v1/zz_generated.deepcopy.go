@@ -50,7 +50,7 @@ func (in *Definition) DeepCopyInto(out *Definition) {
 	}
 	if in.IOGroups != nil {
 		in, out := &in.IOGroups, &out.IOGroups
-		*out = make([]string, len(*in))
+		*out = make([]int, len(*in))
 		copy(*out, *in)
 	}
 }
