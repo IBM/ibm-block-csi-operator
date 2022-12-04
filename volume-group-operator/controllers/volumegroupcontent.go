@@ -5,6 +5,7 @@ import (
 	"fmt"
 	volumegroupv1 "github.com/IBM/volume-group-operator/api/v1"
 	volumegroup "github.com/IBM/volume-group-operator/controllers/volumegroup"
+	"github.com/container-storage-interface/spec/lib/go/csi"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -94,9 +95,10 @@ func (r *VolumeGroupReconciler) generateSecretReference(secretName string, secre
 }
 
 func (r *VolumeGroupReconciler) generateVolumeGroupContentSource(vgcObj *volumegroupv1.VolumeGroupClass, resp *volumegroup.Response) *volumegroupv1.VolumeGroupContentSource {
+	CreateVolumeGroupResponse := resp.Response.(*csi.CreateVolumeGroupResponse)
 	return &volumegroupv1.VolumeGroupContentSource{
 		Driver:                vgcObj.Driver,
-		VolumeGroupHandle:     resp.Response.VolumeGroup.VolumeGroupId,
-		VolumeGroupAttributes: resp.Response.VolumeGroup.VolumeGroupContext,
+		VolumeGroupHandle:     CreateVolumeGroupResponse.VolumeGroup.VolumeGroupId,
+		VolumeGroupAttributes: CreateVolumeGroupResponse.VolumeGroup.VolumeGroupContext,
 	}
 }

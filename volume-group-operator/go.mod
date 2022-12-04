@@ -10,6 +10,8 @@ require (
 	sigs.k8s.io/controller-runtime v0.13.0
 )
 
+require google.golang.org/genproto v0.0.0-20220502173005-c8bf987b8c21 // indirect
+
 require (
 	cloud.google.com/go v0.97.0 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect

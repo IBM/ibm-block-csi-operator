@@ -21,7 +21,6 @@ import (
 	"github.com/IBM/volume-group-operator/controllers/volumegroup"
 	"github.com/container-storage-interface/spec/lib/go/csi"
 	"github.com/go-logr/logr"
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -96,8 +95,6 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		}
 	}
 
-	var pvc *corev1.PersistentVolumeClaim
-
 	volumeGroupContentSource, _ := r.getVolumeGroupContentSource(logger, req.NamespacedName)
 	volumeGroupId := volumeGroupContentSource.VolumeGroupHandle
 
@@ -108,22 +105,13 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 			return reconcile.Result{}, err
 		}
-		if err = r.addFinalizerToPVC(logger, pvc); err != nil {
-			logger.Error(err, "Failed to add PersistentVolumeClaim finalizer")
 
-			return reconcile.Result{}, err
-		}
 	} else {
 		if contains(instance.GetFinalizers(), volumeGroupFinalizer) {
 			if err = r.deleteVolumeGroup(logger, volumeGroupId, secret); err != nil {
 				logger.Error(err, "failed to delete volume group")
 
 				return ctrl.Result{}, err
-			}
-			if err = r.removeFinalizerFromPVC(logger, pvc); err != nil {
-				logger.Error(err, "Failed to remove PersistentVolumeClaim finalizer")
-
-				return reconcile.Result{}, err
 			}
 
 			// once all finalizers have been removed, the object will be
