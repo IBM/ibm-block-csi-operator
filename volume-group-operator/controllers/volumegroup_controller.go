@@ -66,7 +66,6 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 	vgcObj, err := r.getVolumeGroupClass(logger, *instance.Spec.VolumeGroupClassName)
 	if err != nil {
-		setFailureCondition(instance)
 		uErr := r.updateVolumeGroupStatusError(instance, logger, err.Error())
 		if uErr != nil {
 			logger.Error(uErr, "failed to update volumeGroup status", "VGName", instance.Name)
@@ -87,7 +86,6 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	if secretName != "" && secretNamespace != "" {
 		secret, err = r.getSecret(logger, secretName, secretNamespace)
 		if err != nil {
-			setFailureCondition(instance)
 			uErr := r.updateVolumeGroupStatusError(instance, logger, err.Error())
 			if uErr != nil {
 				logger.Error(uErr, "failed to update volumeGroup status", "VGName", instance.Name)
@@ -152,7 +150,6 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	resp := r.createVolumeGroup(logger, volumeGroupName, parameters, secret)
 	if resp.Error != nil {
 		logger.Error(err, "failed to create volume group")
-		setFailureCondition(instance)
 		msg := volumegroup.GetMessageFromError(resp.Error)
 		uErr := r.updateVolumeGroupStatusError(instance, logger, msg)
 		if uErr != nil {
