@@ -18,7 +18,9 @@ package main
 
 import (
 	"flag"
+	"github.com/IBM/volume-group-operator/pkg/config"
 	"os"
+	"time"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -34,6 +36,11 @@ import (
 	csiv1 "github.com/IBM/volume-group-operator/api/v1"
 	"github.com/IBM/volume-group-operator/controllers"
 	//+kubebuilder:scaffold:imports
+)
+
+const (
+	// defaultTimeout is default timeout for RPC call.
+	defaultTimeout = time.Minute
 )
 
 var (
@@ -55,7 +62,19 @@ func main() {
 	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
 
+	cfg := config.NewDriverConfig()
+
+	flag.StringVar(&cfg.DriverName, "driver-name", "", "The CSI driver name.")
+	flag.StringVar(&cfg.DriverEndpoint, "csi-address", "/run/csi/socket", "Address of the CSI driver socket.")
+	flag.DurationVar(&cfg.RPCTimeout, "rpc-timeout", defaultTimeout, "The timeout for RPCs to the CSI driver.")
+
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
+
+	err := cfg.Validate()
+	if err != nil {
+		setupLog.Error(err, "error in driver configuration")
+		os.Exit(1)
+	}
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme: scheme,
@@ -69,7 +88,7 @@ func main() {
 	if err = (&controllers.VolumeGroupReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
+	}).SetupWithManager(mgr, cfg); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "VolumeGroup")
 		os.Exit(1)
 	}
