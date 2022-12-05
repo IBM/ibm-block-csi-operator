@@ -433,7 +433,7 @@ func (c *IBMBlockCSI) GenerateVolumeGroupClusterRole() *rbacv1.ClusterRole {
 			{
 				APIGroups: []string{volumeGroupApiGroup},
 				Resources: []string{volumeGroupContentsResource},
-				Verbs:     []string{verbGet, verbList, verbWatch, verbCreate},
+				Verbs:     []string{verbGet, verbList, verbWatch, verbCreate, verbUpdate, verbPatch, verbDelete},
 			},
 			{
 				APIGroups: []string{""},
