@@ -216,9 +216,8 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	replicator.ImagePullPolicy = s.getCSIAddonsReplicatorPullPolicy()
 
 	volumegroup := s.ensureContainer(volumeGroupContainerName,
-		s.getCSIVolumeGroupImage(),[]string{})
+		s.getCSIVolumeGroupImage(), []string{})
 	volumegroup.ImagePullPolicy = s.getCSIVolumeGroupPullPolicy()
-
 
 	healthPortArg := fmt.Sprintf("--health-port=%v", healthPort)
 	livenessProbe := s.ensureContainer(controllerLivenessProbeContainerName,
@@ -438,6 +437,10 @@ func (s *csiControllerSyncer) getCSIResizerPullPolicy() corev1.PullPolicy {
 
 func (s *csiControllerSyncer) getCSIAddonsReplicatorPullPolicy() corev1.PullPolicy {
 	return s.getSidecarPullPolicy(config.CSIAddonsReplicator)
+}
+
+func (s *csiControllerSyncer) getCSIVolumeGroupPullPolicy() corev1.PullPolicy {
+	return s.getSidecarPullPolicy(config.CSIVolumeGroup)
 }
 
 func ensurePorts(ports ...corev1.ContainerPort) []corev1.ContainerPort {
