@@ -62,9 +62,6 @@ func main() {
 		},
 	}
 
-	opts.BindFlags(flag.CommandLine)
-	flag.Parse()
-
 	cfg := config.NewDriverConfig()
 
 	flag.StringVar(&cfg.DriverName, "driver-name", "", "The CSI driver name.")
@@ -72,6 +69,9 @@ func main() {
 	flag.DurationVar(&cfg.RPCTimeout, "rpc-timeout", defaultTimeout, "The timeout for RPCs to the CSI driver.")
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
+
+	opts.BindFlags(flag.CommandLine)
+	flag.Parse()
 
 	err := cfg.Validate()
 	if err != nil {
