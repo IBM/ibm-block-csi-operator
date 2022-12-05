@@ -108,6 +108,12 @@ metadata:
                 "imagePullPolicy": "IfNotPresent"
               },
               {
+                "name": "csi-volume-group",
+                "repository": "quay.io/csiblock/volume-group-operator",
+                "tag": "staging",
+                "imagePullPolicy": "IfNotPresent"
+              },
+              {
                 "name": "livenessprobe",
                 "repository": "k8s.gcr.io/sig-storage/livenessprobe",
                 "tag": "v2.6.0",
@@ -362,12 +368,19 @@ spec:
                 - list
                 - update
                 - watch
+                - patch
             - apiGroups:
                 - ""
               resources:
                 - persistentvolumeclaims/status
               verbs:
-                - patch
+                - get
+            - apiGroups:
+                - ""
+              resources:
+                - persistentvolumeclaims/finalizers
+              verbs:
+                - update
             - apiGroups:
                 - ""
               resources:
