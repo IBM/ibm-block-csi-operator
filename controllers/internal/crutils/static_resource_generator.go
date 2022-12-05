@@ -38,7 +38,7 @@ const (
 	persistentVolumeClaimsStatusResource     string = "persistentvolumeclaims/status"
 	persistentVolumeClaimsFinalizersResource string = "persistentvolumeclaims/finalizers"
 	volumeGroupClassesResource               string = "volumegroupclasses"
-	volumeCroupContentsResource              string = "volumegroupcontents"
+	volumeGroupContentsResource              string = "volumegroupcontents"
 	volumeGroupsResources                    string = "volumegroups"
 	volumeGroupsStatusResource               string = "volumegroups/status"
 	volumeGroupsFinalizersResource           string = "volumegroups/finalizers"
@@ -432,7 +432,7 @@ func (c *IBMBlockCSI) GenerateVolumeGroupClusterRole() *rbacv1.ClusterRole {
 			},
 			{
 				APIGroups: []string{volumeGroupApiGroup},
-				Resources: []string{volumeCroupContentsResource},
+				Resources: []string{volumeGroupContentsResource},
 				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 			{
