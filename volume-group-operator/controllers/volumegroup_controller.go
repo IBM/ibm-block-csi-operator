@@ -19,15 +19,17 @@ package controllers
 import (
 	"context"
 	"github.com/IBM/volume-group-operator/controllers/volumegroup"
+	"github.com/IBM/volume-group-operator/pkg/config"
 	"github.com/container-storage-interface/spec/lib/go/csi"
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"time"
 
 	volumegroupv1 "github.com/IBM/volume-group-operator/api/v1"
-	"github.com/IBM/volume-group-operator/pkg/config"
+	grpcClient "github.com/IBM/volume-group-operator/pkg/client"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -41,11 +43,18 @@ type VolumeGroupReconciler struct {
 	Log          logr.Logger
 	Scheme       *runtime.Scheme
 	DriverConfig *config.DriverConfig
+	GRPCClient   *grpcClient.Client
+	VolumeGroup  grpcClient.VolumeGroup
 }
 
 //+kubebuilder:rbac:groups=csi.ibm.com,resources=volumegroups,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=csi.ibm.com,resources=volumegroups/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=csi.ibm.com,resources=volumegroups/finalizers,verbs=update
+//+kubebuilder:rbac:groups=csi.ibm.com,resources=volumegroupclasses,verbs=get;list;watch
+//+kubebuilder:rbac:groups=csi.ibm.com,resources=volumegroupcontents,verbs=get;list;watch
+//+kubebuilder:rbac:groups="",resources=persistentvolumeclaims,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups="",resources=persistentvolumeclaims/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups="",resources=persistentvolumeclaims/finalizers,verbs=update
 
 func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger := r.Log.WithValues("Request.Name", req.Name, "Request.Namespace", req.Namespace)
@@ -174,10 +183,28 @@ func (r *VolumeGroupReconciler) volumeGroupLabelSelector(instance *volumegroupv1
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *VolumeGroupReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *VolumeGroupReconciler) SetupWithManager(mgr ctrl.Manager, cfg *config.DriverConfig) error {
+	pred := predicate.GenerationChangedPredicate{}
+
+	r.DriverConfig = cfg
+	c, err := grpcClient.New(cfg.DriverEndpoint, cfg.RPCTimeout)
+	if err != nil {
+		r.Log.Error(err, "failed to create GRPC Client", "Endpoint", cfg.DriverEndpoint, "GRPC Timeout", cfg.RPCTimeout)
+
+		return err
+	}
+	err = c.Probe()
+	if err != nil {
+		r.Log.Error(err, "failed to connect to driver", "Endpoint", cfg.DriverEndpoint, "GRPC Timeout", cfg.RPCTimeout)
+
+		return err
+	}
+	r.GRPCClient = c
+	r.VolumeGroup = grpcClient.NewVolumeGroupClient(r.GRPCClient.Client, cfg.RPCTimeout)
+
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&volumegroupv1.VolumeGroup{}).
-		Complete(r)
+		WithEventFilter(pred).Complete(r)
 }
 
 func (r *VolumeGroupReconciler) updateVolumeGroupStatusError(

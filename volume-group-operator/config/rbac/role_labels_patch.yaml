@@ -1,0 +1,6 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: volume-group-operator
+  labels:
+    app.kubernetes.io/name: clusterrole
