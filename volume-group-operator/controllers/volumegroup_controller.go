@@ -104,9 +104,6 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		}
 	}
 
-	volumeGroupContentSource, _ := r.getVolumeGroupContentSource(logger, req.NamespacedName)
-	volumeGroupId := volumeGroupContentSource.VolumeGroupHandle
-
 	// check if the object is being deleted
 	if instance.GetDeletionTimestamp().IsZero() {
 		if err = r.addFinalizerToVG(logger, instance); err != nil {
@@ -117,10 +114,14 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 	} else {
 		if contains(instance.GetFinalizers(), volumeGroupFinalizer) {
-			if err = r.deleteVolumeGroup(logger, volumeGroupId, secret); err != nil {
-				logger.Error(err, "failed to delete volume group")
+			volumeGroupContentSource, uErr := r.getVolumeGroupContentSource(logger, req.NamespacedName)
+			if uErr == nil {
+				volumeGroupId := volumeGroupContentSource.VolumeGroupHandle
+				if err = r.deleteVolumeGroup(logger, volumeGroupId, secret); err != nil {
+					logger.Error(err, "failed to delete volume group")
 
-				return ctrl.Result{}, err
+					return ctrl.Result{}, err
+				}
 			}
 
 			// once all finalizers have been removed, the object will be
@@ -131,6 +132,7 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 				return reconcile.Result{}, err
 			}
 		}
+
 		logger.Info("volumeGroup object is terminated, skipping reconciliation")
 
 		return ctrl.Result{}, nil

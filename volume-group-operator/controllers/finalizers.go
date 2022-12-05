@@ -27,7 +27,7 @@ import (
 )
 
 const (
-	volumeGroupFinalizer    = "volumegroup.storage.ibm.io/"
+	volumeGroupFinalizer    = "volumegroup.storage.ibm.io"
 	pvcVolumeGroupFinalizer = "volumegroup.storage.ibm.io/pvc-protection"
 )
 

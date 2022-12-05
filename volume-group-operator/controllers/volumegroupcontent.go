@@ -35,7 +35,7 @@ func (r VolumeGroupReconciler) getVolumeGroupContentSource(logger logr.Logger, r
 
 // createVolumeGroupContent saves VolumeGroupContentSource on cluster.
 func (r *VolumeGroupReconciler) createVolumeGroupContent(logger logr.Logger, instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupContent) error {
-	err := r.Client.Create(context.TODO(), vgcObj, nil)
+	err := r.Client.Create(context.TODO(), vgcObj)
 	if err != nil {
 		logger.Error(err, "VolumeGroupContent not found", "VolumeGroupContent Name")
 		return err
@@ -52,7 +52,8 @@ func (r *VolumeGroupReconciler) createVolumeGroupContent(logger logr.Logger, ins
 func (r *VolumeGroupReconciler) generateVolumeGroupContent(instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupClass, resp *volumegroup.Response, secretName string, secretNamespace string, groupCreationTime *metav1.Time, ready *bool) *volumegroupv1.VolumeGroupContent {
 	return &volumegroupv1.VolumeGroupContent{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: fmt.Sprintf("%s-%s", instance.Name, "content"),
+			Name:      fmt.Sprintf("%s-%s", instance.Name, "content"),
+			Namespace: instance.Namespace,
 		},
 		Spec:   r.generateVolumeGroupContentSpec(instance, vgcObj, resp, secretName, secretNamespace),
 		Status: r.generateVolumeGroupContentStatus(groupCreationTime, ready),
@@ -95,7 +96,7 @@ func (r *VolumeGroupReconciler) generateSecretReference(secretName string, secre
 }
 
 func (r *VolumeGroupReconciler) generateVolumeGroupContentSource(vgcObj *volumegroupv1.VolumeGroupClass, resp *volumegroup.Response) *volumegroupv1.VolumeGroupContentSource {
-	CreateVolumeGroupResponse := resp.Response.(*csi.CreateVolumeGroupResponse)
+	CreateVolumeGroupResponse := resp.Response.(csi.CreateVolumeGroupResponse)
 	return &volumegroupv1.VolumeGroupContentSource{
 		Driver:                vgcObj.Driver,
 		VolumeGroupHandle:     CreateVolumeGroupResponse.VolumeGroup.VolumeGroupId,
