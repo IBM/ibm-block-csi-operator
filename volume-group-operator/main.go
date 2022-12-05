@@ -22,13 +22,13 @@ import (
 	"os"
 	"time"
 
-	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
-	// to ensure that exec-entrypoint and run can make use of them.
-	_ "k8s.io/client-go/plugin/pkg/client/auth"
-
+	uberzap "go.uber.org/zap"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
+	// to ensure that exec-entrypoint and run can make use of them.
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -57,8 +57,11 @@ func init() {
 
 func main() {
 	opts := zap.Options{
-		Development: true,
+		ZapOpts: []uberzap.Option{
+			uberzap.AddCaller(),
+		},
 	}
+
 	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
 
@@ -87,6 +90,7 @@ func main() {
 
 	if err = (&controllers.VolumeGroupReconciler{
 		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("VolumeGroup"),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr, cfg); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "VolumeGroup")

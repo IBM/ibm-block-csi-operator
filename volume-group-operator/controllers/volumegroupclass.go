@@ -29,7 +29,7 @@ import (
 // getVolumeGroupClass get volume group class object from the subjected namespace and return the same.
 func (r VolumeGroupReconciler) getVolumeGroupClass(logger logr.Logger, vgcName string) (*volumegroupv1.VolumeGroupClass, error) {
 	vgcObj := &volumegroupv1.VolumeGroupClass{}
-	err := r.Client.Get(context.TODO(), types.NamespacedName{Name: vgcName}, vgcObj)
+	err := r.Client.Get(context.TODO(), types.NamespacedName{Name: vgcName, Namespace: "default"}, vgcObj)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			logger.Error(err, "VolumeGroupClass not found", "VolumeGroupClass", vgcName)

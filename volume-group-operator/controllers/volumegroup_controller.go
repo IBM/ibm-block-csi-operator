@@ -211,7 +211,7 @@ func (r *VolumeGroupReconciler) updateVolumeGroupStatusError(
 	instance *volumegroupv1.VolumeGroup,
 	logger logr.Logger,
 	message string) error {
-	instance.Status.Error.Message = &message
+	instance.Status.Error = &volumegroupv1.VolumeGroupError{Message: &message}
 	err := r.updateVolumeGroupStatus(instance, logger)
 	if err != nil {
 		return err
