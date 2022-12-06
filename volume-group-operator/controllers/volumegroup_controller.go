@@ -20,7 +20,6 @@ import (
 	"context"
 	"github.com/IBM/volume-group-operator/controllers/volumegroup"
 	"github.com/IBM/volume-group-operator/pkg/config"
-	"github.com/container-storage-interface/spec/lib/go/csi"
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -114,7 +113,7 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 	} else {
 		if contains(instance.GetFinalizers(), volumeGroupFinalizer) {
-			volumeGroupContentSource, uErr := r.getVolumeGroupContentSource(logger, req.NamespacedName)
+			volumeGroupContentSource, uErr := r.getVolumeGroupContentSource(logger, instance)
 			if uErr == nil {
 				volumeGroupId := volumeGroupContentSource.VolumeGroupHandle
 				if err = r.deleteVolumeGroup(logger, volumeGroupId, secret); err != nil {
@@ -147,7 +146,7 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	}
 	volumeGroupName := "testing" //TODO
 	// create volume group group on every reconcile
-	resp := r.createVolumeGroup(logger, volumeGroupName, parameters, secret)
+	resp := r.createVolumeGroup(volumeGroupName, parameters, secret)
 	if resp.Error != nil {
 		logger.Error(err, "failed to create volume group")
 		msg := volumegroup.GetMessageFromError(resp.Error)
@@ -165,10 +164,14 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		logger.Error(err, "failed to update volumeGroup status", "VGName", instance.Name)
 		return reconcile.Result{}, err
 	}
-
-	instance.Spec.Source.VolumeGroupContentName = &vgc.Name
-	instance.Spec.Source.Selector = r.volumeGroupLabelSelector(instance)
-
+	instance.Spec.Source = volumegroupv1.VolumeGroupSource{
+		VolumeGroupContentName: &vgc.Name,
+		Selector:               r.volumeGroupLabelSelector(instance),
+	}
+	if err = r.Client.Update(context.TODO(), instance); err != nil {
+		logger.Error(err, "failed to update status")
+		return reconcile.Result{}, err
+	}
 	uErr := r.updateVolumeGroupStatus(instance, logger)
 	if uErr != nil {
 		logger.Error(uErr, "failed to update volumeGroup status", "VGName", instance.Name)
@@ -236,29 +239,17 @@ func (r *VolumeGroupReconciler) deleteVolumeGroup(logger logr.Logger, volumeGrou
 	c := volumegroup.CommonRequestParameters{
 		VolumeGroupID: volumeGroupId,
 		Secrets:       secrets,
+		VolumeGroup:   r.VolumeGroup,
 	}
 
-	logger.Info("create volume request with parameters:", c)
-	response := csi.DeleteVolumeGroupResponse{}
-	resp := volumegroup.Response{
-		Response: response,
-		Error:    nil,
+	volumeGroup := volumegroup.VolumeGroup{
+		Params: c,
 	}
 
-	//volumeGroup := volumegroup.VolumeGroup{
-	//	Params: c,
-	//}
-	//
-	//resp := volumeGroup.Delete()
+	resp := volumeGroup.Delete()
 
 	if resp.Error != nil {
-		//if isKnownError := resp.HasKnownGRPCError(disableReplicationKnownErrors); isKnownError {
-		//	logger.Info("volume not found", "volumeID", volumeID)
-		//
-		//	return nil
-		//}
 		logger.Error(resp.Error, "failed to delete volume group")
-
 		return resp.Error
 	}
 
@@ -266,42 +257,21 @@ func (r *VolumeGroupReconciler) deleteVolumeGroup(logger logr.Logger, volumeGrou
 }
 
 // createVolumeGroup defines and runs a set of tasks required to delete volume group.
-func (r *VolumeGroupReconciler) createVolumeGroup(logger logr.Logger, volumeGroupName string, parameters, secrets map[string]string) *volumegroup.Response {
+func (r *VolumeGroupReconciler) createVolumeGroup(volumeGroupName string, parameters, secrets map[string]string) *volumegroup.Response {
 	c := volumegroup.CommonRequestParameters{
-		Name:       volumeGroupName,
-		Parameters: parameters,
-		Secrets:    secrets,
+		Name:        volumeGroupName,
+		Parameters:  parameters,
+		Secrets:     secrets,
+		VolumeGroup: r.VolumeGroup,
 	}
 
-	//volumeGroup := volumegroup.VolumeGroup{
-	//	Params: c,
-	//}
-
-	logger.Info("create volume request with parameters:", c)
-	response := csi.CreateVolumeGroupResponse{
-		VolumeGroup: &csi.VolumeGroup{
-			VolumeGroupId: volumeGroupName,
-		},
-	}
-	resp := volumegroup.Response{
-		Response: response,
-		Error:    nil,
+	volumeGroup := volumegroup.VolumeGroup{
+		Params: c,
 	}
 
-	//resp := volumeGroup.Create()
+	resp := volumeGroup.Create()
 
-	if resp.Error != nil {
-		//if isKnownError := resp.HasKnownGRPCError(disableReplicationKnownErrors); isKnownError {
-		//	logger.Info("volume not found", "volumeID", volumeID)
-		//
-		//	return nil
-		//}
-		logger.Error(resp.Error, "failed to create volume group")
-
-		return &resp
-	}
-
-	return &resp
+	return resp
 }
 
 func getCurrentTime() *metav1.Time {

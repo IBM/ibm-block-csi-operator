@@ -14,20 +14,16 @@ import (
 )
 
 // getVolumeGroupContentSource get VolumeGroupContentSource object from the request.
-func (r VolumeGroupReconciler) getVolumeGroupContentSource(logger logr.Logger, req types.NamespacedName) (*volumegroupv1.VolumeGroupContentSource, error) {
+func (r VolumeGroupReconciler) getVolumeGroupContentSource(logger logr.Logger, instance *volumegroupv1.VolumeGroup) (*volumegroupv1.VolumeGroupContentSource, error) {
 	VGC := &volumegroupv1.VolumeGroupContent{}
-	err := r.Client.Get(context.TODO(), req, VGC)
+	VolumeGroupContentName := *instance.Spec.Source.VolumeGroupContentName
+	err := r.Client.Get(context.TODO(), types.NamespacedName{Name: VolumeGroupContentName, Namespace: instance.Namespace}, VGC)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			logger.Error(err, "VolumeGroupContent not found", "VolumeGroupContent Name", req.Name)
+			logger.Error(err, "VolumeGroupContent not found", "VolumeGroupContent Name", VolumeGroupContentName)
 		}
 
 		return nil, err
-	}
-
-	// Validate PVC in bound state
-	if *VGC.Status.Ready != true {
-		return nil, fmt.Errorf("VolumeGroupContentSource %q is not Ready", req.Name)
 	}
 
 	return VGC.Spec.Source, nil
@@ -37,13 +33,12 @@ func (r VolumeGroupReconciler) getVolumeGroupContentSource(logger logr.Logger, r
 func (r *VolumeGroupReconciler) createVolumeGroupContent(logger logr.Logger, instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupContent) error {
 	err := r.Client.Create(context.TODO(), vgcObj)
 	if err != nil {
-		logger.Error(err, "VolumeGroupContent not found", "VolumeGroupContent Name")
+		if errors.IsAlreadyExists(err) {
+			logger.Info("VolumeGroupContent is already exists")
+			return nil
+		}
+		logger.Error(err, "VolumeGroupContent creation failed", "VolumeGroupContent Name")
 		return err
-	}
-
-	// Validate PVC in bound state
-	if *vgcObj.Status.Ready != true {
-		return fmt.Errorf("VolumeGroupContentSource %q is not Ready", instance.Name)
 	}
 
 	return nil
@@ -96,7 +91,7 @@ func (r *VolumeGroupReconciler) generateSecretReference(secretName string, secre
 }
 
 func (r *VolumeGroupReconciler) generateVolumeGroupContentSource(vgcObj *volumegroupv1.VolumeGroupClass, resp *volumegroup.Response) *volumegroupv1.VolumeGroupContentSource {
-	CreateVolumeGroupResponse := resp.Response.(csi.CreateVolumeGroupResponse)
+	CreateVolumeGroupResponse := resp.Response.(*csi.CreateVolumeGroupResponse)
 	return &volumegroupv1.VolumeGroupContentSource{
 		Driver:                vgcObj.Driver,
 		VolumeGroupHandle:     CreateVolumeGroupResponse.VolumeGroup.VolumeGroupId,
