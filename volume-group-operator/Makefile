@@ -19,7 +19,6 @@ help: ## Display this help.
 manifests: controller-gen kustomize## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=volume-group-operator webhook paths="./..." output:crd:artifacts:config=config/crd/bases
 	hack/update_labels_in_crd.sh
-	hack/update_labels_in_rbac.sh
 
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."

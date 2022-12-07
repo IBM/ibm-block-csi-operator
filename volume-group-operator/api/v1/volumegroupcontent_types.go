@@ -85,6 +85,15 @@ type VolumeGroupContentStatus struct {
 //+kubebuilder:subresource:status
 
 // VolumeGroupContent is the Schema for the volumegroupcontents API
+// +kubebuilder:object:root=true
+// +kubebuilder:resource:scope=Cluster,shortName=vsc;vgcs
+// +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="Ready",type=boolean,JSONPath=`.status.ready`
+// +kubebuilder:printcolumn:name="DeletionPolicy",type=string,JSONPath=`.spec.volumeGroupDeletionPolicy`
+// +kubebuilder:printcolumn:name="Driver",type=string,JSONPath=`.spec.source.driver`
+// +kubebuilder:printcolumn:name="VolumeGroupClass",type=string,JSONPath=`.spec.volumeGroupClassName`
+// +kubebuilder:printcolumn:name="VolumeGroup",type=string,JSONPath=`.spec.volumeGroupRef.name`
+// +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 type VolumeGroupContent struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
