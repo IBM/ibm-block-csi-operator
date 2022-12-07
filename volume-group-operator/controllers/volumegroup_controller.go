@@ -158,7 +158,7 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	if err != nil {
 		return reconcile.Result{}, err
 	}
-	// create volume group group on every reconcile
+	// create volume group on every reconcile
 	createVolumeGroupResponse := r.createVolumeGroup(volumeGroupName, parameters, secret)
 	if createVolumeGroupResponse.Error != nil {
 		logger.Error(err, "failed to create volume group")
@@ -198,7 +198,7 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 		return reconcile.Result{}, err
 	}
-	//TODO add all PVCs that have the VG label to VG
+	//TODO CSI-4986 add all PVCs that have the VG label to VG
 
 	return ctrl.Result{}, nil
 }
