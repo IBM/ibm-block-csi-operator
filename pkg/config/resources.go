@@ -46,6 +46,8 @@ const (
 	ExternalResizerClusterRoleBinding     ResourceName = "external-resizer-clusterrolebinding"
 	CSIAddonsReplicatorClusterRole        ResourceName = "csi-addons-replicator-clusterrole"
 	CSIAddonsReplicatorClusterRoleBinding ResourceName = "csi-addons-replicator-clusterrolebinding"
+	CSIVolumeGroupClusterRole             ResourceName = "csi-volume-group-clusterrole"
+	CSIVolumeGroupClusterRoleBinding      ResourceName = "csi-volume-group-clusterrolebinding"
 	CSIControllerSCCClusterRole           ResourceName = "csi-controller-scc-clusterrole"
 	CSIControllerSCCClusterRoleBinding    ResourceName = "csi-controller-scc-clusterrolebinding"
 	CSINodeSCCClusterRole                 ResourceName = "csi-node-scc-clusterrole"

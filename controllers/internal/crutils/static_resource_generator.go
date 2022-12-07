@@ -26,38 +26,45 @@ import (
 )
 
 const (
-	snapshotStorageApiGroup              string = "snapshot.storage.k8s.io"
-	securityOpenshiftApiGroup            string = "security.openshift.io"
-	storageApiGroup                      string = "storage.k8s.io"
-	rbacAuthorizationApiGroup            string = "rbac.authorization.k8s.io"
-	replicationStorageOpenshiftApiGroup  string = "replication.storage.openshift.io"
-	storageClassesResource               string = "storageclasses"
-	persistentVolumesResource            string = "persistentvolumes"
-	persistentVolumeClaimsResource       string = "persistentvolumeclaims"
-	persistentVolumeClaimsStatusResource string = "persistentvolumeclaims/status"
-	podsResource                         string = "pods"
-	volumeAttachmentsResource            string = "volumeattachments"
-	volumeAttachmentsStatusResource      string = "volumeattachments/status"
-	volumeSnapshotClassesResource        string = "volumesnapshotclasses"
-	volumeSnapshotsResource              string = "volumesnapshots"
-	volumeSnapshotContentsResource       string = "volumesnapshotcontents"
-	volumeSnapshotContentsStatusResource string = "volumesnapshotcontents/status"
-	volumeReplicationClassesResource     string = "volumereplicationclasses"
-	volumeReplicationsResource           string = "volumereplications"
-	volumeReplicationsFinalizersResource string = "volumereplications/finalizers"
-	volumeReplicationsStatusResource     string = "volumereplications/status"
-	eventsResource                       string = "events"
-	nodesResource                        string = "nodes"
-	csiNodesResource                     string = "csinodes"
-	secretsResource                      string = "secrets"
-	securityContextConstraintsResource   string = "securitycontextconstraints"
-	verbGet                              string = "get"
-	verbList                             string = "list"
-	verbWatch                            string = "watch"
-	verbCreate                           string = "create"
-	verbUpdate                           string = "update"
-	verbPatch                            string = "patch"
-	verbDelete                           string = "delete"
+	snapshotStorageApiGroup                  string = "snapshot.storage.k8s.io"
+	securityOpenshiftApiGroup                string = "security.openshift.io"
+	volumeGroupApiGroup                      string = "csi.ibm.com"
+	storageApiGroup                          string = "storage.k8s.io"
+	rbacAuthorizationApiGroup                string = "rbac.authorization.k8s.io"
+	replicationStorageOpenshiftApiGroup      string = "replication.storage.openshift.io"
+	storageClassesResource                   string = "storageclasses"
+	persistentVolumesResource                string = "persistentvolumes"
+	persistentVolumeClaimsResource           string = "persistentvolumeclaims"
+	persistentVolumeClaimsStatusResource     string = "persistentvolumeclaims/status"
+	persistentVolumeClaimsFinalizersResource string = "persistentvolumeclaims/finalizers"
+	volumeGroupClassesResource               string = "volumegroupclasses"
+	volumeGroupContentsResource              string = "volumegroupcontents"
+	volumeGroupsResources                    string = "volumegroups"
+	volumeGroupsStatusResource               string = "volumegroups/status"
+	volumeGroupsFinalizersResource           string = "volumegroups/finalizers"
+	podsResource                             string = "pods"
+	volumeAttachmentsResource                string = "volumeattachments"
+	volumeAttachmentsStatusResource          string = "volumeattachments/status"
+	volumeSnapshotClassesResource            string = "volumesnapshotclasses"
+	volumeSnapshotsResource                  string = "volumesnapshots"
+	volumeSnapshotContentsResource           string = "volumesnapshotcontents"
+	volumeSnapshotContentsStatusResource     string = "volumesnapshotcontents/status"
+	volumeReplicationClassesResource         string = "volumereplicationclasses"
+	volumeReplicationsResource               string = "volumereplications"
+	volumeReplicationsFinalizersResource     string = "volumereplications/finalizers"
+	volumeReplicationsStatusResource         string = "volumereplications/status"
+	eventsResource                           string = "events"
+	nodesResource                            string = "nodes"
+	csiNodesResource                         string = "csinodes"
+	secretsResource                          string = "secrets"
+	securityContextConstraintsResource       string = "securitycontextconstraints"
+	verbGet                                  string = "get"
+	verbList                                 string = "list"
+	verbWatch                                string = "watch"
+	verbCreate                               string = "create"
+	verbUpdate                               string = "update"
+	verbPatch                                string = "patch"
+	verbDelete                               string = "delete"
 )
 
 func (c *IBMBlockCSI) GenerateCSIDriver() *storagev1.CSIDriver {
@@ -392,6 +399,76 @@ func (c *IBMBlockCSI) GenerateCSIAddonsReplicatorClusterRoleBinding() *rbacv1.Cl
 		RoleRef: rbacv1.RoleRef{
 			Kind:     "ClusterRole",
 			Name:     config.GetNameForResource(config.CSIAddonsReplicatorClusterRole, c.Name),
+			APIGroup: rbacAuthorizationApiGroup,
+		},
+	}
+}
+
+func (c *IBMBlockCSI) GenerateVolumeGroupClusterRole() *rbacv1.ClusterRole {
+	return &rbacv1.ClusterRole{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: config.GetNameForResource(config.CSIVolumeGroupClusterRole, c.Name),
+		},
+		Rules: []rbacv1.PolicyRule{
+			{
+				APIGroups: []string{volumeGroupApiGroup},
+				Resources: []string{volumeGroupsResources},
+				Verbs:     []string{verbGet, verbList, verbWatch, verbCreate, verbUpdate, verbPatch, verbDelete},
+			},
+			{
+				APIGroups: []string{volumeGroupApiGroup},
+				Resources: []string{volumeGroupsStatusResource},
+				Verbs:     []string{verbGet, verbUpdate, verbPatch},
+			},
+			{
+				APIGroups: []string{volumeGroupApiGroup},
+				Resources: []string{volumeGroupsFinalizersResource},
+				Verbs:     []string{verbUpdate},
+			},
+			{
+				APIGroups: []string{volumeGroupApiGroup},
+				Resources: []string{volumeGroupClassesResource},
+				Verbs:     []string{verbGet, verbList, verbWatch},
+			},
+			{
+				APIGroups: []string{volumeGroupApiGroup},
+				Resources: []string{volumeGroupContentsResource},
+				Verbs:     []string{verbGet, verbList, verbWatch, verbCreate, verbUpdate, verbPatch, verbDelete},
+			},
+			{
+				APIGroups: []string{""},
+				Resources: []string{persistentVolumeClaimsResource},
+				Verbs:     []string{verbGet, verbList, verbWatch, verbUpdate, verbPatch},
+			},
+			{
+				APIGroups: []string{""},
+				Resources: []string{persistentVolumeClaimsStatusResource},
+				Verbs:     []string{verbGet, verbUpdate, verbPatch},
+			},
+			{
+				APIGroups: []string{""},
+				Resources: []string{persistentVolumeClaimsFinalizersResource},
+				Verbs:     []string{verbUpdate},
+			},
+		},
+	}
+}
+
+func (c *IBMBlockCSI) GenerateVolumeGroupClusterRoleBinding() *rbacv1.ClusterRoleBinding {
+	return &rbacv1.ClusterRoleBinding{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: config.GetNameForResource(config.CSIVolumeGroupClusterRoleBinding, c.Name),
+		},
+		Subjects: []rbacv1.Subject{
+			{
+				Kind:      "ServiceAccount",
+				Name:      config.GetNameForResource(config.CSIControllerServiceAccount, c.Name),
+				Namespace: c.Namespace,
+			},
+		},
+		RoleRef: rbacv1.RoleRef{
+			Kind:     "ClusterRole",
+			Name:     config.GetNameForResource(config.CSIVolumeGroupClusterRole, c.Name),
 			APIGroup: rbacAuthorizationApiGroup,
 		},
 	}

@@ -46,6 +46,7 @@ const (
 	snapshotterContainerName             = "csi-snapshotter"
 	resizerContainerName                 = "csi-resizer"
 	replicatorContainerName              = "csi-addons-replicator"
+	volumeGroupContainerName             = "csi-volume-group"
 	controllerLivenessProbeContainerName = "livenessprobe"
 
 	commonMaxWorkersFlag  = "--worker-threads"
@@ -214,6 +215,10 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	)
 	replicator.ImagePullPolicy = s.getCSIAddonsReplicatorPullPolicy()
 
+	volumegroup := s.ensureContainer(volumeGroupContainerName,
+		s.getCSIVolumeGroupImage(), []string{})
+	volumegroup.ImagePullPolicy = s.getCSIVolumeGroupPullPolicy()
+
 	healthPortArg := fmt.Sprintf("--health-port=%v", healthPort)
 	livenessProbe := s.ensureContainer(controllerLivenessProbeContainerName,
 		s.getLivenessProbeImage(),
@@ -231,6 +236,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		snapshotter,
 		resizer,
 		replicator,
+		volumegroup,
 		livenessProbe,
 	}
 }
@@ -320,7 +326,7 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 		}
 
 	case provisionerContainerName, attacherContainerName, snapshotterContainerName,
-		resizerContainerName, replicatorContainerName:
+		resizerContainerName, replicatorContainerName, volumeGroupContainerName:
 		return []corev1.EnvVar{
 			{
 				Name:  "ADDRESS",
@@ -334,7 +340,7 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 func (s *csiControllerSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 	switch name {
 	case ControllerContainerName, provisionerContainerName, attacherContainerName, snapshotterContainerName,
-		resizerContainerName, replicatorContainerName:
+		resizerContainerName, replicatorContainerName, volumeGroupContainerName:
 		return []corev1.VolumeMount{
 			{
 				Name:      socketVolumeName,
@@ -397,6 +403,10 @@ func (s *csiControllerSyncer) getCSIAddonsReplicatorImage() string {
 	return s.getSidecarImageByName(config.CSIAddonsReplicator)
 }
 
+func (s *csiControllerSyncer) getCSIVolumeGroupImage() string {
+	return s.getSidecarImageByName(config.CSIVolumeGroup)
+}
+
 func (s *csiControllerSyncer) getSidecarPullPolicy(sidecarName string) corev1.PullPolicy {
 	sidecar := s.getSidecarByName(sidecarName)
 	if sidecar != nil && sidecar.ImagePullPolicy != "" {
@@ -427,6 +437,10 @@ func (s *csiControllerSyncer) getCSIResizerPullPolicy() corev1.PullPolicy {
 
 func (s *csiControllerSyncer) getCSIAddonsReplicatorPullPolicy() corev1.PullPolicy {
 	return s.getSidecarPullPolicy(config.CSIAddonsReplicator)
+}
+
+func (s *csiControllerSyncer) getCSIVolumeGroupPullPolicy() corev1.PullPolicy {
+	return s.getSidecarPullPolicy(config.CSIVolumeGroup)
 }
 
 func ensurePorts(ports ...corev1.ContainerPort) []corev1.ContainerPort {
