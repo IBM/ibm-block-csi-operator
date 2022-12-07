@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"github.com/IBM/volume-group-operator/controllers/volumegroup"
 	"github.com/IBM/volume-group-operator/pkg/config"
 	"github.com/go-logr/logr"
@@ -34,7 +35,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-const volumeGroupLAbelKey = "volumegroup"
+const (
+	volumeGroupLAbelKey = "volumegroup"
+	snapshotNamePrefix  = "volumegroup"
+)
 
 // VolumeGroupReconciler reconciles a VolumeGroup object
 type VolumeGroupReconciler struct {
@@ -113,9 +117,9 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 	} else {
 		if contains(instance.GetFinalizers(), volumeGroupFinalizer) {
-			volumeGroupContentSource, uErr := r.getVolumeGroupContentSource(logger, instance)
+			volumeGroupContent, uErr := r.getVolumeGroupContent(logger, instance)
 			if uErr == nil {
-				volumeGroupId := volumeGroupContentSource.VolumeGroupHandle
+				volumeGroupId := volumeGroupContent.Spec.Source.VolumeGroupHandle
 				if err = r.deleteVolumeGroup(logger, volumeGroupId, secret); err != nil {
 					logger.Error(err, "failed to delete volume group")
 
@@ -130,6 +134,12 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 				return reconcile.Result{}, err
 			}
+			if err = r.removeFinalizerFromVGC(logger, volumeGroupContent); err != nil {
+				logger.Error(err, "Failed to remove volume group content finalizer")
+
+				return reconcile.Result{}, err
+			}
+			err = r.Client.Delete(context.TODO(), volumeGroupContent)
 		}
 
 		logger.Info("volumeGroup object is terminated, skipping reconciliation")
@@ -144,12 +154,15 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 		return reconcile.Result{}, err
 	}
-	volumeGroupName := "testing" //TODO
+	volumeGroupName, err := makeVolumeGroupName(snapshotNamePrefix, string(instance.UID))
+	if err != nil {
+		return reconcile.Result{}, err
+	}
 	// create volume group group on every reconcile
-	resp := r.createVolumeGroup(volumeGroupName, parameters, secret)
-	if resp.Error != nil {
+	createVolumeGroupResponse := r.createVolumeGroup(volumeGroupName, parameters, secret)
+	if createVolumeGroupResponse.Error != nil {
 		logger.Error(err, "failed to create volume group")
-		msg := volumegroup.GetMessageFromError(resp.Error)
+		msg := volumegroup.GetMessageFromError(createVolumeGroupResponse.Error)
 		uErr := r.updateVolumeGroupStatusError(instance, logger, msg)
 		if uErr != nil {
 			logger.Error(uErr, "failed to update volumeGroup status", "VGName", instance.Name)
@@ -158,10 +171,10 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return reconcile.Result{}, err
 	}
 	ready := true
-	vgc := r.generateVolumeGroupContent(instance, vgcObj, resp, secretName, secretNamespace, groupCreationTime, &ready)
+	vgc := r.generateVolumeGroupContent(instance, vgcObj, createVolumeGroupResponse, secretName, secretNamespace, groupCreationTime, &ready)
 
 	if err = r.createVolumeGroupContent(logger, instance, vgc); err != nil {
-		logger.Error(err, "failed to update volumeGroup status", "VGName", instance.Name)
+		logger.Error(err, "failed to create volumeGroupContent", "VGCName", vgc.Name)
 		return reconcile.Result{}, err
 	}
 	instance.Spec.Source = volumegroupv1.VolumeGroupSource{
@@ -176,9 +189,25 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	if uErr != nil {
 		logger.Error(uErr, "failed to update volumeGroup status", "VGName", instance.Name)
 	}
+	vgc, err = r.getVolumeGroupContent(logger, instance)
+	if err != nil {
+		return reconcile.Result{}, err
+	}
+	if err = r.addFinalizerToVGC(logger, vgc); err != nil {
+		logger.Error(err, "Failed to add VolumeGroup finalizer")
+
+		return reconcile.Result{}, err
+	}
 	//TODO add all PVCs that have the VG label to VG
 
 	return ctrl.Result{}, nil
+}
+
+func makeVolumeGroupName(prefix string, volumeGroupUID string) (string, error) {
+	if len(volumeGroupUID) == 0 {
+		return "", fmt.Errorf("Corrupted volumeGroup object, it is missing UID")
+	}
+	return fmt.Sprintf("%s-%s", prefix, volumeGroupUID), nil
 }
 
 func (r *VolumeGroupReconciler) volumeGroupLabelSelector(instance *volumegroupv1.VolumeGroup) *metav1.LabelSelector {

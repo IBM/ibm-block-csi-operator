@@ -27,8 +27,9 @@ import (
 )
 
 const (
-	volumeGroupFinalizer    = "volumegroup.storage.ibm.io"
-	pvcVolumeGroupFinalizer = "volumegroup.storage.ibm.io/pvc-protection"
+	volumeGroupFinalizer        = "volumegroup.storage.ibm.io"
+	volumeGroupContentFinalizer = "volumegroup.storage.ibm.io/vgc-protection"
+	pvcVolumeGroupFinalizer     = "volumegroup.storage.ibm.io/pvc-protection"
 )
 
 // addFinalizerToVG adds the VG finalizer on the VolumeGroup instance.
@@ -47,6 +48,22 @@ func (r *VolumeGroupReconciler) addFinalizerToVG(logger logr.Logger, vg *volumeg
 	return nil
 }
 
+// addFinalizerToVGC adds the VG finalizer on the VolumeGroupContent instance.
+func (r *VolumeGroupReconciler) addFinalizerToVGC(logger logr.Logger, vgc *volumegroupv1.VolumeGroupContent,
+) error {
+	if !contains(vgc.ObjectMeta.Finalizers, volumeGroupContentFinalizer) {
+		logger.Info("adding finalizer to volumeGroupContent object", "Finalizer", volumeGroupContentFinalizer)
+		vgc.ObjectMeta.Finalizers = append(vgc.ObjectMeta.Finalizers, volumeGroupContentFinalizer)
+		if err := r.Client.Update(context.TODO(), vgc); err != nil {
+			return fmt.Errorf("failed to add finalizer (%s) to volumeGroupContent resource"+
+				" (%s/%s) %w",
+				volumeGroupContentFinalizer, vgc.Namespace, vgc.Name, err)
+		}
+	}
+
+	return nil
+}
+
 // removeFinalizerFromVG removes the VG finalizer from the VolumeGroup instance.
 func (r *VolumeGroupReconciler) removeFinalizerFromVG(logger logr.Logger, vg *volumegroupv1.VolumeGroup) error {
 	if contains(vg.ObjectMeta.Finalizers, volumeGroupFinalizer) {
@@ -56,6 +73,21 @@ func (r *VolumeGroupReconciler) removeFinalizerFromVG(logger logr.Logger, vg *vo
 			return fmt.Errorf("failed to remove finalizer (%s) from VolumeGroup resource"+
 				" (%s/%s), %w",
 				volumeGroupFinalizer, vg.Namespace, vg.Name, err)
+		}
+	}
+
+	return nil
+}
+
+// removeFinalizerFromVGC removes the VG finalizer from the VolumeGroupContent instance.
+func (r *VolumeGroupReconciler) removeFinalizerFromVGC(logger logr.Logger, vgc *volumegroupv1.VolumeGroupContent) error {
+	if contains(vgc.ObjectMeta.Finalizers, volumeGroupContentFinalizer) {
+		logger.Info("removing finalizer from VolumeGroupContent object", "Finalizer", volumeGroupContentFinalizer)
+		vgc.ObjectMeta.Finalizers = remove(vgc.ObjectMeta.Finalizers, volumeGroupContentFinalizer)
+		if err := r.Client.Update(context.TODO(), vgc); err != nil {
+			return fmt.Errorf("failed to remove finalizer (%s) from VolumeGroupContent resource"+
+				" (%s/%s), %w",
+				volumeGroupContentFinalizer, vgc.Namespace, vgc.Name, err)
 		}
 	}
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	volumegroupv1 "github.com/IBM/volume-group-operator/api/v1"
-	volumegroup "github.com/IBM/volume-group-operator/controllers/volumegroup"
+	"github.com/IBM/volume-group-operator/controllers/volumegroup"
 	"github.com/container-storage-interface/spec/lib/go/csi"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
@@ -13,8 +13,8 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-// getVolumeGroupContentSource get VolumeGroupContentSource object from the request.
-func (r VolumeGroupReconciler) getVolumeGroupContentSource(logger logr.Logger, instance *volumegroupv1.VolumeGroup) (*volumegroupv1.VolumeGroupContentSource, error) {
+// getVolumeGroupContent get VolumeGroupContent object from the request.
+func (r VolumeGroupReconciler) getVolumeGroupContent(logger logr.Logger, instance *volumegroupv1.VolumeGroup) (*volumegroupv1.VolumeGroupContent, error) {
 	VGC := &volumegroupv1.VolumeGroupContent{}
 	VolumeGroupContentName := *instance.Spec.Source.VolumeGroupContentName
 	err := r.Client.Get(context.TODO(), types.NamespacedName{Name: VolumeGroupContentName, Namespace: instance.Namespace}, VGC)
@@ -26,7 +26,7 @@ func (r VolumeGroupReconciler) getVolumeGroupContentSource(logger logr.Logger, i
 		return nil, err
 	}
 
-	return VGC.Spec.Source, nil
+	return VGC, nil
 }
 
 // createVolumeGroupContent saves VolumeGroupContentSource on cluster.
