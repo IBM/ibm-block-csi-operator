@@ -33,12 +33,15 @@ import (
 
 	csiv1 "github.com/IBM/volume-group-operator/api/v1"
 	"github.com/IBM/volume-group-operator/controllers"
+	"github.com/IBM/volume-group-operator/controllers/persistentvolumeclaim"
+	"github.com/IBM/volume-group-operator/pkg/messages"
 	//+kubebuilder:scaffold:imports
 )
 
 var (
-	scheme   = runtime.NewScheme()
-	setupLog = ctrl.Log.WithName("setup")
+	scheme        = runtime.NewScheme()
+	setupLog      = ctrl.Log.WithName("setup")
+	pvcController = "PersistentVolumeClaimController"
 )
 
 func init() {
@@ -71,6 +74,15 @@ func main() {
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "VolumeGroup")
+		os.Exit(1)
+	}
+
+	if err = (&persistentvolumeclaim.PersistentVolumeClaimWatcher{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+		Log:    ctrl.Log.WithName(pvcController),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, messages.UnableToCreatePVCController)
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder
