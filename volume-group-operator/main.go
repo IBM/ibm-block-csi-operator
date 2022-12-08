@@ -18,15 +18,17 @@ package main
 
 import (
 	"flag"
+	"github.com/IBM/volume-group-operator/pkg/config"
 	"os"
+	"time"
 
-	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
-	// to ensure that exec-entrypoint and run can make use of them.
-	_ "k8s.io/client-go/plugin/pkg/client/auth"
-
+	uberzap "go.uber.org/zap"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
+	// to ensure that exec-entrypoint and run can make use of them.
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -34,6 +36,11 @@ import (
 	csiv1 "github.com/IBM/volume-group-operator/api/v1"
 	"github.com/IBM/volume-group-operator/controllers"
 	//+kubebuilder:scaffold:imports
+)
+
+const (
+	// defaultTimeout is default timeout for RPC call.
+	defaultTimeout = time.Minute
 )
 
 var (
@@ -50,12 +57,27 @@ func init() {
 
 func main() {
 	opts := zap.Options{
-		Development: true,
+		ZapOpts: []uberzap.Option{
+			uberzap.AddCaller(),
+		},
 	}
+
+	cfg := config.NewDriverConfig()
+
+	flag.StringVar(&cfg.DriverName, "driver-name", "", "The CSI driver name.")
+	flag.StringVar(&cfg.DriverEndpoint, "csi-address", "/run/csi/socket", "Address of the CSI driver socket.")
+	flag.DurationVar(&cfg.RPCTimeout, "rpc-timeout", defaultTimeout, "The timeout for RPCs to the CSI driver.")
+
+	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
+
 	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
 
-	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
+	err := cfg.Validate()
+	if err != nil {
+		setupLog.Error(err, "error in driver configuration")
+		os.Exit(1)
+	}
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme: scheme,
@@ -68,8 +90,9 @@ func main() {
 
 	if err = (&controllers.VolumeGroupReconciler{
 		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("VolumeGroup"),
 		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
+	}).SetupWithManager(mgr, cfg); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "VolumeGroup")
 		os.Exit(1)
 	}

@@ -18,6 +18,8 @@ package controllers
 
 import (
 	"context"
+	"github.com/IBM/volume-group-operator/pkg/config"
+	"github.com/go-logr/logr"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -30,6 +32,7 @@ import (
 // VolumeGroupReconciler reconciles a VolumeGroup object
 type VolumeGroupReconciler struct {
 	client.Client
+	Log    logr.Logger
 	Scheme *runtime.Scheme
 }
 
@@ -51,7 +54,7 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *VolumeGroupReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *VolumeGroupReconciler) SetupWithManager(mgr ctrl.Manager, cfg *config.DriverConfig) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&csiv1.VolumeGroup{}).
 		Complete(r)
