@@ -87,7 +87,7 @@ func main() {
 
 	log := ctrl.Log.WithName("controllers").WithName("VolumeGroup")
 	grpcClientInstance, err := getControllerGrpcClient(cfg, log)
-	exitWithError(err, err.Error())
+	exitWithError(err, "failed to get controller GRPC client")
 
 	controllerUtils := utils.ControllerUtils{
 		Client: mgr.GetClient(),
