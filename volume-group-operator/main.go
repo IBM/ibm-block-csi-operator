@@ -19,6 +19,7 @@ package main
 import (
 	"flag"
 	"github.com/IBM/volume-group-operator/controllers/utils"
+	grpcClient "github.com/IBM/volume-group-operator/pkg/client"
 	"github.com/IBM/volume-group-operator/pkg/config"
 	"github.com/go-logr/logr"
 	"os"
@@ -94,7 +95,7 @@ func main() {
 
 	err = (&controllers.VolumeGroupReconciler{
 		Client:       mgr.GetClient(),
-		Utils:  controllerUtils,
+		Utils:        controllerUtils,
 		Log:          log,
 		Scheme:       mgr.GetScheme(),
 		DriverConfig: cfg,
