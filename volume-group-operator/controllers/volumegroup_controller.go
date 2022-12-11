@@ -18,19 +18,27 @@ package controllers
 
 import (
 	"context"
+	"github.com/IBM/volume-group-operator/pkg/config"
+	"github.com/go-logr/logr"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	csiv1 "github.com/IBM/volume-group-operator/api/v1"
+	volumegroupv1 "github.com/IBM/volume-group-operator/api/v1"
+	grpcClient "github.com/IBM/volume-group-operator/pkg/client"
 )
 
 // VolumeGroupReconciler reconciles a VolumeGroup object
 type VolumeGroupReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Log               logr.Logger
+	Scheme            *runtime.Scheme
+	DriverConfig      *config.DriverConfig
+	GRPCClient        *grpcClient.Client
+	VolumeGroupClient grpcClient.VolumeGroup
 }
 
 //+kubebuilder:rbac:groups=csi.ibm.com,resources=volumegroups,verbs=get;list;watch;create;update;patch;delete
@@ -51,8 +59,12 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *VolumeGroupReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *VolumeGroupReconciler) SetupWithManager(mgr ctrl.Manager, cfg *config.DriverConfig) error {
+	pred := predicate.GenerationChangedPredicate{}
+
+	r.VolumeGroupClient = grpcClient.NewVolumeGroupClient(r.GRPCClient.Client, cfg.RPCTimeout)
+
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&csiv1.VolumeGroup{}).
-		Complete(r)
+		For(&volumegroupv1.VolumeGroup{}).
+		WithEventFilter(pred).Complete(r)
 }
