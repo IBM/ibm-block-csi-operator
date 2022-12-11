@@ -18,11 +18,14 @@ package main
 
 import (
 	"flag"
-	grpcClient "github.com/IBM/volume-group-operator/pkg/client"
-	"github.com/IBM/volume-group-operator/pkg/config"
-	"github.com/go-logr/logr"
 	"os"
 	"time"
+
+	"github.com/IBM/volume-group-operator/controllers/persistentvolumeclaim"
+	grpcClient "github.com/IBM/volume-group-operator/pkg/client"
+	"github.com/IBM/volume-group-operator/pkg/config"
+	"github.com/IBM/volume-group-operator/pkg/messages"
+	"github.com/go-logr/logr"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -37,8 +40,6 @@ import (
 
 	csiv1 "github.com/IBM/volume-group-operator/api/v1"
 	"github.com/IBM/volume-group-operator/controllers"
-	"github.com/IBM/volume-group-operator/controllers/persistentvolumeclaim"
-	"github.com/IBM/volume-group-operator/pkg/messages"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -96,22 +97,13 @@ func main() {
 
 	exitWithError(err, "unable to create controller  with controller VolumeGroup")
 
-	if err = (&controllers.VolumeGroupReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "VolumeGroup")
-		os.Exit(1)
-	}
-
-	if err = (&persistentvolumeclaim.PersistentVolumeClaimWatcher{
+	err = (&persistentvolumeclaim.PersistentVolumeClaimWatcher{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 		Log:    ctrl.Log.WithName(pvcController),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, messages.UnableToCreatePVCController)
-		os.Exit(1)
-	}
+	}).SetupWithManager(mgr)
+	exitWithError(err, messages.UnableToCreatePVCController)
+
 	//+kubebuilder:scaffold:builder
 
 	err = mgr.AddHealthzCheck("healthz", healthz.Ping)
