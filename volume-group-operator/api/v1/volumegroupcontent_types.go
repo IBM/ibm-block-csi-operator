@@ -86,7 +86,7 @@ type VolumeGroupContentStatus struct {
 
 // VolumeGroupContent is the Schema for the volumegroupcontents API
 // +kubebuilder:object:root=true
-// +kubebuilder:resource:scope=Cluster,shortName=vsc;vgcs
+// +kubebuilder:resource:scope=Namespaced,shortName=vgc;vgcs
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="Ready",type=boolean,JSONPath=`.status.ready`
 // +kubebuilder:printcolumn:name="DeletionPolicy",type=string,JSONPath=`.spec.volumeGroupDeletionPolicy`
