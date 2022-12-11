@@ -14,11 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package controllers
+package utils
 
 import (
 	"context"
-
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -26,7 +25,7 @@ import (
 )
 
 // getSecret retrieves the secrets based on name and namespace input.
-func (r *VolumeGroupReconciler) getSecret(logger logr.Logger, name, namespace string) (map[string]string, error) {
+func (r *ControllerUtils) getSecret(logger logr.Logger, name, namespace string) (map[string]string, error) {
 	namespacedName := types.NamespacedName{Name: name, Namespace: namespace}
 	secret := &corev1.Secret{}
 	err := r.Client.Get(context.TODO(), namespacedName, secret)

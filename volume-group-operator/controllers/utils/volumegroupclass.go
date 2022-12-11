@@ -14,11 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package controllers
+package utils
 
 import (
 	"context"
-
 	volumegroupv1 "github.com/IBM/volume-group-operator/api/v1"
 
 	"github.com/go-logr/logr"
@@ -27,7 +26,7 @@ import (
 )
 
 // getVolumeGroupClass get volume group class object from the subjected namespace and return the same.
-func (r VolumeGroupReconciler) getVolumeGroupClass(logger logr.Logger, vgcName string) (*volumegroupv1.VolumeGroupClass, error) {
+func (r *ControllerUtils) getVolumeGroupClass(logger logr.Logger, vgcName string) (*volumegroupv1.VolumeGroupClass, error) {
 	vgcObj := &volumegroupv1.VolumeGroupClass{}
 	err := r.Client.Get(context.TODO(), types.NamespacedName{Name: vgcName, Namespace: "default"}, vgcObj)
 	if err != nil {

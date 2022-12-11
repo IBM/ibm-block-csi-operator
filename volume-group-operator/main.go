@@ -18,6 +18,7 @@ package main
 
 import (
 	"flag"
+	"github.com/IBM/volume-group-operator/controllers/utils"
 	"github.com/IBM/volume-group-operator/pkg/config"
 	"os"
 	"time"
@@ -87,11 +88,14 @@ func main() {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
-
-	if err = (&controllers.VolumeGroupReconciler{
+	controllerUtils := utils.ControllerUtils{
 		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("VolumeGroup"),
-		Scheme: mgr.GetScheme(),
+	}
+	if err = (&controllers.VolumeGroupReconciler{
+		Client:          mgr.GetClient(),
+		ControllerUtils: controllerUtils,
+		Log:             ctrl.Log.WithName("controllers").WithName("VolumeGroup"),
+		Scheme:          mgr.GetScheme(),
 	}).SetupWithManager(mgr, cfg); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "VolumeGroup")
 		os.Exit(1)

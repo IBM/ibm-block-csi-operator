@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package controllers
+package utils
 
 // Checks whether a string is contained within a slice.
 func contains(slice []string, s string) bool {
