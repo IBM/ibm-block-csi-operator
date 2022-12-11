@@ -18,17 +18,19 @@ package utils
 
 import (
 	"context"
+	"fmt"
 	volumegroupv1 "github.com/IBM/volume-group-operator/api/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/types"
 )
 
 // GetVolumeGroupClass get volume group class object from the subjected namespace and return the same.
 func (r *ControllerUtils) GetVolumeGroupClass(logger logr.Logger, vgcName string) (*volumegroupv1.VolumeGroupClass, error) {
-	vgcObj := &volumegroupv1.VolumeGroupClass{}
-	err := r.Client.Get(context.TODO(), types.NamespacedName{Name: vgcName, Namespace: "default"}, vgcObj)
+	vgcObjl := &volumegroupv1.VolumeGroupClassList{}
+	err := r.Client.List(context.TODO(), vgcObjl, &client.ListOptions{Raw: &metav1.ListOptions{FieldSelector: fmt.Sprintf("metadata.name=%s", vgcName)}})
 	if err != nil {
 		if errors.IsNotFound(err) {
 			logger.Error(err, "VolumeGroupClass not found", "VolumeGroupClass", vgcName)
@@ -38,6 +40,12 @@ func (r *ControllerUtils) GetVolumeGroupClass(logger logr.Logger, vgcName string
 
 		return nil, err
 	}
-
+	items := vgcObjl.Items
+	if len(items) > 1 {
+		var Ierr error
+		Ierr = fmt.Errorf("got an unexpected amount of object while fetching VolumeGroupClass %s", vgcName)
+		return nil, Ierr
+	}
+	vgcObj := &items[1]
 	return vgcObj, nil
 }
