@@ -45,6 +45,6 @@ func (r *ControllerUtils) GetVolumeGroupClass(logger logr.Logger, vgcName string
 		Ierr = fmt.Errorf("got an unexpected amount of object while fetching VolumeGroupClass %s", vgcName)
 		return nil, Ierr
 	}
-	vgcObj := &items[1]
+	vgcObj := &items[0]
 	return vgcObj, nil
 }
