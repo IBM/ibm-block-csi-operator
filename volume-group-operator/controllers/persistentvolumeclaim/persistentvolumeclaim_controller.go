@@ -3,6 +3,8 @@ package persistentvolumeclaim
 import (
 	"context"
 
+	csiv1 "github.com/IBM/volume-group-operator/api/v1"
+	"github.com/IBM/volume-group-operator/controllers/utils"
 	"github.com/IBM/volume-group-operator/pkg/messages"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
@@ -26,7 +28,16 @@ func (r *PersistentVolumeClaimWatcher) Reconcile(_ context.Context, req reconcil
 	result = reconcile.Result{}
 	reqLogger := r.Log.WithValues(messages.RequestNamespace, req.Namespace, messages.RequestName, req.Name)
 	reqLogger.Info(messages.ReconcilePersistentVolumeClaim)
-	_, err = r.getPersistentVolumeClaim(reqLogger, req)
+	pvc, err := r.getPersistentVolumeClaim(reqLogger, req)
+	if err != nil {
+		return result, err
+	}
+	vgList, err := utils.GetVGList(reqLogger, r.Client)
+	if err != nil {
+		return result, err
+	}
+
+	err = r.removePersistentVolumeClaimFromVolumeGroups(reqLogger, pvc, vgList)
 	if err != nil {
 		return result, err
 	}
@@ -49,6 +60,24 @@ func (r PersistentVolumeClaimWatcher) getPersistentVolumeClaim(logger logr.Logge
 	}
 
 	return pvc, nil
+}
+
+func (r PersistentVolumeClaimWatcher) removePersistentVolumeClaimFromVolumeGroups(
+	logger logr.Logger, pvc *corev1.PersistentVolumeClaim, vgList csiv1.VolumeGroupList) error {
+	for _, vg := range vgList.Items {
+		if !utils.IsPvcPartOfVG(pvc.GetObjectMeta().GetName(), vg.Status.PVCList) {
+			continue
+		}
+		IsPVCMatchesVG, err := utils.IsPVCMatchesVG(logger, r.Client, pvc, vg)
+		if err != nil {
+			return err
+		}
+		if !IsPVCMatchesVG {
+			logger.Info(messages.RemovePersistentVolumeClaimFromVolumeGroup,
+				pvc.Namespace, pvc.Name, vg.Namespace, vg.Name)
+		}
+	}
+	return nil
 }
 
 func (r *PersistentVolumeClaimWatcher) SetupWithManager(mgr ctrl.Manager) error {
