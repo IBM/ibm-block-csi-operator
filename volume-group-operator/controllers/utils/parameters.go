@@ -23,19 +23,15 @@ import (
 )
 
 const (
-	// VolumeGroup Parameters prefixed with volumeGroupParameterPrefix are not passed through
-	// to the driver on RPC calls. Instead, these are the parameters used by the
-	// operator to get the required object from kubernetes and pass it to the
-	// Driver.
-	volumeGroupParameterPrefix = "volumegroup.storage.ibm.io/"
+	VolumeGroupParameterPrefix = "volumegroup.storage.ibm.io/"
 
-	prefixedVolumeGroupSecretNameKey      = volumeGroupParameterPrefix + "secret-name"      // name key for secret
-	prefixedVolumeGroupSecretNamespaceKey = volumeGroupParameterPrefix + "secret-namespace" // namespace key secret
+	PrefixedVolumeGroupSecretNameKey      = VolumeGroupParameterPrefix + "secret-name"      // name key for secret
+	PrefixedVolumeGroupSecretNamespaceKey = VolumeGroupParameterPrefix + "secret-namespace" // namespace key secret
 )
 
-// filterPrefixedParameters removes all the reserved keys from the
+// FilterPrefixedParameters removes all the reserved keys from the
 // volumegroupclass which are matching the prefix.
-func filterPrefixedParameters(prefix string, param map[string]string) map[string]string {
+func FilterPrefixedParameters(prefix string, param map[string]string) map[string]string {
 	newParam := map[string]string{}
 	for k, v := range param {
 		if !strings.HasPrefix(k, prefix) {
@@ -46,24 +42,24 @@ func filterPrefixedParameters(prefix string, param map[string]string) map[string
 	return newParam
 }
 
-// validatePrefixParameters checks for unknown reserved keys in parameters and
+// ValidatePrefixedParameters checks for unknown reserved keys in parameters and
 // empty values for reserved keys.
-func validatePrefixedParameters(param map[string]string) error {
+func ValidatePrefixedParameters(param map[string]string) error {
 	for k, v := range param {
-		if strings.HasPrefix(k, volumeGroupParameterPrefix) {
+		if strings.HasPrefix(k, VolumeGroupParameterPrefix) {
 			switch k {
-			case prefixedVolumeGroupSecretNameKey:
+			case PrefixedVolumeGroupSecretNameKey:
 				if v == "" {
 					return errors.New("secret name cannot be empty")
 				}
-			case prefixedVolumeGroupSecretNamespaceKey:
+			case PrefixedVolumeGroupSecretNamespaceKey:
 				if v == "" {
 					return errors.New("secret namespace cannot be empty")
 				}
 			// keep adding known prefixes to this list.
 			default:
 
-				return fmt.Errorf("found unknown parameter key %q with reserved prefix %s", k, volumeGroupParameterPrefix)
+				return fmt.Errorf("found unknown parameter key %q with reserved prefix %s", k, VolumeGroupParameterPrefix)
 			}
 		}
 	}

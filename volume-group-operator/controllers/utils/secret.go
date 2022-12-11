@@ -24,8 +24,8 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-// getSecret retrieves the secrets based on name and namespace input.
-func (r *ControllerUtils) getSecret(logger logr.Logger, name, namespace string) (map[string]string, error) {
+// GetSecret retrieves the secrets based on name and namespace input.
+func (r *ControllerUtils) GetSecret(logger logr.Logger, name, namespace string) (map[string]string, error) {
 	namespacedName := types.NamespacedName{Name: name, Namespace: namespace}
 	secret := &corev1.Secret{}
 	err := r.Client.Get(context.TODO(), namespacedName, secret)

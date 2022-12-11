@@ -92,10 +92,10 @@ func main() {
 		Client: mgr.GetClient(),
 	}
 	if err = (&controllers.VolumeGroupReconciler{
-		Client:          mgr.GetClient(),
-		ControllerUtils: controllerUtils,
-		Log:             ctrl.Log.WithName("controllers").WithName("VolumeGroup"),
-		Scheme:          mgr.GetScheme(),
+		Client: mgr.GetClient(),
+		Utils:  controllerUtils,
+		Log:    ctrl.Log.WithName("controllers").WithName("VolumeGroup"),
+		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr, cfg); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "VolumeGroup")
 		os.Exit(1)

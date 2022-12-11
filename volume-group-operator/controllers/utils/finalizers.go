@@ -31,8 +31,8 @@ const (
 	pvcVolumeGroupFinalizer     = "volumegroup.storage.ibm.io/pvc-protection"
 )
 
-// addFinalizerToVG adds the VG finalizer on the VolumeGroup instance.
-func (r *ControllerUtils) addFinalizerToVG(logger logr.Logger, vg *volumegroupv1.VolumeGroup,
+// AddFinalizerToVG adds the VG finalizer on the VolumeGroup instance.
+func (r *ControllerUtils) AddFinalizerToVG(logger logr.Logger, vg *volumegroupv1.VolumeGroup,
 ) error {
 	if !contains(vg.ObjectMeta.Finalizers, volumeGroupFinalizer) {
 		logger.Info("adding finalizer to VolumeGroup object", "Finalizer", volumeGroupFinalizer)
@@ -47,8 +47,8 @@ func (r *ControllerUtils) addFinalizerToVG(logger logr.Logger, vg *volumegroupv1
 	return nil
 }
 
-// addFinalizerToVGC adds the VG finalizer on the VolumeGroupContent instance.
-func (r *ControllerUtils) addFinalizerToVGC(logger logr.Logger, vgc *volumegroupv1.VolumeGroupContent,
+// AddFinalizerToVGC adds the VG finalizer on the VolumeGroupContent instance.
+func (r *ControllerUtils) AddFinalizerToVGC(logger logr.Logger, vgc *volumegroupv1.VolumeGroupContent,
 ) error {
 	if !contains(vgc.ObjectMeta.Finalizers, volumeGroupContentFinalizer) {
 		logger.Info("adding finalizer to volumeGroupContent object", "Finalizer", volumeGroupContentFinalizer)
@@ -63,8 +63,8 @@ func (r *ControllerUtils) addFinalizerToVGC(logger logr.Logger, vgc *volumegroup
 	return nil
 }
 
-// removeFinalizerFromVG removes the VG finalizer from the VolumeGroup instance.
-func (r *ControllerUtils) removeFinalizerFromVG(logger logr.Logger, vg *volumegroupv1.VolumeGroup) error {
+// RemoveFinalizerFromVG removes the VG finalizer from the VolumeGroup instance.
+func (r *ControllerUtils) RemoveFinalizerFromVG(logger logr.Logger, vg *volumegroupv1.VolumeGroup) error {
 	if contains(vg.ObjectMeta.Finalizers, volumeGroupFinalizer) {
 		logger.Info("removing finalizer from VolumeGroup object", "Finalizer", volumeGroupFinalizer)
 		vg.ObjectMeta.Finalizers = remove(vg.ObjectMeta.Finalizers, volumeGroupFinalizer)
@@ -78,8 +78,8 @@ func (r *ControllerUtils) removeFinalizerFromVG(logger logr.Logger, vg *volumegr
 	return nil
 }
 
-// removeFinalizerFromVGC removes the VG finalizer from the VolumeGroupContent instance.
-func (r *ControllerUtils) removeFinalizerFromVGC(logger logr.Logger, vgc *volumegroupv1.VolumeGroupContent) error {
+// RemoveFinalizerFromVGC removes the VG finalizer from the VolumeGroupContent instance.
+func (r *ControllerUtils) RemoveFinalizerFromVGC(logger logr.Logger, vgc *volumegroupv1.VolumeGroupContent) error {
 	if contains(vgc.ObjectMeta.Finalizers, volumeGroupContentFinalizer) {
 		logger.Info("removing finalizer from VolumeGroupContent object", "Finalizer", volumeGroupContentFinalizer)
 		vgc.ObjectMeta.Finalizers = remove(vgc.ObjectMeta.Finalizers, volumeGroupContentFinalizer)
@@ -93,8 +93,8 @@ func (r *ControllerUtils) removeFinalizerFromVGC(logger logr.Logger, vgc *volume
 	return nil
 }
 
-// addFinalizerToPVC adds the VG finalizer on the PersistentVolumeClaim.
-func (r *ControllerUtils) addFinalizerToPVC(logger logr.Logger, pvc *corev1.PersistentVolumeClaim) error {
+// AddFinalizerToPVC adds the VG finalizer on the PersistentVolumeClaim.
+func (r *ControllerUtils) AddFinalizerToPVC(logger logr.Logger, pvc *corev1.PersistentVolumeClaim) error {
 	if !contains(pvc.ObjectMeta.Finalizers, pvcVolumeGroupFinalizer) {
 		logger.Info("adding finalizer to PersistentVolumeClaim object", "Finalizer", pvcVolumeGroupFinalizer)
 		pvc.ObjectMeta.Finalizers = append(pvc.ObjectMeta.Finalizers, pvcVolumeGroupFinalizer)
@@ -108,8 +108,8 @@ func (r *ControllerUtils) addFinalizerToPVC(logger logr.Logger, pvc *corev1.Pers
 	return nil
 }
 
-// removeFinalizerFromPVC removes the VG finalizer on PersistentVolumeClaim.
-func (r *ControllerUtils) removeFinalizerFromPVC(logger logr.Logger, pvc *corev1.PersistentVolumeClaim,
+// RemoveFinalizerFromPVC removes the VG finalizer on PersistentVolumeClaim.
+func (r *ControllerUtils) RemoveFinalizerFromPVC(logger logr.Logger, pvc *corev1.PersistentVolumeClaim,
 ) error {
 	if contains(pvc.ObjectMeta.Finalizers, pvcVolumeGroupFinalizer) {
 		logger.Info("removing finalizer from PersistentVolumeClaim object", "Finalizer", pvcVolumeGroupFinalizer)

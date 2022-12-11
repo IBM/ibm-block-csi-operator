@@ -13,8 +13,8 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-// getVolumeGroupContent get VolumeGroupContent object from the request.
-func (r *ControllerUtils) getVolumeGroupContent(logger logr.Logger, instance *volumegroupv1.VolumeGroup) (*volumegroupv1.VolumeGroupContent, error) {
+// GetVolumeGroupContent get VolumeGroupContent object from the request.
+func (r *ControllerUtils) GetVolumeGroupContent(logger logr.Logger, instance *volumegroupv1.VolumeGroup) (*volumegroupv1.VolumeGroupContent, error) {
 	VGC := &volumegroupv1.VolumeGroupContent{}
 	VolumeGroupContentName := *instance.Spec.Source.VolumeGroupContentName
 	err := r.Client.Get(context.TODO(), types.NamespacedName{Name: VolumeGroupContentName, Namespace: instance.Namespace}, VGC)
@@ -29,8 +29,8 @@ func (r *ControllerUtils) getVolumeGroupContent(logger logr.Logger, instance *vo
 	return VGC, nil
 }
 
-// createVolumeGroupContent saves VolumeGroupContentSource on cluster.
-func (r *ControllerUtils) createVolumeGroupContent(logger logr.Logger, instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupContent) error {
+// CreateVolumeGroupContent saves VolumeGroupContentSource on cluster.
+func (r *ControllerUtils) CreateVolumeGroupContent(logger logr.Logger, instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupContent) error {
 	err := r.Client.Create(context.TODO(), vgcObj)
 	if err != nil {
 		if errors.IsAlreadyExists(err) {
@@ -44,7 +44,8 @@ func (r *ControllerUtils) createVolumeGroupContent(logger logr.Logger, instance 
 	return nil
 }
 
-func (r *ControllerUtils) generateVolumeGroupContent(instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupClass, resp *volumegroup.Response, secretName string, secretNamespace string, groupCreationTime *metav1.Time, ready *bool) *volumegroupv1.VolumeGroupContent {
+// GenerateVolumeGroupContent create an VolumeGroupContent object.
+func (r *ControllerUtils) GenerateVolumeGroupContent(instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupClass, resp *volumegroup.Response, secretName string, secretNamespace string, groupCreationTime *metav1.Time, ready *bool) *volumegroupv1.VolumeGroupContent {
 	return &volumegroupv1.VolumeGroupContent{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fmt.Sprintf("%s-%s", instance.Name, "content"),
