@@ -16,8 +16,8 @@ limitations under the License.
 
 package utils
 
-// Checks whether a string is contained within a slice.
-func contains(slice []string, s string) bool {
+// Contains Checks whether a string is contained within a slice.
+func Contains(slice []string, s string) bool {
 	for _, item := range slice {
 		if item == s {
 			return true
