@@ -44,12 +44,12 @@ const (
 // VolumeGroupReconciler reconciles a VolumeGroup object
 type VolumeGroupReconciler struct {
 	client.Client
-	Utils        utils.ControllerUtils
-	Log          logr.Logger
-	Scheme       *runtime.Scheme
-	DriverConfig *config.DriverConfig
-	GRPCClient   *grpcClient.Client
-	VolumeGroup  grpcClient.VolumeGroup
+	Utils             utils.ControllerUtils
+	Log               logr.Logger
+	Scheme            *runtime.Scheme
+	DriverConfig      *config.DriverConfig
+	GRPCClient        *grpcClient.Client
+	VolumeGroupClient grpcClient.VolumeGroup
 }
 
 //+kubebuilder:rbac:groups=csi.ibm.com,resources=volumegroups,verbs=get;list;watch;create;update;patch;delete
@@ -222,7 +222,7 @@ func (r *VolumeGroupReconciler) volumeGroupLabelSelector(instance *volumegroupv1
 func (r *VolumeGroupReconciler) SetupWithManager(mgr ctrl.Manager, cfg *config.DriverConfig) error {
 	pred := predicate.GenerationChangedPredicate{}
 
-	r.VolumeGroup = grpcClient.NewVolumeGroupClient(r.GRPCClient.Client, cfg.RPCTimeout)
+	r.VolumeGroupClient = grpcClient.NewVolumeGroupClient(r.GRPCClient.Client, cfg.RPCTimeout)
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&volumegroupv1.VolumeGroup{}).
