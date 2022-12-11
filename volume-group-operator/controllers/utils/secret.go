@@ -24,7 +24,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-// GetSecret retrieves the secrets based on name and namespace input.
 func (r *ControllerUtils) GetSecret(logger logr.Logger, name, namespace string) (map[string]string, error) {
 	namespacedName := types.NamespacedName{Name: name, Namespace: namespace}
 	secret := &corev1.Secret{}
@@ -43,7 +42,6 @@ func (r *ControllerUtils) GetSecret(logger logr.Logger, name, namespace string) 
 	return convertMap(secret.Data), nil
 }
 
-// convertMap converts map[string][]byte to map[string]string.
 func convertMap(oldMap map[string][]byte) map[string]string {
 	newMap := make(map[string]string)
 

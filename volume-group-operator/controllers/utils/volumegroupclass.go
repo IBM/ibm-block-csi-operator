@@ -25,7 +25,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-// GetVolumeGroupClass get volume group class object from the subjected namespace and return the same.
 func (r *ControllerUtils) GetVolumeGroupClass(logger logr.Logger, vgcName string) (*volumegroupv1.VolumeGroupClass, error) {
 	vgcObj := &volumegroupv1.VolumeGroupClass{}
 	err := r.Client.Get(context.TODO(), types.NamespacedName{Name: vgcName, Namespace: "default"}, vgcObj)

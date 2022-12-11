@@ -13,7 +13,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-// GetVolumeGroupContent get VolumeGroupContent object from the request.
 func (r *ControllerUtils) GetVolumeGroupContent(logger logr.Logger, instance *volumegroupv1.VolumeGroup) (*volumegroupv1.VolumeGroupContent, error) {
 	VGC := &volumegroupv1.VolumeGroupContent{}
 	VolumeGroupContentName := *instance.Spec.Source.VolumeGroupContentName
@@ -29,7 +28,6 @@ func (r *ControllerUtils) GetVolumeGroupContent(logger logr.Logger, instance *vo
 	return VGC, nil
 }
 
-// CreateVolumeGroupContent saves VolumeGroupContentSource on cluster.
 func (r *ControllerUtils) CreateVolumeGroupContent(logger logr.Logger, instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupContent) error {
 	err := r.Client.Create(context.TODO(), vgcObj)
 	if err != nil {
@@ -44,7 +42,6 @@ func (r *ControllerUtils) CreateVolumeGroupContent(logger logr.Logger, instance 
 	return nil
 }
 
-// GenerateVolumeGroupContent create an VolumeGroupContent object.
 func (r *ControllerUtils) GenerateVolumeGroupContent(instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupClass, resp *volumegroup.Response, secretName string, secretNamespace string, groupCreationTime *metav1.Time, ready *bool) *volumegroupv1.VolumeGroupContent {
 	return &volumegroupv1.VolumeGroupContent{
 		ObjectMeta: metav1.ObjectMeta{

@@ -16,7 +16,6 @@ limitations under the License.
 
 package utils
 
-// Contains Checks whether a string is contained within a slice.
 func Contains(slice []string, s string) bool {
 	for _, item := range slice {
 		if item == s {
@@ -27,7 +26,6 @@ func Contains(slice []string, s string) bool {
 	return false
 }
 
-// Removes a given string from a slice and returns the new slice.
 func remove(slice []string, s string) (result []string) {
 	for _, item := range slice {
 		if item == s {

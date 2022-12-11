@@ -41,7 +41,6 @@ const (
 	snapshotNamePrefix  = "volumegroup"
 )
 
-// VolumeGroupReconciler reconciles a VolumeGroup object
 type VolumeGroupReconciler struct {
 	client.Client
 	Utils             utils.ControllerUtils
@@ -68,9 +67,7 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	err := r.Client.Get(context.TODO(), req.NamespacedName, instance)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			// Request object not found, could have been deleted after reconcile request.
-			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
-			// Return and don't requeue
+
 			logger.Info("VolumeGroup resource not found")
 
 			return reconcile.Result{}, nil
@@ -109,7 +106,6 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		}
 	}
 
-	// check if the object is being deleted
 	if instance.GetDeletionTimestamp().IsZero() {
 		if err = r.Utils.AddFinalizerToVG(logger, instance); err != nil {
 			logger.Error(err, "Failed to add VolumeGroup finalizer")
@@ -129,8 +125,6 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 				}
 			}
 
-			// once all finalizers have been removed, the object will be
-			// deleted
 			if err = r.Utils.RemoveFinalizerFromVG(logger, instance); err != nil {
 				logger.Error(err, "Failed to remove volume group finalizer")
 
@@ -160,7 +154,7 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	if err != nil {
 		return reconcile.Result{}, err
 	}
-	// create volume group on every reconcile
+
 	createVolumeGroupResponse := r.createVolumeGroup(volumeGroupName, parameters, secret)
 	if createVolumeGroupResponse.Error != nil {
 		logger.Error(err, "failed to create volume group")
@@ -218,7 +212,6 @@ func (r *VolumeGroupReconciler) volumeGroupLabelSelector(instance *volumegroupv1
 	}
 }
 
-// SetupWithManager sets up the controller with the Manager.
 func (r *VolumeGroupReconciler) SetupWithManager(mgr ctrl.Manager, cfg *config.DriverConfig) error {
 	pred := predicate.GenerationChangedPredicate{}
 
@@ -251,12 +244,11 @@ func (r *VolumeGroupReconciler) updateVolumeGroupStatus(instance *volumegroupv1.
 	return nil
 }
 
-// deleteVolumeGroup defines and runs a set of tasks required to delete volume group.
 func (r *VolumeGroupReconciler) deleteVolumeGroup(logger logr.Logger, volumeGroupId string, secrets map[string]string) error {
 	c := volumegroup.CommonRequestParameters{
 		VolumeGroupID: volumeGroupId,
 		Secrets:       secrets,
-		VolumeGroup:   r.VolumeGroup,
+		VolumeGroup:   r.VolumeGroupClient,
 	}
 
 	volumeGroup := volumegroup.VolumeGroup{
@@ -273,13 +265,12 @@ func (r *VolumeGroupReconciler) deleteVolumeGroup(logger logr.Logger, volumeGrou
 	return nil
 }
 
-// createVolumeGroup defines and runs a set of tasks required to delete volume group.
 func (r *VolumeGroupReconciler) createVolumeGroup(volumeGroupName string, parameters, secrets map[string]string) *volumegroup.Response {
 	c := volumegroup.CommonRequestParameters{
 		Name:        volumeGroupName,
 		Parameters:  parameters,
 		Secrets:     secrets,
-		VolumeGroup: r.VolumeGroup,
+		VolumeGroup: r.VolumeGroupClient,
 	}
 
 	volumeGroup := volumegroup.VolumeGroup{
