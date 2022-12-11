@@ -67,9 +67,7 @@ func main() {
 
 	cfg := config.NewDriverConfig()
 
-	flag.StringVar(&cfg.DriverName, "driver-name", "", "The CSI driver name.")
-	flag.StringVar(&cfg.DriverEndpoint, "csi-address", "/run/csi/socket", "Address of the CSI driver socket.")
-	flag.DurationVar(&cfg.RPCTimeout, "rpc-timeout", defaultTimeout, "The timeout for RPCs to the CSI driver.")
+	defineFlags(cfg)
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
@@ -115,6 +113,12 @@ func main() {
 	err = mgr.Start(ctrl.SetupSignalHandler())
 	exitWithError(err, "problem running manager")
 
+}
+
+func defineFlags(cfg *config.DriverConfig) {
+	flag.StringVar(&cfg.DriverName, "driver-name", "", "The CSI driver name.")
+	flag.StringVar(&cfg.DriverEndpoint, "csi-address", "/run/csi/socket", "Address of the CSI driver socket.")
+	flag.DurationVar(&cfg.RPCTimeout, "rpc-timeout", defaultTimeout, "The timeout for RPCs to the CSI driver.")
 }
 
 func getControllerGrpcClient(cfg *config.DriverConfig, log logr.Logger) (*grpcClient.Client, error) {
