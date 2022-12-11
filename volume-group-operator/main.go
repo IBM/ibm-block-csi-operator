@@ -19,7 +19,9 @@ package main
 import (
 	"flag"
 	"github.com/IBM/volume-group-operator/controllers/utils"
+	grpcClient "github.com/IBM/volume-group-operator/pkg/client"
 	"github.com/IBM/volume-group-operator/pkg/config"
+	"github.com/go-logr/logr"
 	"os"
 	"time"
 
@@ -75,45 +77,65 @@ func main() {
 	flag.Parse()
 
 	err := cfg.Validate()
-	if err != nil {
-		setupLog.Error(err, "error in driver configuration")
-		os.Exit(1)
-	}
+	exitWithError(err, "error in driver configuration")
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme: scheme,
 		Port:   9443,
 	})
-	if err != nil {
-		setupLog.Error(err, "unable to start manager")
-		os.Exit(1)
-	}
+	exitWithError(err, "unable to start manager")
+
+	log := ctrl.Log.WithName("controllers").WithName("VolumeGroup")
+	grpcClientInstance, err := getControllerGrpcClient(cfg, log)
+	exitWithError(err, err.Error())
+
 	controllerUtils := utils.ControllerUtils{
 		Client: mgr.GetClient(),
 	}
-	if err = (&controllers.VolumeGroupReconciler{
-		Client: mgr.GetClient(),
-		Utils:  controllerUtils,
-		Log:    ctrl.Log.WithName("controllers").WithName("VolumeGroup"),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr, cfg); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "VolumeGroup")
-		os.Exit(1)
-	}
+
+	err = (&controllers.VolumeGroupReconciler{
+		Client:       mgr.GetClient(),
+		Utils:        controllerUtils,
+		Log:          log,
+		Scheme:       mgr.GetScheme(),
+		DriverConfig: cfg,
+		GRPCClient:   grpcClientInstance,
+	}).SetupWithManager(mgr, cfg)
+	exitWithError(err, "unable to create controller  with controller VolumeGroup")
+
 	//+kubebuilder:scaffold:builder
 
-	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
-		setupLog.Error(err, "unable to set up health check")
-		os.Exit(1)
-	}
-	if err := mgr.AddReadyzCheck("readyz", healthz.Ping); err != nil {
-		setupLog.Error(err, "unable to set up ready check")
-		os.Exit(1)
-	}
+	err = mgr.AddHealthzCheck("healthz", healthz.Ping)
+	exitWithError(err, "unable to set up health check")
+
+	err = mgr.AddReadyzCheck("readyz", healthz.Ping)
+	exitWithError(err, "unable to set up ready check")
 
 	setupLog.Info("starting manager")
-	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
-		setupLog.Error(err, "problem running manager")
+	err = mgr.Start(ctrl.SetupSignalHandler())
+	exitWithError(err, "problem running manager")
+
+}
+
+func getControllerGrpcClient(cfg *config.DriverConfig, log logr.Logger) (*grpcClient.Client, error) {
+	grpcClientInstance, err := grpcClient.New(cfg.DriverEndpoint, cfg.RPCTimeout)
+	if err != nil {
+		log.Error(err, "failed to create GRPC Client", "Endpoint", cfg.DriverEndpoint, "GRPC Timeout", cfg.RPCTimeout)
+
+		return nil, err
+	}
+	err = grpcClientInstance.Probe()
+	if err != nil {
+		log.Error(err, "failed to connect to driver", "Endpoint", cfg.DriverEndpoint, "GRPC Timeout", cfg.RPCTimeout)
+
+		return nil, err
+	}
+	return grpcClientInstance, err
+}
+
+func exitWithError(err error, msg string) {
+	if err != nil {
+		setupLog.Error(err, msg)
 		os.Exit(1)
 	}
 }
