@@ -18,7 +18,6 @@ package main
 
 import (
 	"flag"
-	"github.com/IBM/volume-group-operator/controllers/utils"
 	grpcClient "github.com/IBM/volume-group-operator/pkg/client"
 	"github.com/IBM/volume-group-operator/pkg/config"
 	"github.com/go-logr/logr"
@@ -73,6 +72,8 @@ func main() {
 
 	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
+
+	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
 	err := cfg.Validate()
 	exitWithError(err, "error in driver configuration")
