@@ -74,6 +74,8 @@ func main() {
 	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
 
+	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
+
 	err := cfg.Validate()
 	exitWithError(err, "error in driver configuration")
 
