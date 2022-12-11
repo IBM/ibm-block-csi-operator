@@ -62,20 +62,6 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 func (r *VolumeGroupReconciler) SetupWithManager(mgr ctrl.Manager, cfg *config.DriverConfig) error {
 	pred := predicate.GenerationChangedPredicate{}
 
-	r.DriverConfig = cfg
-	c, err := grpcClient.New(cfg.DriverEndpoint, cfg.RPCTimeout)
-	if err != nil {
-		r.Log.Error(err, "failed to create GRPC Client", "Endpoint", cfg.DriverEndpoint, "GRPC Timeout", cfg.RPCTimeout)
-
-		return err
-	}
-	err = c.Probe()
-	if err != nil {
-		r.Log.Error(err, "failed to connect to driver", "Endpoint", cfg.DriverEndpoint, "GRPC Timeout", cfg.RPCTimeout)
-
-		return err
-	}
-	r.GRPCClient = c
 	r.VolumeGroup = grpcClient.NewVolumeGroupClient(r.GRPCClient.Client, cfg.RPCTimeout)
 
 	return ctrl.NewControllerManagedBy(mgr).
