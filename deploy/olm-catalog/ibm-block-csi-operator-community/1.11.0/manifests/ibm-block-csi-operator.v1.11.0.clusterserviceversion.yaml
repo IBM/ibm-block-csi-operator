@@ -117,7 +117,7 @@ metadata:
               {
                 "name": "csi-volume-group",
                 "repository": "quay.io/csiblock/volume-group-operator",
-                "tag": "staging",
+                "tag": "v1",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
