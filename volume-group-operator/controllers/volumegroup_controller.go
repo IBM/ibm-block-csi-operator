@@ -144,12 +144,6 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	}
 
 	groupCreationTime := getCurrentTime()
-	instance.Status.GroupCreationTime = groupCreationTime
-	if err = r.Client.Update(context.TODO(), instance); err != nil {
-		logger.Error(err, "failed to update status")
-
-		return reconcile.Result{}, err
-	}
 	volumeGroupName, err := makeVolumeGroupName(snapshotNamePrefix, string(instance.UID))
 	if err != nil {
 		return reconcile.Result{}, err
@@ -166,8 +160,7 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 		return reconcile.Result{}, err
 	}
-	ready := true
-	vgc := r.Utils.GenerateVolumeGroupContent(instance, vgcObj, createVolumeGroupResponse, secretName, secretNamespace, groupCreationTime, &ready)
+	vgc := r.Utils.GenerateVolumeGroupContent(volumeGroupName, instance, vgcObj, createVolumeGroupResponse, secretName, secretNamespace)
 
 	if err = r.Utils.CreateVolumeGroupContent(logger, instance, vgc); err != nil {
 		logger.Error(err, "failed to create volumeGroupContent", "VGCName", vgc.Name)
@@ -177,10 +170,19 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		VolumeGroupContentName: &vgc.Name,
 		Selector:               r.volumeGroupLabelSelector(instance),
 	}
+
 	if err = r.Client.Update(context.TODO(), instance); err != nil {
-		logger.Error(err, "failed to update status")
+		logger.Error(err, "failed to update instance")
 		return reconcile.Result{}, err
 	}
+	ready := true
+	instance.Status = volumegroupv1.VolumeGroupStatus{
+		BoundVolumeGroupContentName: &vgc.Name,
+		GroupCreationTime:           groupCreationTime,
+		Ready:                       &ready,
+		Error:                       nil,
+	}
+
 	uErr := r.updateVolumeGroupStatus(instance, logger)
 	if uErr != nil {
 		logger.Error(uErr, "failed to update volumeGroup status", "VGName", instance.Name)
@@ -192,6 +194,10 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	if err = r.Utils.AddFinalizerToVGC(logger, vgc); err != nil {
 		logger.Error(err, "Failed to add VolumeGroup finalizer")
 
+		return reconcile.Result{}, err
+	}
+
+	if err = r.Utils.UpdateVolumeGroupStatus(logger, vgc, groupCreationTime, &ready); err != nil {
 		return reconcile.Result{}, err
 	}
 	//TODO CSI-4986 add all PVCs that have the VG label to VG

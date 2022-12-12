@@ -2,7 +2,6 @@ package utils
 
 import (
 	"context"
-	"fmt"
 	volumegroupv1 "github.com/IBM/volume-group-operator/api/v1"
 	"github.com/IBM/volume-group-operator/controllers/volumegroup"
 	"github.com/container-storage-interface/spec/lib/go/csi"
@@ -42,14 +41,13 @@ func (r *ControllerUtils) CreateVolumeGroupContent(logger logr.Logger, instance 
 	return nil
 }
 
-func (r *ControllerUtils) GenerateVolumeGroupContent(instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupClass, resp *volumegroup.Response, secretName string, secretNamespace string, groupCreationTime *metav1.Time, ready *bool) *volumegroupv1.VolumeGroupContent {
+func (r *ControllerUtils) GenerateVolumeGroupContent(vgname string, instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupClass, resp *volumegroup.Response, secretName string, secretNamespace string) *volumegroupv1.VolumeGroupContent {
 	return &volumegroupv1.VolumeGroupContent{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      fmt.Sprintf("%s-%s", instance.Name, "content"),
+			Name:      vgname,
 			Namespace: instance.Namespace,
 		},
-		Spec:   r.generateVolumeGroupContentSpec(instance, vgcObj, resp, secretName, secretNamespace),
-		Status: r.generateVolumeGroupContentStatus(groupCreationTime, ready),
+		Spec: r.generateVolumeGroupContentSpec(instance, vgcObj, resp, secretName, secretNamespace),
 	}
 }
 
@@ -59,6 +57,15 @@ func (r *ControllerUtils) generateVolumeGroupContentStatus(groupCreationTime *me
 		PVList:            []corev1.PersistentVolume{},
 		Ready:             ready,
 	}
+}
+
+func (r *ControllerUtils) UpdateVolumeGroupStatus(logger logr.Logger, vgc *volumegroupv1.VolumeGroupContent, groupCreationTime *metav1.Time, ready *bool) error {
+	vgc.Status = r.generateVolumeGroupContentStatus(groupCreationTime, ready)
+	if err := r.Client.Status().Update(context.TODO(), vgc); err != nil {
+		logger.Error(err, "failed to update status")
+		return err
+	}
+	return nil
 }
 
 func (r *ControllerUtils) generateVolumeGroupContentSpec(instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupClass, resp *volumegroup.Response, secretName string, secretNamespace string) volumegroupv1.VolumeGroupContentSpec {
