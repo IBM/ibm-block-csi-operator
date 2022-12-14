@@ -89,6 +89,16 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return ctrl.Result{}, nil
 	}
 
+	err = utils.ValidatePrefixedParameters(vgcObj.Parameters)
+	if err != nil {
+		logger.Error(err, "failed to validate parameters of volumegroupClass", "VGClassName", vgcObj.Name)
+		uErr := r.updateVolumeGroupStatusError(instance, logger, err.Error())
+		if uErr != nil {
+			logger.Error(uErr, "failed to update volumeGroup status", "VGName", instance.Name)
+		}
+
+		return ctrl.Result{}, err
+	}
 	parameters := utils.FilterPrefixedParameters(utils.VolumeGroupParameterPrefix, vgcObj.Parameters)
 
 	secretName := vgcObj.Parameters[utils.PrefixedVolumeGroupSecretNameKey]
