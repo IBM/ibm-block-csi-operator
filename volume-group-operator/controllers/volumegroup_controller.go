@@ -126,12 +126,28 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	} else {
 		if utils.Contains(instance.GetFinalizers(), utils.VolumeGroupFinalizer) {
 			volumeGroupContent, uErr := r.Utils.GetVolumeGroupContent(logger, instance)
-			if uErr == nil {
+			if uErr != nil {
+				if !errors.IsNotFound(uErr) {
+					logger.Error(uErr, "failed to get volumeGroupContent", *instance.Spec.Source.VolumeGroupContentName)
+					return ctrl.Result{}, uErr
+				}
+
+			} else {
 				volumeGroupId := volumeGroupContent.Spec.Source.VolumeGroupHandle
 				if err = r.deleteVolumeGroup(logger, volumeGroupId, secret); err != nil {
 					logger.Error(err, "failed to delete volume group")
 
 					return ctrl.Result{}, err
+				}
+				if err = r.Utils.RemoveFinalizerFromVGC(logger, volumeGroupContent); err != nil {
+					logger.Error(err, "Failed to remove volume group content finalizer")
+
+					return reconcile.Result{}, err
+				}
+				if err = r.Client.Delete(context.TODO(), volumeGroupContent); err != nil {
+					logger.Error(err, "Failed to remove volume group content finalizer")
+
+					return reconcile.Result{}, err
 				}
 			}
 
@@ -140,12 +156,7 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 				return reconcile.Result{}, err
 			}
-			if err = r.Utils.RemoveFinalizerFromVGC(logger, volumeGroupContent); err != nil {
-				logger.Error(err, "Failed to remove volume group content finalizer")
 
-				return reconcile.Result{}, err
-			}
-			err = r.Client.Delete(context.TODO(), volumeGroupContent)
 		}
 
 		logger.Info("volumeGroup object is terminated, skipping reconciliation")
