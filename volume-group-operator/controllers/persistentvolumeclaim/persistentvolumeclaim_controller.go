@@ -44,6 +44,9 @@ func (r *PersistentVolumeClaimWatcher) Reconcile(_ context.Context, req reconcil
 	reqLogger.Info(messages.ReconcilePersistentVolumeClaim)
 	_, err = r.getPersistentVolumeClaim(reqLogger, req)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return result, nil
+		}
 		return result, err
 	}
 
