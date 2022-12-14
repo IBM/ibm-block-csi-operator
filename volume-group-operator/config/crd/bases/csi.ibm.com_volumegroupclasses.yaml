@@ -16,10 +16,25 @@ spec:
     kind: VolumeGroupClass
     listKind: VolumeGroupClassList
     plural: volumegroupclasses
+    shortNames:
+    - vgclass
     singular: volumegroupclass
-  scope: Namespaced
+  scope: Cluster
   versions:
-  - name: v1
+  - additionalPrinterColumns:
+    - jsonPath: .driver
+      name: Driver
+      type: string
+    - jsonPath: .volumeGroupDeletionPolicy
+      name: DeletionPolicy
+      type: string
+    - jsonPath: .supportVolumeGroupSnapshot
+      name: SupportVolumeGroupSnapshot
+      type: boolean
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1
     schema:
       openAPIV3Schema:
         description: VolumeGroupClass is the Schema for the volumegroupclasses API
