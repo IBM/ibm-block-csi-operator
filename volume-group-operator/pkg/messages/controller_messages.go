@@ -28,4 +28,5 @@ var (
 	PersistentVolumeClaimMatchedToVolumeGroup      = "%s/%s persistentVolumeClaim is matched with %s/%s volumeGroup"
 	PersistentVolumeClaimNotMatchedToVolumeGroup   = "%s/%s persistentVolumeClaim is not matched with %s/%s volumeGroup"
 	RemovePersistentVolumeClaimFromVolumeGroup     = "Removing %s/%s persistentVolumeClaim from %s/%s volumeGroup"
+	RemovedPersistentVolumeClaimFromVolumeGroup    = "Successfully removed %s/%s persistentVolumeClaim from %s/%s volumeGroup"
 )

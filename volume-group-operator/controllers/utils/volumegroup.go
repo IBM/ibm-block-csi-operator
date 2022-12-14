@@ -24,10 +24,10 @@ import (
 	"github.com/IBM/volume-group-operator/pkg/messages"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
-	"sigs.k8s.io/controller-runtime/pkg/client"
+	runtimeClient "sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func GetVGList(logger logr.Logger, client client.Client) (csiv1.VolumeGroupList, error) {
+func GetVGList(logger logr.Logger, client runtimeClient.Client) (csiv1.VolumeGroupList, error) {
 	logger.Info(messages.ListVolumeGroups)
 	vg := &csiv1.VolumeGroupList{}
 	err := client.List(context.TODO(), vg)
@@ -37,7 +37,7 @@ func GetVGList(logger logr.Logger, client client.Client) (csiv1.VolumeGroupList,
 	return *vg, nil
 }
 
-func IsPVCMatchesVG(logger logr.Logger, client client.Client,
+func IsPVCMatchesVG(logger logr.Logger, client runtimeClient.Client,
 	pvc *corev1.PersistentVolumeClaim, vg csiv1.VolumeGroup) (bool, error) {
 
 	logger.Info(fmt.Sprintf(messages.CheckIfPersistentVolumeClaimMatchesVolumeGroup,
@@ -56,11 +56,37 @@ func IsPVCMatchesVG(logger logr.Logger, client client.Client,
 	}
 }
 
-func IsPvcPartOfVG(pvcName string, pvcListInVG []corev1.PersistentVolumeClaim) bool {
-	for _, pvc := range pvcListInVG {
-		if pvc.Name == pvcName {
+func IsPVCPartOfVG(pvc *corev1.PersistentVolumeClaim, pvcListInVG []corev1.PersistentVolumeClaim) bool {
+	for _, pvcFromList := range pvcListInVG {
+		if pvcFromList.Name == pvc.Name && pvcFromList.Namespace == pvc.Namespace {
 			return true
 		}
 	}
 	return false
+}
+
+func RemovePVCFromVG(logger logr.Logger, client runtimeClient.Client, pvc *corev1.PersistentVolumeClaim, vg *csiv1.VolumeGroup) error {
+	logger.Info(fmt.Sprintf(messages.RemovePersistentVolumeClaimFromVolumeGroup,
+		pvc.Namespace, pvc.Name, vg.Namespace, vg.Name))
+	vg.Status.PVCList = removePersistentVolumeClaimFromVolumeGroupPVCList(pvc, vg.Status.PVCList)
+	err := client.Status().Update(context.TODO(), vg)
+	if err != nil {
+		logger.Error(err, fmt.Sprintf(messages.FailedToRemovePersistentVolumeClaimFromVolumeGroup,
+			pvc.Namespace, pvc.Name, vg.Namespace, vg.Name))
+		return err
+	}
+	logger.Info(fmt.Sprintf(messages.RemovedPersistentVolumeClaimFromVolumeGroup,
+		pvc.Namespace, pvc.Name, vg.Namespace, vg.Name))
+	return nil
+}
+
+func removePersistentVolumeClaimFromVolumeGroupPVCList(pvc *corev1.PersistentVolumeClaim,
+	pvcListInVG []corev1.PersistentVolumeClaim) []corev1.PersistentVolumeClaim {
+	for index, pvcFromList := range pvcListInVG {
+		if pvcFromList.Name == pvc.Name && pvcFromList.Namespace == pvc.Namespace {
+			pvcListInVG = removeByIndexFromPersistentVolumeClaimList(pvcListInVG, index)
+			return pvcListInVG
+		}
+	}
+	return pvcListInVG
 }

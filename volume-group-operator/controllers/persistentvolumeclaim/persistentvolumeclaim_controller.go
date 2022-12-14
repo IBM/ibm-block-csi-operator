@@ -81,16 +81,20 @@ func (r PersistentVolumeClaimWatcher) getPersistentVolumeClaim(logger logr.Logge
 func (r PersistentVolumeClaimWatcher) removePersistentVolumeClaimFromVolumeGroups(
 	logger logr.Logger, pvc *corev1.PersistentVolumeClaim, vgList csiv1.VolumeGroupList) error {
 	for _, vg := range vgList.Items {
-		if !utils.IsPvcPartOfVG(pvc.GetObjectMeta().GetName(), vg.Status.PVCList) {
+		if !utils.IsPVCPartOfVG(pvc, vg.Status.PVCList) {
 			continue
 		}
 		IsPVCMatchesVG, err := utils.IsPVCMatchesVG(logger, r.Client, pvc, vg)
 		if err != nil {
 			return err
 		}
+
 		if !IsPVCMatchesVG {
-			logger.Info(messages.RemovePersistentVolumeClaimFromVolumeGroup,
-				pvc.Namespace, pvc.Name, vg.Namespace, vg.Name)
+			err := utils.RemovePVCFromVG(logger, r.Client, pvc, &vg)
+			if err != nil {
+				return err
+			}
+
 		}
 	}
 	return nil
