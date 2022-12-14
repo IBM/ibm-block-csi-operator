@@ -90,12 +90,17 @@ func (r PersistentVolumeClaimWatcher) removePersistentVolumeClaimFromVolumeGroup
 		}
 
 		if !IsPVCMatchesVG {
-			err := utils.RemovePVCFromVG(logger, r.Client, pvc, &vg)
-			if err != nil {
-				return err
-			}
-
+			return r.removeVolumeFromPvcListAndPvList(logger, pvc, vg)
 		}
+	}
+	return nil
+}
+
+func (r PersistentVolumeClaimWatcher) removeVolumeFromPvcListAndPvList(logger logr.Logger,
+	pvc *corev1.PersistentVolumeClaim, vg csiv1.VolumeGroup) error {
+	err := utils.RemovePVCFromVG(logger, r.Client, pvc, &vg)
+	if err != nil {
+		return err
 	}
 	return nil
 }
