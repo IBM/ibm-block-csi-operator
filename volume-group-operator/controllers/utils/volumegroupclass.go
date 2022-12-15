@@ -1,5 +1,5 @@
 /*
-Copyright 2021.
+Copyright 2022.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,31 +18,23 @@ package utils
 
 import (
 	"context"
-	"fmt"
 	volumegroupv1 "github.com/IBM/volume-group-operator/api/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-
 	"github.com/go-logr/logr"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 func (r *ControllerUtils) GetVolumeGroupClass(logger logr.Logger, vgcName string) (*volumegroupv1.VolumeGroupClass, error) {
-	vgcObjl := &volumegroupv1.VolumeGroupClassList{}
-	err := r.Client.List(context.TODO(), vgcObjl, &client.ListOptions{Raw: &metav1.ListOptions{FieldSelector: fmt.Sprintf("metadata.name=%s", vgcName)}})
+	vgcObj := &volumegroupv1.VolumeGroupClass{}
+	err := r.Client.Get(context.TODO(), types.NamespacedName{Name: vgcName}, vgcObj)
 	if err != nil {
-		logger.Error(err, "Got an unexpected error while fetching VolumeGroupClass", "VolumeGroupClass", vgcName)
+		if apierrors.IsNotFound(err) {
+			logger.Error(err, "VolumeGroupClass not found", "VolumeGroupClass Name", vgcName)
+		} else {
+			logger.Error(err, "Got an unexpected error while fetching VolumeGroupClass", "VolumeGroupClass", vgcName)
+		}
+
 		return nil, err
 	}
-	var Ierr error
-	items := vgcObjl.Items
-	if len(items) != 1 {
-		if len(items) == 0 {
-			Ierr = fmt.Errorf("VolumeGroupClass %s not found", vgcName)
-			return nil, Ierr
-		}
-		Ierr = fmt.Errorf("got an unexpected amount of object while fetching VolumeGroupClass %s", vgcName)
-		return nil, Ierr
-	}
-	vgcObj := &items[0]
 	return vgcObj, nil
 }
