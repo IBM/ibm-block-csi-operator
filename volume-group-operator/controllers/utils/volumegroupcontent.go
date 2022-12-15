@@ -45,7 +45,8 @@ func (r *ControllerUtils) CreateVolumeGroupContent(logger logr.Logger, instance 
 }
 
 // GenerateVolumeGroupContent create an VolumeGroupContent object.
-func (r *ControllerUtils) GenerateVolumeGroupContent(instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupClass, resp *volumegroup.Response, secretName string, secretNamespace string, groupCreationTime *metav1.Time, ready *bool) *volumegroupv1.VolumeGroupContent {
+func (r *ControllerUtils) GenerateVolumeGroupContent(instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupClass,
+	resp *volumegroup.Response, secretName string, secretNamespace string, groupCreationTime *metav1.Time, ready *bool) *volumegroupv1.VolumeGroupContent {
 	return &volumegroupv1.VolumeGroupContent{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fmt.Sprintf("%s-%s", instance.Name, "content"),
@@ -64,7 +65,8 @@ func (r *ControllerUtils) generateVolumeGroupContentStatus(groupCreationTime *me
 	}
 }
 
-func (r *ControllerUtils) generateVolumeGroupContentSpec(instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupClass, resp *volumegroup.Response, secretName string, secretNamespace string) volumegroupv1.VolumeGroupContentSpec {
+func (r *ControllerUtils) generateVolumeGroupContentSpec(instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupClass,
+	resp *volumegroup.Response, secretName string, secretNamespace string) volumegroupv1.VolumeGroupContentSpec {
 	return volumegroupv1.VolumeGroupContentSpec{
 		VolumeGroupClassName: instance.Spec.VolumeGroupClassName,
 		VolumeGroupRef:       r.generateObjectReference(instance),

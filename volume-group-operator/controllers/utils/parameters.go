@@ -22,13 +22,6 @@ import (
 	"strings"
 )
 
-const (
-	VolumeGroupParameterPrefix = "volumegroup.storage.ibm.io/"
-
-	PrefixedVolumeGroupSecretNameKey      = VolumeGroupParameterPrefix + "secret-name"      // name key for secret
-	PrefixedVolumeGroupSecretNamespaceKey = VolumeGroupParameterPrefix + "secret-namespace" // namespace key secret
-)
-
 // FilterPrefixedParameters removes all the reserved keys from the
 // volumegroupclass which are matching the prefix.
 func FilterPrefixedParameters(prefix string, param map[string]string) map[string]string {
@@ -46,7 +39,7 @@ func FilterPrefixedParameters(prefix string, param map[string]string) map[string
 // empty values for reserved keys.
 func ValidatePrefixedParameters(param map[string]string) error {
 	for k, v := range param {
-		if strings.HasPrefix(k, VolumeGroupParameterPrefix) {
+		if strings.HasPrefix(k, VolumeGroupAsPrefix) {
 			switch k {
 			case PrefixedVolumeGroupSecretNameKey:
 				if v == "" {
@@ -59,7 +52,7 @@ func ValidatePrefixedParameters(param map[string]string) error {
 			// keep adding known prefixes to this list.
 			default:
 
-				return fmt.Errorf("found unknown parameter key %q with reserved prefix %s", k, VolumeGroupParameterPrefix)
+				return fmt.Errorf("found unknown parameter key %q with reserved prefix %s", k, VolumeGroupAsPrefix)
 			}
 		}
 	}
