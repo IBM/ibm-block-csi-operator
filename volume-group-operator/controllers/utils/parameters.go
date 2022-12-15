@@ -22,8 +22,6 @@ import (
 	"strings"
 )
 
-// FilterPrefixedParameters removes all the reserved keys from the
-// volumegroupclass which are matching the prefix.
 func FilterPrefixedParameters(prefix string, param map[string]string) map[string]string {
 	newParam := map[string]string{}
 	for k, v := range param {
@@ -35,8 +33,6 @@ func FilterPrefixedParameters(prefix string, param map[string]string) map[string
 	return newParam
 }
 
-// ValidatePrefixedParameters checks for unknown reserved keys in parameters and
-// empty values for reserved keys.
 func ValidatePrefixedParameters(param map[string]string) error {
 	for k, v := range param {
 		if strings.HasPrefix(k, VolumeGroupAsPrefix) {
@@ -49,7 +45,7 @@ func ValidatePrefixedParameters(param map[string]string) error {
 				if v == "" {
 					return errors.New("secret namespace cannot be empty")
 				}
-			// keep adding known prefixes to this list.
+
 			default:
 
 				return fmt.Errorf("found unknown parameter key %q with reserved prefix %s", k, VolumeGroupAsPrefix)

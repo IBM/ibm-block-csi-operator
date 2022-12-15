@@ -18,7 +18,6 @@ package main
 
 import (
 	"flag"
-	"github.com/IBM/volume-group-operator/controllers/utils"
 	grpcClient "github.com/IBM/volume-group-operator/pkg/client"
 	"github.com/IBM/volume-group-operator/pkg/config"
 	"github.com/go-logr/logr"
@@ -85,15 +84,10 @@ func main() {
 
 	log := ctrl.Log.WithName("controllers").WithName("VolumeGroup")
 	grpcClientInstance, err := getControllerGrpcClient(cfg, log)
-	exitWithError(err, err.Error())
-
-	controllerUtils := utils.ControllerUtils{
-		Client: mgr.GetClient(),
-	}
+	exitWithError(err, "failed to get controller GRPC client")
 
 	err = (&controllers.VolumeGroupReconciler{
 		Client:       mgr.GetClient(),
-		Utils:        controllerUtils,
 		Log:          log,
 		Scheme:       mgr.GetScheme(),
 		DriverConfig: cfg,

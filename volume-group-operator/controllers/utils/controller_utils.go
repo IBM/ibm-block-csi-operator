@@ -6,14 +6,16 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// ControllerUtils contains helper methods
-type ControllerUtils struct {
-	client.Client
+func UpdateObject(client client.Client, updateObject client.Object) error {
+	if err := client.Update(context.TODO(), updateObject); err != nil {
+		return fmt.Errorf("failed to update %s (%s/%s) %w", updateObject.GetObjectKind(), updateObject.GetNamespace(), updateObject.GetName(), err)
+	}
+	return nil
 }
 
-func (r *ControllerUtils) updateObject(updateObject client.Object) error {
-	if err := r.Client.Update(context.TODO(), updateObject); err != nil {
-		return fmt.Errorf("failed to update %s (%s/%s) %w", updateObject.GetObjectKind(), updateObject.GetNamespace(), updateObject.GetName(), err)
+func UpdateObjectStatus(client client.Client, updateObject client.Object) error {
+	if err := client.Status().Update(context.TODO(), updateObject); err != nil {
+		return fmt.Errorf("failed to update %s (%s/%s) status %w", updateObject.GetObjectKind(), updateObject.GetNamespace(), updateObject.GetName(), err)
 	}
 	return nil
 }

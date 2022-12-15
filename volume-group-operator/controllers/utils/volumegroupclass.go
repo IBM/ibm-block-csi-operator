@@ -22,12 +22,12 @@ import (
 	"github.com/go-logr/logr"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// GetVolumeGroupClass get volume group class object from the subjected namespace and return the same.
-func (r *ControllerUtils) GetVolumeGroupClass(logger logr.Logger, vgcName string) (*volumegroupv1.VolumeGroupClass, error) {
+func GetVolumeGroupClass(client client.Client, logger logr.Logger, vgcName string) (*volumegroupv1.VolumeGroupClass, error) {
 	vgcObj := &volumegroupv1.VolumeGroupClass{}
-	err := r.Client.Get(context.TODO(), types.NamespacedName{Name: vgcName}, vgcObj)
+	err := client.Get(context.TODO(), types.NamespacedName{Name: vgcName}, vgcObj)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			logger.Error(err, "VolumeGroupClass not found", "VolumeGroupClass Name", vgcName)

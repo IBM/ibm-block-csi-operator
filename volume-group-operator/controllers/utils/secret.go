@@ -22,13 +22,13 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// GetSecretData retrieves the secrets based on name and namespace input.
-func (r *ControllerUtils) GetSecretData(logger logr.Logger, name, namespace string) (map[string]string, error) {
+func GetSecretData(client client.Client, logger logr.Logger, name, namespace string) (map[string]string, error) {
 	namespacedName := types.NamespacedName{Name: name, Namespace: namespace}
 	secret := &corev1.Secret{}
-	err := r.Client.Get(context.TODO(), namespacedName, secret)
+	err := client.Get(context.TODO(), namespacedName, secret)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			logger.Error(err, "secret not found", "Secret Name", name, "Secret Namespace", namespace)
@@ -43,7 +43,6 @@ func (r *ControllerUtils) GetSecretData(logger logr.Logger, name, namespace stri
 	return convertMap(secret.Data), nil
 }
 
-// convertMap converts map[string][]byte to map[string]string.
 func convertMap(oldMap map[string][]byte) map[string]string {
 	newMap := make(map[string]string)
 
