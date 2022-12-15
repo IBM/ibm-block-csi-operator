@@ -7,69 +7,69 @@ metadata:
     app.kubernetes.io/name: clusterrole
   name: volume-group-operator
 rules:
-- apiGroups:
-  - ""
-  resources:
-  - persistentvolumeclaims
-  verbs:
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - persistentvolumeclaims/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - ""
-  resources:
-  - persistentvolumeclaims/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - csi.ibm.com
-  resources:
-  - volumegroupclasses
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - csi.ibm.com
-  resources:
-  - volumegroupcontents
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - csi.ibm.com
-  resources:
-  - volumegroups
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - csi.ibm.com
-  resources:
-  - volumegroups/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - csi.ibm.com
-  resources:
-  - volumegroups/status
-  verbs:
-  - get
-  - patch
-  - update
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumeclaims
+    verbs:
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumeclaims/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumeclaims/status
+    verbs:
+      - get
+      - patch
+      - update
+  - apiGroups:
+      - csi.ibm.com
+    resources:
+      - volumegroupclasses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - csi.ibm.com
+    resources:
+      - volumegroupcontents
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - csi.ibm.com
+    resources:
+      - volumegroups
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - csi.ibm.com
+    resources:
+      - volumegroups/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - csi.ibm.com
+    resources:
+      - volumegroups/status
+    verbs:
+      - get
+      - patch
+      - update
