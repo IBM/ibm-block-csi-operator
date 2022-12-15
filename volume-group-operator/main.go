@@ -69,8 +69,6 @@ func main() {
 
 	defineFlags(cfg)
 
-	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
-
 	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
 

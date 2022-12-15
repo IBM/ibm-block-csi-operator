@@ -68,7 +68,8 @@ func (r *ControllerUtils) UpdateVolumeGroupStatus(logger logr.Logger, vgc *volum
 	return nil
 }
 
-func (r *ControllerUtils) generateVolumeGroupContentSpec(instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupClass, resp *volumegroup.Response, secretName string, secretNamespace string) volumegroupv1.VolumeGroupContentSpec {
+func (r *ControllerUtils) generateVolumeGroupContentSpec(instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupClass,
+	resp *volumegroup.Response, secretName string, secretNamespace string) volumegroupv1.VolumeGroupContentSpec {
 	return volumegroupv1.VolumeGroupContentSpec{
 		VolumeGroupClassName: instance.Spec.VolumeGroupClassName,
 		VolumeGroupRef:       r.generateObjectReference(instance),

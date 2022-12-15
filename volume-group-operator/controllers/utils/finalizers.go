@@ -17,44 +17,31 @@ limitations under the License.
 package utils
 
 import (
-	"context"
-	"fmt"
 	volumegroupv1 "github.com/IBM/volume-group-operator/api/v1"
-
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
 )
 
-const (
-	VolumeGroupFinalizer        = "volumegroup.storage.ibm.io"
-	volumeGroupContentFinalizer = "volumegroup.storage.ibm.io/vgc-protection"
-	pvcVolumeGroupFinalizer     = "volumegroup.storage.ibm.io/pvc-protection"
-)
-
-func (r *ControllerUtils) AddFinalizerToVG(logger logr.Logger, vg *volumegroupv1.VolumeGroup,
-) error {
+func (r *ControllerUtils) AddFinalizerToVG(logger logr.Logger, vg *volumegroupv1.VolumeGroup) error {
 	if !Contains(vg.ObjectMeta.Finalizers, VolumeGroupFinalizer) {
 		logger.Info("adding finalizer to VolumeGroup object", "Finalizer", VolumeGroupFinalizer)
 		vg.ObjectMeta.Finalizers = append(vg.ObjectMeta.Finalizers, VolumeGroupFinalizer)
-		if err := r.Client.Update(context.TODO(), vg); err != nil {
-			return fmt.Errorf("failed to add finalizer (%s) to volumeGroup resource"+
-				" (%s/%s) %w",
-				VolumeGroupFinalizer, vg.Namespace, vg.Name, err)
+		if err := r.updateObject(vg); err != nil {
+			logger.Error(err, "failed to add finalizer to volumeGroup resource", "finalizer", VolumeGroupFinalizer)
+			return err
 		}
 	}
 
 	return nil
 }
 
-func (r *ControllerUtils) AddFinalizerToVGC(logger logr.Logger, vgc *volumegroupv1.VolumeGroupContent,
-) error {
+func (r *ControllerUtils) AddFinalizerToVGC(logger logr.Logger, vgc *volumegroupv1.VolumeGroupContent) error {
 	if !Contains(vgc.ObjectMeta.Finalizers, volumeGroupContentFinalizer) {
-		logger.Info("adding finalizer to volumeGroupContent object", "Finalizer", volumeGroupContentFinalizer)
+		logger.Info("adding finalizer to volumeGroupContent object", "Name", vgc.Name, "Finalizer", volumeGroupContentFinalizer)
 		vgc.ObjectMeta.Finalizers = append(vgc.ObjectMeta.Finalizers, volumeGroupContentFinalizer)
-		if err := r.Client.Update(context.TODO(), vgc); err != nil {
-			return fmt.Errorf("failed to add finalizer (%s) to volumeGroupContent resource"+
-				" (%s/%s) %w",
-				volumeGroupContentFinalizer, vgc.Namespace, vgc.Name, err)
+		if err := r.updateObject(vgc); err != nil {
+			logger.Error(err, "failed to add finalizer to volumeGroupContent resource", "finalizer", VolumeGroupFinalizer)
+			return err
 		}
 	}
 
@@ -65,10 +52,9 @@ func (r *ControllerUtils) RemoveFinalizerFromVG(logger logr.Logger, vg *volumegr
 	if Contains(vg.ObjectMeta.Finalizers, VolumeGroupFinalizer) {
 		logger.Info("removing finalizer from VolumeGroup object", "Finalizer", VolumeGroupFinalizer)
 		vg.ObjectMeta.Finalizers = remove(vg.ObjectMeta.Finalizers, VolumeGroupFinalizer)
-		if err := r.Client.Update(context.TODO(), vg); err != nil {
-			return fmt.Errorf("failed to remove finalizer (%s) from VolumeGroup resource"+
-				" (%s/%s), %w",
-				VolumeGroupFinalizer, vg.Namespace, vg.Name, err)
+		if err := r.updateObject(vg); err != nil {
+			logger.Error(err, "failed to remove finalizer to VolumeGroup resource", "finalizer", VolumeGroupFinalizer)
+			return err
 		}
 	}
 
@@ -77,12 +63,11 @@ func (r *ControllerUtils) RemoveFinalizerFromVG(logger logr.Logger, vg *volumegr
 
 func (r *ControllerUtils) RemoveFinalizerFromVGC(logger logr.Logger, vgc *volumegroupv1.VolumeGroupContent) error {
 	if Contains(vgc.ObjectMeta.Finalizers, volumeGroupContentFinalizer) {
-		logger.Info("removing finalizer from VolumeGroupContent object", "Finalizer", volumeGroupContentFinalizer)
+		logger.Info("removing finalizer from VolumeGroupContent object", "Name", vgc.Name, "Finalizer", volumeGroupContentFinalizer)
 		vgc.ObjectMeta.Finalizers = remove(vgc.ObjectMeta.Finalizers, volumeGroupContentFinalizer)
-		if err := r.Client.Update(context.TODO(), vgc); err != nil {
-			return fmt.Errorf("failed to remove finalizer (%s) from VolumeGroupContent resource"+
-				" (%s/%s), %w",
-				volumeGroupContentFinalizer, vgc.Namespace, vgc.Name, err)
+		if err := r.updateObject(vgc); err != nil {
+			logger.Error(err, "failed to remove finalizer to VolumeGroupContent resource", "finalizer", VolumeGroupFinalizer)
+			return err
 		}
 	}
 
@@ -91,27 +76,24 @@ func (r *ControllerUtils) RemoveFinalizerFromVGC(logger logr.Logger, vgc *volume
 
 func (r *ControllerUtils) AddFinalizerToPVC(logger logr.Logger, pvc *corev1.PersistentVolumeClaim) error {
 	if !Contains(pvc.ObjectMeta.Finalizers, pvcVolumeGroupFinalizer) {
-		logger.Info("adding finalizer to PersistentVolumeClaim object", "Finalizer", pvcVolumeGroupFinalizer)
+		logger.Info("adding finalizer to PersistentVolumeClaim object", "Namespace", pvc.Namespace, "Name", pvc.Name, "Finalizer", pvcVolumeGroupFinalizer)
 		pvc.ObjectMeta.Finalizers = append(pvc.ObjectMeta.Finalizers, pvcVolumeGroupFinalizer)
-		if err := r.Client.Update(context.TODO(), pvc); err != nil {
-			return fmt.Errorf("failed to add finalizer (%s) to PersistentVolumeClaim resource"+
-				" (%s/%s) %w",
-				pvcVolumeGroupFinalizer, pvc.Namespace, pvc.Name, err)
+		if err := r.updateObject(pvc); err != nil {
+			logger.Error(err, "failed to add finalizer to PersistentVolumeClaim resource", "finalizer", VolumeGroupFinalizer)
+			return err
 		}
 	}
 
 	return nil
 }
 
-func (r *ControllerUtils) RemoveFinalizerFromPVC(logger logr.Logger, pvc *corev1.PersistentVolumeClaim,
-) error {
+func (r *ControllerUtils) RemoveFinalizerFromPVC(logger logr.Logger, pvc *corev1.PersistentVolumeClaim) error {
 	if Contains(pvc.ObjectMeta.Finalizers, pvcVolumeGroupFinalizer) {
-		logger.Info("removing finalizer from PersistentVolumeClaim object", "Finalizer", pvcVolumeGroupFinalizer)
+		logger.Info("removing finalizer from PersistentVolumeClaim object", "Namespace", pvc.Namespace, "Name", pvc.Name, "Finalizer", pvcVolumeGroupFinalizer)
 		pvc.ObjectMeta.Finalizers = remove(pvc.ObjectMeta.Finalizers, pvcVolumeGroupFinalizer)
-		if err := r.Client.Update(context.TODO(), pvc); err != nil {
-			return fmt.Errorf("failed to remove finalizer (%s) from PersistentVolumeClaim resource"+
-				" (%s/%s), %w",
-				pvcVolumeGroupFinalizer, pvc.Namespace, pvc.Name, err)
+		if err := r.updateObject(pvc); err != nil {
+			logger.Error(err, "failed to remove finalizer to PersistentVolumeClaim resource", "finalizer", VolumeGroupFinalizer)
+			return err
 		}
 	}
 

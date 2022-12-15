@@ -24,7 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-func (r *ControllerUtils) GetSecret(logger logr.Logger, name, namespace string) (map[string]string, error) {
+func (r *ControllerUtils) GetSecretData(logger logr.Logger, name, namespace string) (map[string]string, error) {
 	namespacedName := types.NamespacedName{Name: name, Namespace: namespace}
 	secret := &corev1.Secret{}
 	err := r.Client.Get(context.TODO(), namespacedName, secret)
