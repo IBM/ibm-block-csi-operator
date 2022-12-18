@@ -16,28 +16,8 @@ limitations under the License.
 
 package volumegroup
 
-import (
-	"github.com/IBM/volume-group-operator/pkg/client"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-)
-
 type VolumeGroup struct {
 	Params CommonRequestParameters
-}
-
-type Response struct {
-	Response interface{}
-	Error    error
-}
-
-type CommonRequestParameters struct {
-	Name          string
-	VolumeGroupID string
-	VolumeIds     []string
-	Parameters    map[string]string
-	Secrets       map[string]string
-	VolumeGroup   client.VolumeGroup
 }
 
 func (r *VolumeGroup) Create() *Response {
@@ -67,32 +47,4 @@ func (r *VolumeGroup) Modify() *Response {
 	)
 
 	return &Response{Response: resp, Error: err}
-}
-
-func (r *Response) HasKnownGRPCError(knownErrors []codes.Code) bool {
-	if r.Error == nil {
-		return false
-	}
-
-	s, ok := status.FromError(r.Error)
-	if !ok {
-		return false
-	}
-
-	for _, e := range knownErrors {
-		if s.Code() == e {
-			return true
-		}
-	}
-
-	return false
-}
-
-func GetMessageFromError(err error) string {
-	s, ok := status.FromError(err)
-	if !ok {
-		return err.Error()
-	}
-
-	return s.Message()
 }

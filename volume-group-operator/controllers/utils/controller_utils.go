@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"fmt"
+	"google.golang.org/grpc/status"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -18,4 +19,15 @@ func UpdateObjectStatus(client client.Client, updateObject client.Object) error 
 		return fmt.Errorf("failed to update %s (%s/%s) status %w", updateObject.GetObjectKind(), updateObject.GetNamespace(), updateObject.GetName(), err)
 	}
 	return nil
+}
+
+func GetMessageFromError(err error) string {
+	s, ok := status.FromError(err)
+	if !ok {
+		// This is not gRPC error. The operation must have failed before gRPC
+		// method was called, otherwise we would get gRPC error.
+		return err.Error()
+	}
+
+	return s.Message()
 }
