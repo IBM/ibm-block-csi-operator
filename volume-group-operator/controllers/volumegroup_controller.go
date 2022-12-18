@@ -109,8 +109,6 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 	if instance.GetDeletionTimestamp().IsZero() {
 		if err = utils.AddFinalizerToVG(r.Client, logger, instance); err != nil {
-			logger.Error(err, "Failed to add VolumeGroup finalizer")
-
 			return reconcile.Result{}, err
 		}
 
