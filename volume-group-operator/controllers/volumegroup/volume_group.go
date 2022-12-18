@@ -16,31 +16,8 @@ limitations under the License.
 
 package volumegroup
 
-import (
-	"github.com/IBM/volume-group-operator/pkg/client"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-)
-
-// VolumeGroup represents the instance of a single volume group operation.
 type VolumeGroup struct {
 	Params CommonRequestParameters
-}
-
-// Response is the response of a volume group operation.
-type Response struct {
-	Response interface{}
-	Error    error
-}
-
-// CommonRequestParameters holds the common parameters across volume group operations.
-type CommonRequestParameters struct {
-	Name          string
-	VolumeGroupID string
-	VolumeIds     []string
-	Parameters    map[string]string
-	Secrets       map[string]string
-	VolumeGroup   client.VolumeGroup
 }
 
 func (r *VolumeGroup) Create() *Response {
@@ -70,37 +47,4 @@ func (r *VolumeGroup) Modify() *Response {
 	)
 
 	return &Response{Response: resp, Error: err}
-}
-
-func (r *Response) HasKnownGRPCError(knownErrors []codes.Code) bool {
-	if r.Error == nil {
-		return false
-	}
-
-	s, ok := status.FromError(r.Error)
-	if !ok {
-		// This is not gRPC error. The operation must have failed before gRPC
-		// method was called, otherwise we would get gRPC error.
-		return false
-	}
-
-	for _, e := range knownErrors {
-		if s.Code() == e {
-			return true
-		}
-	}
-
-	return false
-}
-
-// GetMessageFromError returns the message from the error.
-func GetMessageFromError(err error) string {
-	s, ok := status.FromError(err)
-	if !ok {
-		// This is not gRPC error. The operation must have failed before gRPC
-		// method was called, otherwise we would get gRPC error.
-		return err.Error()
-	}
-
-	return s.Message()
 }
