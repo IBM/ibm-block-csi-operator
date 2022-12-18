@@ -21,7 +21,6 @@ func GetVolumeGroupContent(client client.Client, logger logr.Logger, instance *v
 		if errors.IsNotFound(err) {
 			logger.Error(err, "VolumeGroupContent not found", "VolumeGroupContent Name", VolumeGroupContentName)
 		}
-
 		return nil, err
 	}
 
@@ -52,21 +51,21 @@ func GenerateVolumeGroupContent(vgname string, instance *volumegroupv1.VolumeGro
 	}
 }
 
-func generateVolumeGroupContentStatus(groupCreationTime *metav1.Time, ready *bool) volumegroupv1.VolumeGroupContentStatus {
-	return volumegroupv1.VolumeGroupContentStatus{
-		GroupCreationTime: groupCreationTime,
-		PVList:            []corev1.PersistentVolume{},
-		Ready:             ready,
-	}
-}
-
-func UpdateVolumeGroupStatus(client client.Client, logger logr.Logger, vgc *volumegroupv1.VolumeGroupContent, groupCreationTime *metav1.Time, ready *bool) error {
-	vgc.Status = generateVolumeGroupContentStatus(groupCreationTime, ready)
+func UpdateVolumeGroupContentStatus(client client.Client, logger logr.Logger, vgc *volumegroupv1.VolumeGroupContent, groupCreationTime *metav1.Time, ready bool) error {
+	vgc.Status = generateVolumeGroupContentStatus(vgc, groupCreationTime, ready)
 	if err := UpdateObjectStatus(client, vgc); err != nil {
 		logger.Error(err, "failed to update status")
 		return err
 	}
 	return nil
+}
+
+func generateVolumeGroupContentStatus(vgc *volumegroupv1.VolumeGroupContent, groupCreationTime *metav1.Time, ready bool) volumegroupv1.VolumeGroupContentStatus {
+	return volumegroupv1.VolumeGroupContentStatus{
+		GroupCreationTime: groupCreationTime,
+		PVList:            vgc.Status.PVList,
+		Ready:             &ready,
+	}
 }
 
 func generateVolumeGroupContentSpec(instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupClass,

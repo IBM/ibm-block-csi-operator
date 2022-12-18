@@ -36,11 +36,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-const (
-	volumeGroupLAbelKey = "volumegroup"
-	snapshotNamePrefix  = "volumegroup"
-)
-
 type VolumeGroupReconciler struct {
 	client.Client
 	Log               logr.Logger
@@ -76,11 +71,10 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 	vgcObj, err := utils.GetVolumeGroupClass(r.Client, logger, *instance.Spec.VolumeGroupClassName)
 	if err != nil {
-		uErr := r.updateVolumeGroupStatusError(instance, logger, err.Error())
+		uErr := utils.UpdateVolumeGroupStatusError(r.Client, instance, logger, err.Error())
 		if uErr != nil {
-			logger.Error(uErr, "failed to update volumeGroup status", "VGName", instance.Name)
+			return ctrl.Result{}, uErr
 		}
-
 		return ctrl.Result{}, err
 	}
 
@@ -91,11 +85,10 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	err = utils.ValidatePrefixedParameters(vgcObj.Parameters)
 	if err != nil {
 		logger.Error(err, "failed to validate parameters of volumegroupClass", "VGClassName", vgcObj.Name)
-		uErr := r.updateVolumeGroupStatusError(instance, logger, err.Error())
+		uErr := utils.UpdateVolumeGroupStatusError(r.Client, instance, logger, err.Error())
 		if uErr != nil {
-			logger.Error(uErr, "failed to update volumeGroup status", "VGName", instance.Name)
+			return ctrl.Result{}, uErr
 		}
-
 		return ctrl.Result{}, err
 	}
 	parameters := utils.FilterPrefixedParameters(utils.VolumeGroupAsPrefix, vgcObj.Parameters)
@@ -106,11 +99,10 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	if secretName != "" && secretNamespace != "" {
 		secret, err = utils.GetSecretData(r.Client, logger, secretName, secretNamespace)
 		if err != nil {
-			uErr := r.updateVolumeGroupStatusError(instance, logger, err.Error())
+			uErr := utils.UpdateVolumeGroupStatusError(r.Client, instance, logger, err.Error())
 			if uErr != nil {
-				logger.Error(uErr, "failed to update volumeGroup status", "VGName", instance.Name)
+				return ctrl.Result{}, uErr
 			}
-
 			return reconcile.Result{}, err
 		}
 	}
@@ -124,47 +116,17 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 	} else {
 		if utils.Contains(instance.GetFinalizers(), utils.VolumeGroupFinalizer) {
-			volumeGroupContent, uErr := utils.GetVolumeGroupContent(r.Client, logger, instance)
-			if uErr != nil {
-				if !errors.IsNotFound(uErr) {
-					logger.Error(uErr, "failed to get volumeGroupContent", *instance.Spec.Source.VolumeGroupContentName)
-					return ctrl.Result{}, uErr
-				}
-
-			} else {
-				volumeGroupId := volumeGroupContent.Spec.Source.VolumeGroupHandle
-				if err = r.deleteVolumeGroup(logger, volumeGroupId, secret); err != nil {
-					logger.Error(err, "failed to delete volume group")
-
-					return ctrl.Result{}, err
-				}
-				if err = utils.RemoveFinalizerFromVGC(r.Client, logger, volumeGroupContent); err != nil {
-					logger.Error(err, "Failed to remove volume group content finalizer")
-
-					return reconcile.Result{}, err
-				}
-				if err = r.Client.Delete(context.TODO(), volumeGroupContent); err != nil {
-					logger.Error(err, "Failed to remove volume group content finalizer")
-
-					return reconcile.Result{}, err
-				}
+			err = r.removeInstance(logger, instance, secret)
+			if err != nil {
+				return ctrl.Result{}, err
 			}
-
-			if err = utils.RemoveFinalizerFromVG(r.Client, logger, instance); err != nil {
-				logger.Error(err, "Failed to remove volume group finalizer")
-
-				return reconcile.Result{}, err
-			}
-
 		}
-
 		logger.Info("volumeGroup object is terminated, skipping reconciliation")
-
 		return ctrl.Result{}, nil
 	}
 
 	groupCreationTime := getCurrentTime()
-	volumeGroupName, err := makeVolumeGroupName(snapshotNamePrefix, string(instance.UID))
+	volumeGroupName, err := makeVolumeGroupName(utils.VolumeGroupPrefix, string(instance.UID))
 	if err != nil {
 		return reconcile.Result{}, err
 	}
@@ -173,50 +135,34 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	if createVolumeGroupResponse.Error != nil {
 		logger.Error(err, "failed to create volume group")
 		msg := utils.GetMessageFromError(createVolumeGroupResponse.Error)
-		uErr := r.updateVolumeGroupStatusError(instance, logger, msg)
+		uErr := utils.UpdateVolumeGroupStatusError(r.Client, instance, logger, msg)
 		if uErr != nil {
-			logger.Error(uErr, "failed to update volumeGroup status", "VGName", instance.Name)
+			return ctrl.Result{}, uErr
 		}
-
 		return reconcile.Result{}, err
 	}
 	vgc := utils.GenerateVolumeGroupContent(volumeGroupName, instance, vgcObj, createVolumeGroupResponse, secretName, secretNamespace)
 
 	if err = utils.CreateVolumeGroupContent(r.Client, logger, instance, vgc); err != nil {
-		logger.Error(err, "failed to create volumeGroupContent", "VGCName", vgc.Name)
 		return reconcile.Result{}, err
 	}
-	instance.Spec.Source = volumegroupv1.VolumeGroupSource{
-		VolumeGroupContentName: &vgc.Name,
-		Selector:               r.volumeGroupLabelSelector(instance),
-	}
+	utils.UpdateVolumeGroupSource(instance, vgc)
 
 	if err = utils.UpdateObject(r.Client, instance); err != nil {
 		return reconcile.Result{}, err
 	}
-	ready := true
-	instance.Status = volumegroupv1.VolumeGroupStatus{
-		BoundVolumeGroupContentName: &vgc.Name,
-		GroupCreationTime:           groupCreationTime,
-		Ready:                       &ready,
-		Error:                       nil,
-	}
-
-	uErr := r.updateVolumeGroupStatus(instance, logger)
+	uErr := utils.UpdateVolumeGroupStatus(r.Client, instance, vgc, groupCreationTime, true, logger)
 	if uErr != nil {
-		logger.Error(uErr, "failed to update volumeGroup status", "VGName", instance.Name)
 	}
 	vgc, err = utils.GetVolumeGroupContent(r.Client, logger, instance)
 	if err != nil {
 		return reconcile.Result{}, err
 	}
 	if err = utils.AddFinalizerToVGC(r.Client, logger, vgc); err != nil {
-		logger.Error(err, "Failed to add VolumeGroup finalizer")
-
 		return reconcile.Result{}, err
 	}
 
-	if err = utils.UpdateVolumeGroupStatus(r.Client, logger, vgc, groupCreationTime, &ready); err != nil {
+	if err = utils.UpdateVolumeGroupContentStatus(r.Client, logger, vgc, groupCreationTime, true); err != nil {
 		return reconcile.Result{}, err
 	}
 	//TODO CSI-4986 add all PVCs that have the VG label to VG
@@ -224,17 +170,38 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	return ctrl.Result{}, nil
 }
 
+func (r *VolumeGroupReconciler) removeInstance(logger logr.Logger, instance *volumegroupv1.VolumeGroup, secret map[string]string) error {
+	volumeGroupContent, err := utils.GetVolumeGroupContent(r.Client, logger, instance)
+	if err != nil {
+		if !errors.IsNotFound(err) {
+			return err
+		}
+
+	} else {
+		volumeGroupId := volumeGroupContent.Spec.Source.VolumeGroupHandle
+		if err = r.deleteVolumeGroup(logger, volumeGroupId, secret); err != nil {
+			return err
+		}
+		if err = utils.RemoveFinalizerFromVGC(r.Client, logger, volumeGroupContent); err != nil {
+			return err
+		}
+		if err = r.Client.Delete(context.TODO(), volumeGroupContent); err != nil {
+			logger.Error(err, "Failed to delete volume group content", "VGCName", volumeGroupContent.Name)
+			return err
+		}
+	}
+
+	if err = utils.RemoveFinalizerFromVG(r.Client, logger, instance); err != nil {
+		return err
+	}
+	return nil
+}
+
 func makeVolumeGroupName(prefix string, volumeGroupUID string) (string, error) {
 	if len(volumeGroupUID) == 0 {
 		return "", fmt.Errorf("Corrupted volumeGroup object, it is missing UID")
 	}
 	return fmt.Sprintf("%s-%s", prefix, volumeGroupUID), nil
-}
-
-func (r *VolumeGroupReconciler) volumeGroupLabelSelector(instance *volumegroupv1.VolumeGroup) *metav1.LabelSelector {
-	return &metav1.LabelSelector{
-		MatchLabels: map[string]string{volumeGroupLAbelKey: instance.Name},
-	}
 }
 
 func (r *VolumeGroupReconciler) SetupWithManager(mgr ctrl.Manager, cfg *config.DriverConfig) error {
@@ -245,28 +212,6 @@ func (r *VolumeGroupReconciler) SetupWithManager(mgr ctrl.Manager, cfg *config.D
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&volumegroupv1.VolumeGroup{}).
 		WithEventFilter(pred).Complete(r)
-}
-
-func (r *VolumeGroupReconciler) updateVolumeGroupStatusError(
-	instance *volumegroupv1.VolumeGroup,
-	logger logr.Logger,
-	message string) error {
-	instance.Status.Error = &volumegroupv1.VolumeGroupError{Message: &message}
-	err := r.updateVolumeGroupStatus(instance, logger)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (r *VolumeGroupReconciler) updateVolumeGroupStatus(instance *volumegroupv1.VolumeGroup, logger logr.Logger) error {
-	if err := utils.UpdateObjectStatus(r.Client, instance); err != nil {
-		logger.Error(err, "failed to update status")
-
-		return err
-	}
-	return nil
 }
 
 func (r *VolumeGroupReconciler) deleteVolumeGroup(logger logr.Logger, volumeGroupId string, secrets map[string]string) error {
