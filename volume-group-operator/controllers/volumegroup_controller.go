@@ -172,7 +172,7 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	createVolumeGroupResponse := r.createVolumeGroup(volumeGroupName, parameters, secret)
 	if createVolumeGroupResponse.Error != nil {
 		logger.Error(err, "failed to create volume group")
-		msg := volumegroup.GetMessageFromError(createVolumeGroupResponse.Error)
+		msg := utils.GetMessageFromError(createVolumeGroupResponse.Error)
 		uErr := r.updateVolumeGroupStatusError(instance, logger, msg)
 		if uErr != nil {
 			logger.Error(uErr, "failed to update volumeGroup status", "VGName", instance.Name)
