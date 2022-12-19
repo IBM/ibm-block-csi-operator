@@ -24,10 +24,10 @@ import (
 	"github.com/IBM/volume-group-operator/pkg/messages"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
-	runtimeClient "sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func GetVGList(logger logr.Logger, client runtimeClient.Client) (csiv1.VolumeGroupList, error) {
+func GetVGList(logger logr.Logger, client client.Client) (csiv1.VolumeGroupList, error) {
 	logger.Info(messages.ListVolumeGroups)
 	vg := &csiv1.VolumeGroupList{}
 	err := client.List(context.TODO(), vg)
@@ -37,7 +37,7 @@ func GetVGList(logger logr.Logger, client runtimeClient.Client) (csiv1.VolumeGro
 	return *vg, nil
 }
 
-func IsPVCMatchesVG(logger logr.Logger, client runtimeClient.Client,
+func IsPVCMatchesVG(logger logr.Logger, client client.Client,
 	pvc *corev1.PersistentVolumeClaim, vg csiv1.VolumeGroup) (bool, error) {
 
 	logger.Info(fmt.Sprintf(messages.CheckIfPersistentVolumeClaimMatchesVolumeGroup,
@@ -65,7 +65,7 @@ func IsPVCPartOfVG(pvc *corev1.PersistentVolumeClaim, pvcListInVG []corev1.Persi
 	return false
 }
 
-func RemovePVCFromVG(logger logr.Logger, client runtimeClient.Client, pvc *corev1.PersistentVolumeClaim, vg *csiv1.VolumeGroup) error {
+func RemovePVCFromVG(logger logr.Logger, client client.Client, pvc *corev1.PersistentVolumeClaim, vg *csiv1.VolumeGroup) error {
 	logger.Info(fmt.Sprintf(messages.RemovePersistentVolumeClaimFromVolumeGroup,
 		pvc.Namespace, pvc.Name, vg.Namespace, vg.Name))
 	vg.Status.PVCList = removePersistentVolumeClaimFromVolumeGroupPVCList(pvc, vg.Status.PVCList)

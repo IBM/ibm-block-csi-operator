@@ -71,7 +71,7 @@ type VolumeGroupContentStatus struct {
 
 	// A list of persistent volumes
 	// +optional
-	PVList []corev1.PersistentVolume `json:"pvcList,omitempty"`
+	PVList []corev1.PersistentVolume `json:"pvList,omitempty"`
 
 	// +optional
 	Ready *bool `json:"ready,omitempty"`

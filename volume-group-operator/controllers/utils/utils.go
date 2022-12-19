@@ -24,3 +24,8 @@ func removeByIndexFromPersistentVolumeClaimList(pvcList []corev1.PersistentVolum
 	index int) []corev1.PersistentVolumeClaim {
 	return append(pvcList[:index], pvcList[index+1:]...)
 }
+
+func removeByIndexFromPersistentVolumeList(pvList []corev1.PersistentVolume,
+	index int) []corev1.PersistentVolume {
+	return append(pvList[:index], pvList[index+1:]...)
+}

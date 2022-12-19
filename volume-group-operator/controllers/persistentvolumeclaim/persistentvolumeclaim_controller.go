@@ -56,7 +56,7 @@ func (r *PersistentVolumeClaimWatcher) Reconcile(_ context.Context, req reconcil
 		return result, err
 	}
 
-	err = r.removePersistentVolumeClaimFromVolumeGroups(reqLogger, pvc, vgList)
+	err = r.removePersistentVolumeClaimFromVolumeGroupObjects(reqLogger, pvc, vgList)
 	if err != nil {
 		return result, err
 	}
@@ -81,7 +81,7 @@ func (r PersistentVolumeClaimWatcher) getPersistentVolumeClaim(logger logr.Logge
 	return pvc, nil
 }
 
-func (r PersistentVolumeClaimWatcher) removePersistentVolumeClaimFromVolumeGroups(
+func (r PersistentVolumeClaimWatcher) removePersistentVolumeClaimFromVolumeGroupObjects(
 	logger logr.Logger, pvc *corev1.PersistentVolumeClaim, vgList csiv1.VolumeGroupList) error {
 	for _, vg := range vgList.Items {
 		if !utils.IsPVCPartOfVG(pvc, vg.Status.PVCList) {
@@ -104,6 +104,21 @@ func (r PersistentVolumeClaimWatcher) removeVolumeFromPvcListAndPvList(logger lo
 	err := utils.RemovePVCFromVG(logger, r.Client, pvc, &vg)
 	if err != nil {
 		return err
+	}
+	pv, err := utils.GetPVFromPVC(logger, r.Client, pvc)
+	if err != nil {
+		return err
+	}
+	vgc, err := utils.GetVGC(logger, r.Client, &vg)
+	if err != nil {
+		return err
+	}
+
+	if pv != nil {
+		err = utils.RemovePVFromVGC(logger, r.Client, pv, vgc)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
