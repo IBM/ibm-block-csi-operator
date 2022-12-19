@@ -18,10 +18,10 @@ package controllers
 
 import (
 	"context"
-	"time"
 	"github.com/IBM/volume-group-operator/pkg/config"
 	"github.com/go-logr/logr"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"time"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -29,13 +29,10 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	log "sigs.k8s.io/controller-runtime/pkg/log"
 
 	volumegroupv1 "github.com/IBM/volume-group-operator/api/v1"
 	grpcClient "github.com/IBM/volume-group-operator/pkg/client"
 )
-
-var volumeGroupLog = log.Log.WithName("volumegroup_controller")
 
 const (
 	VolumeGroup               = "VolumeGroup"
@@ -63,8 +60,6 @@ type VolumeGroupReconciler struct {
 //+kubebuilder:rbac:groups="",resources=persistentvolumeclaims/finalizers,verbs=update
 
 func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
-
 	// TODO(user): your logic here
 
 	return ctrl.Result{}, nil
@@ -72,7 +67,8 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *VolumeGroupReconciler) SetupWithManager(mgr ctrl.Manager, cfg *config.DriverConfig) error {
-	err := r.waitForCrds()
+	logger := r.Log.WithName("SetupWithManager")
+	err := r.waitForCrds(logger)
 	if err != nil {
 		r.Log.Error(err, "failed to wait for crds")
 
@@ -87,9 +83,7 @@ func (r *VolumeGroupReconciler) SetupWithManager(mgr ctrl.Manager, cfg *config.D
 		WithEventFilter(pred).Complete(r)
 }
 
-func (r *VolumeGroupReconciler) waitForCrds() error {
-	logger := volumeGroupLog.WithName("waitForCrds")
-
+func (r *VolumeGroupReconciler) waitForCrds(logger logr.Logger) error {
 	err := r.waitForVolumeGroupResource(logger, VolumeGroup)
 	if err != nil {
 		logger.Error(err, "failed to wait for VolumeGroup CRD")
