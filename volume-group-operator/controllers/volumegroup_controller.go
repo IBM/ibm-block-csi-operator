@@ -88,17 +88,9 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	}
 	parameters := utils.FilterPrefixedParameters(utils.VolumeGroupAsPrefix, vgcObj.Parameters)
 
-	secretName := vgcObj.Parameters[utils.PrefixedVolumeGroupSecretNameKey]
-	secretNamespace := vgcObj.Parameters[utils.PrefixedVolumeGroupSecretNamespaceKey]
-	secret := make(map[string]string)
-	if secretName != "" && secretNamespace != "" {
-		secret, err = utils.GetSecretData(r.Client, logger, secretName, secretNamespace)
-		if err != nil {
-			if uErr := utils.UpdateVolumeGroupStatusError(r.Client, instance, logger, err.Error()); uErr != nil {
-				return ctrl.Result{}, uErr
-			}
-			return ctrl.Result{}, err
-		}
+	secret, err := utils.GetSecretDataFromClass(r.Client, vgcObj, logger, instance)
+	if err != nil {
+		return ctrl.Result{}, err
 	}
 
 	if instance.GetDeletionTimestamp().IsZero() {
@@ -117,7 +109,7 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	}
 
 	groupCreationTime := getCurrentTime()
-	volumeGroupName, err := makeVolumeGroupName(utils.VolumeGroupAsPrefix, string(instance.UID))
+	volumeGroupName, err := makeVolumeGroupName(utils.VolumeGroupNamePrefix, string(instance.UID))
 	if err != nil {
 		return ctrl.Result{}, err
 	}
@@ -131,9 +123,10 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		}
 		return ctrl.Result{}, err
 	}
+	secretName, secretNamespace := utils.GetSecretCred(vgcObj)
 	vgc := utils.GenerateVolumeGroupContent(volumeGroupName, instance, vgcObj, createVolumeGroupResponse, secretName, secretNamespace)
-
-	if err = utils.CreateVolumeGroupContent(r.Client, logger, instance, vgc); err != nil {
+	logger.Info("GenerateVolumeGroupContent", "vgc", vgc)
+	if err = utils.CreateVolumeGroupContent(r.Client, logger, vgc); err != nil {
 		return ctrl.Result{}, err
 	}
 	utils.UpdateVolumeGroupSource(instance, vgc)
@@ -168,20 +161,36 @@ func (r *VolumeGroupReconciler) removeInstance(logger logr.Logger, instance *vol
 		}
 
 	} else {
-		volumeGroupId := volumeGroupContent.Spec.Source.VolumeGroupHandle
-		if err = r.deleteVolumeGroup(logger, volumeGroupId, secret); err != nil {
-			return err
-		}
-		if err = utils.RemoveFinalizerFromVGC(r.Client, logger, volumeGroupContent); err != nil {
-			return err
-		}
-		if err = r.Client.Delete(context.TODO(), volumeGroupContent); err != nil {
-			logger.Error(err, "Failed to delete volume group content", "VGCName", volumeGroupContent.Name)
+		err = r.removeVolumeGroupContent(logger, volumeGroupContent, secret)
+		if err != nil {
 			return err
 		}
 	}
 
 	if err = utils.RemoveFinalizerFromVG(r.Client, logger, instance); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *VolumeGroupReconciler) removeVolumeGroupContent(logger logr.Logger, volumeGroupContent *volumegroupv1.VolumeGroupContent, secret map[string]string) error {
+	volumeGroupId := volumeGroupContent.Spec.Source.VolumeGroupHandle
+	if err := r.deleteVolumeGroup(logger, volumeGroupId, secret); err != nil {
+		return err
+	}
+	err := r.RemoveVGCObject(logger, volumeGroupContent)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *VolumeGroupReconciler) RemoveVGCObject(logger logr.Logger, volumeGroupContent *volumegroupv1.VolumeGroupContent) error {
+	if err := utils.RemoveFinalizerFromVGC(r.Client, logger, volumeGroupContent); err != nil {
+		return err
+	}
+	if err := r.Client.Delete(context.TODO(), volumeGroupContent); err != nil {
+		logger.Error(err, "Failed to delete volume group content", "VGCName", volumeGroupContent.Name)
 		return err
 	}
 	return nil

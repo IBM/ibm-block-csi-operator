@@ -27,7 +27,7 @@ func GetVolumeGroupContent(client client.Client, logger logr.Logger, instance *v
 	return VGC, nil
 }
 
-func CreateVolumeGroupContent(client client.Client, logger logr.Logger, instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupContent) error {
+func CreateVolumeGroupContent(client client.Client, logger logr.Logger, vgcObj *volumegroupv1.VolumeGroupContent) error {
 	err := client.Create(context.TODO(), vgcObj)
 	if err != nil {
 		if errors.IsAlreadyExists(err) {
