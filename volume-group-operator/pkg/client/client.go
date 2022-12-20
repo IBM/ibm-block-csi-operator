@@ -26,18 +26,15 @@ import (
 	"google.golang.org/grpc"
 )
 
-// Client holds the GRPC connenction details.
 type Client struct {
 	Client  *grpc.ClientConn
 	Timeout time.Duration
 }
 
-// Connect to the GRPC client.
 func connect(address string) (*grpc.ClientConn, error) {
 	return connection.Connect(address, metrics.NewCSIMetricsManager(""), connection.OnConnectionLoss(connection.ExitOnConnectionLoss()))
 }
 
-// New creates and returns the GRPC client.
 func New(address string, timeout time.Duration) (*Client, error) {
 	c := &Client{}
 	cc, err := connect(address)
@@ -50,12 +47,10 @@ func New(address string, timeout time.Duration) (*Client, error) {
 	return c, nil
 }
 
-// Probe the GRPC client once.
 func (c *Client) Probe() error {
 	return rpc.ProbeForever(c.Client, c.Timeout)
 }
 
-// GetDriverName gets the driver name from the driver.
 func (c *Client) GetDriverName() (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
 	defer cancel()

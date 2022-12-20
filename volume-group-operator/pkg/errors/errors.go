@@ -39,13 +39,3 @@ type PersistentVolumeDoesNotExist struct {
 func (e *PersistentVolumeDoesNotExist) Error() string {
 	return fmt.Sprintf(messages.PersistentVolumeDoesNotExist, e.PVName, e.PVNamespace, e.ErrorMessage)
 }
-
-type VolumeGroupContentDoesNotExist struct {
-	VGCName      string
-	VGCNamespace string
-	ErrorMessage string
-}
-
-func (e *VolumeGroupContentDoesNotExist) Error() string {
-	return fmt.Sprintf(messages.VolumeGroupContentDoesNotExist, e.VGCName, e.VGCNamespace, e.ErrorMessage)
-}

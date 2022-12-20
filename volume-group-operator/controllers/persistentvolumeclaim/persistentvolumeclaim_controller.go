@@ -109,7 +109,7 @@ func (r PersistentVolumeClaimWatcher) removeVolumeFromPvcListAndPvList(logger lo
 	if err != nil {
 		return err
 	}
-	vgc, err := utils.GetVGC(logger, r.Client, &vg)
+	vgc, err := utils.GetVolumeGroupContent(r.Client, logger, &vg)
 	if err != nil {
 		return err
 	}

@@ -20,25 +20,64 @@ import (
 	"context"
 	"fmt"
 
-	csiv1 "github.com/IBM/volume-group-operator/api/v1"
+	volumegroupv1 "github.com/IBM/volume-group-operator/api/v1"
 	"github.com/IBM/volume-group-operator/pkg/messages"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func GetVGList(logger logr.Logger, client client.Client) (csiv1.VolumeGroupList, error) {
+func UpdateVolumeGroupSource(instance *volumegroupv1.VolumeGroup, vgc *volumegroupv1.VolumeGroupContent) {
+	instance.Spec.Source = volumegroupv1.VolumeGroupSource{
+		VolumeGroupContentName: &vgc.Name,
+		Selector:               getVolumeGroupLabelSelector(instance),
+	}
+}
+
+func updateVolumeGroupStatus(client client.Client, instance *volumegroupv1.VolumeGroup, logger logr.Logger) error {
+	if err := UpdateObjectStatus(client, instance); err != nil {
+		logger.Error(err, "failed to update status")
+
+		return err
+	}
+	return nil
+}
+
+func UpdateVolumeGroupStatus(client client.Client, instance *volumegroupv1.VolumeGroup, vgc *volumegroupv1.VolumeGroupContent,
+	groupCreationTime *metav1.Time, ready bool, logger logr.Logger) error {
+	instance.Status = volumegroupv1.VolumeGroupStatus{
+		BoundVolumeGroupContentName: &vgc.Name,
+		GroupCreationTime:           groupCreationTime,
+		Ready:                       &ready,
+		Error:                       nil,
+	}
+	return updateVolumeGroupStatus(client, instance, logger)
+}
+
+func UpdateVolumeGroupStatusError(client client.Client, instance *volumegroupv1.VolumeGroup, logger logr.Logger, message string) error {
+	instance.Status.Error = &volumegroupv1.VolumeGroupError{Message: &message}
+	err := updateVolumeGroupStatus(client, instance, logger)
+	if err != nil {
+		logger.Error(err, "failed to update volumeGroup status", "VGName", instance.Name)
+		return err
+	}
+
+	return nil
+}
+
+func GetVGList(logger logr.Logger, client client.Client) (volumegroupv1.VolumeGroupList, error) {
 	logger.Info(messages.ListVolumeGroups)
-	vg := &csiv1.VolumeGroupList{}
+	vg := &volumegroupv1.VolumeGroupList{}
 	err := client.List(context.TODO(), vg)
 	if err != nil {
-		return csiv1.VolumeGroupList{}, err
+		return volumegroupv1.VolumeGroupList{}, err
 	}
 	return *vg, nil
 }
 
 func IsPVCMatchesVG(logger logr.Logger, client client.Client,
-	pvc *corev1.PersistentVolumeClaim, vg csiv1.VolumeGroup) (bool, error) {
+	pvc *corev1.PersistentVolumeClaim, vg volumegroupv1.VolumeGroup) (bool, error) {
 
 	logger.Info(fmt.Sprintf(messages.CheckIfPersistentVolumeClaimMatchesVolumeGroup,
 		pvc.Namespace, pvc.Name, vg.Namespace, vg.Name))
@@ -65,7 +104,7 @@ func IsPVCPartOfVG(pvc *corev1.PersistentVolumeClaim, pvcListInVG []corev1.Persi
 	return false
 }
 
-func RemovePVCFromVG(logger logr.Logger, client client.Client, pvc *corev1.PersistentVolumeClaim, vg *csiv1.VolumeGroup) error {
+func RemovePVCFromVG(logger logr.Logger, client client.Client, pvc *corev1.PersistentVolumeClaim, vg *volumegroupv1.VolumeGroup) error {
 	logger.Info(fmt.Sprintf(messages.RemovePersistentVolumeClaimFromVolumeGroup,
 		pvc.Namespace, pvc.Name, vg.Namespace, vg.Name))
 	vg.Status.PVCList = removePersistentVolumeClaimFromVolumeGroupPVCList(pvc, vg.Status.PVCList)

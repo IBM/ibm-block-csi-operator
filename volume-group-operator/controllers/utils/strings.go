@@ -14,28 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package config
+package utils
 
-import (
-	"errors"
-	"time"
-)
-
-type DriverConfig struct {
-	DriverEndpoint string
-	DriverName     string
-	RPCTimeout     time.Duration
-}
-
-func NewDriverConfig() *DriverConfig {
-	return &DriverConfig{}
-}
-
-func (cfg *DriverConfig) Validate() error {
-
-	if cfg.DriverName == "" {
-		return errors.New("driverName is empty")
+func Contains(slice []string, s string) bool {
+	for _, item := range slice {
+		if item == s {
+			return true
+		}
 	}
 
-	return nil
+	return false
+}
+
+func remove(slice []string, s string) (result []string) {
+	for _, item := range slice {
+		if item == s {
+			continue
+		}
+		result = append(result, item)
+	}
+
+	return
 }

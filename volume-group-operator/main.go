@@ -98,7 +98,6 @@ func main() {
 		DriverConfig: cfg,
 		GRPCClient:   grpcClientInstance,
 	}).SetupWithManager(mgr, cfg)
-
 	exitWithError(err, "unable to create controller  with controller VolumeGroup")
 
 	err = (&persistentvolumeclaim.PersistentVolumeClaimWatcher{
