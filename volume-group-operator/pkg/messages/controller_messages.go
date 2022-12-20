@@ -38,4 +38,8 @@ var (
 	AddedPersistentVolumeClaimToVolumeGroup          = "Successfully added %s/%s persistentVolumeClaim to %s/%s volumeGroup"
 	AddPersistentVolumeToVolumeGroupContent          = "Adding %s persistentVolume to %s/%s volumeGroup"
 	AddedPersistentVolumeToVolumeGroupContent        = "Successfully added %s persistentVolume to %s/%s volumeGroupContent"
+	RemoveVolumeFromVolumeGroup                      = "Removing volume of persistentVolumeClaim from %s/%s volumeGroup"
+	RemovedVolumeFromVolumeGroup                     = "Successfully Removed volume of persistentVolumeClaim from %s/%s volumeGroup"
+	ModifyVolumeGroup                                = "Modifying %s volumeGroupID with %v volumeIDs"
+	ModifiedVolumeGroup                              = "Successfully modified %s volumeGroupID"
 )
