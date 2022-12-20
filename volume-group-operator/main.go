@@ -27,13 +27,13 @@ import (
 	"github.com/IBM/volume-group-operator/pkg/messages"
 	"github.com/go-logr/logr"
 
-	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
-	// to ensure that exec-entrypoint and run can make use of them.
-	_ "k8s.io/client-go/plugin/pkg/client/auth"
-
+	uberzap "go.uber.org/zap"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
+	// to ensure that exec-entrypoint and run can make use of them.
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -63,7 +63,9 @@ func init() {
 
 func main() {
 	opts := zap.Options{
-		Development: true,
+		ZapOpts: []uberzap.Option{
+			uberzap.AddCaller(),
+		},
 	}
 
 	cfg := config.NewDriverConfig()
@@ -84,7 +86,7 @@ func main() {
 	})
 	exitWithError(err, "unable to start manager")
 
-	log := logr.Logger{}
+	log := ctrl.Log.WithName("controllers").WithName("VolumeGroup")
 	grpcClientInstance, err := getControllerGrpcClient(cfg, log)
 	exitWithError(err, "failed to get controller GRPC client")
 
@@ -95,7 +97,6 @@ func main() {
 		DriverConfig: cfg,
 		GRPCClient:   grpcClientInstance,
 	}).SetupWithManager(mgr, cfg)
-
 	exitWithError(err, "unable to create controller  with controller VolumeGroup")
 
 	err = (&persistentvolumeclaim.PersistentVolumeClaimWatcher{
