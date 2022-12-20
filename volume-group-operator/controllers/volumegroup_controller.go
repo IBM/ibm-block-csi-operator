@@ -117,7 +117,7 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	}
 
 	groupCreationTime := getCurrentTime()
-	volumeGroupName, err := makeVolumeGroupName(utils.VolumeGroupPrefix, string(instance.UID))
+	volumeGroupName, err := makeVolumeGroupName(utils.VolumeGroupAsPrefix, string(instance.UID))
 	if err != nil {
 		return ctrl.Result{}, err
 	}
