@@ -135,17 +135,5 @@ func GetVgId(logger logr.Logger, client client.Client, vg *volumegroupv1.VolumeG
 	if err != nil {
 		return "", err
 	}
-	return string(vgc.Spec.VolumeGroupRef.UID), nil
-}
-
-func GetPVCListVolumeIds(logger logr.Logger, client client.Client, pvcList []corev1.PersistentVolumeClaim) ([]string, error) {
-	volumeIds := []string{}
-	for _, pvc := range pvcList {
-		pv, err := GetPVFromPVC(logger, client, &pvc)
-		if err != nil {
-			return nil, err
-		}
-		volumeIds = append(volumeIds, string(pv.Spec.ClaimRef.UID))
-	}
-	return volumeIds, nil
+	return string(vgc.Spec.Source.VolumeGroupHandle), nil
 }
