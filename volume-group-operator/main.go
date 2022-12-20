@@ -18,11 +18,14 @@ package main
 
 import (
 	"flag"
-	grpcClient "github.com/IBM/volume-group-operator/pkg/client"
-	"github.com/IBM/volume-group-operator/pkg/config"
-	"github.com/go-logr/logr"
 	"os"
 	"time"
+
+	"github.com/IBM/volume-group-operator/controllers/persistentvolumeclaim"
+	grpcClient "github.com/IBM/volume-group-operator/pkg/client"
+	"github.com/IBM/volume-group-operator/pkg/config"
+	"github.com/IBM/volume-group-operator/pkg/messages"
+	"github.com/go-logr/logr"
 
 	uberzap "go.uber.org/zap"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -46,8 +49,9 @@ const (
 )
 
 var (
-	scheme   = runtime.NewScheme()
-	setupLog = ctrl.Log.WithName("setup")
+	scheme        = runtime.NewScheme()
+	setupLog      = ctrl.Log.WithName("setup")
+	pvcController = "PersistentVolumeClaimController"
 )
 
 func init() {
@@ -94,6 +98,13 @@ func main() {
 		GRPCClient:   grpcClientInstance,
 	}).SetupWithManager(mgr, cfg)
 	exitWithError(err, "unable to create controller  with controller VolumeGroup")
+
+	err = (&persistentvolumeclaim.PersistentVolumeClaimWatcher{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+		Log:    ctrl.Log.WithName(pvcController),
+	}).SetupWithManager(mgr)
+	exitWithError(err, messages.UnableToCreatePVCController)
 
 	//+kubebuilder:scaffold:builder
 
