@@ -66,6 +66,11 @@ func (r *PersistentVolumeClaimWatcher) Reconcile(_ context.Context, req reconcil
 		return result, err
 	}
 
+	err = r.addPersistentVolumeClaimToVolumeGroupObjects(reqLogger, pvc, vgList)
+	if err != nil {
+		return result, err
+	}
+
 	return result, nil
 }
 
@@ -212,4 +217,49 @@ func (r *PersistentVolumeClaimWatcher) SetupWithManager(mgr ctrl.Manager) error 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&corev1.PersistentVolumeClaim{}, builder.WithPredicates(pvcPredicate)).
 		WithEventFilter(pred).Complete(r)
+}
+
+func (r PersistentVolumeClaimWatcher) addPersistentVolumeClaimToVolumeGroupObjects(
+	logger logr.Logger, pvc *corev1.PersistentVolumeClaim, vgList csiv1.VolumeGroupList) error {
+	for _, vg := range vgList.Items {
+		if utils.IsPVCPartOfVG(pvc, vg.Status.PVCList) {
+			continue
+		}
+		IsPVCMatchesVG, err := utils.IsPVCMatchesVG(logger, r.Client, pvc, vg)
+		if err != nil {
+			return r.updateVolumeGroupStatusError(logger, &vg, err)
+		}
+
+		if IsPVCMatchesVG {
+			err = r.addVolumeToPvcListAndPvList(logger, pvc, &vg)
+			if err != nil {
+				return r.updateVolumeGroupStatusError(logger, &vg, err)
+			}
+		}
+	}
+	return nil
+}
+
+func (r PersistentVolumeClaimWatcher) addVolumeToPvcListAndPvList(logger logr.Logger,
+	pvc *corev1.PersistentVolumeClaim, vg *csiv1.VolumeGroup) error {
+	err := utils.AddPVCToVG(logger, r.Client, pvc, vg)
+	if err != nil {
+		return err
+	}
+	pv, err := utils.GetPVFromPVC(logger, r.Client, pvc)
+	if err != nil {
+		return err
+	}
+	vgc, err := utils.GetVolumeGroupContent(r.Client, logger, vg)
+	if err != nil {
+		return err
+	}
+
+	if pv != nil {
+		err = utils.AddPVToVGC(logger, r.Client, pv, vgc)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

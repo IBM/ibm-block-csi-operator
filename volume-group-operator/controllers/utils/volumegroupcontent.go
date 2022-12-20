@@ -136,3 +136,19 @@ func removePersistentVolumeFromVolumeGroupContentPVList(pv *corev1.PersistentVol
 	}
 	return pvListInVGC
 }
+
+func AddPVToVGC(logger logr.Logger, client client.Client, pv *corev1.PersistentVolume,
+	vgc *volumegroupv1.VolumeGroupContent) error {
+	logger.Info(fmt.Sprintf(messages.AddPersistentVolumeToVolumeGroupContent,
+		pv.Namespace, pv.Name, vgc.Namespace, vgc.Name))
+	vgc.Status.PVList = append(vgc.Status.PVList, *pv)
+	err := client.Status().Update(context.TODO(), vgc)
+	if err != nil {
+		logger.Error(err, fmt.Sprintf(messages.FailedToAddPersistentVolumeToVolumeGroupContent,
+			pv.Namespace, pv.Name, vgc.Namespace, vgc.Name))
+		return err
+	}
+	logger.Info(fmt.Sprintf(messages.AddedPersistentVolumeToVolumeGroupContent,
+		pv.Namespace, pv.Name, vgc.Namespace, vgc.Name))
+	return nil
+}

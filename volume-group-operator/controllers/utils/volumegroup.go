@@ -149,3 +149,18 @@ func GetPVCListVolumeIds(logger logr.Logger, client client.Client, pvcList []cor
 	}
 	return volumeIds, nil
 }
+
+func AddPVCToVG(logger logr.Logger, client client.Client, pvc *corev1.PersistentVolumeClaim, vg *volumegroupv1.VolumeGroup) error {
+	logger.Info(fmt.Sprintf(messages.AddPersistentVolumeClaimToVolumeGroup,
+		pvc.Namespace, pvc.Name, vg.Namespace, vg.Name))
+	vg.Status.PVCList = append(vg.Status.PVCList, *pvc)
+	err := client.Status().Update(context.TODO(), vg)
+	if err != nil {
+		logger.Error(err, fmt.Sprintf(messages.FailedToAddPersistentVolumeClaimToVolumeGroup,
+			pvc.Namespace, pvc.Name, vg.Namespace, vg.Name))
+		return err
+	}
+	logger.Info(fmt.Sprintf(messages.AddedPersistentVolumeClaimToVolumeGroup,
+		pvc.Namespace, pvc.Name, vg.Namespace, vg.Name))
+	return nil
+}
