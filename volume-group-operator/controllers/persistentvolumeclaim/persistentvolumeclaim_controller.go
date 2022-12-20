@@ -18,9 +18,12 @@ package persistentvolumeclaim
 
 import (
 	"context"
+	"fmt"
 
 	csiv1 "github.com/IBM/volume-group-operator/api/v1"
 	"github.com/IBM/volume-group-operator/controllers/utils"
+	"github.com/IBM/volume-group-operator/controllers/volumegroup"
+	grpcClient "github.com/IBM/volume-group-operator/pkg/client"
 	"github.com/IBM/volume-group-operator/pkg/messages"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
@@ -35,9 +38,11 @@ import (
 )
 
 type PersistentVolumeClaimWatcher struct {
-	Client client.Client
-	Scheme *runtime.Scheme
-	Log    logr.Logger
+	Client            client.Client
+	Scheme            *runtime.Scheme
+	Log               logr.Logger
+	GRPCClient        *grpcClient.Client
+	VolumeGroupClient grpcClient.VolumeGroup
 }
 
 func (r *PersistentVolumeClaimWatcher) Reconcile(_ context.Context, req reconcile.Request) (result reconcile.Result, err error) {
@@ -89,14 +94,92 @@ func (r PersistentVolumeClaimWatcher) removePersistentVolumeClaimFromVolumeGroup
 		}
 		IsPVCMatchesVG, err := utils.IsPVCMatchesVG(logger, r.Client, pvc, vg)
 		if err != nil {
-			return err
+			return r.updateVolumeGroupStatusError(logger, &vg, err)
 		}
 
 		if !IsPVCMatchesVG {
-			return r.removeVolumeFromPvcListAndPvList(logger, pvc, vg)
+			err := r.removeVolumeFromVolumeGroup(logger, pvc, &vg)
+			if err != nil {
+				return err
+			}
+			err = r.removeVolumeFromPvcListAndPvList(logger, pvc, vg)
+			if err != nil {
+				return r.updateVolumeGroupStatusError(logger, &vg, err)
+			}
 		}
 	}
 	return nil
+}
+
+func (r PersistentVolumeClaimWatcher) removeVolumeFromVolumeGroup(logger logr.Logger,
+	pvc *corev1.PersistentVolumeClaim, vg *csiv1.VolumeGroup) error {
+	vg.Status.PVCList = utils.RemovePVCFromVGPVCList(pvc, vg.Status.PVCList)
+
+	err := r.modifyVolumeGroup(logger, vg)
+	return r.updateVolumeGroupStatusError(logger, vg, err)
+}
+
+func (r *PersistentVolumeClaimWatcher) modifyVolumeGroup(logger logr.Logger, vg *csiv1.VolumeGroup) error {
+	params, err := r.generateModifyVolumeGroupParams(logger, vg)
+	if err != nil {
+		return err
+	}
+	volumeGroup := volumegroup.VolumeGroup{
+		Params: params,
+	}
+
+	modifyVolumeGroupResponse := volumeGroup.Modify()
+	responseError := modifyVolumeGroupResponse.Error
+	if responseError != nil {
+		logger.Error(responseError, fmt.Sprintf(messages.FailedToModifyVolumeGroup, vg.Namespace, vg.Name))
+		return responseError
+	}
+	return nil
+}
+func (r *PersistentVolumeClaimWatcher) generateModifyVolumeGroupParams(logger logr.Logger,
+	vg *csiv1.VolumeGroup) (volumegroup.CommonRequestParameters, error) {
+	vgId, err := utils.GetVgId(logger, r.Client, vg)
+	if err != nil {
+		return volumegroup.CommonRequestParameters{}, err
+	}
+	volumeIds, err := utils.GetPVCListVolumeIds(logger, r.Client, vg.Status.PVCList)
+	if err != nil {
+		return volumegroup.CommonRequestParameters{}, err
+	}
+	secrets, err := r.getSecrets(logger, *vg.Spec.VolumeGroupClassName)
+	if err != nil {
+		return volumegroup.CommonRequestParameters{}, err
+	}
+
+	return volumegroup.CommonRequestParameters{
+		Secrets:       secrets,
+		VolumeGroup:   r.VolumeGroupClient,
+		VolumeGroupID: vgId,
+		VolumeIds:     volumeIds,
+	}, nil
+}
+func (r *PersistentVolumeClaimWatcher) getSecrets(logger logr.Logger, vgcName string) (map[string]string, error) {
+	vgc, err := utils.GetVolumeGroupClass(r.Client, logger, vgcName)
+	if err != nil {
+		return nil, err
+	}
+	secrets, err := utils.GetSecretDataFromVolumeGroupClass(r.Client, logger, vgc)
+	if err != nil {
+		return nil, err
+	}
+	return secrets, nil
+}
+
+func (r *PersistentVolumeClaimWatcher) updateVolumeGroupStatusError(logger logr.Logger,
+	vg *csiv1.VolumeGroup, err error) error {
+	if err != nil {
+		msg := utils.GetMessageFromError(err)
+		uErr := utils.UpdateVolumeGroupStatusError(r.Client, vg, logger, msg)
+		if uErr != nil {
+			return uErr
+		}
+	}
+	return err
 }
 
 func (r PersistentVolumeClaimWatcher) removeVolumeFromPvcListAndPvList(logger logr.Logger,

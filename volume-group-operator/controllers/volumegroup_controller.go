@@ -19,6 +19,8 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/IBM/volume-group-operator/controllers/utils"
 	"github.com/IBM/volume-group-operator/controllers/volumegroup"
 	"github.com/IBM/volume-group-operator/pkg/config"
@@ -27,7 +29,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"time"
 
 	volumegroupv1 "github.com/IBM/volume-group-operator/api/v1"
 	grpcClient "github.com/IBM/volume-group-operator/pkg/client"
@@ -93,18 +94,13 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	}
 	parameters := utils.FilterPrefixedParameters(utils.VolumeGroupAsPrefix, vgcObj.Parameters)
 
-	secretName := vgcObj.Parameters[utils.PrefixedVolumeGroupSecretNameKey]
-	secretNamespace := vgcObj.Parameters[utils.PrefixedVolumeGroupSecretNamespaceKey]
-	secret := make(map[string]string)
-	if secretName != "" && secretNamespace != "" {
-		secret, err = utils.GetSecretData(r.Client, logger, secretName, secretNamespace)
-		if err != nil {
-			uErr := utils.UpdateVolumeGroupStatusError(r.Client, instance, logger, err.Error())
-			if uErr != nil {
-				return ctrl.Result{}, uErr
-			}
-			return reconcile.Result{}, err
+	secret, err := utils.GetSecretDataFromVolumeGroupClass(r.Client, logger, vgcObj)
+	if err != nil {
+		uErr := utils.UpdateVolumeGroupStatusError(r.Client, instance, logger, err.Error())
+		if uErr != nil {
+			return ctrl.Result{}, uErr
 		}
+		return reconcile.Result{}, err
 	}
 
 	if instance.GetDeletionTimestamp().IsZero() {
@@ -139,7 +135,7 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		}
 		return reconcile.Result{}, err
 	}
-	vgc := utils.GenerateVolumeGroupContent(volumeGroupName, instance, vgcObj, createVolumeGroupResponse, secretName, secretNamespace)
+	vgc := utils.GenerateVolumeGroupContent(volumeGroupName, instance, vgcObj, createVolumeGroupResponse)
 
 	if err = utils.CreateVolumeGroupContent(r.Client, logger, instance, vgc); err != nil {
 		return reconcile.Result{}, err

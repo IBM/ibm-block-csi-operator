@@ -33,4 +33,5 @@ var (
 	GetVolumeGroupContentOfVolumeGroup               = "Get matching volumeGroupContent from %s/%s VolumeGroup"
 	RemovePersistentVolumeFromVolumeGroupContent     = "Removing %s/%s persistentVolume from %s/%s volumeGroupContent"
 	RemovedPersistentVolumeFromVolumeGroupContent    = "Successfully removed %s/%s persistentVolume from %s/%s volumeGroupContent"
+	FailedToModifyVolumeGroup                        = "Failed to modify %s/%s volumeGroup"
 )
