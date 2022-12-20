@@ -7,11 +7,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-const (
-	VolumeGroup       = "volumegroup"
-	VolumeGroupPrefix = VolumeGroup
-)
-
 func UpdateObject(client client.Client, updateObject client.Object) error {
 	if err := client.Update(context.TODO(), updateObject); err != nil {
 		return fmt.Errorf("failed to update %s (%s/%s) %w", updateObject.GetObjectKind(), updateObject.GetNamespace(), updateObject.GetName(), err)

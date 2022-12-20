@@ -51,6 +51,14 @@ func GenerateVolumeGroupContent(vgname string, instance *volumegroupv1.VolumeGro
 	}
 }
 
+func generateVolumeGroupContentStatus(vgc *volumegroupv1.VolumeGroupContent, groupCreationTime *metav1.Time, ready bool) volumegroupv1.VolumeGroupContentStatus {
+	return volumegroupv1.VolumeGroupContentStatus{
+		GroupCreationTime: groupCreationTime,
+		PVList:            vgc.Status.PVList,
+		Ready:             &ready,
+	}
+}
+
 func UpdateVolumeGroupContentStatus(client client.Client, logger logr.Logger, vgc *volumegroupv1.VolumeGroupContent, groupCreationTime *metav1.Time, ready bool) error {
 	vgc.Status = generateVolumeGroupContentStatus(vgc, groupCreationTime, ready)
 	if err := UpdateObjectStatus(client, vgc); err != nil {
@@ -58,14 +66,6 @@ func UpdateVolumeGroupContentStatus(client client.Client, logger logr.Logger, vg
 		return err
 	}
 	return nil
-}
-
-func generateVolumeGroupContentStatus(vgc *volumegroupv1.VolumeGroupContent, groupCreationTime *metav1.Time, ready bool) volumegroupv1.VolumeGroupContentStatus {
-	return volumegroupv1.VolumeGroupContentStatus{
-		GroupCreationTime: groupCreationTime,
-		PVList:            vgc.Status.PVList,
-		Ready:             &ready,
-	}
 }
 
 func generateVolumeGroupContentSpec(instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupClass,
