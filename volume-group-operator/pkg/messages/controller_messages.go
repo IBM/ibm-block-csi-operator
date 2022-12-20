@@ -35,7 +35,7 @@ var (
 	RemovedPersistentVolumeFromVolumeGroupContent    = "Successfully removed %s/%s persistentVolume from %s/%s volumeGroupContent"
 	FailedToModifyVolumeGroup                        = "Failed to modify %s/%s volumeGroup"
 	AddPersistentVolumeClaimToVolumeGroup            = "Adding %s/%s persistentVolumeClaim to %s/%s volumeGroup"
-	AddedPersistentVolumeClaimToVolumeGroup          = "Successfully added %s/%s persistentVolumeClaim to %s/%s volumeGroupContent"
-	AddPersistentVolumeToVolumeGroupContent          = "Adding %s/%s persistentVolume to %s/%s volumeGroup"
-	AddedPersistentVolumeToVolumeGroupContent        = "Successfully added %s/%s persistentVolume to %s/%s volumeGroupContent"
+	AddedPersistentVolumeClaimToVolumeGroup          = "Successfully added %s/%s persistentVolumeClaim to %s/%s volumeGroup"
+	AddPersistentVolumeToVolumeGroupContent          = "Adding %s persistentVolume to %s/%s volumeGroup"
+	AddedPersistentVolumeToVolumeGroupContent        = "Successfully added %s persistentVolume to %s/%s volumeGroupContent"
 )

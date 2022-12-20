@@ -31,7 +31,7 @@ import (
 func UpdateVolumeGroupSource(instance *volumegroupv1.VolumeGroup, vgc *volumegroupv1.VolumeGroupContent) {
 	instance.Spec.Source = volumegroupv1.VolumeGroupSource{
 		VolumeGroupContentName: &vgc.Name,
-		Selector:               getVolumeGroupLabelSelector(instance),
+		Selector:               instance.Spec.Source.Selector,
 	}
 }
 
@@ -154,7 +154,7 @@ func AddPVCToVG(logger logr.Logger, client client.Client, pvc *corev1.Persistent
 	logger.Info(fmt.Sprintf(messages.AddPersistentVolumeClaimToVolumeGroup,
 		pvc.Namespace, pvc.Name, vg.Namespace, vg.Name))
 	vg.Status.PVCList = append(vg.Status.PVCList, *pvc)
-	err := client.Status().Update(context.TODO(), vg)
+	err := updateVolumeGroupStatus(client, vg, logger)
 	if err != nil {
 		logger.Error(err, fmt.Sprintf(messages.FailedToAddPersistentVolumeClaimToVolumeGroup,
 			pvc.Namespace, pvc.Name, vg.Namespace, vg.Name))
