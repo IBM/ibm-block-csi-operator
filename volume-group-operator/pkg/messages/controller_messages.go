@@ -34,4 +34,8 @@ var (
 	RemovePersistentVolumeFromVolumeGroupContent     = "Removing %s/%s persistentVolume from %s/%s volumeGroupContent"
 	RemovedPersistentVolumeFromVolumeGroupContent    = "Successfully removed %s/%s persistentVolume from %s/%s volumeGroupContent"
 	FailedToModifyVolumeGroup                        = "Failed to modify %s/%s volumeGroup"
+	RemoveVolumeFromVolumeGroup                      = "Removing volume of persistentVolumeClaim from %s/%s volumeGroup"
+	RemovedVolumeFromVolumeGroup                     = "Successfully Removed volume of persistentVolumeClaim from %s/%s volumeGroup"
+	ModifyVolumeGroup                                = "Modifying %s volumeGroupID with %v volumeIDs"
+	ModifiedVolumeGroup                              = "Successfully modified %s volumeGroupID"
 )

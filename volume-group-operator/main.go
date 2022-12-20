@@ -101,10 +101,11 @@ func main() {
 	exitWithError(err, "unable to create controller  with controller VolumeGroup")
 
 	err = (&persistentvolumeclaim.PersistentVolumeClaimWatcher{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-		Log:    ctrl.Log.WithName(pvcController),
-	}).SetupWithManager(mgr)
+		Client:     mgr.GetClient(),
+		Scheme:     mgr.GetScheme(),
+		Log:        ctrl.Log.WithName(pvcController),
+		GRPCClient: grpcClientInstance,
+	}).SetupWithManager(mgr, cfg)
 	exitWithError(err, messages.UnableToCreatePVCController)
 
 	//+kubebuilder:scaffold:builder

@@ -24,6 +24,7 @@ import (
 	"github.com/IBM/volume-group-operator/controllers/utils"
 	"github.com/IBM/volume-group-operator/controllers/volumegroup"
 	grpcClient "github.com/IBM/volume-group-operator/pkg/client"
+	"github.com/IBM/volume-group-operator/pkg/config"
 	"github.com/IBM/volume-group-operator/pkg/messages"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
@@ -113,10 +114,15 @@ func (r PersistentVolumeClaimWatcher) removePersistentVolumeClaimFromVolumeGroup
 
 func (r PersistentVolumeClaimWatcher) removeVolumeFromVolumeGroup(logger logr.Logger,
 	pvc *corev1.PersistentVolumeClaim, vg *csiv1.VolumeGroup) error {
+	logger.Info(fmt.Sprintf(messages.RemoveVolumeFromVolumeGroup, vg.Namespace, vg.Name))
 	vg.Status.PVCList = utils.RemovePVCFromVGPVCList(pvc, vg.Status.PVCList)
 
 	err := r.modifyVolumeGroup(logger, vg)
-	return r.updateVolumeGroupStatusError(logger, vg, err)
+	if err != nil {
+		return r.updateVolumeGroupStatusError(logger, vg, err)
+	}
+	logger.Info(fmt.Sprintf(messages.RemovedVolumeFromVolumeGroup, vg.Namespace, vg.Name))
+	return nil
 }
 
 func (r *PersistentVolumeClaimWatcher) modifyVolumeGroup(logger logr.Logger, vg *csiv1.VolumeGroup) error {
@@ -124,6 +130,7 @@ func (r *PersistentVolumeClaimWatcher) modifyVolumeGroup(logger logr.Logger, vg 
 	if err != nil {
 		return err
 	}
+	logger.Info(fmt.Sprintf(messages.ModifyVolumeGroup, params.VolumeGroupID, params.VolumeIds))
 	volumeGroup := volumegroup.VolumeGroup{
 		Params: params,
 	}
@@ -134,6 +141,7 @@ func (r *PersistentVolumeClaimWatcher) modifyVolumeGroup(logger logr.Logger, vg 
 		logger.Error(responseError, fmt.Sprintf(messages.FailedToModifyVolumeGroup, vg.Namespace, vg.Name))
 		return responseError
 	}
+	logger.Info(fmt.Sprintf(messages.ModifiedVolumeGroup, params.VolumeGroupID))
 	return nil
 }
 func (r *PersistentVolumeClaimWatcher) generateModifyVolumeGroupParams(logger logr.Logger,
@@ -206,8 +214,9 @@ func (r PersistentVolumeClaimWatcher) removeVolumeFromPvcListAndPvList(logger lo
 	return nil
 }
 
-func (r *PersistentVolumeClaimWatcher) SetupWithManager(mgr ctrl.Manager) error {
+func (r *PersistentVolumeClaimWatcher) SetupWithManager(mgr ctrl.Manager, cfg *config.DriverConfig) error {
 	pred := predicate.LabelChangedPredicate{}
+	r.VolumeGroupClient = grpcClient.NewVolumeGroupClient(r.GRPCClient.Client, cfg.RPCTimeout)
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&corev1.PersistentVolumeClaim{}, builder.WithPredicates(pvcPredicate)).
