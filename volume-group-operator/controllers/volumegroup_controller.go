@@ -26,7 +26,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"time"
 
 	volumegroupv1 "github.com/IBM/volume-group-operator/api/v1"
@@ -58,21 +57,19 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	logger := r.Log.WithValues("Request.Name", req.Name, "Request.Namespace", req.Namespace)
 
 	instance := &volumegroupv1.VolumeGroup{}
-	err := r.Client.Get(context.TODO(), req.NamespacedName, instance)
-	if err != nil {
+	if err := r.Client.Get(context.TODO(), req.NamespacedName, instance); err != nil {
 		if errors.IsNotFound(err) {
 
 			logger.Info("VolumeGroup resource not found")
 
-			return reconcile.Result{}, nil
+			return ctrl.Result{}, nil
 		}
-		return reconcile.Result{}, err
+		return ctrl.Result{}, err
 	}
 
 	vgcObj, err := utils.GetVolumeGroupClass(r.Client, logger, *instance.Spec.VolumeGroupClassName)
 	if err != nil {
-		uErr := utils.UpdateVolumeGroupStatusError(r.Client, instance, logger, err.Error())
-		if uErr != nil {
+		if uErr := utils.UpdateVolumeGroupStatusError(r.Client, instance, logger, err.Error()); uErr != nil {
 			return ctrl.Result{}, uErr
 		}
 		return ctrl.Result{}, err
@@ -82,11 +79,9 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return ctrl.Result{}, nil
 	}
 
-	err = utils.ValidatePrefixedParameters(vgcObj.Parameters)
-	if err != nil {
+	if err = utils.ValidatePrefixedParameters(vgcObj.Parameters); err != nil {
 		logger.Error(err, "failed to validate parameters of volumegroupClass", "VGClassName", vgcObj.Name)
-		uErr := utils.UpdateVolumeGroupStatusError(r.Client, instance, logger, err.Error())
-		if uErr != nil {
+		if uErr := utils.UpdateVolumeGroupStatusError(r.Client, instance, logger, err.Error()); uErr != nil {
 			return ctrl.Result{}, uErr
 		}
 		return ctrl.Result{}, err
@@ -99,23 +94,21 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	if secretName != "" && secretNamespace != "" {
 		secret, err = utils.GetSecretData(r.Client, logger, secretName, secretNamespace)
 		if err != nil {
-			uErr := utils.UpdateVolumeGroupStatusError(r.Client, instance, logger, err.Error())
-			if uErr != nil {
+			if uErr := utils.UpdateVolumeGroupStatusError(r.Client, instance, logger, err.Error()); uErr != nil {
 				return ctrl.Result{}, uErr
 			}
-			return reconcile.Result{}, err
+			return ctrl.Result{}, err
 		}
 	}
 
 	if instance.GetDeletionTimestamp().IsZero() {
 		if err = utils.AddFinalizerToVG(r.Client, logger, instance); err != nil {
-			return reconcile.Result{}, err
+			return ctrl.Result{}, err
 		}
 
 	} else {
 		if utils.Contains(instance.GetFinalizers(), utils.VolumeGroupFinalizer) {
-			err = r.removeInstance(logger, instance, secret)
-			if err != nil {
+			if err = r.removeInstance(logger, instance, secret); err != nil {
 				return ctrl.Result{}, err
 			}
 		}
@@ -126,42 +119,41 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	groupCreationTime := getCurrentTime()
 	volumeGroupName, err := makeVolumeGroupName(utils.VolumeGroupPrefix, string(instance.UID))
 	if err != nil {
-		return reconcile.Result{}, err
+		return ctrl.Result{}, err
 	}
 
 	createVolumeGroupResponse := r.createVolumeGroup(volumeGroupName, parameters, secret)
 	if createVolumeGroupResponse.Error != nil {
-		logger.Error(err, "failed to create volume group")
+		logger.Error(createVolumeGroupResponse.Error, "failed to create volume group")
 		msg := utils.GetMessageFromError(createVolumeGroupResponse.Error)
-		uErr := utils.UpdateVolumeGroupStatusError(r.Client, instance, logger, msg)
-		if uErr != nil {
+		if uErr := utils.UpdateVolumeGroupStatusError(r.Client, instance, logger, msg); uErr != nil {
 			return ctrl.Result{}, uErr
 		}
-		return reconcile.Result{}, err
+		return ctrl.Result{}, err
 	}
 	vgc := utils.GenerateVolumeGroupContent(volumeGroupName, instance, vgcObj, createVolumeGroupResponse, secretName, secretNamespace)
 
 	if err = utils.CreateVolumeGroupContent(r.Client, logger, instance, vgc); err != nil {
-		return reconcile.Result{}, err
+		return ctrl.Result{}, err
 	}
 	utils.UpdateVolumeGroupSource(instance, vgc)
 
 	if err = utils.UpdateObject(r.Client, instance); err != nil {
-		return reconcile.Result{}, err
+		return ctrl.Result{}, err
 	}
-	uErr := utils.UpdateVolumeGroupStatus(r.Client, instance, vgc, groupCreationTime, true, logger)
-	if uErr != nil {
+	if uErr := utils.UpdateVolumeGroupStatus(r.Client, instance, vgc, groupCreationTime, true, logger); uErr != nil {
+		return ctrl.Result{}, uErr
 	}
 	vgc, err = utils.GetVolumeGroupContent(r.Client, logger, instance)
 	if err != nil {
-		return reconcile.Result{}, err
+		return ctrl.Result{}, err
 	}
 	if err = utils.AddFinalizerToVGC(r.Client, logger, vgc); err != nil {
-		return reconcile.Result{}, err
+		return ctrl.Result{}, err
 	}
 
 	if err = utils.UpdateVolumeGroupContentStatus(r.Client, logger, vgc, groupCreationTime, true); err != nil {
-		return reconcile.Result{}, err
+		return ctrl.Result{}, err
 	}
 	//TODO CSI-4986 add all PVCs that have the VG label to VG
 

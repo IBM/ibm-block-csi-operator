@@ -1,17 +1,16 @@
 package utils
 
 import (
-	"github.com/IBM/volume-group-operator/api/v1"
 	volumegroupv1 "github.com/IBM/volume-group-operator/api/v1"
 	"github.com/go-logr/logr"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func UpdateVolumeGroupSource(instance *v1.VolumeGroup, vgc *v1.VolumeGroupContent) {
-	instance.Spec.Source = v1.VolumeGroupSource{
+func UpdateVolumeGroupSource(instance *volumegroupv1.VolumeGroup, vgc *volumegroupv1.VolumeGroupContent) {
+	instance.Spec.Source = volumegroupv1.VolumeGroupSource{
 		VolumeGroupContentName: &vgc.Name,
-		Selector:               getVolumeGroupLabelSelector(instance),
+		Selector:               instance.Spec.Source.Selector,
 	}
 }
 
