@@ -20,7 +20,7 @@ var (
 	MatchingLabelsAndLabelSelectorFailed                 = "Could not check if labels are matched with labelSelector, got %s"
 	FailedToRemovePersistentVolumeClaimFromVolumeGroup   = "Could not remove %s/%s persistentVolumeClaim from %s/%s volumeGroup"
 	PersistentVolumeDoesNotExist                         = "%s/%s persistentVolume does not exist"
-	UnExpectedPersistentVolumeClaimError                 = "Got an unexpected error while fetching PersistentVolumeClaim"
+	UnExpectedPersistentVolumeClaimError                 = "Got an unexpected error while fetching %s/%s PersistentVolumeClaim"
 	FailedToRemovePersistentVolumeFromVolumeGroupContent = "Could not remove %s persistentVolume from %s/%s volumeGroupContent"
 	FailedToCreateEvent                                  = "Failed to create %s/%s event"
 	FailedToGetPersistentVolumeClaim                     = "Failed to get %s/%s persistentVolumeClaim"
