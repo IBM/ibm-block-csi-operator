@@ -24,7 +24,9 @@ import (
 	"github.com/IBM/volume-group-operator/pkg/messages"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -36,8 +38,9 @@ func UpdateVolumeGroupSource(instance *volumegroupv1.VolumeGroup, vgc *volumegro
 }
 
 func updateVolumeGroupStatus(client client.Client, instance *volumegroupv1.VolumeGroup, logger logr.Logger) error {
+	logger.Info(fmt.Sprintf(messages.UpdateVolumeGroupStatus, instance.Namespace, instance.Name))
 	if err := UpdateObjectStatus(client, instance); err != nil {
-		logger.Error(err, "failed to update status")
+		logger.Error(err, "failed to update volumeGroup status", "VGName", instance.Name)
 
 		return err
 	}
@@ -59,11 +62,32 @@ func UpdateVolumeGroupStatusError(client client.Client, instance *volumegroupv1.
 	instance.Status.Error = &volumegroupv1.VolumeGroupError{Message: &message}
 	err := updateVolumeGroupStatus(client, instance, logger)
 	if err != nil {
-		logger.Error(err, "failed to update volumeGroup status", "VGName", instance.Name)
+		if apierrors.IsConflict(err) {
+			vg, uErr := getVolumeGroup(client, instance)
+			if uErr != nil {
+				return uErr
+			}
+			vg.Status.Error = &volumegroupv1.VolumeGroupError{Message: &message}
+			uErr = updateVolumeGroupStatus(client, vg, logger)
+			if uErr != nil {
+				return uErr
+			}
+			return nil
+		}
 		return err
 	}
 
 	return nil
+}
+
+func getVolumeGroup(client client.Client, instance *volumegroupv1.VolumeGroup) (*volumegroupv1.VolumeGroup, error) {
+	vg := &volumegroupv1.VolumeGroup{}
+	namespacedVG := types.NamespacedName{Name: instance.Name, Namespace: instance.Namespace}
+	err := client.Get(context.TODO(), namespacedVG, vg)
+	if err != nil {
+		return nil, err
+	}
+	return vg, nil
 }
 
 func GetVGList(logger logr.Logger, client client.Client) (volumegroupv1.VolumeGroupList, error) {
