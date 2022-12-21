@@ -18,6 +18,7 @@ func HandleErrorMessage(logger logr.Logger, client client.Client, vg *volumegrou
 		if uErr != nil {
 			return uErr
 		}
+		return err
 	}
 	return nil
 }
