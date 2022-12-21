@@ -18,11 +18,8 @@ func ModifyVolumeGroup(logger logr.Logger, client client.Client, vg *volumegroup
 		return err
 	}
 	logger.Info(fmt.Sprintf(messages.ModifyVolumeGroup, params.VolumeGroupID, params.VolumeIds))
-	volumeGroup := volumegroup.VolumeGroup{
-		Params: params,
-	}
-
-	modifyVolumeGroupResponse := volumeGroup.Modify()
+	volumeGroupRequest := volumegroup.NewVolumeGroupRequest(params)
+	modifyVolumeGroupResponse := volumeGroupRequest.Modify()
 	responseError := modifyVolumeGroupResponse.Error
 	if responseError != nil {
 		logger.Error(responseError, fmt.Sprintf(messages.FailedToModifyVolumeGroup, vg.Namespace, vg.Name))
@@ -41,7 +38,7 @@ func generateModifyVolumeGroupParams(logger logr.Logger, client client.Client,
 	if err != nil {
 		return volumegroup.CommonRequestParameters{}, err
 	}
-	secrets, err := getSecrets(logger, client, *vg.Spec.VolumeGroupClassName)
+	secrets, err := getSecrets(logger, client, vg)
 	if err != nil {
 		return volumegroup.CommonRequestParameters{}, err
 	}
@@ -53,12 +50,12 @@ func generateModifyVolumeGroupParams(logger logr.Logger, client client.Client,
 		VolumeIds:     volumeIds,
 	}, nil
 }
-func getSecrets(logger logr.Logger, client client.Client, vgcName string) (map[string]string, error) {
-	vgc, err := GetVolumeGroupClass(client, logger, vgcName)
+func getSecrets(logger logr.Logger, client client.Client, vg *volumegroupv1.VolumeGroup) (map[string]string, error) {
+	vgc, err := GetVolumeGroupClass(client, logger, *vg.Spec.VolumeGroupClassName)
 	if err != nil {
 		return nil, err
 	}
-	secrets, err := GetSecretDataFromVolumeGroupClass(client, logger, vgc)
+	secrets, err := GetSecretDataFromClass(client, vgc, logger, vg)
 	if err != nil {
 		return nil, err
 	}

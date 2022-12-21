@@ -27,26 +27,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func GetSecretDataFromVolumeGroupClass(client client.Client, logger logr.Logger,
-	vgc *volumegroupv1.VolumeGroupClass) (map[string]string, error) {
-	secretName, secretNamespace := GetSecretNameAndNamespace(vgc)
-	secret := make(map[string]string)
-	if secretName != "" && secretNamespace != "" {
-		secret, err := getSecretData(client, logger, secretName, secretNamespace)
-		if err != nil {
-			return nil, err
-		}
-		return secret, nil
-	}
-	return secret, nil
-}
-
-func GetSecretNameAndNamespace(vgc *volumegroupv1.VolumeGroupClass) (string, string) {
-	secretName := vgc.Parameters[PrefixedVolumeGroupSecretNameKey]
-	secretNamespace := vgc.Parameters[PrefixedVolumeGroupSecretNamespaceKey]
-	return secretName, secretNamespace
-}
-
 func getSecretData(client client.Client, logger logr.Logger, name, namespace string) (map[string]string, error) {
 	namespacedName := types.NamespacedName{Name: name, Namespace: namespace}
 	secret := &corev1.Secret{}
@@ -73,4 +53,26 @@ func convertMap(oldMap map[string][]byte) map[string]string {
 	}
 
 	return newMap
+}
+
+func GetSecretDataFromClass(client client.Client, vgcObj *volumegroupv1.VolumeGroupClass, logger logr.Logger, instance *volumegroupv1.VolumeGroup) (map[string]string, error) {
+	secretName, secretNamespace := GetSecretCred(vgcObj)
+	secret := make(map[string]string)
+	var err error
+	if secretName != "" && secretNamespace != "" {
+		secret, err = getSecretData(client, logger, secretName, secretNamespace)
+		if err != nil {
+			if uErr := UpdateVolumeGroupStatusError(client, instance, logger, err.Error()); uErr != nil {
+				return nil, uErr
+			}
+			return nil, err
+		}
+	}
+	return secret, nil
+}
+
+func GetSecretCred(vgcObj *volumegroupv1.VolumeGroupClass) (string, string) {
+	secretName := vgcObj.Parameters[PrefixedVolumeGroupSecretNameKey]
+	secretNamespace := vgcObj.Parameters[PrefixedVolumeGroupSecretNamespaceKey]
+	return secretName, secretNamespace
 }
