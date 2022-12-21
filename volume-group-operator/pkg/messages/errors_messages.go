@@ -24,4 +24,5 @@ var (
 	FailedToRemovePersistentVolumeFromVolumeGroupContent = "Could not remove %s/%s persistentVolume from %s/%s volumeGroupContent"
 	FailedToAddPersistentVolumeClaimToVolumeGroup        = "Could not add %s/%s persistentVolumeClaim to %s/%s volumeGroup"
 	FailedToAddPersistentVolumeToVolumeGroupContent      = "Could not add %s persistentVolume to %s/%s volumeGroupContent"
+	FaildToCreateEvent                                   = "Failed to create %s/%s event"
 )

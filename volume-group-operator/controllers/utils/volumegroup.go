@@ -130,7 +130,7 @@ func RemovePVCFromVGPVCList(pvc *corev1.PersistentVolumeClaim,
 	return pvcListInVG
 }
 
-func GetVgId(logger logr.Logger, client client.Client, vg *volumegroupv1.VolumeGroup) (string, error) {
+func getVgId(logger logr.Logger, client client.Client, vg *volumegroupv1.VolumeGroup) (string, error) {
 	vgc, err := GetVolumeGroupContent(client, logger, vg)
 	if err != nil {
 		return "", err
