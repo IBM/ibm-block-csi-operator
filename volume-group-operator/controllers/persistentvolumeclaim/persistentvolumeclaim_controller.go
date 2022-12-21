@@ -111,14 +111,20 @@ func (r PersistentVolumeClaimWatcher) removePersistentVolumeClaimFromVolumeGroup
 			if err != nil {
 				return utils.HandleErrorMessage(logger, r.Client, &vg, err, removingPVC)
 			}
-		}
-		err = utils.HandleSuccessMessage(logger, r.Client, &vg,
-			messages.RemovedPersistentVolumeFromVolumeGroupContent, removingPVC)
-		if err != nil {
-			return err
+			err = r.addSuccessRemoveEvent(logger, pvc, &vg)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
+}
+
+func (r PersistentVolumeClaimWatcher) addSuccessRemoveEvent(logger logr.Logger,
+	pvc *corev1.PersistentVolumeClaim, vg *csiv1.VolumeGroup) error {
+	message := fmt.Sprintf(messages.RemovedPersistentVolumeClaimFromVolumeGroup,
+		pvc.Namespace, pvc.Name, vg.Namespace, vg.Name)
+	return utils.HandleSuccessMessage(logger, r.Client, vg, message, removingPVC)
 }
 
 func (r PersistentVolumeClaimWatcher) removeVolumeFromVolumeGroup(logger logr.Logger,

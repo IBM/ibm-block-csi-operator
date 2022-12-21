@@ -21,8 +21,8 @@ var (
 	FailedToRemovePersistentVolumeClaimFromVolumeGroup   = "Could not remove %s/%s persistentVolumeClaim from %s/%s volumeGroup"
 	PersistentVolumeDoesNotExist                         = "%s/%s persistentVolume does not exist"
 	UnExpectedPersistentVolumeClaimError                 = "Got an unexpected error while fetching PersistentVolumeClaim"
-	FailedToRemovePersistentVolumeFromVolumeGroupContent = "Could not remove %s/%s persistentVolume from %s/%s volumeGroupContent"
+	FailedToRemovePersistentVolumeFromVolumeGroupContent = "Could not remove %s persistentVolume from %s/%s volumeGroupContent"
 	FailedToAddPersistentVolumeClaimToVolumeGroup        = "Could not add %s/%s persistentVolumeClaim to %s/%s volumeGroup"
 	FailedToAddPersistentVolumeToVolumeGroupContent      = "Could not add %s persistentVolume to %s/%s volumeGroupContent"
-	FaildToCreateEvent                                   = "Failed to create %s/%s event"
+	FailedToCreateEvent                                   = "Failed to create %s/%s event"
 )
