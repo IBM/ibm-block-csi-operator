@@ -44,4 +44,5 @@ var (
 	ModifiedVolumeGroup                              = "Successfully modified %s volumeGroupID"
 	CreateEventForVolumeGroup                        = "Creating event for %s/%s volumeGroup, with [%s] message"
 	EventCreated                                     = "Successfully Created  %s/%s event"
+	UpdateVolumeGroupStatus                          = "Updating status of %s/%s volumeGroup"
 )
