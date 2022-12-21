@@ -21,7 +21,7 @@ var (
 	RequestName                                      = "Request.Name"
 	RequestNamespace                                 = "Request.Namespace"
 	UnableToCreatePVCController                      = "Unable to create persistentvolumeclaim controller"
-	PersistentVolumeClaimNotFound                    = "PersistentVolumeClaim not found"
+	PersistentVolumeClaimNotFound                    = "%s/%s persistentVolumeClaim not found"
 	ListVolumeGroups                                 = "Listing volumeGroups"
 	CheckIfPersistentVolumeClaimMatchesVolumeGroup   = "Checking if %s/%s persistentVolumeClaim is matches %s/%s volumeGroup"
 	PersistentVolumeClaimMatchedToVolumeGroup        = "%s/%s persistentVolumeClaim is matched with %s/%s volumeGroup"

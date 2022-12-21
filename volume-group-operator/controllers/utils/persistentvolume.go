@@ -36,7 +36,7 @@ func GetPVFromPVC(logger logr.Logger, client client.Client, pvc *corev1.Persiste
 func getPersistentVolumeName(logger logr.Logger, client client.Client, pvc *corev1.PersistentVolumeClaim) (string, error) {
 	pvName := pvc.Spec.VolumeName
 	if pvName == "" {
-		pvc, err := getPersistentVolumeClaim(logger, client, pvc)
+		pvc, err := GetPersistentVolumeClaim(logger, client, pvc.Name, pvc.Namespace)
 		if err != nil {
 			return "", err
 		}

@@ -29,7 +29,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -49,7 +48,7 @@ func (r *PersistentVolumeClaimWatcher) Reconcile(_ context.Context, req reconcil
 	result = reconcile.Result{}
 	reqLogger := r.Log.WithValues(messages.RequestNamespace, req.Namespace, messages.RequestName, req.Name)
 	reqLogger.Info(messages.ReconcilePersistentVolumeClaim)
-	pvc, err := r.getPersistentVolumeClaim(reqLogger, req)
+	pvc, err := utils.GetPersistentVolumeClaim(reqLogger, r.Client, req.Name, req.Namespace)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			return result, nil
@@ -72,23 +71,6 @@ func (r *PersistentVolumeClaimWatcher) Reconcile(_ context.Context, req reconcil
 	}
 
 	return result, nil
-}
-
-func (r PersistentVolumeClaimWatcher) getPersistentVolumeClaim(logger logr.Logger,
-	req reconcile.Request) (*corev1.PersistentVolumeClaim, error) {
-	pvc := &corev1.PersistentVolumeClaim{}
-	err := r.Client.Get(context.TODO(), types.NamespacedName{Name: req.Name, Namespace: req.Namespace}, pvc)
-	if err != nil {
-		if errors.IsNotFound(err) {
-			logger.Error(err, messages.PersistentVolumeClaimNotFound, persistentVolumeClaim, pvc)
-		} else {
-			logger.Error(err, messages.UnExpectedPersistentVolumeClaimError, persistentVolumeClaim, pvc)
-		}
-
-		return nil, err
-	}
-
-	return pvc, nil
 }
 
 func (r PersistentVolumeClaimWatcher) removePersistentVolumeClaimFromVolumeGroupObjects(
