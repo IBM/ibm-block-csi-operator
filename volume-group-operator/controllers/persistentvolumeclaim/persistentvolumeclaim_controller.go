@@ -117,7 +117,7 @@ func (r PersistentVolumeClaimWatcher) removePersistentVolumeClaimFromVolumeGroup
 
 func (r PersistentVolumeClaimWatcher) addSuccessRemoveEvent(logger logr.Logger,
 	pvc *corev1.PersistentVolumeClaim, vg *csiv1.VolumeGroup) error {
-	message := fmt.Sprintf(messages.RemovedPersistentVolumeFromVolumeGroupContent,
+	message := fmt.Sprintf(messages.RemovedPersistentVolumeClaimFromVolumeGroup,
 		pvc.Namespace, pvc.Name, vg.Namespace, vg.Name)
 	return utils.HandleSuccessMessage(logger, r.Client, vg, message, removingPVC)
 }

@@ -53,7 +53,7 @@ func generateVGEvent(vg *volumegroupv1.VolumeGroup, reason, message, eventType s
 func createEvent(logger logr.Logger, client client.Client, event *corev1.Event) error {
 	err := client.Create(context.TODO(), event)
 	if err != nil {
-		logger.Error(err, fmt.Sprintf(messages.FaildToCreateEvent, event.Namespace, event.Name))
+		logger.Error(err, fmt.Sprintf(messages.FailedToCreateEvent, event.Namespace, event.Name))
 		return err
 	}
 	logger.Info(fmt.Sprintf(messages.EventCreated, event.Namespace, event.Name))

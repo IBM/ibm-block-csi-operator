@@ -113,16 +113,16 @@ func generateVolumeGroupContentSource(vgcObj *volumegroupv1.VolumeGroupClass, re
 
 func RemovePVFromVGC(logger logr.Logger, client client.Client, pv *corev1.PersistentVolume, vgc *volumegroupv1.VolumeGroupContent) error {
 	logger.Info(fmt.Sprintf(messages.RemovePersistentVolumeFromVolumeGroupContent,
-		pv.Namespace, pv.Name, vgc.Namespace, vgc.Name))
+		pv.Name, vgc.Namespace, vgc.Name))
 	vgc.Status.PVList = removePersistentVolumeFromVolumeGroupContentPVList(pv, vgc.Status.PVList)
 	err := client.Status().Update(context.TODO(), vgc)
 	if err != nil {
 		logger.Error(err, fmt.Sprintf(messages.FailedToRemovePersistentVolumeFromVolumeGroupContent,
-			pv.Namespace, pv.Name, vgc.Namespace, vgc.Name))
+			pv.Name, vgc.Namespace, vgc.Name))
 		return err
 	}
 	logger.Info(fmt.Sprintf(messages.RemovedPersistentVolumeFromVolumeGroupContent,
-		pv.Namespace, pv.Name, vgc.Namespace, vgc.Name))
+		pv.Name, vgc.Namespace, vgc.Name))
 	return nil
 }
 
