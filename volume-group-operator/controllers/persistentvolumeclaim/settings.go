@@ -38,4 +38,5 @@ var (
 		},
 	}
 	removingPVC = "removePVC"
+	addingPVC   = "addPVC"
 )

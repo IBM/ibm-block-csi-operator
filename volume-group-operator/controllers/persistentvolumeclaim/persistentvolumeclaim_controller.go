@@ -166,13 +166,13 @@ func (r PersistentVolumeClaimWatcher) addPersistentVolumeClaimToVolumeGroupObjec
 		}
 		IsPVCMatchesVG, err := utils.IsPVCMatchesVG(logger, r.Client, pvc, vg)
 		if err != nil {
-			return r.updateVolumeGroupStatusError(logger, &vg, err)
+			return utils.HandleErrorMessage(logger, r.Client, &vg, err, addingPVC)
 		}
 
 		if IsPVCMatchesVG {
 			err = r.addVolumeToPvcListAndPvList(logger, pvc, &vg)
 			if err != nil {
-				return r.updateVolumeGroupStatusError(logger, &vg, err)
+				return utils.HandleErrorMessage(logger, r.Client, &vg, err, addingPVC)
 			}
 		}
 	}
