@@ -28,7 +28,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	volumegroupv1 "github.com/IBM/volume-group-operator/api/v1"
 	grpcClient "github.com/IBM/volume-group-operator/pkg/client"
