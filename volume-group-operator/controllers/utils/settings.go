@@ -1,6 +1,7 @@
 package utils
 
 const (
+	VolumeGroupNamePrefix                 = "volumegroup"
 	volumeGroupGroupName                  = "volumegroup.storage.ibm.io"
 	VolumeGroupFinalizer                  = volumeGroupGroupName
 	VolumeGroupAsPrefix                   = volumeGroupGroupName + "/"

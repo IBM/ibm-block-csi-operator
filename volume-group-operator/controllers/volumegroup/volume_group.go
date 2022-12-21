@@ -16,11 +16,15 @@ limitations under the License.
 
 package volumegroup
 
-type VolumeGroup struct {
+type volumeGroupRequest struct {
 	Params CommonRequestParameters
 }
 
-func (r *VolumeGroup) Create() *Response {
+func NewVolumeGroupRequest(params CommonRequestParameters) *volumeGroupRequest {
+	return &volumeGroupRequest{Params: params}
+}
+
+func (r *volumeGroupRequest) Create() *Response {
 	resp, err := r.Params.VolumeGroup.CreateVolumeGroup(
 		r.Params.Name,
 		r.Params.Secrets,
@@ -30,7 +34,7 @@ func (r *VolumeGroup) Create() *Response {
 	return &Response{Response: resp, Error: err}
 }
 
-func (r *VolumeGroup) Delete() *Response {
+func (r *volumeGroupRequest) Delete() *Response {
 	resp, err := r.Params.VolumeGroup.DeleteVolumeGroup(
 		r.Params.VolumeGroupID,
 		r.Params.Secrets,
@@ -39,7 +43,7 @@ func (r *VolumeGroup) Delete() *Response {
 	return &Response{Response: resp, Error: err}
 }
 
-func (r *VolumeGroup) Modify() *Response {
+func (r *volumeGroupRequest) Modify() *Response {
 	resp, err := r.Params.VolumeGroup.ModifyVolumeGroupMembership(
 		r.Params.VolumeGroupID,
 		r.Params.VolumeIds,

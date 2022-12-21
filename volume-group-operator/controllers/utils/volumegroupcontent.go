@@ -32,7 +32,7 @@ func GetVolumeGroupContent(client client.Client, logger logr.Logger, vg *volumeg
 	return vgc, nil
 }
 
-func CreateVolumeGroupContent(client client.Client, logger logr.Logger, instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupContent) error {
+func CreateVolumeGroupContent(client client.Client, logger logr.Logger, vgcObj *volumegroupv1.VolumeGroupContent) error {
 	err := client.Create(context.TODO(), vgcObj)
 	if err != nil {
 		if errors.IsAlreadyExists(err) {
@@ -46,18 +46,8 @@ func CreateVolumeGroupContent(client client.Client, logger logr.Logger, instance
 	return nil
 }
 
-func GenerateVolumeGroupContent(vgname string, instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupClass, resp *volumegroup.Response, secretName string, secretNamespace string) *volumegroupv1.VolumeGroupContent {
-	return &volumegroupv1.VolumeGroupContent{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      vgname,
-			Namespace: instance.Namespace,
-		},
-		Spec: generateVolumeGroupContentSpec(instance, vgcObj, resp, secretName, secretNamespace),
-	}
-}
-
 func UpdateVolumeGroupContentStatus(client client.Client, logger logr.Logger, vgc *volumegroupv1.VolumeGroupContent, groupCreationTime *metav1.Time, ready bool) error {
-	vgc.Status = generateVolumeGroupContentStatus(vgc, groupCreationTime, ready)
+	updateVolumeGroupContentStatusFields(vgc, groupCreationTime, ready)
 	if err := UpdateObjectStatus(client, vgc); err != nil {
 		logger.Error(err, "failed to update status")
 		return err
@@ -65,11 +55,18 @@ func UpdateVolumeGroupContentStatus(client client.Client, logger logr.Logger, vg
 	return nil
 }
 
-func generateVolumeGroupContentStatus(vgc *volumegroupv1.VolumeGroupContent, groupCreationTime *metav1.Time, ready bool) volumegroupv1.VolumeGroupContentStatus {
-	return volumegroupv1.VolumeGroupContentStatus{
-		GroupCreationTime: groupCreationTime,
-		PVList:            vgc.Status.PVList,
-		Ready:             &ready,
+func updateVolumeGroupContentStatusFields(vgc *volumegroupv1.VolumeGroupContent, groupCreationTime *metav1.Time, ready bool) {
+	vgc.Status.GroupCreationTime = groupCreationTime
+	vgc.Status.Ready = &ready
+}
+
+func GenerateVolumeGroupContent(vgname string, instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupClass, resp *volumegroup.Response, secretName string, secretNamespace string) *volumegroupv1.VolumeGroupContent {
+	return &volumegroupv1.VolumeGroupContent{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      vgname,
+			Namespace: instance.Namespace,
+		},
+		Spec: generateVolumeGroupContentSpec(instance, vgcObj, resp, secretName, secretNamespace),
 	}
 }
 

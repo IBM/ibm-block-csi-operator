@@ -28,11 +28,14 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func UpdateVolumeGroupSource(instance *volumegroupv1.VolumeGroup, vgc *volumegroupv1.VolumeGroupContent) {
-	instance.Spec.Source = volumegroupv1.VolumeGroupSource{
-		VolumeGroupContentName: &vgc.Name,
-		Selector:               getVolumeGroupLabelSelector(instance),
+func UpdateVolumeGroupSourceContent(client client.Client, instance *volumegroupv1.VolumeGroup,
+	vgc *volumegroupv1.VolumeGroupContent, logger logr.Logger) error {
+	instance.Spec.Source.VolumeGroupContentName = &vgc.Name
+	if err := UpdateObject(client, instance); err != nil {
+		logger.Error(err, "failed to update status")
+		return err
 	}
+	return nil
 }
 
 func updateVolumeGroupStatus(client client.Client, instance *volumegroupv1.VolumeGroup, logger logr.Logger) error {
@@ -46,12 +49,11 @@ func updateVolumeGroupStatus(client client.Client, instance *volumegroupv1.Volum
 
 func UpdateVolumeGroupStatus(client client.Client, instance *volumegroupv1.VolumeGroup, vgc *volumegroupv1.VolumeGroupContent,
 	groupCreationTime *metav1.Time, ready bool, logger logr.Logger) error {
-	instance.Status = volumegroupv1.VolumeGroupStatus{
-		BoundVolumeGroupContentName: &vgc.Name,
-		GroupCreationTime:           groupCreationTime,
-		Ready:                       &ready,
-		Error:                       nil,
-	}
+	instance.Status.BoundVolumeGroupContentName = &vgc.Name
+	instance.Status.GroupCreationTime = groupCreationTime
+	instance.Status.Ready = &ready
+	instance.Status.Error = nil
+
 	return updateVolumeGroupStatus(client, instance, logger)
 }
 
