@@ -219,15 +219,6 @@ func (r PersistentVolumeClaimWatcher) removeVolumeFromPvcListAndPvList(logger lo
 	return nil
 }
 
-func (r *PersistentVolumeClaimWatcher) SetupWithManager(mgr ctrl.Manager, cfg *config.DriverConfig) error {
-	pred := predicate.LabelChangedPredicate{}
-	r.VolumeGroupClient = grpcClient.NewVolumeGroupClient(r.GRPCClient.Client, cfg.RPCTimeout)
-
-	return ctrl.NewControllerManagedBy(mgr).
-		For(&corev1.PersistentVolumeClaim{}, builder.WithPredicates(pvcPredicate)).
-		WithEventFilter(pred).Complete(r)
-}
-
 func (r PersistentVolumeClaimWatcher) addPersistentVolumeClaimToVolumeGroupObjects(
 	logger logr.Logger, pvc *corev1.PersistentVolumeClaim, vgList csiv1.VolumeGroupList) error {
 	for _, vg := range vgList.Items {
@@ -271,4 +262,13 @@ func (r PersistentVolumeClaimWatcher) addVolumeToPvcListAndPvList(logger logr.Lo
 		}
 	}
 	return nil
+}
+
+func (r *PersistentVolumeClaimWatcher) SetupWithManager(mgr ctrl.Manager, cfg *config.DriverConfig) error {
+	pred := predicate.LabelChangedPredicate{}
+	r.VolumeGroupClient = grpcClient.NewVolumeGroupClient(r.GRPCClient.Client, cfg.RPCTimeout)
+
+	return ctrl.NewControllerManagedBy(mgr).
+		For(&corev1.PersistentVolumeClaim{}, builder.WithPredicates(pvcPredicate)).
+		WithEventFilter(pred).Complete(r)
 }
