@@ -41,6 +41,20 @@ func CreateVolumeGroupContent(client client.Client, logger logr.Logger, vgcObj *
 	return nil
 }
 
+func UpdateVolumeGroupContentStatus(client client.Client, logger logr.Logger, vgc *volumegroupv1.VolumeGroupContent, groupCreationTime *metav1.Time, ready bool) error {
+	updateVolumeGroupContentStatusFields(vgc, groupCreationTime, ready)
+	if err := UpdateObjectStatus(client, vgc); err != nil {
+		logger.Error(err, "failed to update status")
+		return err
+	}
+	return nil
+}
+
+func updateVolumeGroupContentStatusFields(vgc *volumegroupv1.VolumeGroupContent, groupCreationTime *metav1.Time, ready bool) {
+	vgc.Status.GroupCreationTime = groupCreationTime
+	vgc.Status.Ready = &ready
+}
+
 func GenerateVolumeGroupContent(vgname string, instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupClass, resp *volumegroup.Response, secretName string, secretNamespace string) *volumegroupv1.VolumeGroupContent {
 	return &volumegroupv1.VolumeGroupContent{
 		ObjectMeta: metav1.ObjectMeta{
@@ -49,23 +63,6 @@ func GenerateVolumeGroupContent(vgname string, instance *volumegroupv1.VolumeGro
 		},
 		Spec: generateVolumeGroupContentSpec(instance, vgcObj, resp, secretName, secretNamespace),
 	}
-}
-
-func generateVolumeGroupContentStatus(vgc *volumegroupv1.VolumeGroupContent, groupCreationTime *metav1.Time, ready bool) volumegroupv1.VolumeGroupContentStatus {
-	return volumegroupv1.VolumeGroupContentStatus{
-		GroupCreationTime: groupCreationTime,
-		PVList:            vgc.Status.PVList,
-		Ready:             &ready,
-	}
-}
-
-func UpdateVolumeGroupContentStatus(client client.Client, logger logr.Logger, vgc *volumegroupv1.VolumeGroupContent, groupCreationTime *metav1.Time, ready bool) error {
-	vgc.Status = generateVolumeGroupContentStatus(vgc, groupCreationTime, ready)
-	if err := UpdateObjectStatus(client, vgc); err != nil {
-		logger.Error(err, "failed to update status")
-		return err
-	}
-	return nil
 }
 
 func generateVolumeGroupContentSpec(instance *volumegroupv1.VolumeGroup, vgcObj *volumegroupv1.VolumeGroupClass,

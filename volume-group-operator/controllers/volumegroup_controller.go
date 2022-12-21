@@ -129,9 +129,8 @@ func (r *VolumeGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	if err = utils.CreateVolumeGroupContent(r.Client, logger, vgc); err != nil {
 		return ctrl.Result{}, err
 	}
-	utils.UpdateVolumeGroupSource(instance, vgc)
 
-	if err = utils.UpdateObject(r.Client, instance); err != nil {
+	if err = utils.UpdateVolumeGroupSourceContent(r.Client, instance, vgc, logger); err != nil {
 		return ctrl.Result{}, err
 	}
 	if uErr := utils.UpdateVolumeGroupStatus(r.Client, instance, vgc, groupCreationTime, true, logger); uErr != nil {
@@ -214,17 +213,15 @@ func (r *VolumeGroupReconciler) SetupWithManager(mgr ctrl.Manager, cfg *config.D
 }
 
 func (r *VolumeGroupReconciler) deleteVolumeGroup(logger logr.Logger, volumeGroupId string, secrets map[string]string) error {
-	c := volumegroup.CommonRequestParameters{
+	param := volumegroup.CommonRequestParameters{
 		VolumeGroupID: volumeGroupId,
 		Secrets:       secrets,
 		VolumeGroup:   r.VolumeGroupClient,
 	}
 
-	volumeGroup := volumegroup.VolumeGroup{
-		Params: c,
-	}
+	volumeGroupRequest := volumegroup.NewVolumeGroupRequest(param)
 
-	resp := volumeGroup.Delete()
+	resp := volumeGroupRequest.Delete()
 
 	if resp.Error != nil {
 		logger.Error(resp.Error, "failed to delete volume group")
@@ -235,18 +232,16 @@ func (r *VolumeGroupReconciler) deleteVolumeGroup(logger logr.Logger, volumeGrou
 }
 
 func (r *VolumeGroupReconciler) createVolumeGroup(volumeGroupName string, parameters, secrets map[string]string) *volumegroup.Response {
-	c := volumegroup.CommonRequestParameters{
+	param := volumegroup.CommonRequestParameters{
 		Name:        volumeGroupName,
 		Parameters:  parameters,
 		Secrets:     secrets,
 		VolumeGroup: r.VolumeGroupClient,
 	}
 
-	volumeGroup := volumegroup.VolumeGroup{
-		Params: c,
-	}
+	volumeGroupRequest := volumegroup.NewVolumeGroupRequest(param)
 
-	resp := volumeGroup.Create()
+	resp := volumeGroupRequest.Create()
 
 	return resp
 }
