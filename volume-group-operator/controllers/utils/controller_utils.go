@@ -3,9 +3,10 @@ package utils
 import (
 	"context"
 	"fmt"
-	volumegroupv1 "github.com/IBM/volume-group-operator/api/v1"
+	"math/rand"
+	"time"
+
 	"google.golang.org/grpc/status"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -39,8 +40,11 @@ func GetMessageFromError(err error) string {
 	return s.Message()
 }
 
-func getVolumeGroupLabelSelector(instance *volumegroupv1.VolumeGroup) *v1.LabelSelector {
-	return &v1.LabelSelector{
-		MatchLabels: map[string]string{VolumeGroup: instance.Name},
+func generateString() string {
+	rand.Seed(time.Now().UnixNano())
+	b := make([]byte, 16)
+	for i := range b {
+		b[i] = letterBytes[rand.Intn(len(letterBytes))]
 	}
+	return string(b)
 }

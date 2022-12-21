@@ -37,4 +37,5 @@ var (
 			return false
 		},
 	}
+	removingPVC = "removePVC"
 )

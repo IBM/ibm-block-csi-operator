@@ -31,7 +31,7 @@ import (
 func UpdateVolumeGroupSource(instance *volumegroupv1.VolumeGroup, vgc *volumegroupv1.VolumeGroupContent) {
 	instance.Spec.Source = volumegroupv1.VolumeGroupSource{
 		VolumeGroupContentName: &vgc.Name,
-		Selector:               getVolumeGroupLabelSelector(instance),
+		Selector:               instance.Spec.Source.Selector,
 	}
 }
 
@@ -130,7 +130,7 @@ func RemovePVCFromVGPVCList(pvc *corev1.PersistentVolumeClaim,
 	return pvcListInVG
 }
 
-func GetVgId(logger logr.Logger, client client.Client, vg *volumegroupv1.VolumeGroup) (string, error) {
+func getVgId(logger logr.Logger, client client.Client, vg *volumegroupv1.VolumeGroup) (string, error) {
 	vgc, err := GetVolumeGroupContent(client, logger, vg)
 	if err != nil {
 		return "", err
