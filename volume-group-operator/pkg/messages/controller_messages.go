@@ -49,4 +49,5 @@ var (
 	GetPersistentVolume                              = "Getting %s persistentVolume"
 	AddVolumeToVolumeGroup                           = "Adding volume of persistentVolumeClaim to %s/%s volumeGroup"
 	AddedVolumeToVolumeGroup                         = "Successfully added volume of persistentVolumeClaim to %s/%s volumeGroup"
+	PersistentVolumeClaimIsNotInBoundPhase           = "PersistentVolumeClaim is not in bound phase, stopping the reconcile, when it will be in bound phase, reconcile will continue"
 )
