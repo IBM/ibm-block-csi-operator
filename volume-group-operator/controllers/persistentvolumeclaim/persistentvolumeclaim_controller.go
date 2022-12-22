@@ -51,7 +51,7 @@ func (r *PersistentVolumeClaimWatcher) Reconcile(_ context.Context, req reconcil
 		}
 		return result, err
 	}
-	if pvc.Spec.VolumeName != "" {
+	if len(pvc.Spec.VolumeName) == 0 {
 		reqLogger.Info(messages.PersistentVolumeClaimIsNotInBoundPhase)
 		return result, nil
 	}
