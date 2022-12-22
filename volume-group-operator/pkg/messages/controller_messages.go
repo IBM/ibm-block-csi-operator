@@ -47,4 +47,5 @@ var (
 	UpdateVolumeGroupStatus                          = "Updating status of %s/%s volumeGroup"
 	GetPersistentVolumeClaim                         = "Getting %s/%s persistentVolumeClaim"
 	GetPersistentVolume                              = "Getting %s persistentVolume"
+	PersistentVolumeClaimIsNotInBoundPhase           = "PersistentVolumeClaim is not in bound phase, stopping the reconcile, when it will be in bound phase, reconcile will continue"
 )

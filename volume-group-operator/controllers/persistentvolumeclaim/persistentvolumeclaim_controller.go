@@ -56,6 +56,10 @@ func (r *PersistentVolumeClaimWatcher) Reconcile(_ context.Context, req reconcil
 		return result, err
 	}
 
+	if pvc.Status.Phase != corev1.ClaimBound {
+		reqLogger.Info(messages.PersistentVolumeClaimIsNotInBoundPhase)
+		return result, nil
+	}
 	err = r.removePersistentVolumeClaimFromVolumeGroupObjects(reqLogger, pvc)
 	if err != nil {
 		return result, err
