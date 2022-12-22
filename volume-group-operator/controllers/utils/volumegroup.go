@@ -121,15 +121,6 @@ func IsPVCMatchesVG(logger logr.Logger, client client.Client,
 	}
 }
 
-func IsPVCPartOfVG(pvc *corev1.PersistentVolumeClaim, pvcListInVG []corev1.PersistentVolumeClaim) bool {
-	for _, pvcFromList := range pvcListInVG {
-		if pvcFromList.Name == pvc.Name && pvcFromList.Namespace == pvc.Namespace {
-			return true
-		}
-	}
-	return false
-}
-
 func RemovePVCFromVG(logger logr.Logger, client client.Client, pvc *corev1.PersistentVolumeClaim, vg *volumegroupv1.VolumeGroup) error {
 	logger.Info(fmt.Sprintf(messages.RemovePersistentVolumeClaimFromVolumeGroup,
 		pvc.Namespace, pvc.Name, vg.Namespace, vg.Name))
@@ -165,6 +156,10 @@ func getVgId(logger logr.Logger, client client.Client, vg *volumegroupv1.VolumeG
 }
 
 func AddPVCToVG(logger logr.Logger, client client.Client, pvc *corev1.PersistentVolumeClaim, vg *volumegroupv1.VolumeGroup) error {
+	if IsPVCPartOfVG(pvc, vg.Status.PVCList) {
+		return nil
+	}
+
 	logger.Info(fmt.Sprintf(messages.AddPersistentVolumeClaimToVolumeGroup,
 		pvc.Namespace, pvc.Name, vg.Namespace, vg.Name))
 	vg.Status.PVCList = append(vg.Status.PVCList, *pvc)
@@ -177,4 +172,13 @@ func AddPVCToVG(logger logr.Logger, client client.Client, pvc *corev1.Persistent
 	logger.Info(fmt.Sprintf(messages.AddedPersistentVolumeClaimToVolumeGroup,
 		pvc.Namespace, pvc.Name, vg.Namespace, vg.Name))
 	return nil
+}
+
+func IsPVCPartOfVG(pvc *corev1.PersistentVolumeClaim, pvcListInVG []corev1.PersistentVolumeClaim) bool {
+	for _, pvcFromList := range pvcListInVG {
+		if pvcFromList.Name == pvc.Name && pvcFromList.Namespace == pvc.Namespace {
+			return true
+		}
+	}
+	return false
 }

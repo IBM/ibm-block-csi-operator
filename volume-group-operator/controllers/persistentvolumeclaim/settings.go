@@ -17,6 +17,10 @@ limitations under the License.
 package persistentvolumeclaim
 
 import (
+	"reflect"
+
+	corev1 "k8s.io/api/core/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
@@ -30,7 +34,7 @@ var (
 			return false
 		},
 		UpdateFunc: func(e event.UpdateEvent) bool {
-			return true
+			return isLabelsChanged(e.ObjectOld, e.ObjectNew) || isSpecChanged(e.ObjectOld, e.ObjectNew)
 		},
 		GenericFunc: func(e event.GenericEvent) bool {
 			return false
@@ -39,3 +43,13 @@ var (
 	removingPVC = "removePVC"
 	addingPVC   = "addPVC"
 )
+
+func isLabelsChanged(oldObject, newObject client.Object) bool {
+	return !reflect.DeepEqual(oldObject.(*corev1.PersistentVolumeClaim).Labels,
+		newObject.(*corev1.PersistentVolumeClaim).Labels)
+}
+
+func isSpecChanged(oldObject, newObject client.Object) bool {
+	return !reflect.DeepEqual(oldObject.(*corev1.PersistentVolumeClaim).Spec,
+		newObject.(*corev1.PersistentVolumeClaim).Spec)
+}

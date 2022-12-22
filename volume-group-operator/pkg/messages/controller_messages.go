@@ -42,7 +42,7 @@ var (
 	RemovedVolumeFromVolumeGroup                     = "Successfully Removed volume of persistentVolumeClaim from %s/%s volumeGroup"
 	ModifyVolumeGroup                                = "Modifying %s volumeGroupID with %v volumeIDs"
 	ModifiedVolumeGroup                              = "Successfully modified %s volumeGroupID"
-	CreateEventForVolumeGroup                        = "Creating event for %s/%s volumeGroup, with [%s] message"
+	CreateEventForNamespacedObject                   = "Creating event for %s/%s %s, with [%s] message"
 	EventCreated                                     = "Successfully Created  %s/%s event"
 	UpdateVolumeGroupStatus                          = "Updating status of %s/%s volumeGroup"
 	GetPersistentVolumeClaim                         = "Getting %s/%s persistentVolumeClaim"

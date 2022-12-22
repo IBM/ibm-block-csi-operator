@@ -25,6 +25,7 @@ type DriverConfig struct {
 	DriverEndpoint string
 	DriverName     string
 	RPCTimeout     time.Duration
+	MultipleVGsToPVC string
 }
 
 func NewDriverConfig() *DriverConfig {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	volumegroupv1 "github.com/IBM/volume-group-operator/api/v1"
 	"github.com/IBM/volume-group-operator/pkg/messages"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
@@ -40,4 +41,33 @@ func GetPersistentVolumeClaim(logger logr.Logger, client client.Client, name, na
 		return nil, err
 	}
 	return pvc, nil
+}
+
+func IsPVCCanBeAddedToVG(logger logr.Logger, client client.Client,
+	pvc *corev1.PersistentVolumeClaim, vgs []volumegroupv1.VolumeGroup) error {
+	vgsWithPVC := []string{}
+	newVGsForPVC := []string{}
+	for _, vg := range vgs {
+		if IsPVCPartOfVG(pvc, vg.Status.PVCList) {
+			vgsWithPVC = append(vgsWithPVC, vg.Name)
+		} else if isPVCMatchesVG, _ := IsPVCMatchesVG(logger, client, pvc, vg); isPVCMatchesVG {
+			newVGsForPVC = append(newVGsForPVC, vg.Name)
+		}
+	}
+	return checkIfPVCCanBeAddedToVG(logger, pvc, vgsWithPVC, newVGsForPVC)
+}
+
+func checkIfPVCCanBeAddedToVG(logger logr.Logger, pvc *corev1.PersistentVolumeClaim,
+	vgsWithPVC, newVGsForPVC []string) error {
+	if len(vgsWithPVC) > 0 && len(newVGsForPVC) > 0 {
+		message := fmt.Sprintf(messages.PersistentVolumeClaimIsAlreadyBelongToGroup, pvc.Namespace, pvc.Name, newVGsForPVC, vgsWithPVC)
+		logger.Info(message)
+		return fmt.Errorf(message)
+	}
+	if len(newVGsForPVC) > 1 {
+		message := fmt.Sprintf(messages.PersistentVolumeClaimMatchedWithMultipleNewGroups, pvc.Namespace, pvc.Name, newVGsForPVC)
+		logger.Info(message)
+		return fmt.Errorf(message)
+	}
+	return nil
 }

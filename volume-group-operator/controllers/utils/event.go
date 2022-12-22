@@ -15,31 +15,32 @@ import (
 
 func createSuccessVolumeGroupEvent(logger logr.Logger, client client.Client, vg *volumegroupv1.VolumeGroup,
 	message, reason string) error {
-	event := generateVGEvent(vg, reason, message, normalEventType)
-	logger.Info(fmt.Sprintf(messages.CreateEventForVolumeGroup, vg.Name, vg.Namespace, message))
+	event := generateEvent(vg, reason, message, normalEventType)
+	logger.Info(fmt.Sprintf(messages.CreateEventForNamespacedObject, vg.Name, vg.Namespace, vg.Kind, message))
 	return createEvent(logger, client, event)
 }
 
-func createVolumeGroupErrorEvent(logger logr.Logger, client client.Client, vg *volumegroupv1.VolumeGroup,
+func createNamespacedObjectErrorEvent(logger logr.Logger, client client.Client, object client.Object,
 	errorMessage, reason string) error {
-	event := generateVGEvent(vg, reason, errorMessage, warningEventType)
-	logger.Info(fmt.Sprintf(messages.CreateEventForVolumeGroup, vg.Name, vg.Namespace, errorMessage))
+	event := generateEvent(object, reason, errorMessage, warningEventType)
+	logger.Info(fmt.Sprintf(messages.CreateEventForNamespacedObject, object.GetNamespace(), object.GetName(),
+		object.GetObjectKind().GroupVersionKind().Kind, errorMessage))
 	return createEvent(logger, client, event)
 }
 
-func generateVGEvent(vg *volumegroupv1.VolumeGroup, reason, message, eventType string) *corev1.Event {
+func generateEvent(object client.Object, reason, message, eventType string) *corev1.Event {
 	return &corev1.Event{
 		ObjectMeta: metav1.ObjectMeta{
-			Namespace: vg.Namespace,
-			Name:      fmt.Sprintf("%s.%s", vg.Name, generateString()),
+			Namespace: object.GetNamespace(),
+			Name:      fmt.Sprintf("%s.%s", object.GetName(), generateString()),
 		},
 		ReportingController: volumeGroupController,
 		InvolvedObject: corev1.ObjectReference{
-			Kind:       vg.Kind,
-			APIVersion: vg.APIVersion,
-			Name:       vg.Name,
-			Namespace:  vg.Namespace,
-			UID:        vg.UID,
+			Kind:       object.GetObjectKind().GroupVersionKind().Kind,
+			APIVersion: object.GetObjectKind().GroupVersionKind().Version,
+			Name:       object.GetName(),
+			Namespace:  object.GetNamespace(),
+			UID:        object.GetUID(),
 		},
 		Reason:  reason,
 		Message: message,
