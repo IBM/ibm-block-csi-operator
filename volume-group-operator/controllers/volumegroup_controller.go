@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"github.com/IBM/volume-group-operator/controllers/utils"
 	"github.com/IBM/volume-group-operator/pkg/config"
 	"github.com/go-logr/logr"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
@@ -43,6 +44,7 @@ const (
 // VolumeGroupReconciler reconciles a VolumeGroup object
 type VolumeGroupReconciler struct {
 	client.Client
+	Utils             utils.ControllerUtils
 	Log               logr.Logger
 	Scheme            *runtime.Scheme
 	DriverConfig      *config.DriverConfig
