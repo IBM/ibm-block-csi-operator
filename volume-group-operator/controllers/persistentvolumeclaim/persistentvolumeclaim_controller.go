@@ -194,10 +194,6 @@ func (r PersistentVolumeClaimWatcher) isPVCCanBeAddedToVG(logger logr.Logger, pv
 
 func (r PersistentVolumeClaimWatcher) addVolumeToVolumeGroup(logger logr.Logger,
 	pvc *corev1.PersistentVolumeClaim, vg *csiv1.VolumeGroup) error {
-	if utils.IsPVCPartOfVG(pvc, vg.Status.PVCList) {
-		return nil
-	}
-
 	logger.Info(fmt.Sprintf(messages.AddVolumeToVolumeGroup, vg.Namespace, vg.Name))
 	vg.Status.PVCList = append(vg.Status.PVCList, *pvc)
 
