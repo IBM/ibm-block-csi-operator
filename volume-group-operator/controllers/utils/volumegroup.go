@@ -156,10 +156,6 @@ func getVgId(logger logr.Logger, client client.Client, vg *volumegroupv1.VolumeG
 }
 
 func AddPVCToVG(logger logr.Logger, client client.Client, pvc *corev1.PersistentVolumeClaim, vg *volumegroupv1.VolumeGroup) error {
-	if IsPVCPartOfVG(pvc, vg.Status.PVCList) {
-		return nil
-	}
-
 	logger.Info(fmt.Sprintf(messages.AddPersistentVolumeClaimToVolumeGroup,
 		pvc.Namespace, pvc.Name, vg.Namespace, vg.Name))
 	vg.Status.PVCList = append(vg.Status.PVCList, *pvc)

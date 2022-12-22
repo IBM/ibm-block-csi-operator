@@ -153,6 +153,7 @@ func (r PersistentVolumeClaimWatcher) removeVolumeFromPvcListAndPvList(logger lo
 
 func (r PersistentVolumeClaimWatcher) addPersistentVolumeClaimToVolumeGroupObjects(
 	logger logr.Logger, pvc *corev1.PersistentVolumeClaim) error {
+	var err error
 	vgList, err := utils.GetVGList(logger, r.Client)
 	if err != nil {
 		return err
@@ -163,9 +164,12 @@ func (r PersistentVolumeClaimWatcher) addPersistentVolumeClaimToVolumeGroupObjec
 	}
 
 	for _, vg := range vgList.Items {
-		isPVCMatchesVG, err := utils.IsPVCMatchesVG(logger, r.Client, pvc, vg)
-		if err != nil {
-			return utils.HandleErrorMessage(logger, r.Client, &vg, err, addingPVC)
+		isPVCMatchesVG := false
+		if !utils.IsPVCPartOfVG(pvc, vg.Status.PVCList){
+			isPVCMatchesVG, err = utils.IsPVCMatchesVG(logger, r.Client, pvc, vg)
+			if err != nil {
+				return utils.HandleErrorMessage(logger, r.Client, &vg, err, addingPVC)
+			}
 		}
 
 		if isPVCMatchesVG {
