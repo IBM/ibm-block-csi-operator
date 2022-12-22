@@ -14,7 +14,7 @@ func HandleErrorMessage(logger logr.Logger, client client.Client, vg *volumegrou
 		if uErr != nil {
 			return uErr
 		}
-		uErr = createVolumeGroupErrorEvent(logger, client, vg, errorMessage, reason)
+		uErr = createNamespacedObjectErrorEvent(logger, client, vg, errorMessage, reason)
 		if uErr != nil {
 			return uErr
 		}
