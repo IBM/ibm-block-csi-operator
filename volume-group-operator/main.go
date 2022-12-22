@@ -84,7 +84,7 @@ func main() {
 	})
 	exitWithError(err, "unable to start manager")
 
-	log := logr.Logger{}
+	log := ctrl.Log.WithName("controllers").WithName("VolumeGroup")
 	grpcClientInstance, err := getControllerGrpcClient(cfg, log)
 	exitWithError(err, "failed to get controller GRPC client")
 
