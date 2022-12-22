@@ -33,4 +33,5 @@ var (
 	GetVolumeGroupContentOfVolumeGroup               = "Get matching volumeGroupContent from %s/%s VolumeGroup"
 	RemovePersistentVolumeFromVolumeGroupContent     = "Removing %s/%s persistentVolume from %s/%s volumeGroupContent"
 	RemovedPersistentVolumeFromVolumeGroupContent    = "Successfully removed %s/%s persistentVolume from %s/%s volumeGroupContent"
+	PersistentVolumeClaimIsNotInBoundPhase           = "PersistentVolumeClaim is not in bound phase, stopping the reconcile, when it will be in bound phase, reconcile will continue"
 )
