@@ -165,7 +165,11 @@ func (r PersistentVolumeClaimWatcher) addPersistentVolumeClaimToVolumeGroupObjec
 		}
 
 		if isPVCMatchesVG {
-			err := r.addVolumeFromPvcListAndPvList(logger, pvc, &vg)
+			err := r.addVolumeToVolumeGroup(logger, pvc, &vg)
+			if err != nil {
+				return utils.HandleErrorMessage(logger, r.Client, &vg, err, addingPVC)
+			}
+			err = r.addVolumeFromPvcListAndPvList(logger, pvc, &vg)
 			return utils.HandleErrorMessage(logger, r.Client, &vg, err, addingPVC)
 		}
 	}
@@ -179,6 +183,23 @@ func (r PersistentVolumeClaimWatcher) isPVCCanBeAddedToVG(logger logr.Logger, pv
 	}
 	err := utils.IsPVCCanBeAddedToVG(logger, r.Client, pvc, vgList.Items)
 	return utils.HandlePVCErrorMessage(logger, r.Client, pvc, err, addingPVC)
+}
+
+func (r PersistentVolumeClaimWatcher) addVolumeToVolumeGroup(logger logr.Logger,
+	pvc *corev1.PersistentVolumeClaim, vg *csiv1.VolumeGroup) error {
+	if utils.IsPVCPartOfVG(pvc, vg.Status.PVCList) {
+		return nil
+	}
+
+	logger.Info(fmt.Sprintf(messages.AddVolumeToVolumeGroup, vg.Namespace, vg.Name))
+	vg.Status.PVCList = append(vg.Status.PVCList, *pvc)
+
+	err := utils.ModifyVolumeGroup(logger, r.Client, vg, r.VolumeGroupClient)
+	if err != nil {
+		return err
+	}
+	logger.Info(fmt.Sprintf(messages.AddedVolumeToVolumeGroup, vg.Namespace, vg.Name))
+	return nil
 }
 
 func (r PersistentVolumeClaimWatcher) addVolumeFromPvcListAndPvList(logger logr.Logger,

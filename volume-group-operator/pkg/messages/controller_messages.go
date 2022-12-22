@@ -47,4 +47,6 @@ var (
 	UpdateVolumeGroupStatus                          = "Updating status of %s/%s volumeGroup"
 	GetPersistentVolumeClaim                         = "Getting %s/%s persistentVolumeClaim"
 	GetPersistentVolume                              = "Getting %s persistentVolume"
+	AddVolumeToVolumeGroup                           = "Adding volume of persistentVolumeClaim to %s/%s volumeGroup"
+	AddedVolumeToVolumeGroup                         = "Successfully added volume of persistentVolumeClaim to %s/%s volumeGroup"
 )
