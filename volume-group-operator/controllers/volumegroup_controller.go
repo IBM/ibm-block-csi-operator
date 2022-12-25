@@ -30,9 +30,18 @@ import (
 
 	volumegroupv1 "github.com/IBM/volume-group-operator/api/v1"
 	grpcClient "github.com/IBM/volume-group-operator/pkg/client"
+	"k8s.io/apimachinery/pkg/api/meta"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+)
+
+const (
+	VolumeGroup        = "VolumeGroup"
+	VolumeGroupClass   = "VolumeGroupClass"
+	VolumeGroupContent = "VolumeGroupContent"
 )
 
 type VolumeGroupReconciler struct {
@@ -203,6 +212,13 @@ func makeVolumeGroupName(prefix string, volumeGroupUID string) (string, error) {
 }
 
 func (r *VolumeGroupReconciler) SetupWithManager(mgr ctrl.Manager, cfg *config.DriverConfig) error {
+	logger := r.Log.WithName("SetupWithManager")
+	err := r.waitForCrds(logger)
+	if err != nil {
+		r.Log.Error(err, "failed to wait for crds")
+
+		return err
+	}
 	pred := predicate.GenerationChangedPredicate{}
 
 	r.VolumeGroupClient = grpcClient.NewVolumeGroupClient(r.GRPCClient.Client, cfg.RPCTimeout)
@@ -210,6 +226,54 @@ func (r *VolumeGroupReconciler) SetupWithManager(mgr ctrl.Manager, cfg *config.D
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&volumegroupv1.VolumeGroup{}).
 		WithEventFilter(pred).Complete(r)
+}
+
+func (r *VolumeGroupReconciler) waitForCrds(logger logr.Logger) error {
+	err := r.waitForVolumeGroupResource(logger, VolumeGroup)
+	if err != nil {
+		logger.Error(err, "failed to wait for VolumeGroup CRD")
+
+		return err
+	}
+
+	err = r.waitForVolumeGroupResource(logger, VolumeGroupClass)
+	if err != nil {
+		logger.Error(err, "failed to wait for VolumeGroupClass CRD")
+
+		return err
+	}
+
+	err = r.waitForVolumeGroupResource(logger, VolumeGroupContent)
+	if err != nil {
+		logger.Error(err, "failed to wait for VolumeGroupContent CRD")
+
+		return err
+	}
+
+	return nil
+}
+
+func (r *VolumeGroupReconciler) waitForVolumeGroupResource(logger logr.Logger, resourceName string) error {
+	unstructuredResource := &unstructured.UnstructuredList{}
+	unstructuredResource.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   volumegroupv1.GroupVersion.Group,
+		Kind:    resourceName,
+		Version: volumegroupv1.GroupVersion.Version,
+	})
+	for {
+		err := r.Client.List(context.TODO(), unstructuredResource)
+		if err == nil {
+			return nil
+		}
+		// return errors other than NoMatch
+		if !meta.IsNoMatchError(err) {
+			logger.Error(err, "got an unexpected error while waiting for resource", "Resource", resourceName)
+
+			return err
+		}
+		logger.Info("resource does not exist", "Resource", resourceName)
+		time.Sleep(5 * time.Second)
+	}
 }
 
 func (r *VolumeGroupReconciler) deleteVolumeGroup(logger logr.Logger, volumeGroupId string, secrets map[string]string) error {
