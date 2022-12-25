@@ -34,7 +34,7 @@ var (
 			return false
 		},
 		UpdateFunc: func(e event.UpdateEvent) bool {
-			return isLabelsChanged(e.ObjectOld, e.ObjectNew) || isSpecChanged(e.ObjectOld, e.ObjectNew)
+			return isLabelsChanged(e.ObjectOld, e.ObjectNew) || isPhaseChanged(e.ObjectOld, e.ObjectNew)
 		},
 		GenericFunc: func(e event.GenericEvent) bool {
 			return false
@@ -49,7 +49,7 @@ func isLabelsChanged(oldObject, newObject client.Object) bool {
 		newObject.(*corev1.PersistentVolumeClaim).Labels)
 }
 
-func isSpecChanged(oldObject, newObject client.Object) bool {
-	return !reflect.DeepEqual(oldObject.(*corev1.PersistentVolumeClaim).Spec,
-		newObject.(*corev1.PersistentVolumeClaim).Spec)
+func isPhaseChanged(oldObject, newObject client.Object) bool {
+	return !reflect.DeepEqual(oldObject.(*corev1.PersistentVolumeClaim).Status.Phase,
+		newObject.(*corev1.PersistentVolumeClaim).Status.Phase)
 }

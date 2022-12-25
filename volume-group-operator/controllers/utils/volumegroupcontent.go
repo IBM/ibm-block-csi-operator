@@ -137,7 +137,7 @@ func AddPVToVGC(logger logr.Logger, client client.Client, pv *corev1.PersistentV
 	vgc *volumegroupv1.VolumeGroupContent) error {
 	logger.Info(fmt.Sprintf(messages.AddPersistentVolumeToVolumeGroupContent,
 		pv.Name, vgc.Namespace, vgc.Name))
-	vgc.Status.PVList = append(vgc.Status.PVList, *pv)
+	vgc.Status.PVList = appendPersistentVolume(vgc.Status.PVList, *pv)
 	err := client.Status().Update(context.TODO(), vgc)
 	if err != nil {
 		logger.Error(err, fmt.Sprintf(messages.FailedToAddPersistentVolumeToVolumeGroupContent,
@@ -147,4 +147,14 @@ func AddPVToVGC(logger logr.Logger, client client.Client, pv *corev1.PersistentV
 	logger.Info(fmt.Sprintf(messages.AddedPersistentVolumeToVolumeGroupContent,
 		pv.Name, vgc.Namespace, vgc.Name))
 	return nil
+}
+
+func appendPersistentVolume(pvListInVGC []corev1.PersistentVolume, pv corev1.PersistentVolume) []corev1.PersistentVolume {
+	for _, pvFromList := range pvListInVGC {
+		if pvFromList.Name == pv.Name {
+			return pvListInVGC
+		}
+	}
+	pvListInVGC = append(pvListInVGC, pv)
+	return pvListInVGC
 }

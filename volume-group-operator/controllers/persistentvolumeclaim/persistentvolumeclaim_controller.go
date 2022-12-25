@@ -55,7 +55,7 @@ func (r *PersistentVolumeClaimWatcher) Reconcile(_ context.Context, req reconcil
 		}
 		return result, err
 	}
-	if len(pvc.Spec.VolumeName) == 0 {
+	if pvc.Status.Phase != corev1.ClaimBound {
 		reqLogger.Info(messages.PersistentVolumeClaimIsNotInBoundPhase)
 		return result, nil
 	}
@@ -209,7 +209,7 @@ func (r PersistentVolumeClaimWatcher) isPVCCanBeAddedToVG(logger logr.Logger, pv
 func (r PersistentVolumeClaimWatcher) addVolumeToVolumeGroup(logger logr.Logger,
 	pvc *corev1.PersistentVolumeClaim, vg *csiv1.VolumeGroup) error {
 	logger.Info(fmt.Sprintf(messages.AddVolumeToVolumeGroup, vg.Namespace, vg.Name))
-	vg.Status.PVCList = append(vg.Status.PVCList, *pvc)
+	vg.Status.PVCList = utils.AppendPVC(vg.Status.PVCList, *pvc)
 
 	err := utils.ModifyVolumeGroup(logger, r.Client, vg, r.VolumeGroupClient)
 	if err != nil {
