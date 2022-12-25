@@ -147,6 +147,20 @@ func (r PersistentVolumeClaimWatcher) removeVolumeFromPvcListAndPvList(logger lo
 			return err
 		}
 	}
+
+	return r.removePersistentVolumeClaimFinalizer(logger, pvc)
+}
+
+func (r PersistentVolumeClaimWatcher) removePersistentVolumeClaimFinalizer(logger logr.Logger,
+	pvc *corev1.PersistentVolumeClaim) error {
+	vgList, err := utils.GetVGList(logger, r.Client)
+	if err != nil {
+		return err
+	}
+
+	if !utils.IsPVCPartAnyVG(pvc, vgList.Items) {
+		return utils.RemoveFinalizerFromPVC(r.Client, logger, pvc)
+	}
 	return nil
 }
 
@@ -164,7 +178,7 @@ func (r PersistentVolumeClaimWatcher) addPersistentVolumeClaimToVolumeGroupObjec
 
 	for _, vg := range vgList.Items {
 		isPVCMatchesVG := false
-		if !utils.IsPVCPartOfVG(pvc, vg.Status.PVCList){
+		if !utils.IsPVCPartOfVG(pvc, vg.Status.PVCList) {
 			isPVCMatchesVG, err = utils.IsPVCMatchesVG(logger, r.Client, pvc, vg)
 			if err != nil {
 				return utils.HandleErrorMessage(logger, r.Client, &vg, err, addingPVC)
@@ -214,6 +228,10 @@ func (r PersistentVolumeClaimWatcher) addVolumeFromPvcListAndPvList(logger logr.
 
 	err = r.addPVToVGC(logger, pvc, vg)
 	if err != nil {
+		return err
+	}
+
+	if err = utils.AddFinalizerToPVC(r.Client, logger, pvc); err != nil {
 		return err
 	}
 

@@ -170,6 +170,15 @@ func AddPVCToVG(logger logr.Logger, client client.Client, pvc *corev1.Persistent
 	return nil
 }
 
+func IsPVCPartAnyVG(pvc *corev1.PersistentVolumeClaim, vgs []volumegroupv1.VolumeGroup) bool {
+	for _, vg := range vgs {
+		if IsPVCPartOfVG(pvc, vg.Status.PVCList) {
+			return true
+		}
+	}
+	return false
+}
+
 func IsPVCPartOfVG(pvc *corev1.PersistentVolumeClaim, pvcListInVG []corev1.PersistentVolumeClaim) bool {
 	for _, pvcFromList := range pvcListInVG {
 		if pvcFromList.Name == pvc.Name && pvcFromList.Namespace == pvc.Namespace {
