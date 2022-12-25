@@ -21,24 +21,18 @@ import (
 	"time"
 )
 
-// DriverConfig holds the CSI driver configuration.
 type DriverConfig struct {
-	// DriverEndpoint represents the gRPC endpoint for CSI driver.
 	DriverEndpoint string
-	// DriverName is the name of CSI Driver.
-	DriverName string
-	// RPCTimeout for RPCs to the CSI driver.
-	RPCTimeout time.Duration
+	DriverName     string
+	RPCTimeout     time.Duration
 }
 
-// NewDriverConfig returns the newly initialized DriverConfig.
 func NewDriverConfig() *DriverConfig {
 	return &DriverConfig{}
 }
 
-// Validate operation configurations.
 func (cfg *DriverConfig) Validate() error {
-	// check driver name is set
+
 	if cfg.DriverName == "" {
 		return errors.New("driverName is empty")
 	}

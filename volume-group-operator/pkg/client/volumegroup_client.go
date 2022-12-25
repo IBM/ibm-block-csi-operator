@@ -29,23 +29,16 @@ type volumeGroupClient struct {
 	timeout time.Duration
 }
 
-// VolumeGroup holds the methods required for volume group.
 type VolumeGroup interface {
-	// CreateVolumeGroup RPC call to create the volume group.
 	CreateVolumeGroup(name string, secrets, parameters map[string]string) (*csi.CreateVolumeGroupResponse, error)
-	// DeleteVolumeGroup RPC call to delete the volume group.
 	DeleteVolumeGroup(volumeGroupId string, secrets map[string]string) (*csi.DeleteVolumeGroupResponse, error)
-	// ModifyVolumeGroupMembership RPC call to modify the volume group.
 	ModifyVolumeGroupMembership(volumeGroupId string, volumeIds []string, secrets map[string]string) (*csi.ModifyVolumeGroupMembershipResponse, error)
 }
 
-// NewVolumeGroupClient returns VolumeGroup interface which has the RPC
-// calls for volume group.
 func NewVolumeGroupClient(cc *grpc.ClientConn, timeout time.Duration) VolumeGroup {
 	return &volumeGroupClient{client: csi.NewControllerClient(cc), timeout: timeout}
 }
 
-// CreateVolumeGroup RPC call to create the volume group.
 func (rc *volumeGroupClient) CreateVolumeGroup(name string, secrets, parameters map[string]string) (*csi.CreateVolumeGroupResponse, error) {
 	req := &csi.CreateVolumeGroupRequest{
 		Name:       name,
@@ -60,7 +53,6 @@ func (rc *volumeGroupClient) CreateVolumeGroup(name string, secrets, parameters 
 	return resp, err
 }
 
-// DeleteVolumeGroup RPC call to delete the volume group.
 func (rc *volumeGroupClient) DeleteVolumeGroup(volumeGroupId string, secrets map[string]string) (*csi.DeleteVolumeGroupResponse, error) {
 	req := &csi.DeleteVolumeGroupRequest{
 		VolumeGroupId: volumeGroupId,
@@ -74,7 +66,6 @@ func (rc *volumeGroupClient) DeleteVolumeGroup(volumeGroupId string, secrets map
 	return resp, err
 }
 
-// ModifyVolumeGroupMembership RPC call to modify the volume group.
 func (rc *volumeGroupClient) ModifyVolumeGroupMembership(volumeGroupId string, volumeIds []string, secrets map[string]string) (*csi.ModifyVolumeGroupMembershipResponse, error) {
 	req := &csi.ModifyVolumeGroupMembershipRequest{
 		VolumeGroupId: volumeGroupId,
