@@ -2,8 +2,11 @@ package utils
 
 import (
 	"context"
+	"fmt"
+
 	volumegroupv1 "github.com/IBM/volume-group-operator/api/v1"
 	"github.com/IBM/volume-group-operator/controllers/volumegroup"
+	"github.com/IBM/volume-group-operator/pkg/messages"
 	"github.com/container-storage-interface/spec/lib/go/csi"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
@@ -13,10 +16,12 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func GetVolumeGroupContent(client client.Client, logger logr.Logger, instance *volumegroupv1.VolumeGroup) (*volumegroupv1.VolumeGroupContent, error) {
-	VGC := &volumegroupv1.VolumeGroupContent{}
-	VolumeGroupContentName := *instance.Spec.Source.VolumeGroupContentName
-	err := client.Get(context.TODO(), types.NamespacedName{Name: VolumeGroupContentName, Namespace: instance.Namespace}, VGC)
+func GetVolumeGroupContent(client client.Client, logger logr.Logger, vg *volumegroupv1.VolumeGroup) (*volumegroupv1.VolumeGroupContent, error) {
+	logger.Info(fmt.Sprintf(messages.GetVolumeGroupContentOfVolumeGroup, vg.Name, vg.Namespace))
+	vgc := &volumegroupv1.VolumeGroupContent{}
+	VolumeGroupContentName := *vg.Spec.Source.VolumeGroupContentName
+	namespacedVGC := types.NamespacedName{Name: VolumeGroupContentName, Namespace: vg.Namespace}
+	err := client.Get(context.TODO(), namespacedVGC, vgc)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			logger.Error(err, "VolumeGroupContent not found", "VolumeGroupContent Name", VolumeGroupContentName)
@@ -24,7 +29,7 @@ func GetVolumeGroupContent(client client.Client, logger logr.Logger, instance *v
 		return nil, err
 	}
 
-	return VGC, nil
+	return vgc, nil
 }
 
 func CreateVolumeGroupContent(client client.Client, logger logr.Logger, vgcObj *volumegroupv1.VolumeGroupContent) error {
@@ -100,4 +105,29 @@ func generateVolumeGroupContentSource(vgcObj *volumegroupv1.VolumeGroupClass, re
 		VolumeGroupHandle:     CreateVolumeGroupResponse.VolumeGroup.VolumeGroupId,
 		VolumeGroupAttributes: CreateVolumeGroupResponse.VolumeGroup.VolumeGroupContext,
 	}
+}
+
+func RemovePVFromVGC(logger logr.Logger, client client.Client, pv *corev1.PersistentVolume, vgc *volumegroupv1.VolumeGroupContent) error {
+	logger.Info(fmt.Sprintf(messages.RemovePersistentVolumeFromVolumeGroupContent,
+		pv.Namespace, pv.Name, vgc.Namespace, vgc.Name))
+	vgc.Status.PVList = removeFromPVList(pv, vgc.Status.PVList)
+	err := client.Status().Update(context.TODO(), vgc)
+	if err != nil {
+		logger.Error(err, fmt.Sprintf(messages.FailedToRemovePersistentVolumeFromVolumeGroupContent,
+			pv.Namespace, pv.Name, vgc.Namespace, vgc.Name))
+		return err
+	}
+	logger.Info(fmt.Sprintf(messages.RemovedPersistentVolumeFromVolumeGroupContent,
+		pv.Namespace, pv.Name, vgc.Namespace, vgc.Name))
+	return nil
+}
+
+func removeFromPVList(pv *corev1.PersistentVolume, pvListInVGC []corev1.PersistentVolume) []corev1.PersistentVolume {
+	for index, pvcFromList := range pvListInVGC {
+		if pvcFromList.Name == pv.Name && pvcFromList.Namespace == pv.Namespace {
+			pvListInVGC = removeByIndexFromPersistentVolumeList(pvListInVGC, index)
+			return pvListInVGC
+		}
+	}
+	return pvListInVGC
 }

@@ -19,19 +19,20 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/IBM/volume-group-operator/controllers/utils"
 	"github.com/IBM/volume-group-operator/controllers/volumegroup"
 	"github.com/IBM/volume-group-operator/pkg/config"
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"time"
 
 	volumegroupv1 "github.com/IBM/volume-group-operator/api/v1"
 	grpcClient "github.com/IBM/volume-group-operator/pkg/client"
-	"k8s.io/apimachinery/pkg/api/meta"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	ctrl "sigs.k8s.io/controller-runtime"

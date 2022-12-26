@@ -17,10 +17,21 @@ limitations under the License.
 package messages
 
 var (
-	ReconcilePersistentVolumeClaim       = "Reconciling PersistentVolumeClaim"
-	RequestName                          = "Request.Name"
-	RequestNamespace                     = "Request.Namespace"
-	UnableToCreatePVCController          = "Unable to create persistentvolumeclaim controller"
-	PersistentVolumeClaimNotFound        = "PersistentVolumeClaim not found"
-	UnExpectedPersistentVolumeClaimError = "Got an unexpected error while fetching PersistentVolumeClaim"
+	ReconcilePersistentVolumeClaim                   = "Reconciling PersistentVolumeClaim"
+	RequestName                                      = "Request.Name"
+	RequestNamespace                                 = "Request.Namespace"
+	UnableToCreatePVCController                      = "Unable to create persistentvolumeclaim controller"
+	PersistentVolumeClaimNotFound                    = "PersistentVolumeClaim not found"
+	ListVolumeGroups                                 = "Listing volumeGroups"
+	CheckIfPersistentVolumeClaimMatchesVolumeGroup   = "Checking if %s/%s persistentVolumeClaim is matches %s/%s volumeGroup"
+	PersistentVolumeClaimMatchedToVolumeGroup        = "%s/%s persistentVolumeClaim is matched with %s/%s volumeGroup"
+	PersistentVolumeClaimNotMatchedToVolumeGroup     = "%s/%s persistentVolumeClaim is not matched with %s/%s volumeGroup"
+	RemovePersistentVolumeClaimFromVolumeGroup       = "Removing %s/%s persistentVolumeClaim from %s/%s volumeGroup"
+	RemovedPersistentVolumeClaimFromVolumeGroup      = "Successfully removed %s/%s persistentVolumeClaim from %s/%s volumeGroup"
+	PersistentVolumeClaimDoesNotHavePersistentVolume = "PersistentVolumeClaim does not Have persistentVolume"
+	GetPersistentVolumeOfPersistentVolumeClaim       = "Get matching persistentVolume from %s/%s persistentVolumeClaim"
+	GetVolumeGroupContentOfVolumeGroup               = "Get matching volumeGroupContent from %s/%s VolumeGroup"
+	RemovePersistentVolumeFromVolumeGroupContent     = "Removing %s/%s persistentVolume from %s/%s volumeGroupContent"
+	RemovedPersistentVolumeFromVolumeGroupContent    = "Successfully removed %s/%s persistentVolume from %s/%s volumeGroupContent"
+	PersistentVolumeClaimIsNotInBoundPhase           = "PersistentVolumeClaim is not in bound phase, stopping the reconcile, when it will be in bound phase, reconcile will continue"
 )

@@ -19,6 +19,8 @@ package persistentvolumeclaim
 import (
 	"context"
 
+	csiv1 "github.com/IBM/volume-group-operator/api/v1"
+	"github.com/IBM/volume-group-operator/controllers/utils"
 	"github.com/IBM/volume-group-operator/pkg/messages"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
@@ -42,11 +44,24 @@ func (r *PersistentVolumeClaimWatcher) Reconcile(_ context.Context, req reconcil
 	result = reconcile.Result{}
 	reqLogger := r.Log.WithValues(messages.RequestNamespace, req.Namespace, messages.RequestName, req.Name)
 	reqLogger.Info(messages.ReconcilePersistentVolumeClaim)
-	_, err = r.getPersistentVolumeClaim(reqLogger, req)
+	pvc, err := r.getPersistentVolumeClaim(reqLogger, req)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			return result, nil
 		}
+		return result, err
+	}
+	if pvc.Status.Phase != corev1.ClaimBound {
+		reqLogger.Info(messages.PersistentVolumeClaimIsNotInBoundPhase)
+		return result, nil
+	}
+	vgList, err := utils.GetVGList(reqLogger, r.Client)
+	if err != nil {
+		return result, err
+	}
+
+	err = r.removePersistentVolumeClaimFromVolumeGroupObjects(reqLogger, pvc, vgList)
+	if err != nil {
 		return result, err
 	}
 
@@ -68,6 +83,48 @@ func (r PersistentVolumeClaimWatcher) getPersistentVolumeClaim(logger logr.Logge
 	}
 
 	return pvc, nil
+}
+
+func (r PersistentVolumeClaimWatcher) removePersistentVolumeClaimFromVolumeGroupObjects(
+	logger logr.Logger, pvc *corev1.PersistentVolumeClaim, vgList csiv1.VolumeGroupList) error {
+	for _, vg := range vgList.Items {
+		if !utils.IsPVCPartOfVG(pvc, vg.Status.PVCList) {
+			continue
+		}
+		IsPVCMatchesVG, err := utils.IsPVCMatchesVG(logger, r.Client, pvc, vg)
+		if err != nil {
+			return err
+		}
+
+		if !IsPVCMatchesVG {
+			return r.removeVolumeFromPvcListAndPvList(logger, pvc, vg)
+		}
+	}
+	return nil
+}
+
+func (r PersistentVolumeClaimWatcher) removeVolumeFromPvcListAndPvList(logger logr.Logger,
+	pvc *corev1.PersistentVolumeClaim, vg csiv1.VolumeGroup) error {
+	err := utils.RemovePVCFromVG(logger, r.Client, pvc, &vg)
+	if err != nil {
+		return err
+	}
+	pv, err := utils.GetPVFromPVC(logger, r.Client, pvc)
+	if err != nil {
+		return err
+	}
+	vgc, err := utils.GetVolumeGroupContent(r.Client, logger, &vg)
+	if err != nil {
+		return err
+	}
+
+	if pv != nil {
+		err = utils.RemovePVFromVGC(logger, r.Client, pv, vgc)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (r *PersistentVolumeClaimWatcher) SetupWithManager(mgr ctrl.Manager) error {
