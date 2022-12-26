@@ -148,15 +148,6 @@ func IsPVCMatchesVG(logger logr.Logger, client client.Client,
 	}
 }
 
-func IsPVCPartOfVG(pvc *corev1.PersistentVolumeClaim, pvcList []corev1.PersistentVolumeClaim) bool {
-	for _, pvcFromList := range pvcList {
-		if pvcFromList.Name == pvc.Name && pvcFromList.Namespace == pvc.Namespace {
-			return true
-		}
-	}
-	return false
-}
-
 func RemovePVCFromVG(logger logr.Logger, client client.Client, pvc *corev1.PersistentVolumeClaim, vg *volumegroupv1.VolumeGroup) error {
 	logger.Info(fmt.Sprintf(messages.RemovePersistentVolumeClaimFromVolumeGroup,
 		pvc.Namespace, pvc.Name, vg.Namespace, vg.Name))
@@ -213,4 +204,22 @@ func AppendPVC(pvcListInVG []corev1.PersistentVolumeClaim, pvc corev1.Persistent
 	}
 	pvcListInVG = append(pvcListInVG, pvc)
 	return pvcListInVG
+}
+
+func IsPVCPartAnyVG(pvc *corev1.PersistentVolumeClaim, vgs []volumegroupv1.VolumeGroup) bool {
+	for _, vg := range vgs {
+		if IsPVCPartOfVG(pvc, vg.Status.PVCList) {
+			return true
+		}
+	}
+	return false
+}
+
+func IsPVCPartOfVG(pvc *corev1.PersistentVolumeClaim, pvcList []corev1.PersistentVolumeClaim) bool {
+	for _, pvcFromList := range pvcList {
+		if pvcFromList.Name == pvc.Name && pvcFromList.Namespace == pvc.Namespace {
+			return true
+		}
+	}
+	return false
 }
