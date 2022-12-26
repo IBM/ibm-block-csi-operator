@@ -88,8 +88,8 @@ func AddFinalizerToPVC(client client.Client, logger logr.Logger, pvc *corev1.Per
 	return nil
 }
 
-func RemoveFinalizerFromPVCs(client client.Client, logger logr.Logger, vg *volumegroupv1.VolumeGroup) error {
-	for _, pvc := range vg.Status.PVCList {
+func RemoveFinalizerFromPVCs(client client.Client, logger logr.Logger, pvcs []corev1.PersistentVolumeClaim) error {
+	for _, pvc := range pvcs {
 		if err := RemoveFinalizerFromPVC(client, logger, &pvc); err != nil {
 			return err
 		}
