@@ -456,6 +456,11 @@ func (c *IBMBlockCSI) GenerateVolumeGroupClusterRole() *rbacv1.ClusterRole {
 				Resources: []string{persistentVolumeClaimsFinalizersResource},
 				Verbs:     []string{verbUpdate},
 			},
+			{
+				APIGroups: []string{storageApiGroup},
+				Resources: []string{storageClassesResource},
+				Verbs:     []string{verbGet},
+			},
 		},
 	}
 }
