@@ -195,28 +195,12 @@ func (r PersistentVolumeClaimWatcher) addVolumeToPvcListAndPvList(logger logr.Lo
 		return err
 	}
 
-	err = r.addPVToVGC(logger, pvc, vg)
+	err = utils.AddMatchingPVToMatchingVGC(logger, r.Client, pvc, vg)
 	if err != nil {
 		return err
 	}
 
 	return r.addSuccessAddEvent(logger, pvc, vg)
-}
-
-func (r PersistentVolumeClaimWatcher) addPVToVGC(logger logr.Logger, pvc *corev1.PersistentVolumeClaim, vg *csiv1.VolumeGroup) error {
-	pv, err := utils.GetPVFromPVC(logger, r.Client, pvc)
-	if err != nil {
-		return err
-	}
-	vgc, err := utils.GetVolumeGroupContent(r.Client, logger, vg)
-	if err != nil {
-		return err
-	}
-
-	if pv != nil {
-		return utils.AddPVToVGC(logger, r.Client, pv, vgc)
-	}
-	return nil
 }
 
 func (r PersistentVolumeClaimWatcher) addSuccessAddEvent(logger logr.Logger,
