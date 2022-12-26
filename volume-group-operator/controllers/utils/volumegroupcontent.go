@@ -16,6 +16,23 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+func AddMatchingPVToMatchingVGC(logger logr.Logger, client client.Client,
+	pvc *corev1.PersistentVolumeClaim, vg *volumegroupv1.VolumeGroup) error {
+	pv, err := GetPVFromPVC(logger, client, pvc)
+	if err != nil {
+		return err
+	}
+	vgc, err := GetVolumeGroupContent(client, logger, vg)
+	if err != nil {
+		return err
+	}
+
+	if pv != nil {
+		return addPVToVGC(logger, client, pv, vgc)
+	}
+	return nil
+}
+
 func GetVolumeGroupContent(client client.Client, logger logr.Logger, vg *volumegroupv1.VolumeGroup) (*volumegroupv1.VolumeGroupContent, error) {
 	logger.Info(fmt.Sprintf(messages.GetVolumeGroupContentOfVolumeGroup, vg.Name, vg.Namespace))
 	vgc := &volumegroupv1.VolumeGroupContent{}
@@ -130,4 +147,30 @@ func removeFromPVList(pv *corev1.PersistentVolume, pvList []corev1.PersistentVol
 		}
 	}
 	return pvList
+}
+
+func addPVToVGC(logger logr.Logger, client client.Client, pv *corev1.PersistentVolume,
+	vgc *volumegroupv1.VolumeGroupContent) error {
+	logger.Info(fmt.Sprintf(messages.AddPersistentVolumeToVolumeGroupContent,
+		pv.Name, vgc.Namespace, vgc.Name))
+	vgc.Status.PVList = appendPersistentVolume(vgc.Status.PVList, *pv)
+	err := client.Status().Update(context.TODO(), vgc)
+	if err != nil {
+		logger.Error(err, fmt.Sprintf(messages.FailedToAddPersistentVolumeToVolumeGroupContent,
+			pv.Name, vgc.Namespace, vgc.Name))
+		return err
+	}
+	logger.Info(fmt.Sprintf(messages.AddedPersistentVolumeToVolumeGroupContent,
+		pv.Name, vgc.Namespace, vgc.Name))
+	return nil
+}
+
+func appendPersistentVolume(pvListInVGC []corev1.PersistentVolume, pv corev1.PersistentVolume) []corev1.PersistentVolume {
+	for _, pvFromList := range pvListInVGC {
+		if pvFromList.Name == pv.Name {
+			return pvListInVGC
+		}
+	}
+	pvListInVGC = append(pvListInVGC, pv)
+	return pvListInVGC
 }

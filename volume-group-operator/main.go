@@ -100,10 +100,11 @@ func main() {
 	exitWithError(err, "unable to create controller  with controller VolumeGroup")
 
 	err = (&persistentvolumeclaim.PersistentVolumeClaimWatcher{
-		Client:     mgr.GetClient(),
-		Scheme:     mgr.GetScheme(),
-		Log:        ctrl.Log.WithName(pvcController),
-		GRPCClient: grpcClientInstance,
+		Client:       mgr.GetClient(),
+		Scheme:       mgr.GetScheme(),
+		Log:          ctrl.Log.WithName(pvcController),
+		DriverConfig: cfg,
+		GRPCClient:   grpcClientInstance,
 	}).SetupWithManager(mgr, cfg)
 	exitWithError(err, messages.UnableToCreatePVCController)
 
@@ -125,6 +126,7 @@ func defineFlags(cfg *config.DriverConfig) {
 	flag.StringVar(&cfg.DriverName, "driver-name", "", "The CSI driver name.")
 	flag.StringVar(&cfg.DriverEndpoint, "csi-address", "/run/csi/socket", "Address of the CSI driver socket.")
 	flag.DurationVar(&cfg.RPCTimeout, "rpc-timeout", defaultTimeout, "The timeout for RPCs to the CSI driver.")
+	flag.StringVar(&cfg.MultipleVGsToPVC, "multiple-vgs-to-pvc", "true", "Can PVC be assigned to multiple VolumeGroups.")
 }
 
 func getControllerGrpcClient(cfg *config.DriverConfig, log logr.Logger) (*grpcClient.Client, error) {
