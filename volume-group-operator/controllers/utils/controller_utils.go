@@ -3,6 +3,9 @@ package utils
 import (
 	"context"
 	"fmt"
+	"math/rand"
+	"time"
+
 	"google.golang.org/grpc/status"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -30,4 +33,13 @@ func GetMessageFromError(err error) string {
 	}
 
 	return s.Message()
+}
+
+func generateString() string {
+	rand.Seed(time.Now().UnixNano())
+	b := make([]byte, 16)
+	for i := range b {
+		b[i] = letterBytes[rand.Intn(len(letterBytes))]
+	}
+	return string(b)
 }

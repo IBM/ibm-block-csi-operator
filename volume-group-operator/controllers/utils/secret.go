@@ -18,6 +18,7 @@ package utils
 
 import (
 	"context"
+
 	volumegroupv1 "github.com/IBM/volume-group-operator/api/v1"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
@@ -26,7 +27,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func GetSecretData(client client.Client, logger logr.Logger, name, namespace string) (map[string]string, error) {
+func getSecretData(client client.Client, logger logr.Logger, name, namespace string) (map[string]string, error) {
 	namespacedName := types.NamespacedName{Name: name, Namespace: namespace}
 	secret := &corev1.Secret{}
 	err := client.Get(context.TODO(), namespacedName, secret)
@@ -59,7 +60,7 @@ func GetSecretDataFromClass(client client.Client, vgcObj *volumegroupv1.VolumeGr
 	secret := make(map[string]string)
 	var err error
 	if secretName != "" && secretNamespace != "" {
-		secret, err = GetSecretData(client, logger, secretName, secretNamespace)
+		secret, err = getSecretData(client, logger, secretName, secretNamespace)
 		if err != nil {
 			if uErr := UpdateVolumeGroupStatusError(client, instance, logger, err.Error()); uErr != nil {
 				return nil, uErr

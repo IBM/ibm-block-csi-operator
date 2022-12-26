@@ -109,7 +109,7 @@ func IsPVCPartOfVG(pvc *corev1.PersistentVolumeClaim, pvcList []corev1.Persisten
 func RemovePVCFromVG(logger logr.Logger, client client.Client, pvc *corev1.PersistentVolumeClaim, vg *volumegroupv1.VolumeGroup) error {
 	logger.Info(fmt.Sprintf(messages.RemovePersistentVolumeClaimFromVolumeGroup,
 		pvc.Namespace, pvc.Name, vg.Namespace, vg.Name))
-	vg.Status.PVCList = removeFromPVCList(pvc, vg.Status.PVCList)
+	vg.Status.PVCList = RemoveFromPVCList(pvc, vg.Status.PVCList)
 	err := client.Status().Update(context.TODO(), vg)
 	if err != nil {
 		logger.Error(err, fmt.Sprintf(messages.FailedToRemovePersistentVolumeClaimFromVolumeGroup,
@@ -121,7 +121,7 @@ func RemovePVCFromVG(logger logr.Logger, client client.Client, pvc *corev1.Persi
 	return nil
 }
 
-func removeFromPVCList(pvc *corev1.PersistentVolumeClaim, pvcList []corev1.PersistentVolumeClaim) []corev1.PersistentVolumeClaim {
+func RemoveFromPVCList(pvc *corev1.PersistentVolumeClaim, pvcList []corev1.PersistentVolumeClaim) []corev1.PersistentVolumeClaim {
 	for index, pvcFromList := range pvcList {
 		if pvcFromList.Name == pvc.Name && pvcFromList.Namespace == pvc.Namespace {
 			pvcList = removeByIndexFromPVCList(pvcList, index)
@@ -129,4 +129,12 @@ func removeFromPVCList(pvc *corev1.PersistentVolumeClaim, pvcList []corev1.Persi
 		}
 	}
 	return pvcList
+}
+
+func getVgId(logger logr.Logger, client client.Client, vg *volumegroupv1.VolumeGroup) (string, error) {
+	vgc, err := GetVolumeGroupContent(client, logger, vg)
+	if err != nil {
+		return "", err
+	}
+	return string(vgc.Spec.Source.VolumeGroupHandle), nil
 }

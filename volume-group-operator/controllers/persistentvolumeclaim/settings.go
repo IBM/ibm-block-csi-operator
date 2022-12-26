@@ -22,8 +22,7 @@ import (
 )
 
 var (
-	persistentVolumeClaim = "PersistentVolumeClaim"
-	pvcPredicate          = predicate.Funcs{
+	pvcPredicate = predicate.Funcs{
 		CreateFunc: func(e event.CreateEvent) bool {
 			return true
 		},
@@ -37,4 +36,5 @@ var (
 			return false
 		},
 	}
+	removingPVC = "removePVC"
 )

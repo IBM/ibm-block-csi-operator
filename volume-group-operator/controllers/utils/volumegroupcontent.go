@@ -114,20 +114,20 @@ func RemovePVFromVGC(logger logr.Logger, client client.Client, pv *corev1.Persis
 	err := client.Status().Update(context.TODO(), vgc)
 	if err != nil {
 		logger.Error(err, fmt.Sprintf(messages.FailedToRemovePersistentVolumeFromVolumeGroupContent,
-			pv.Namespace, pv.Name, vgc.Namespace, vgc.Name))
+			pv.Name, vgc.Namespace, vgc.Name))
 		return err
 	}
 	logger.Info(fmt.Sprintf(messages.RemovedPersistentVolumeFromVolumeGroupContent,
-		pv.Namespace, pv.Name, vgc.Namespace, vgc.Name))
+		pv.Name, vgc.Namespace, vgc.Name))
 	return nil
 }
 
-func removeFromPVList(pv *corev1.PersistentVolume, pvListInVGC []corev1.PersistentVolume) []corev1.PersistentVolume {
-	for index, pvcFromList := range pvListInVGC {
-		if pvcFromList.Name == pv.Name && pvcFromList.Namespace == pv.Namespace {
-			pvListInVGC = removeByIndexFromPersistentVolumeList(pvListInVGC, index)
-			return pvListInVGC
+func removeFromPVList(pv *corev1.PersistentVolume, pvList []corev1.PersistentVolume) []corev1.PersistentVolume {
+	for index, pvFromList := range pvList {
+		if pvFromList.Name == pv.Name && pvFromList.Namespace == pv.Namespace {
+			pvList = removeByIndexFromPersistentVolumeList(pvList, index)
+			return pvList
 		}
 	}
-	return pvListInVGC
+	return pvList
 }

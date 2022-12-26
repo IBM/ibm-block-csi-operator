@@ -18,15 +18,17 @@ package persistentvolumeclaim
 
 import (
 	"context"
+	"fmt"
 
 	csiv1 "github.com/IBM/volume-group-operator/api/v1"
 	"github.com/IBM/volume-group-operator/controllers/utils"
+	grpcClient "github.com/IBM/volume-group-operator/pkg/client"
+	"github.com/IBM/volume-group-operator/pkg/config"
 	"github.com/IBM/volume-group-operator/pkg/messages"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -35,16 +37,18 @@ import (
 )
 
 type PersistentVolumeClaimWatcher struct {
-	Client client.Client
-	Scheme *runtime.Scheme
-	Log    logr.Logger
+	Client            client.Client
+	Scheme            *runtime.Scheme
+	Log               logr.Logger
+	GRPCClient        *grpcClient.Client
+	VolumeGroupClient grpcClient.VolumeGroup
 }
 
 func (r *PersistentVolumeClaimWatcher) Reconcile(_ context.Context, req reconcile.Request) (result reconcile.Result, err error) {
 	result = reconcile.Result{}
 	reqLogger := r.Log.WithValues(messages.RequestNamespace, req.Namespace, messages.RequestName, req.Name)
 	reqLogger.Info(messages.ReconcilePersistentVolumeClaim)
-	pvc, err := r.getPersistentVolumeClaim(reqLogger, req)
+	pvc, err := utils.GetPersistentVolumeClaim(reqLogger, r.Client, req.Name, req.Namespace)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			return result, nil
@@ -68,23 +72,6 @@ func (r *PersistentVolumeClaimWatcher) Reconcile(_ context.Context, req reconcil
 	return result, nil
 }
 
-func (r PersistentVolumeClaimWatcher) getPersistentVolumeClaim(logger logr.Logger,
-	req reconcile.Request) (*corev1.PersistentVolumeClaim, error) {
-	pvc := &corev1.PersistentVolumeClaim{}
-	err := r.Client.Get(context.TODO(), types.NamespacedName{Name: req.Name, Namespace: req.Namespace}, pvc)
-	if err != nil {
-		if errors.IsNotFound(err) {
-			logger.Error(err, messages.PersistentVolumeClaimNotFound, persistentVolumeClaim, pvc)
-		} else {
-			logger.Error(err, messages.UnExpectedPersistentVolumeClaimError, persistentVolumeClaim, pvc)
-		}
-
-		return nil, err
-	}
-
-	return pvc, nil
-}
-
 func (r PersistentVolumeClaimWatcher) removePersistentVolumeClaimFromVolumeGroupObjects(
 	logger logr.Logger, pvc *corev1.PersistentVolumeClaim, vgList csiv1.VolumeGroupList) error {
 	for _, vg := range vgList.Items {
@@ -93,13 +80,44 @@ func (r PersistentVolumeClaimWatcher) removePersistentVolumeClaimFromVolumeGroup
 		}
 		IsPVCMatchesVG, err := utils.IsPVCMatchesVG(logger, r.Client, pvc, vg)
 		if err != nil {
-			return err
+			return utils.HandleErrorMessage(logger, r.Client, &vg, err, removingPVC)
 		}
 
 		if !IsPVCMatchesVG {
-			return r.removeVolumeFromPvcListAndPvList(logger, pvc, vg)
+			err := r.removeVolumeFromVolumeGroup(logger, pvc, &vg)
+			if err != nil {
+				return utils.HandleErrorMessage(logger, r.Client, &vg, err, removingPVC)
+			}
+			err = r.removeVolumeFromPvcListAndPvList(logger, pvc, vg)
+			if err != nil {
+				return utils.HandleErrorMessage(logger, r.Client, &vg, err, removingPVC)
+			}
+			err = r.addSuccessRemoveEvent(logger, pvc, &vg)
+			if err != nil {
+				return err
+			}
 		}
 	}
+	return nil
+}
+
+func (r PersistentVolumeClaimWatcher) addSuccessRemoveEvent(logger logr.Logger,
+	pvc *corev1.PersistentVolumeClaim, vg *csiv1.VolumeGroup) error {
+	message := fmt.Sprintf(messages.RemovedPersistentVolumeClaimFromVolumeGroup,
+		pvc.Namespace, pvc.Name, vg.Namespace, vg.Name)
+	return utils.HandleSuccessMessage(logger, r.Client, vg, message, removingPVC)
+}
+
+func (r PersistentVolumeClaimWatcher) removeVolumeFromVolumeGroup(logger logr.Logger,
+	pvc *corev1.PersistentVolumeClaim, vg *csiv1.VolumeGroup) error {
+	logger.Info(fmt.Sprintf(messages.RemoveVolumeFromVolumeGroup, vg.Namespace, vg.Name))
+	vg.Status.PVCList = utils.RemoveFromPVCList(pvc, vg.Status.PVCList)
+
+	err := utils.ModifyVolumeGroup(logger, r.Client, vg, r.VolumeGroupClient)
+	if err != nil {
+		return err
+	}
+	logger.Info(fmt.Sprintf(messages.RemovedVolumeFromVolumeGroup, vg.Namespace, vg.Name))
 	return nil
 }
 
@@ -127,8 +145,9 @@ func (r PersistentVolumeClaimWatcher) removeVolumeFromPvcListAndPvList(logger lo
 	return nil
 }
 
-func (r *PersistentVolumeClaimWatcher) SetupWithManager(mgr ctrl.Manager) error {
+func (r *PersistentVolumeClaimWatcher) SetupWithManager(mgr ctrl.Manager, cfg *config.DriverConfig) error {
 	pred := predicate.LabelChangedPredicate{}
+	r.VolumeGroupClient = grpcClient.NewVolumeGroupClient(r.GRPCClient.Client, cfg.RPCTimeout)
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&corev1.PersistentVolumeClaim{}, builder.WithPredicates(pvcPredicate)).
