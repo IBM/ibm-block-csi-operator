@@ -93,7 +93,7 @@ func (r *PersistentVolumeClaimWatcher) isPVCNeedToBeHandled(reqLogger logr.Logge
 
 func (r PersistentVolumeClaimWatcher) removePersistentVolumeClaimFromVolumeGroupObjects(
 	logger logr.Logger, pvc *corev1.PersistentVolumeClaim) error {
-	vgList, err := utils.GetVGList(logger, r.Client)
+	vgList, err := utils.GetVGList(logger, r.Client, r.DriverConfig.DriverName)
 	if err != nil {
 		return err
 	}
@@ -186,7 +186,7 @@ func (r PersistentVolumeClaimWatcher) removePersistentVolumeClaimFinalizer(logge
 func (r PersistentVolumeClaimWatcher) addPersistentVolumeClaimToVolumeGroupObjects(
 	logger logr.Logger, pvc *corev1.PersistentVolumeClaim) error {
 	var err error
-	vgList, err := utils.GetVGList(logger, r.Client)
+	vgList, err := utils.GetVGList(logger, r.Client, r.DriverConfig.DriverName)
 	if err != nil {
 		return err
 	}
