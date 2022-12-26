@@ -92,16 +92,43 @@ func getVolumeGroup(client client.Client, instance *volumegroupv1.VolumeGroup) (
 	return vg, nil
 }
 
-func GetVGList(logger logr.Logger, client client.Client) (volumegroupv1.VolumeGroupList, error) {
+func GetVGList(logger logr.Logger, client client.Client, driver string) (volumegroupv1.VolumeGroupList, error) {
 	logger.Info(messages.ListVolumeGroups)
 	vg := &volumegroupv1.VolumeGroupList{}
 	err := client.List(context.TODO(), vg)
 	if err != nil {
 		return volumegroupv1.VolumeGroupList{}, err
 	}
-	return *vg, nil
+	vgList, err := getProvisionedVGs(logger, client, vg, driver)
+	if err != nil {
+		return volumegroupv1.VolumeGroupList{}, err
+	}
+	return vgList, nil
 }
 
+func getProvisionedVGs(logger logr.Logger, client client.Client, vgList *volumegroupv1.VolumeGroupList,
+	driver string) (volumegroupv1.VolumeGroupList, error) {
+	newVgList := volumegroupv1.VolumeGroupList{}
+	for _, vg := range vgList.Items {
+		isVGHasMatchingDriver, err := isVGHasMatchingDriver(logger, client, vg, driver)
+		if err != nil {
+			return volumegroupv1.VolumeGroupList{}, err
+		}
+		if isVGHasMatchingDriver {
+			newVgList.Items = append(newVgList.Items, vg)
+		}
+	}
+	return newVgList, nil
+}
+
+func isVGHasMatchingDriver(logger logr.Logger, client client.Client, vg volumegroupv1.VolumeGroup,
+	driver string) (bool, error) {
+	vgClassDriver, err := getVGClassDriver(client, logger, *vg.Spec.VolumeGroupClassName)
+	if err != nil {
+		return false, err
+	}
+	return vgClassDriver == driver, nil
+}
 func IsPVCMatchesVG(logger logr.Logger, client client.Client,
 	pvc *corev1.PersistentVolumeClaim, vg volumegroupv1.VolumeGroup) (bool, error) {
 
@@ -166,7 +193,7 @@ func getVgId(logger logr.Logger, client client.Client, vg *volumegroupv1.VolumeG
 func AddPVCToVG(logger logr.Logger, client client.Client, pvc *corev1.PersistentVolumeClaim, vg *volumegroupv1.VolumeGroup) error {
 	logger.Info(fmt.Sprintf(messages.AddPersistentVolumeClaimToVolumeGroup,
 		pvc.Namespace, pvc.Name, vg.Namespace, vg.Name))
-	vg.Status.PVCList = appendPersistentVolumeClaim(vg.Status.PVCList, *pvc)
+	vg.Status.PVCList = AppendPVC(vg.Status.PVCList, *pvc)
 	err := updateVolumeGroupStatus(client, vg, logger)
 	if err != nil {
 		logger.Error(err, fmt.Sprintf(messages.FailedToAddPersistentVolumeClaimToVolumeGroup,
@@ -178,7 +205,7 @@ func AddPVCToVG(logger logr.Logger, client client.Client, pvc *corev1.Persistent
 	return nil
 }
 
-func appendPersistentVolumeClaim(pvcListInVG []corev1.PersistentVolumeClaim, pvc corev1.PersistentVolumeClaim) []corev1.PersistentVolumeClaim {
+func AppendPVC(pvcListInVG []corev1.PersistentVolumeClaim, pvc corev1.PersistentVolumeClaim) []corev1.PersistentVolumeClaim {
 	for _, pvcFromList := range pvcListInVG {
 		if pvcFromList.Name == pvc.Name && pvcFromList.Namespace == pvc.Namespace {
 			return pvcListInVG
