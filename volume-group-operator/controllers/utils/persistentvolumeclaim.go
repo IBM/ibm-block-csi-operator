@@ -71,3 +71,12 @@ func checkIfPVCCanBeAddedToVG(logger logr.Logger, pvc *corev1.PersistentVolumeCl
 	}
 	return nil
 }
+
+func IsPVCHasMatchingDriver(logger logr.Logger, client client.Client,
+	pvc *corev1.PersistentVolumeClaim, driver string) (bool, error) {
+	scProvisioner, err := getStorageClassProvisioner(logger, client, *pvc.Spec.StorageClassName)
+	if err != nil {
+		return false, err
+	}
+	return scProvisioner == driver, nil
+}

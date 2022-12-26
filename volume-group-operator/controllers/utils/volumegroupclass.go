@@ -18,12 +18,21 @@ package utils
 
 import (
 	"context"
+
 	volumegroupv1 "github.com/IBM/volume-group-operator/api/v1"
 	"github.com/go-logr/logr"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
+
+func getVGClassDriver(client client.Client, logger logr.Logger, vgcName string) (string, error) {
+	vgClass, err := GetVolumeGroupClass(client, logger, vgcName)
+	if err != nil {
+		return "", err
+	}
+	return vgClass.Driver, nil
+}
 
 func GetVolumeGroupClass(client client.Client, logger logr.Logger, vgcName string) (*volumegroupv1.VolumeGroupClass, error) {
 	vgcObj := &volumegroupv1.VolumeGroupClass{}
