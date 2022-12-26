@@ -13,4 +13,5 @@ const (
 	volumeGroupController                 = "volumeGroupController"
 	warningEventType                      = "Warning"
 	normalEventType                       = "Normal"
+	storageClassVGParameter               = "volume_group"
 )

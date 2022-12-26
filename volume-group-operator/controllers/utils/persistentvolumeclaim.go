@@ -80,3 +80,11 @@ func IsPVCHasMatchingDriver(logger logr.Logger, client client.Client,
 	}
 	return scProvisioner == driver, nil
 }
+
+func IsPVCInStaticVG(logger logr.Logger, client client.Client, pvc *corev1.PersistentVolumeClaim) (bool, error) {
+	sc, err := getStorageClass(logger, client, *pvc.Spec.StorageClassName)
+	if err != nil {
+		return false, err
+	}
+	return isSCHasParam(sc, storageClassVGParameter), nil
+}

@@ -38,13 +38,9 @@ func HandleSuccessMessage(logger logr.Logger, client client.Client, vg *volumegr
 
 func HandlePVCErrorMessage(logger logr.Logger, client client.Client, pvc *corev1.PersistentVolumeClaim,
 	err error, reason string) error {
-	if err != nil {
-		errorMessage := GetMessageFromError(err)
-		uErr := createNamespacedObjectErrorEvent(logger, client, pvc, errorMessage, reason)
-		if uErr != nil {
-			return uErr
-		}
-		return err
+	errorMessage := GetMessageFromError(err)
+	if uErr := createNamespacedObjectErrorEvent(logger, client, pvc, errorMessage, reason); uErr != nil {
+		return uErr
 	}
 	return nil
 }

@@ -88,6 +88,20 @@ func (r *PersistentVolumeClaimReconciler) isPVCNeedToBeHandled(reqLogger logr.Lo
 		reqLogger.Info(messages.PersistentVolumeClaimIsNotInBoundPhase)
 		return false, nil
 	}
+	isSCHasVGParam, err := utils.IsPVCInStaticVG(reqLogger, r.Client, pvc)
+	if err != nil {
+		return false, err
+	}
+	if isSCHasVGParam {
+		msg := fmt.Sprintf(messages.StorageClassHasVGParameter, *pvc.Spec.StorageClassName, pvc.Namespace, pvc.Name)
+		reqLogger.Info(msg)
+		mErr := fmt.Errorf(msg)
+		err = utils.HandlePVCErrorMessage(reqLogger, r.Client, pvc, mErr, addingPVC)
+		if err != nil {
+			return false, err
+		}
+		return false, nil
+	}
 	return true, nil
 }
 
@@ -221,7 +235,10 @@ func (r PersistentVolumeClaimReconciler) isPVCCanBeAddedToVG(logger logr.Logger,
 		return nil
 	}
 	err := utils.IsPVCCanBeAddedToVG(logger, r.Client, pvc, vgList.Items)
-	return utils.HandlePVCErrorMessage(logger, r.Client, pvc, err, addingPVC)
+	if hErr := utils.HandlePVCErrorMessage(logger, r.Client, pvc, err, addingPVC); hErr != nil {
+		return hErr
+	}
+	return err
 }
 
 func (r PersistentVolumeClaimReconciler) addVolumeToVolumeGroup(logger logr.Logger,
