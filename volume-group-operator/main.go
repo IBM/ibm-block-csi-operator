@@ -31,6 +31,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -99,7 +100,7 @@ func main() {
 	}).SetupWithManager(mgr, cfg)
 	exitWithError(err, "unable to create controller  with controller VolumeGroup")
 
-	err = (&persistentvolumeclaim.PersistentVolumeClaimWatcher{
+	err = (&persistentvolumeclaim.PersistentVolumeClaimReconciler{
 		Client:       mgr.GetClient(),
 		Scheme:       mgr.GetScheme(),
 		Log:          ctrl.Log.WithName(pvcController),
