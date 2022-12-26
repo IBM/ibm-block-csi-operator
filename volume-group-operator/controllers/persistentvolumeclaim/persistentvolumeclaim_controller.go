@@ -35,7 +35,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
-type PersistentVolumeClaimWatcher struct {
+type PersistentVolumeClaimReconciler struct {
 	Client            client.Client
 	Scheme            *runtime.Scheme
 	Log               logr.Logger
@@ -44,7 +44,7 @@ type PersistentVolumeClaimWatcher struct {
 	VolumeGroupClient grpcClient.VolumeGroup
 }
 
-func (r *PersistentVolumeClaimWatcher) Reconcile(_ context.Context, req reconcile.Request) (result reconcile.Result, err error) {
+func (r *PersistentVolumeClaimReconciler) Reconcile(_ context.Context, req reconcile.Request) (result reconcile.Result, err error) {
 	result = reconcile.Result{}
 	reqLogger := r.Log.WithValues(messages.RequestNamespace, req.Namespace, messages.RequestName, req.Name)
 	reqLogger.Info(messages.ReconcilePersistentVolumeClaim)
@@ -76,7 +76,7 @@ func (r *PersistentVolumeClaimWatcher) Reconcile(_ context.Context, req reconcil
 	return result, nil
 }
 
-func (r *PersistentVolumeClaimWatcher) isPVCNeedToBeHandled(reqLogger logr.Logger, pvc *corev1.PersistentVolumeClaim) (bool, error) {
+func (r *PersistentVolumeClaimReconciler) isPVCNeedToBeHandled(reqLogger logr.Logger, pvc *corev1.PersistentVolumeClaim) (bool, error) {
 	isPVCHasMatchingDriver, err := utils.IsPVCHasMatchingDriver(reqLogger, r.Client, pvc, r.DriverConfig.DriverName)
 	if err != nil {
 		return false, err
@@ -105,7 +105,7 @@ func (r *PersistentVolumeClaimWatcher) isPVCNeedToBeHandled(reqLogger logr.Logge
 	return true, nil
 }
 
-func (r PersistentVolumeClaimWatcher) removePersistentVolumeClaimFromVolumeGroupObjects(
+func (r PersistentVolumeClaimReconciler) removePersistentVolumeClaimFromVolumeGroupObjects(
 	logger logr.Logger, pvc *corev1.PersistentVolumeClaim) error {
 	vgList, err := utils.GetVGList(logger, r.Client, r.DriverConfig.DriverName)
 	if err != nil {
@@ -139,14 +139,14 @@ func (r PersistentVolumeClaimWatcher) removePersistentVolumeClaimFromVolumeGroup
 	return nil
 }
 
-func (r PersistentVolumeClaimWatcher) addSuccessRemoveEvent(logger logr.Logger,
+func (r PersistentVolumeClaimReconciler) addSuccessRemoveEvent(logger logr.Logger,
 	pvc *corev1.PersistentVolumeClaim, vg *csiv1.VolumeGroup) error {
 	message := fmt.Sprintf(messages.RemovedPersistentVolumeClaimFromVolumeGroup,
 		pvc.Namespace, pvc.Name, vg.Namespace, vg.Name)
 	return utils.HandleSuccessMessage(logger, r.Client, vg, message, removingPVC)
 }
 
-func (r PersistentVolumeClaimWatcher) removeVolumeFromVolumeGroup(logger logr.Logger,
+func (r PersistentVolumeClaimReconciler) removeVolumeFromVolumeGroup(logger logr.Logger,
 	pvc *corev1.PersistentVolumeClaim, vg *csiv1.VolumeGroup) error {
 	logger.Info(fmt.Sprintf(messages.RemoveVolumeFromVolumeGroup, vg.Namespace, vg.Name))
 	vg.Status.PVCList = utils.RemoveFromPVCList(pvc, vg.Status.PVCList)
@@ -159,7 +159,7 @@ func (r PersistentVolumeClaimWatcher) removeVolumeFromVolumeGroup(logger logr.Lo
 	return nil
 }
 
-func (r PersistentVolumeClaimWatcher) removeVolumeFromPvcListAndPvList(logger logr.Logger,
+func (r PersistentVolumeClaimReconciler) removeVolumeFromPvcListAndPvList(logger logr.Logger,
 	pvc *corev1.PersistentVolumeClaim, vg csiv1.VolumeGroup) error {
 	err := utils.RemovePVCFromVG(logger, r.Client, pvc, &vg)
 	if err != nil {
@@ -184,7 +184,7 @@ func (r PersistentVolumeClaimWatcher) removeVolumeFromPvcListAndPvList(logger lo
 	return r.removePersistentVolumeClaimFinalizer(logger, pvc)
 }
 
-func (r PersistentVolumeClaimWatcher) removePersistentVolumeClaimFinalizer(logger logr.Logger,
+func (r PersistentVolumeClaimReconciler) removePersistentVolumeClaimFinalizer(logger logr.Logger,
 	pvc *corev1.PersistentVolumeClaim) error {
 	vgList, err := utils.GetVGList(logger, r.Client, r.DriverConfig.DriverName)
 	if err != nil {
@@ -197,7 +197,7 @@ func (r PersistentVolumeClaimWatcher) removePersistentVolumeClaimFinalizer(logge
 	return nil
 }
 
-func (r PersistentVolumeClaimWatcher) addPersistentVolumeClaimToVolumeGroupObjects(
+func (r PersistentVolumeClaimReconciler) addPersistentVolumeClaimToVolumeGroupObjects(
 	logger logr.Logger, pvc *corev1.PersistentVolumeClaim) error {
 	var err error
 	vgList, err := utils.GetVGList(logger, r.Client, r.DriverConfig.DriverName)
@@ -229,7 +229,7 @@ func (r PersistentVolumeClaimWatcher) addPersistentVolumeClaimToVolumeGroupObjec
 	return nil
 }
 
-func (r PersistentVolumeClaimWatcher) isPVCCanBeAddedToVG(logger logr.Logger, pvc *corev1.PersistentVolumeClaim,
+func (r PersistentVolumeClaimReconciler) isPVCCanBeAddedToVG(logger logr.Logger, pvc *corev1.PersistentVolumeClaim,
 	vgList csiv1.VolumeGroupList) error {
 	if r.DriverConfig.MultipleVGsToPVC == "true" {
 		return nil
@@ -241,7 +241,7 @@ func (r PersistentVolumeClaimWatcher) isPVCCanBeAddedToVG(logger logr.Logger, pv
 	return err
 }
 
-func (r PersistentVolumeClaimWatcher) addVolumeToVolumeGroup(logger logr.Logger,
+func (r PersistentVolumeClaimReconciler) addVolumeToVolumeGroup(logger logr.Logger,
 	pvc *corev1.PersistentVolumeClaim, vg *csiv1.VolumeGroup) error {
 	logger.Info(fmt.Sprintf(messages.AddVolumeToVolumeGroup, vg.Namespace, vg.Name))
 	vg.Status.PVCList = utils.AppendPVC(vg.Status.PVCList, *pvc)
@@ -254,7 +254,7 @@ func (r PersistentVolumeClaimWatcher) addVolumeToVolumeGroup(logger logr.Logger,
 	return nil
 }
 
-func (r PersistentVolumeClaimWatcher) addVolumeToPvcListAndPvList(logger logr.Logger,
+func (r PersistentVolumeClaimReconciler) addVolumeToPvcListAndPvList(logger logr.Logger,
 	pvc *corev1.PersistentVolumeClaim, vg *csiv1.VolumeGroup) error {
 	err := utils.AddPVCToVG(logger, r.Client, pvc, vg)
 	if err != nil {
@@ -273,13 +273,13 @@ func (r PersistentVolumeClaimWatcher) addVolumeToPvcListAndPvList(logger logr.Lo
 	return r.addSuccessAddEvent(logger, pvc, vg)
 }
 
-func (r PersistentVolumeClaimWatcher) addSuccessAddEvent(logger logr.Logger,
+func (r PersistentVolumeClaimReconciler) addSuccessAddEvent(logger logr.Logger,
 	pvc *corev1.PersistentVolumeClaim, vg *csiv1.VolumeGroup) error {
 	message := fmt.Sprintf(messages.AddedPersistentVolumeClaimToVolumeGroup, pvc.Namespace, pvc.Name, vg.Namespace, vg.Name)
 	return utils.HandleSuccessMessage(logger, r.Client, vg, message, addingPVC)
 }
 
-func (r *PersistentVolumeClaimWatcher) SetupWithManager(mgr ctrl.Manager, cfg *config.DriverConfig) error {
+func (r *PersistentVolumeClaimReconciler) SetupWithManager(mgr ctrl.Manager, cfg *config.DriverConfig) error {
 	r.VolumeGroupClient = grpcClient.NewVolumeGroupClient(r.GRPCClient.Client, cfg.RPCTimeout)
 
 	return ctrl.NewControllerManagedBy(mgr).
