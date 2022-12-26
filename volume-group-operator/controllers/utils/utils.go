@@ -20,8 +20,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-func removeByIndexFromPersistentVolumeClaimList(pvcList []corev1.PersistentVolumeClaim,
-	index int) []corev1.PersistentVolumeClaim {
+func removeByIndexFromPVCList(pvcList []corev1.PersistentVolumeClaim, index int) []corev1.PersistentVolumeClaim {
 	return append(pvcList[:index], pvcList[index+1:]...)
 }
 

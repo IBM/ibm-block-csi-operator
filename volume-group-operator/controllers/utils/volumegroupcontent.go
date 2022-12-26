@@ -110,7 +110,7 @@ func generateVolumeGroupContentSource(vgcObj *volumegroupv1.VolumeGroupClass, re
 func RemovePVFromVGC(logger logr.Logger, client client.Client, pv *corev1.PersistentVolume, vgc *volumegroupv1.VolumeGroupContent) error {
 	logger.Info(fmt.Sprintf(messages.RemovePersistentVolumeFromVolumeGroupContent,
 		pv.Namespace, pv.Name, vgc.Namespace, vgc.Name))
-	vgc.Status.PVList = removePersistentVolumeFromVolumeGroupContentPVList(pv, vgc.Status.PVList)
+	vgc.Status.PVList = removeFromPVList(pv, vgc.Status.PVList)
 	err := client.Status().Update(context.TODO(), vgc)
 	if err != nil {
 		logger.Error(err, fmt.Sprintf(messages.FailedToRemovePersistentVolumeFromVolumeGroupContent,
@@ -122,8 +122,7 @@ func RemovePVFromVGC(logger logr.Logger, client client.Client, pv *corev1.Persis
 	return nil
 }
 
-func removePersistentVolumeFromVolumeGroupContentPVList(pv *corev1.PersistentVolume,
-	pvListInVGC []corev1.PersistentVolume) []corev1.PersistentVolume {
+func removeFromPVList(pv *corev1.PersistentVolume, pvListInVGC []corev1.PersistentVolume) []corev1.PersistentVolume {
 	for index, pvcFromList := range pvListInVGC {
 		if pvcFromList.Name == pv.Name && pvcFromList.Namespace == pv.Namespace {
 			pvListInVGC = removeByIndexFromPersistentVolumeList(pvListInVGC, index)
