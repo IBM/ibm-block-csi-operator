@@ -88,12 +88,12 @@ func (r *PersistentVolumeClaimReconciler) isPVCNeedToBeHandled(reqLogger logr.Lo
 		reqLogger.Info(messages.PersistentVolumeClaimIsNotInBoundPhase)
 		return false, nil
 	}
-	IsSCHasVGParam, err := utils.IsPVCInStaticVG(reqLogger, r.Client, pvc)
+	isSCHasVGParam, err := utils.IsPVCInStaticVG(reqLogger, r.Client, pvc)
 	if err != nil {
 		return false, err
 	}
-	if IsSCHasVGParam {
-		msg := fmt.Sprintf(messages.StorageClassHasVGParameter, pvc.Namespace, pvc.Name)
+	if isSCHasVGParam {
+		msg := fmt.Sprintf(messages.StorageClassHasVGParameter, *pvc.Spec.StorageClassName, pvc.Namespace, pvc.Name)
 		reqLogger.Info(msg)
 		mErr := fmt.Errorf(msg)
 		err = utils.HandlePVCErrorMessage(reqLogger, r.Client, pvc, mErr, addingPVC)

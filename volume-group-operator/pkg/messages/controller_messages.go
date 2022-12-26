@@ -50,5 +50,5 @@ var (
 	AddVolumeToVolumeGroup                           = "Adding volume of persistentVolumeClaim to %s/%s volumeGroup"
 	AddedVolumeToVolumeGroup                         = "Successfully added volume of persistentVolumeClaim to %s/%s volumeGroup"
 	PersistentVolumeClaimIsNotInBoundPhase           = "PersistentVolumeClaim is not in bound phase, stopping the reconcile, when it will be in bound phase, reconcile will continue"
-	StorageClassHasVGParameter                       = "StorageClass contain parameter volume_group for claim %s/%s. volumegroup feature is not supported"
+	StorageClassHasVGParameter                       = "StorageClass %s contain parameter volume_group for claim %s/%s. volumegroup feature is not supported"
 )
