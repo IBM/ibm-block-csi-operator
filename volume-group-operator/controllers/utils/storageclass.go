@@ -19,6 +19,12 @@ func getStorageClassProvisioner(logger logr.Logger, client client.Client, scName
 	return sc.Provisioner, nil
 }
 
+func isSCHasParam(sc *storagev1.StorageClass, param string) bool {
+	scParams := sc.Parameters
+	_, ok := scParams[param]
+	return ok
+}
+
 func getStorageClass(logger logr.Logger, client client.Client, scName string) (*storagev1.StorageClass, error) {
 	sc := &storagev1.StorageClass{}
 	err := client.Get(context.TODO(), types.NamespacedName{Name: scName}, sc)
