@@ -179,6 +179,10 @@ func (r *VolumeGroupReconciler) removeInstance(logger logr.Logger, instance *vol
 	if err = utils.RemoveFinalizerFromVG(r.Client, logger, instance); err != nil {
 		return err
 	}
+
+	if err = utils.RemoveFinalizerFromPVCs(r.Client, logger, instance); err != nil {
+		return err
+	}
 	return nil
 }
 
