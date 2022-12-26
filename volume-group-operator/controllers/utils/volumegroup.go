@@ -99,14 +99,14 @@ func GetVGList(logger logr.Logger, client client.Client, driver string) (volumeg
 	if err != nil {
 		return volumegroupv1.VolumeGroupList{}, err
 	}
-	vgList, err := removeNotMatchingVGs(logger, client, vg, driver)
+	vgList, err := getRelevantVGs(logger, client, vg, driver)
 	if err != nil {
 		return volumegroupv1.VolumeGroupList{}, err
 	}
 	return vgList, nil
 }
 
-func removeNotMatchingVGs(logger logr.Logger, client client.Client, vgList *volumegroupv1.VolumeGroupList,
+func getRelevantVGs(logger logr.Logger, client client.Client, vgList *volumegroupv1.VolumeGroupList,
 	driver string) (volumegroupv1.VolumeGroupList, error) {
 	newVgList := volumegroupv1.VolumeGroupList{}
 	for _, vg := range vgList.Items {
