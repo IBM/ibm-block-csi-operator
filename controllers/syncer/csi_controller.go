@@ -217,7 +217,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 
 	volumegroup := s.ensureContainer(volumeGroupContainerName,
 		s.getCSIVolumeGroupImage(),
-		[]string{driverNameFlag, "--csi-address=$(ADDRESS)", "--rpc-timeout=30s"})
+		[]string{driverNameFlag, "--csi-address=$(ADDRESS)", "--rpc-timeout=30s", "--multiple-vgs-to-pvc=false"})
 	volumegroup.ImagePullPolicy = s.getCSIVolumeGroupPullPolicy()
 
 	healthPortArg := fmt.Sprintf("--health-port=%v", healthPort)
