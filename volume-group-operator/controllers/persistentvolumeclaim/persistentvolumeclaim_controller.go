@@ -172,7 +172,7 @@ func (r PersistentVolumeClaimWatcher) removeVolumeFromPvcListAndPvList(logger lo
 
 func (r PersistentVolumeClaimWatcher) removePersistentVolumeClaimFinalizer(logger logr.Logger,
 	pvc *corev1.PersistentVolumeClaim) error {
-	vgList, err := utils.GetVGList(logger, r.Client)
+	vgList, err := utils.GetVGList(logger, r.Client, r.DriverConfig.DriverName)
 	if err != nil {
 		return err
 	}
