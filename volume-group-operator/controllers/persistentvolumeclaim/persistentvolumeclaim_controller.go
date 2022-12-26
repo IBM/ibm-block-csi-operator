@@ -55,21 +55,40 @@ func (r *PersistentVolumeClaimWatcher) Reconcile(_ context.Context, req reconcil
 		}
 		return result, err
 	}
-	if pvc.Status.Phase != corev1.ClaimBound {
-		reqLogger.Info(messages.PersistentVolumeClaimIsNotInBoundPhase)
+
+	isPVCNeedToBeHandled, err := r.isPVCNeedToBeHandled(reqLogger, pvc)
+	if err != nil {
+		return result, err
+	}
+	if !isPVCNeedToBeHandled {
 		return result, nil
 	}
+
 	err = r.removePersistentVolumeClaimFromVolumeGroupObjects(reqLogger, pvc)
 	if err != nil {
 		return result, err
 	}
-
 	err = r.addPersistentVolumeClaimToVolumeGroupObjects(reqLogger, pvc)
 	if err != nil {
 		return result, err
 	}
 
 	return result, nil
+}
+
+func (r *PersistentVolumeClaimWatcher) isPVCNeedToBeHandled(reqLogger logr.Logger, pvc *corev1.PersistentVolumeClaim) (bool, error) {
+	isPVCHasMatchingDriver, err := utils.IsPVCHasMatchingDriver(reqLogger, r.Client, pvc, r.DriverConfig.DriverName)
+	if err != nil {
+		return false, err
+	}
+	if !isPVCHasMatchingDriver {
+		return false, nil
+	}
+	if pvc.Status.Phase != corev1.ClaimBound {
+		reqLogger.Info(messages.PersistentVolumeClaimIsNotInBoundPhase)
+		return false, nil
+	}
+	return true, nil
 }
 
 func (r PersistentVolumeClaimWatcher) removePersistentVolumeClaimFromVolumeGroupObjects(
