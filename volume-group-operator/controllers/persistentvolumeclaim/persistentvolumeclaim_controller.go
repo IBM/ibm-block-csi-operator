@@ -111,7 +111,7 @@ func (r PersistentVolumeClaimWatcher) addSuccessRemoveEvent(logger logr.Logger,
 func (r PersistentVolumeClaimWatcher) removeVolumeFromVolumeGroup(logger logr.Logger,
 	pvc *corev1.PersistentVolumeClaim, vg *csiv1.VolumeGroup) error {
 	logger.Info(fmt.Sprintf(messages.RemoveVolumeFromVolumeGroup, vg.Namespace, vg.Name))
-	vg.Status.PVCList = utils.RemovePVCFromVGPVCList(pvc, vg.Status.PVCList)
+	vg.Status.PVCList = utils.RemoveFromPVCList(pvc, vg.Status.PVCList)
 
 	err := utils.ModifyVolumeGroup(logger, r.Client, vg, r.VolumeGroupClient)
 	if err != nil {
