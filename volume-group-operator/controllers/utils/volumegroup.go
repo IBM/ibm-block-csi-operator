@@ -124,7 +124,7 @@ func IsPVCMatchesVG(logger logr.Logger, client client.Client,
 func RemovePVCFromVG(logger logr.Logger, client client.Client, pvc *corev1.PersistentVolumeClaim, vg *volumegroupv1.VolumeGroup) error {
 	logger.Info(fmt.Sprintf(messages.RemovePersistentVolumeClaimFromVolumeGroup,
 		pvc.Namespace, pvc.Name, vg.Namespace, vg.Name))
-	vg.Status.PVCList = RemovePVCFromVGPVCList(pvc, vg.Status.PVCList)
+	vg.Status.PVCList = RemoveFromPVCList(pvc, vg.Status.PVCList)
 	err := client.Status().Update(context.TODO(), vg)
 	if err != nil {
 		logger.Error(err, fmt.Sprintf(messages.FailedToRemovePersistentVolumeClaimFromVolumeGroup,
@@ -136,15 +136,14 @@ func RemovePVCFromVG(logger logr.Logger, client client.Client, pvc *corev1.Persi
 	return nil
 }
 
-func RemovePVCFromVGPVCList(pvc *corev1.PersistentVolumeClaim,
-	pvcListInVG []corev1.PersistentVolumeClaim) []corev1.PersistentVolumeClaim {
-	for index, pvcFromList := range pvcListInVG {
+func RemoveFromPVCList(pvc *corev1.PersistentVolumeClaim, pvcList []corev1.PersistentVolumeClaim) []corev1.PersistentVolumeClaim {
+	for index, pvcFromList := range pvcList {
 		if pvcFromList.Name == pvc.Name && pvcFromList.Namespace == pvc.Namespace {
-			pvcListInVG = removeByIndexFromPersistentVolumeClaimList(pvcListInVG, index)
-			return pvcListInVG
+			pvcList = removeByIndexFromPVCList(pvcList, index)
+			return pvcList
 		}
 	}
-	return pvcListInVG
+	return pvcList
 }
 
 func getVgId(logger logr.Logger, client client.Client, vg *volumegroupv1.VolumeGroup) (string, error) {
@@ -189,8 +188,8 @@ func IsPVCPartAnyVG(pvc *corev1.PersistentVolumeClaim, vgs []volumegroupv1.Volum
 	return false
 }
 
-func IsPVCPartOfVG(pvc *corev1.PersistentVolumeClaim, pvcListInVG []corev1.PersistentVolumeClaim) bool {
-	for _, pvcFromList := range pvcListInVG {
+func IsPVCPartOfVG(pvc *corev1.PersistentVolumeClaim, pvcList []corev1.PersistentVolumeClaim) bool {
+	for _, pvcFromList := range pvcList {
 		if pvcFromList.Name == pvc.Name && pvcFromList.Namespace == pvc.Namespace {
 			return true
 		}
