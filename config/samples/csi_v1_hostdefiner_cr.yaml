@@ -14,7 +14,7 @@ spec:
 #    connectivityType:             # Optional. Values nvme/fc/iscsi. The default is chosen dynamically.
 #    allowDelete: true             # Optional. Values true/false. The default is true.
 #    dynamicNodeLabeling: false    # Optional. Values true/false. The default is false.
-    repository: ibmcom/ibm-block-csi-host-definer
+    repository: quay.io/ibmcsiblock/ibm-block-csi-host-definer
     tag: "1.11.0"
     imagePullPolicy: IfNotPresent
     affinity:

@@ -23,7 +23,7 @@ metadata:
           },
           "spec": {
             "controller": {
-              "repository": "ibmcom/ibm-block-csi-driver-controller",
+              "repository": "quay.io/ibmcsiblock/ibm-block-csi-driver-controller",
               "tag": "1.11.0",
               "imagePullPolicy": "IfNotPresent",
               "affinity": {
@@ -47,7 +47,7 @@ metadata:
               }
             },
             "node": {
-              "repository": "ibmcom/ibm-block-csi-driver-node",
+              "repository": "quay.io/ibmcsiblock/ibm-block-csi-driver-node",
               "tag": "1.11.0",
               "imagePullPolicy": "IfNotPresent",
               "affinity": {
@@ -144,7 +144,7 @@ metadata:
             "hostDefiner": {
               "allowDelete": true,
               "dynamicNodeLabeling": false,
-              "repository": "ibmcom/ibm-block-csi-host-definer",
+              "repository": "quay.io/ibmcsiblock/ibm-block-csi-host-definer",
               "tag": "1.11.0",
               "imagePullPolicy": "IfNotPresent",
               "affinity": {
