@@ -11,7 +11,7 @@ metadata:
     capabilities: "Seamless Upgrades"
     categories: "Storage,Cloud Provider"
     certified: "true"
-    containerImage: ibmcom/ibm-block-csi-operator:1.11.0
+    containerImage: quay.io/ibmcsiblock/ibm-block-csi-operator:1.11.0
     createdAt: "2022-03-31T11:00:00Z"
     description: "Run IBM block storage CSI driver."
     repository: https://github.com/IBM/ibm-block-csi-operator
@@ -194,7 +194,7 @@ spec:
     - CSI
   relatedImages:
     - name: ibm-block-csi-operator
-      image: ibmcom/ibm-block-csi-operator:1.11.0
+      image: quay.io/ibmcsiblock/ibm-block-csi-operator:1.11.0
   version: 1.11.0
   replaces: ibm-block-csi-operator.v1.10.0
   maturity: stable
@@ -657,7 +657,7 @@ spec:
                       capabilities:
                         drop:
                           - ALL
-                    image: ibmcom/ibm-block-csi-operator:1.11.0
+                    image: quay.io/ibmcsiblock/ibm-block-csi-operator:1.11.0
                     imagePullPolicy: IfNotPresent
                     command:
                       - ibm-block-csi-operator
