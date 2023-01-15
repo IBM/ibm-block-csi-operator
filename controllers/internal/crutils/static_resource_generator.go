@@ -32,6 +32,7 @@ const (
 	storageApiGroup                          string = "storage.k8s.io"
 	rbacAuthorizationApiGroup                string = "rbac.authorization.k8s.io"
 	replicationStorageOpenshiftApiGroup      string = "replication.storage.openshift.io"
+	csiAddonsApiGroup                        string = "csiaddons.openshift.io"
 	storageClassesResource                   string = "storageclasses"
 	persistentVolumesResource                string = "persistentvolumes"
 	persistentVolumeClaimsResource           string = "persistentvolumeclaims"
@@ -394,62 +395,62 @@ func (c *IBMBlockCSI) GenerateCSIAddonsReplicatorClusterRole() *rbacv1.ClusterRo
 				Verbs:     []string{verbGet},
 			},
 			{
-				APIGroups: []string{replicationStorageOpenshiftApiGroup},
+				APIGroups: []string{csiAddonsApiGroup},
 				Resources: []string{csiAddonsNodesResource},
 				Verbs:     []string{verbCreate, verbDelete, verbGet, verbList, verbPatch, verbUpdate, verbWatch},
 			},
 			{
-				APIGroups: []string{replicationStorageOpenshiftApiGroup},
+				APIGroups: []string{csiAddonsApiGroup},
 				Resources: []string{csiAddonsNodesFinalizersResource},
 				Verbs:     []string{verbUpdate},
 			},
 			{
-				APIGroups: []string{replicationStorageOpenshiftApiGroup},
+				APIGroups: []string{csiAddonsApiGroup},
 				Resources: []string{csiAddonsNodesStatusResource},
 				Verbs:     []string{verbGet, verbPatch, verbUpdate},
 			},
 			{
-				APIGroups: []string{replicationStorageOpenshiftApiGroup},
+				APIGroups: []string{csiAddonsApiGroup},
 				Resources: []string{networkFencesResource},
 				Verbs:     []string{verbCreate, verbDelete, verbGet, verbList, verbPatch, verbUpdate, verbWatch},
 			},
 			{
-				APIGroups: []string{replicationStorageOpenshiftApiGroup},
+				APIGroups: []string{csiAddonsApiGroup},
 				Resources: []string{networkFencesFinalizersResource},
 				Verbs:     []string{verbUpdate},
 			},
 			{
-				APIGroups: []string{replicationStorageOpenshiftApiGroup},
+				APIGroups: []string{csiAddonsApiGroup},
 				Resources: []string{networkFencesStatusResource},
 				Verbs:     []string{verbGet, verbPatch, verbUpdate},
 			},
 			{
-				APIGroups: []string{replicationStorageOpenshiftApiGroup},
+				APIGroups: []string{csiAddonsApiGroup},
 				Resources: []string{reclaimSpaceCronJobsResource},
 				Verbs:     []string{verbCreate, verbDelete, verbGet, verbList, verbPatch, verbUpdate, verbWatch},
 			},
 			{
-				APIGroups: []string{replicationStorageOpenshiftApiGroup},
+				APIGroups: []string{csiAddonsApiGroup},
 				Resources: []string{reclaimSpaceCronJobsFinalizersResource},
 				Verbs:     []string{verbUpdate},
 			},
 			{
-				APIGroups: []string{replicationStorageOpenshiftApiGroup},
+				APIGroups: []string{csiAddonsApiGroup},
 				Resources: []string{reclaimSpaceCronJobsStatusResource},
 				Verbs:     []string{verbGet, verbPatch, verbUpdate},
 			},
 			{
-				APIGroups: []string{replicationStorageOpenshiftApiGroup},
+				APIGroups: []string{csiAddonsApiGroup},
 				Resources: []string{reclaimSpaceJobsResource},
 				Verbs:     []string{verbCreate, verbDelete, verbGet, verbList, verbPatch, verbUpdate, verbWatch},
 			},
 			{
-				APIGroups: []string{replicationStorageOpenshiftApiGroup},
+				APIGroups: []string{csiAddonsApiGroup},
 				Resources: []string{reclaimSpaceJobsFinalizersResource},
 				Verbs:     []string{verbUpdate},
 			},
 			{
-				APIGroups: []string{replicationStorageOpenshiftApiGroup},
+				APIGroups: []string{csiAddonsApiGroup},
 				Resources: []string{reclaimSpaceJobsStatusResource},
 				Verbs:     []string{verbGet, verbPatch, verbUpdate},
 			},
