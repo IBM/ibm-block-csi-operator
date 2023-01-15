@@ -76,48 +76,60 @@ type IBMBlockCSIReconciler struct {
 }
 
 // the rbac rule requires an empty row at the end to render
-//+kubebuilder:rbac:groups="",resources=pods,verbs=get;delete;list;watch
-//+kubebuilder:rbac:groups="",resources=configmaps,verbs=get;create;delete
-//+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch
-//+kubebuilder:rbac:groups="",resources=persistentvolumeclaims,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups="",resources=persistentvolumeclaims/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups="",resources=persistentvolumeclaims/finalizers,verbs=update
-//+kubebuilder:rbac:groups="",resources=persistentvolumes,verbs=get;delete;list;watch;update;create;patch
-//+kubebuilder:rbac:groups="",resources=events,verbs=*
-//+kubebuilder:rbac:groups="",resources=nodes,verbs=get;list;watch
-//+kubebuilder:rbac:groups=apps,resources=deployments;daemonsets;statefulsets,verbs=get;list;watch;update;create;delete
-//+kubebuilder:rbac:groups="",resources=serviceaccounts,verbs=create;delete;get;watch;list
-//+kubebuilder:rbac:groups=rbac.authorization.k8s.io,resources=clusterroles;clusterrolebindings,verbs=create;delete;get;watch;list;update
-//+kubebuilder:rbac:groups=storage.k8s.io,resources=volumeattachments,verbs=get;list;watch;update;patch
-//+kubebuilder:rbac:groups=storage.k8s.io,resources=volumeattachments/status,verbs=patch
-//+kubebuilder:rbac:groups=storage.k8s.io,resources=storageclasses,verbs=get;list;watch
-//+kubebuilder:rbac:groups=monitoring.coreos.com,resources=servicemonitors,verbs=get;create
-//+kubebuilder:rbac:groups=apps,resourceNames=ibm-block-csi-operator,resources=deployments/finalizers,verbs=update
-//+kubebuilder:rbac:groups=storage.k8s.io,resources=csidrivers,verbs=create;delete;get;watch;list
-//+kubebuilder:rbac:groups=storage.k8s.io,resources=csinodes,verbs=get;list;watch
-//+kubebuilder:rbac:groups=security.openshift.io,resourceNames=anyuid;privileged,resources=securitycontextconstraints,verbs=use
-//+kubebuilder:rbac:groups=apiextensions.k8s.io,resources=customresourcedefinitions,verbs=create;list;watch;delete
-//+kubebuilder:rbac:groups=csi.ibm.com,resources=*,verbs=*
-//+kubebuilder:rbac:groups=snapshot.storage.k8s.io,resources=volumesnapshotclasses,verbs=get;watch;list
-//+kubebuilder:rbac:groups=snapshot.storage.k8s.io,resources=volumesnapshotcontents,verbs=get;watch;list;create;update;delete
-//+kubebuilder:rbac:groups=snapshot.storage.k8s.io,resources=volumesnapshotcontents/status,verbs=update
-//+kubebuilder:rbac:groups=snapshot.storage.k8s.io,resources=volumesnapshots,verbs=get;watch;list;update
-//+kubebuilder:rbac:groups=replication.storage.openshift.io,resources=volumereplicationclasses,verbs=get;list;watch
-//+kubebuilder:rbac:groups=replication.storage.openshift.io,resources=volumereplications,verbs=create;delete;get;list;patch;update;watch
-//+kubebuilder:rbac:groups=replication.storage.openshift.io,resources=volumereplications/finalizers,verbs=update
-//+kubebuilder:rbac:groups=replication.storage.openshift.io,resources=volumereplications/status,verbs=get;patch;update
-//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=csiaddonsnodes,verbs=create;delete;get;list;patch;update;watch
-//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=csiaddonsnodes/finalizers,verbs=update
-//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=csiaddonsnodes/status,verbs=get;patch;update
-//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=networkfences,verbs=create;delete;get;list;patch;update;watch
-//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=networkfences/finalizers,verbs=update
-//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=networkfences/status,verbs=get;patch;update
-//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=reclaimspacecronjobs,verbs=create;delete;get;list;patch;update;watch
-//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=reclaimspacecronjobs/finalizers,verbs=update
-//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=reclaimspacecronjobs/status,verbs=get;patch;update
-//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=reclaimspacejobs,verbs=create;delete;get;list;patch;update;watch
-//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=reclaimspacejobs/finalizers,verbs=update
-//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=reclaimspacejobs/status,verbs=get;patch;update
+// +kubebuilder:rbac:groups="",resources=pods,verbs=get;delete;list;watch
+// +kubebuilder:rbac:groups="",resources=configmaps,verbs=get;create;delete
+// +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch
+// +kubebuilder:rbac:groups="",resources=persistentvolumeclaims,verbs=get;list;watch;update;patch
+// +kubebuilder:rbac:groups="",resources=persistentvolumeclaims/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups="",resources=persistentvolumeclaims/finalizers,verbs=update
+// +kubebuilder:rbac:groups="",resources=persistentvolumes,verbs=get;delete;list;watch;update;create;patch
+// +kubebuilder:rbac:groups="",resources=events,verbs=*
+// +kubebuilder:rbac:groups="",resources=nodes,verbs=get;list;watch
+// +kubebuilder:rbac:groups=apps,resources=deployments;daemonsets;statefulsets,verbs=get;list;watch;update;create;delete
+// +kubebuilder:rbac:groups="",resources=serviceaccounts,verbs=create;delete;get;watch;list
+// +kubebuilder:rbac:groups=rbac.authorization.k8s.io,resources=clusterroles;clusterrolebindings,verbs=create;delete;get;watch;list;update
+// +kubebuilder:rbac:groups=storage.k8s.io,resources=volumeattachments,verbs=get;list;watch;update;patch
+// +kubebuilder:rbac:groups=storage.k8s.io,resources=volumeattachments/status,verbs=patch
+// +kubebuilder:rbac:groups=storage.k8s.io,resources=storageclasses,verbs=get;list;watch
+// +kubebuilder:rbac:groups=monitoring.coreos.com,resources=servicemonitors,verbs=get;create
+// +kubebuilder:rbac:groups=apps,resourceNames=ibm-block-csi-operator,resources=deployments/finalizers,verbs=update
+// +kubebuilder:rbac:groups=storage.k8s.io,resources=csidrivers,verbs=create;delete;get;watch;list
+// +kubebuilder:rbac:groups=storage.k8s.io,resources=csinodes,verbs=get;list;watch
+// +kubebuilder:rbac:groups=security.openshift.io,resourceNames=anyuid;privileged,resources=securitycontextconstraints,verbs=use
+// +kubebuilder:rbac:groups=apiextensions.k8s.io,resources=customresourcedefinitions,verbs=create;list;watch;delete
+// +kubebuilder:rbac:groups=csi.ibm.com,resources=*,verbs=*
+// +kubebuilder:rbac:groups=snapshot.storage.k8s.io,resources=volumesnapshotclasses,verbs=get;watch;list
+// +kubebuilder:rbac:groups=snapshot.storage.k8s.io,resources=volumesnapshotcontents,verbs=get;watch;list;create;update;delete
+// +kubebuilder:rbac:groups=snapshot.storage.k8s.io,resources=volumesnapshotcontents/status,verbs=update
+// +kubebuilder:rbac:groups=snapshot.storage.k8s.io,resources=volumesnapshots,verbs=get;watch;list;update
+// +kubebuilder:rbac:groups=replication.storage.openshift.io,resources=volumereplicationclasses,verbs=get;list;watch
+// +kubebuilder:rbac:groups=replication.storage.openshift.io,resources=volumereplications,verbs=create;delete;get;list;patch;update;watch
+// +kubebuilder:rbac:groups=replication.storage.openshift.io,resources=volumereplications/finalizers,verbs=update
+// +kubebuilder:rbac:groups=replication.storage.openshift.io,resources=volumereplications/status,verbs=get;patch;update
+// +kubebuilder:rbac:groups=replication.storage.openshift.io,resources=csiaddonsnodes,verbs=create;delete;get;list;patch;update;watch
+// +kubebuilder:rbac:groups=replication.storage.openshift.io,resources=csiaddonsnodes/finalizers,verbs=update
+// +kubebuilder:rbac:groups=replication.storage.openshift.io,resources=csiaddonsnodes/status,verbs=get;patch;update
+// +kubebuilder:rbac:groups=replication.storage.openshift.io,resources=networkfences,verbs=create;delete;get;list;patch;update;watch
+// +kubebuilder:rbac:groups=replication.storage.openshift.io,resources=networkfences/finalizers,verbs=update
+// +kubebuilder:rbac:groups=replication.storage.openshift.io,resources=networkfences/status,verbs=get;patch;update
+// +kubebuilder:rbac:groups=replication.storage.openshift.io,resources=reclaimspacecronjobs,verbs=create;delete;get;list;patch;update;watch
+// +kubebuilder:rbac:groups=replication.storage.openshift.io,resources=reclaimspacecronjobs/finalizers,verbs=update
+// +kubebuilder:rbac:groups=replication.storage.openshift.io,resources=reclaimspacecronjobs/status,verbs=get;patch;update
+// +kubebuilder:rbac:groups=replication.storage.openshift.io,resources=reclaimspacejobs,verbs=create;delete;get;list;patch;update;watch
+// +kubebuilder:rbac:groups=replication.storage.openshift.io,resources=reclaimspacejobs/finalizers,verbs=update
+// +kubebuilder:rbac:groups=replication.storage.openshift.io,resources=reclaimspacejobs/status,verbs=get;patch;update
+// +kubebuilder:rbac:groups=csiaddons.openshift.io,resources=csiaddonsnodes,verbs=create;delete;get;list;patch;update;watch
+// +kubebuilder:rbac:groups=csiaddons.openshift.io,resources=csiaddonsnodes/finalizers,verbs=update
+// +kubebuilder:rbac:groups=csiaddons.openshift.io,resources=csiaddonsnodes/status,verbs=get;patch;update
+// +kubebuilder:rbac:groups=csiaddons.openshift.io,resources=networkfences,verbs=create;delete;get;list;patch;update;watch
+// +kubebuilder:rbac:groups=csiaddons.openshift.io,resources=networkfences/finalizers,verbs=update
+// +kubebuilder:rbac:groups=csiaddons.openshift.io,resources=networkfences/status,verbs=get;patch;update
+// +kubebuilder:rbac:groups=csiaddons.openshift.io,resources=reclaimspacecronjobs,verbs=create;delete;get;list;patch;update;watch
+// +kubebuilder:rbac:groups=csiaddons.openshift.io,resources=reclaimspacecronjobs/finalizers,verbs=update
+// +kubebuilder:rbac:groups=csiaddons.openshift.io,resources=reclaimspacecronjobs/status,verbs=get;patch;update
+// +kubebuilder:rbac:groups=csiaddons.openshift.io,resources=reclaimspacejobs,verbs=create;delete;get;list;patch;update;watch
+// +kubebuilder:rbac:groups=csiaddons.openshift.io,resources=reclaimspacejobs/finalizers,verbs=update
+// +kubebuilder:rbac:groups=csiaddons.openshift.io,resources=reclaimspacejobs/status,verbs=get;patch;update
 func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request) (reconcile.Result, error) {
 	reqLogger := log.WithValues("Request.Namespace", req.Namespace, "Request.Name", req.Name)
 	reqLogger.Info("Reconciling IBMBlockCSI")
