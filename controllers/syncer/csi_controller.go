@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"math"
 	os "runtime"
+	"strconv"
 
 	"github.com/imdario/mergo"
 	appsv1 "k8s.io/api/apps/v1"
@@ -209,10 +210,11 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	driverNameFlag := fmt.Sprintf("--driver-name=%s", config.DriverName)
 	controllerPodName := fmt.Sprintf("--pod=%s", s.driver.Name)
 	controllerPodNamespace := fmt.Sprintf("--namespace=%s", s.driver.Namespace)
+	controllerPort := fmt.Sprintf("--controller-port=%s",
+		strconv.Itoa(int(controllerPlugin.Ports[0].ContainerPort)))
 	replicator := s.ensureContainer(replicatorContainerName,
 		s.getCSIAddonsReplicatorImage(),
-		[]string{controllerPodName, controllerPodNamespace,
-			"--zap-log-level=5"},
+		[]string{controllerPodName, controllerPodNamespace, controllerPort},
 	)
 	replicator.ImagePullPolicy = s.getCSIAddonsReplicatorPullPolicy()
 
