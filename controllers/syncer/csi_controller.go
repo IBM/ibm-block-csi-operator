@@ -206,12 +206,13 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	)
 	resizer.ImagePullPolicy = s.getCSIResizerPullPolicy()
 
-	leaderElectionNamespaceFlag := fmt.Sprintf("--leader-election-namespace=%s", s.driver.Namespace)
 	driverNameFlag := fmt.Sprintf("--driver-name=%s", config.DriverName)
+	controllerPodName := fmt.Sprintf("--pod=%s", s.driver.Name)
+	controllerPodNamespace := fmt.Sprintf("--namespace=%s", s.driver.Namespace)
 	replicator := s.ensureContainer(replicatorContainerName,
 		s.getCSIAddonsReplicatorImage(),
-		[]string{leaderElectionNamespaceFlag, driverNameFlag,
-			"--csi-address=$(ADDRESS)", "--zap-log-level=5", "--rpc-timeout=30s"},
+		[]string{controllerPodName, controllerPodNamespace,
+			"--zap-log-level=5"},
 	)
 	replicator.ImagePullPolicy = s.getCSIAddonsReplicatorPullPolicy()
 

@@ -155,6 +155,110 @@ rules:
   - update
   - watch
 - apiGroups:
+    - replication.storage.openshift.io
+  resources:
+    - csiaddonsnodes
+  verbs:
+    - create
+    - delete
+    - get
+    - list
+    - patch
+    - update
+    - watch
+- apiGroups:
+    - replication.storage.openshift.io
+  resources:
+    - csiaddonsnodes/finalizers
+  verbs:
+    - update
+- apiGroups:
+    - replication.storage.openshift.io
+  resources:
+    - csiaddonsnodes/status
+  verbs:
+    - get
+    - patch
+    - update
+- apiGroups:
+    - replication.storage.openshift.io
+  resources:
+    - networkfences
+  verbs:
+    - create
+    - delete
+    - get
+    - list
+    - patch
+    - update
+    - watch
+- apiGroups:
+    - replication.storage.openshift.io
+  resources:
+    - networkfences/finalizers
+  verbs:
+    - update
+- apiGroups:
+    - replication.storage.openshift.io
+  resources:
+    - networkfences/status
+  verbs:
+    - get
+    - patch
+    - update
+- apiGroups:
+    - replication.storage.openshift.io
+  resources:
+    - reclaimspacecronjobs
+  verbs:
+    - create
+    - delete
+    - get
+    - list
+    - patch
+    - update
+    - watch
+- apiGroups:
+    - replication.storage.openshift.io
+  resources:
+    - reclaimspacecronjobs/finalizers
+  verbs:
+    - update
+- apiGroups:
+    - replication.storage.openshift.io
+  resources:
+    - reclaimspacecronjobs/status
+  verbs:
+    - get
+    - patch
+    - update
+- apiGroups:
+    - replication.storage.openshift.io
+  resources:
+    - reclaimspacejobs
+  verbs:
+    - create
+    - delete
+    - get
+    - list
+    - patch
+    - update
+    - watch
+- apiGroups:
+    - replication.storage.openshift.io
+  resources:
+    - reclaimspacejobs/finalizers
+  verbs:
+    - update
+- apiGroups:
+    - replication.storage.openshift.io
+  resources:
+    - reclaimspacejobs/status
+  verbs:
+    - get
+    - patch
+    - update
+- apiGroups:
   - replication.storage.openshift.io
   resources:
   - volumereplicationclasses
