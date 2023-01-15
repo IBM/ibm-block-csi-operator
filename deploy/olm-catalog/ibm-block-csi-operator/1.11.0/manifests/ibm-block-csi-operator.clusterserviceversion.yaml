@@ -5,7 +5,7 @@ metadata:
   namespace: placeholder
   annotations:
     capabilities: "Seamless Upgrades"
-    olm.skipRange: '>=1.6.0 <1.11.0'
+    olm.skipRange: ">=1.6.0 <1.11.0"
     categories: "Storage,Cloud Provider"
     certified: "true"
     containerImage: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.11.0
@@ -226,51 +226,51 @@ spec:
         description: "Represents a block storage CSI driver"
         resources:
           - kind: ServiceAccount
-            name: ''
+            name: ""
             version: v1
           - kind: StatefulSet
-            name: ''
+            name: ""
             version: apps/v1
           - kind: DaemonSet
-            name: ''
+            name: ""
             version: apps/v1
         specDescriptors:
           - description: Controller Image Repository.
             displayName: Controller Image Repository
             path: controller.repository
             x-descriptors:
-              - 'urn:alm:descriptor:com.tectonic.ui:text'
+              - "urn:alm:descriptor:com.tectonic.ui:text"
           - description: Controller Image Tag.
             displayName: Controller Image Tag
             path: controller.tag
             x-descriptors:
-              - 'urn:alm:descriptor:com.tectonic.ui:text'
+              - "urn:alm:descriptor:com.tectonic.ui:text"
           - description: Node Image Repository.
             displayName: Node Image Repository
             path: node.repository
             x-descriptors:
-              - 'urn:alm:descriptor:com.tectonic.ui:text'
+              - "urn:alm:descriptor:com.tectonic.ui:text"
           - description: Node Image Tag.
             displayName: Node Image Tag
             path: node.tag
             x-descriptors:
-              - 'urn:alm:descriptor:com.tectonic.ui:text'
+              - "urn:alm:descriptor:com.tectonic.ui:text"
         statusDescriptors:
           - description: The current status of the driver.
             displayName: Status
             path: phase
             x-descriptors:
-              - 'urn:alm:descriptor:io.kubernetes.phase'
+              - "urn:alm:descriptor:io.kubernetes.phase"
           - description: Is the controller ready?
             displayName: Controller Ready
             path: controllerReady
             x-descriptors:
-              - 'urn:alm:descriptor:text'
+              - "urn:alm:descriptor:text"
           - description: Is the node ready?
             displayName: Node Ready
             path: nodeReady
             x-descriptors:
-              - 'urn:alm:descriptor:text'
+              - "urn:alm:descriptor:text"
           - description: The current version of the driver.
             displayName: Version
             path: version
@@ -299,33 +299,33 @@ spec:
         description: "Represents Host Definer for block storage CSI driver"
         resources:
           - kind: ServiceAccount
-            name: ''
+            name: ""
             version: v1
           - kind: Deployment
-            name: ''
+            name: ""
             version: apps/v1
         specDescriptors:
           - description: HostDefiner Image Repository.
             displayName: HostDefiner Image Repository
             path: hostdefiner.repository
             x-descriptors:
-              - 'urn:alm:descriptor:com.tectonic.ui:text'
+              - "urn:alm:descriptor:com.tectonic.ui:text"
           - description: HostDefiner Image Tag.
             displayName: HostDefiner Image Tag
             path: hostdefiner.tag
             x-descriptors:
-              - 'urn:alm:descriptor:com.tectonic.ui:text'
+              - "urn:alm:descriptor:com.tectonic.ui:text"
         statusDescriptors:
           - description: The current status of the host definer.
             displayName: Status
             path: phase
             x-descriptors:
-              - 'urn:alm:descriptor:io.kubernetes.phase'
+              - "urn:alm:descriptor:io.kubernetes.phase"
           - description: Is the host definer deployment ready?
             displayName: HostDefiner Ready
             path: hostdefinerReady
             x-descriptors:
-              - 'urn:alm:descriptor:text'
+              - "urn:alm:descriptor:text"
           - description: The current version of the driver.
             displayName: Version
             path: version
@@ -348,7 +348,7 @@ spec:
               resources:
                 - events
               verbs:
-                - '*'
+                - "*"
             - apiGroups:
                 - ""
               resources:
@@ -455,9 +455,9 @@ spec:
             - apiGroups:
                 - csi.ibm.com
               resources:
-                - '*'
+                - "*"
               verbs:
-                - '*'
+                - "*"
             - apiGroups:
                 - monitoring.coreos.com
               resources:
@@ -598,6 +598,110 @@ spec:
                 - volumeattachments/status
               verbs:
                 - patch
+            - apiGroups:
+                - csiaddons.openshift.io
+              resources:
+                - csiaddonsnodes
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - csiaddons.openshift.io
+              resources:
+                - csiaddonsnodes/finalizers
+              verbs:
+                - update
+            - apiGroups:
+                - csiaddons.openshift.io
+              resources:
+                - csiaddonsnodes/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - csiaddons.openshift.io
+              resources:
+                - networkfences
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - csiaddons.openshift.io
+              resources:
+                - networkfences/finalizers
+              verbs:
+                - update
+            - apiGroups:
+                - csiaddons.openshift.io
+              resources:
+                - networkfences/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - csiaddons.openshift.io
+              resources:
+                - reclaimspacecronjobs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - csiaddons.openshift.io
+              resources:
+                - reclaimspacecronjobs/finalizers
+              verbs:
+                - update
+            - apiGroups:
+                - csiaddons.openshift.io
+              resources:
+                - reclaimspacecronjobs/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - csiaddons.openshift.io
+              resources:
+                - reclaimspacejobs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - csiaddons.openshift.io
+              resources:
+                - reclaimspacejobs/finalizers
+              verbs:
+                - update
+            - apiGroups:
+                - csiaddons.openshift.io
+              resources:
+                - reclaimspacejobs/status
+              verbs:
+                - get
+                - patch
+                - update
 
       deployments:
         - name: ibm-block-csi-operator

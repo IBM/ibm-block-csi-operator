@@ -106,6 +106,18 @@ type IBMBlockCSIReconciler struct {
 //+kubebuilder:rbac:groups=replication.storage.openshift.io,resources=volumereplications,verbs=create;delete;get;list;patch;update;watch
 //+kubebuilder:rbac:groups=replication.storage.openshift.io,resources=volumereplications/finalizers,verbs=update
 //+kubebuilder:rbac:groups=replication.storage.openshift.io,resources=volumereplications/status,verbs=get;patch;update
+//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=csiaddonsnodes,verbs=create;delete;get;list;patch;update;watch
+//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=csiaddonsnodes/finalizers,verbs=update
+//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=csiaddonsnodes/status,verbs=get;patch;update
+//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=networkfences,verbs=create;delete;get;list;patch;update;watch
+//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=networkfences/finalizers,verbs=update
+//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=networkfences/status,verbs=get;patch;update
+//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=reclaimspacecronjobs,verbs=create;delete;get;list;patch;update;watch
+//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=reclaimspacecronjobs/finalizers,verbs=update
+//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=reclaimspacecronjobs/status,verbs=get;patch;update
+//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=reclaimspacejobs,verbs=create;delete;get;list;patch;update;watch
+//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=reclaimspacejobs/finalizers,verbs=update
+//+kubebuilder:rbac:groups=csiaddons.openshift.io,resources=reclaimspacejobs/status,verbs=get;patch;update
 func (r *IBMBlockCSIReconciler) Reconcile(ctx context.Context, req ctrl.Request) (reconcile.Result, error) {
 	reqLogger := log.WithValues("Request.Namespace", req.Namespace, "Request.Name", req.Name)
 	reqLogger.Info("Reconciling IBMBlockCSI")
