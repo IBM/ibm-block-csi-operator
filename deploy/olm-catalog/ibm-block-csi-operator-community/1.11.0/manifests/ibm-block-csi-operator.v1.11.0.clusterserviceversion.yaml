@@ -110,8 +110,8 @@ metadata:
               },
               {
                 "name": "csi-addons-replicator",
-                "repository": "quay.io/csiaddons/volumereplication-operator",
-                "tag": "v0.3.0",
+                "repository": "quay.io/ibmcsiblock/csi-block-volumereplication-operator",
+                "tag": "v0.9.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
