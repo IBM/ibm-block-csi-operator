@@ -7,15 +7,15 @@ metadata:
     app.kubernetes.io/name: host-definer
     app.kubernetes.io/instance: ibm-block-csi
     app.kubernetes.io/managed-by: ibm-block-csi-operator
-    release: v1.10.0
+    release: v1.11.0
 spec:
   hostDefiner:
-#   prefix:
-#   connectivityType:
-#   allowDelete: true    # Optional. Values true/false. The default is true.
-#   dynamicNodeLabeling: false    # Optional. Values true/false. The default is false.
-    repository: ibmcom/ibm-block-csi-host-definer
-    tag: "1.10.0"
+#    prefix:                       # Optional.
+#    connectivityType:             # Optional. Values nvme/fc/iscsi. The default is chosen dynamically.
+#    allowDelete: true             # Optional. Values true/false. The default is true.
+#    dynamicNodeLabeling: false    # Optional. Values true/false. The default is false.
+    repository: quay.io/ibmcsiblock/ibm-block-csi-host-definer
+    tag: "1.11.0"
     imagePullPolicy: IfNotPresent
     affinity:
       nodeAffinity:

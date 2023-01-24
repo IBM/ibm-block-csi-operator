@@ -1,15 +1,15 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
-  name: ibm-block-csi-operator.v1.10.0
+  name: ibm-block-csi-operator.v1.11.0
   namespace: placeholder
   annotations:
     capabilities: "Seamless Upgrades"
-    olm.skipRange: '>=1.6.0 <1.10.0'
+    olm.skipRange: '>=1.6.0 <1.11.0'
     categories: "Storage,Cloud Provider"
     certified: "true"
-    containerImage: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.10.0
-    createdAt: "2022-03-31T11:00:00Z"
+    containerImage: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.11.0
+    createdAt: "2022-08-22T11:00:00Z"
     description: "Run IBM block storage CSI driver on OpenShift."
     repository: https://github.com/IBM/ibm-block-csi-operator
     support: IBM
@@ -23,8 +23,8 @@ metadata:
           },
           "spec": {
             "controller": {
-              "repository": "ibmcom/ibm-block-csi-driver-controller",
-              "tag": "1.10.0",
+              "repository": "quay.io/ibmcsiblock/ibm-block-csi-driver-controller",
+              "tag": "1.11.0",
               "imagePullPolicy": "IfNotPresent",
               "affinity": {
                 "nodeAffinity": {
@@ -47,8 +47,8 @@ metadata:
               }
             },
             "node": {
-              "repository": "ibmcom/ibm-block-csi-driver-node",
-              "tag": "1.10.0",
+              "repository": "quay.io/ibmcsiblock/ibm-block-csi-driver-node",
+              "tag": "1.11.0",
               "imagePullPolicy": "IfNotPresent",
               "affinity": {
                 "nodeAffinity": {
@@ -103,8 +103,14 @@ metadata:
               },
               {
                 "name": "csi-addons-replicator",
-                "repository": "quay.io/csiaddons/volumereplication-operator",
-                "tag": "v0.2.0",
+                "repository": "quay.io/ibmcsiblock/csi-block-volumereplication-operator",
+                "tag": "v0.9.0",
+                "imagePullPolicy": "IfNotPresent"
+              },
+              {
+                "name": "csi-volume-group",
+                "repository": "quay.io/ibmcsiblock/csi-volume-group-operator",
+                "tag": "v0.9.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
@@ -138,8 +144,8 @@ metadata:
             "hostDefiner": {
               "allowDelete": true,
               "dynamicNodeLabeling": false,
-              "repository": "ibmcom/ibm-block-csi-host-definer",
-              "tag": "1.10.0",
+              "repository": "quay.io/ibmcsiblock/ibm-block-csi-host-definer",
+              "tag": "1.11.0",
               "imagePullPolicy": "IfNotPresent",
               "affinity": {
                 "nodeAffinity": {
@@ -179,13 +185,13 @@ spec:
     - CSI
   relatedImages:
     - name: ibm-block-csi-operator
-      image: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.10.0
-  version: 1.10.0
+      image: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.11.0
+  version: 1.11.0
   maturity: stable
   maintainers:
     - name: IBM Block CSI Team
       email: csi.block1@il.ibm.com
-  minKubeVersion: 1.22.0
+  minKubeVersion: 1.23.0
   provider:
     name: IBM
   links:
@@ -362,12 +368,21 @@ spec:
                 - list
                 - update
                 - watch
+                - patch
             - apiGroups:
                 - ""
               resources:
                 - persistentvolumeclaims/status
               verbs:
+                - get
+                - update
                 - patch
+            - apiGroups:
+                - ""
+              resources:
+                - persistentvolumeclaims/finalizers
+              verbs:
+                - update
             - apiGroups:
                 - ""
               resources:
@@ -630,7 +645,7 @@ spec:
                       capabilities:
                         drop:
                           - ALL
-                    image: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.10.0
+                    image: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.11.0
                     imagePullPolicy: IfNotPresent
                     command:
                       - ibm-block-csi-operator

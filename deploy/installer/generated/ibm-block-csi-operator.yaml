@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/name: ibm-block-csi-operator
     csi: ibm
     product: ibm-block-csi-driver
-    release: v1.10.0
+    release: v1.11.0
   name: hostdefiners.csi.ibm.com
 spec:
   group: csi.ibm.com
@@ -590,7 +590,7 @@ metadata:
     app.kubernetes.io/name: ibm-block-csi-operator
     csi: ibm
     product: ibm-block-csi-driver
-    release: v1.10.0
+    release: v1.11.0
   name: hostdefinitions.csi.ibm.com
 spec:
   group: csi.ibm.com
@@ -611,6 +611,9 @@ spec:
     - jsonPath: .spec.hostDefinition.nodeName
       name: Node
       type: string
+    - jsonPath: .spec.hostDefinition.managementAddress
+      name: Management_Address
+      type: string
     name: v1
     schema:
       openAPIV3Schema:
@@ -630,15 +633,30 @@ spec:
               hostDefinition:
                 description: Definition defines the observed state of HostDefinition
                 properties:
+                  connectivityType:
+                    type: string
+                  ioGroups:
+                    items:
+                      type: integer
+                    type: array
+                  managementAddress:
+                    type: string
                   nodeId:
                     type: string
                   nodeName:
                     type: string
+                  nodeNameOnStorage:
+                    type: string
+                  ports:
+                    items:
+                      type: string
+                    type: array
                   secretName:
                     type: string
                   secretNamespace:
                     type: string
                 required:
+                - managementAddress
                 - nodeName
                 type: object
             required:
@@ -676,7 +694,7 @@ metadata:
     app.kubernetes.io/name: ibm-block-csi-operator
     csi: ibm
     product: ibm-block-csi-driver
-    release: v1.10.0
+    release: v1.11.0
   name: ibmblockcsis.csi.ibm.com
 spec:
   group: csi.ibm.com
@@ -1770,7 +1788,7 @@ metadata:
     app.kubernetes.io/name: ibm-block-csi-operator
     csi: ibm
     product: ibm-block-csi-driver
-    release: v1.10.0
+    release: v1.11.0
   name: ibm-block-csi-operator
   namespace: default
 ---
@@ -1819,12 +1837,21 @@ rules:
   - list
   - update
   - watch
+  - patch
 - apiGroups:
   - ""
   resources:
   - persistentvolumeclaims/status
   verbs:
+  - get
+  - update
   - patch
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims/finalizers
+  verbs:
+  - update
 - apiGroups:
   - ""
   resources:
@@ -2082,7 +2109,7 @@ spec:
         productID: 5027566ef6c54de49028be7df25119e1
         productMetric: FREE
         productName: IBM Block CSI Driver
-        productVersion: 1.10.0
+        productVersion: 1.11.0
       labels:
         app.kubernetes.io/instance: ibm-block-csi-operator
         app.kubernetes.io/managed-by: ibm-block-csi-operator
@@ -2116,7 +2143,7 @@ spec:
               fieldPath: metadata.name
         - name: OPERATOR_NAME
           value: ibm-block-csi-operator
-        image: ibmcom/ibm-block-csi-operator:1.10.0
+        image: quay.io/ibmcsiblock/ibm-block-csi-operator:1.11.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           exec:

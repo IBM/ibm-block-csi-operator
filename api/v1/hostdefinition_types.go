@@ -30,7 +30,8 @@ type HostDefinitionSpec struct {
 
 // Definition defines the observed state of HostDefinition
 type Definition struct {
-	NodeName string `json:"nodeName"`
+	NodeName          string `json:"nodeName"`
+	ManagementAddress string `json:"managementAddress"`
 
 	// +kubebuilder:validation:Optional
 	SecretName string `json:"secretName"`
@@ -38,6 +39,14 @@ type Definition struct {
 	SecretNamespace string `json:"secretNamespace"`
 	// +kubebuilder:validation:Optional
 	NodeId string `json:"nodeId"`
+	// +kubebuilder:validation:Optional
+	ConnectivityType string `json:"connectivityType"`
+	// +kubebuilder:validation:Optional
+	Ports []string `json:"ports"`
+	// +kubebuilder:validation:Optional
+	NodeNameOnStorage string `json:"nodeNameOnStorage"`
+	// +kubebuilder:validation:Optional
+	IOGroups []int `json:"ioGroups"`
 }
 
 // HostDefinitionStatus defines the status of the host definition on the storage
@@ -53,6 +62,7 @@ type HostDefinitionStatus struct {
 // +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
 // +kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 // +kubebuilder:printcolumn:name="Node",type=string,JSONPath=`.spec.hostDefinition.nodeName`
+// +kubebuilder:printcolumn:name="Management_Address",type=string,JSONPath=`.spec.hostDefinition.managementAddress`
 type HostDefinition struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

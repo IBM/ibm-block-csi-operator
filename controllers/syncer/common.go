@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 IBM Corp.
+ * Copyright 2022 IBM Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,22 @@
  * limitations under the License.
  */
 
-package version
+package syncer
 
-var (
-	Version       = "1.11.0"
-	DriverVersion = "1.11.0"
+import (
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 )
+
+var defaultAnnotations = []string{
+	"productID",
+	"productName",
+	"productVersion",
+}
+
+func ensureAnnotations(templateObjectMeta *metav1.ObjectMeta, objectMeta *metav1.ObjectMeta, annotations labels.Set) {
+	for _, s := range defaultAnnotations {
+		templateObjectMeta.Annotations[s] = annotations[s]
+		objectMeta.Annotations[s] = annotations[s]
+	}
+}

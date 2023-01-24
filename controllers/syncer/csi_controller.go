@@ -18,6 +18,8 @@ package syncer
 
 import (
 	"fmt"
+	"math"
+	os "runtime"
 
 	"github.com/imdario/mergo"
 	appsv1 "k8s.io/api/apps/v1"
@@ -44,7 +46,11 @@ const (
 	snapshotterContainerName             = "csi-snapshotter"
 	resizerContainerName                 = "csi-resizer"
 	replicatorContainerName              = "csi-addons-replicator"
+	volumeGroupContainerName             = "csi-volume-group"
 	controllerLivenessProbeContainerName = "livenessprobe"
+
+	commonMaxWorkersFlag  = "--worker-threads"
+	resizerMaxWorkersFlag = "--workers"
 
 	controllerContainerHealthPortName          = "healthz"
 	controllerContainerDefaultHealthPortNumber = 9808
@@ -65,6 +71,16 @@ func NewCSIControllerSyncer(c client.Client, scheme *runtime.Scheme, driver *cru
 			Namespace:   driver.Namespace,
 			Annotations: driver.GetAnnotations("", ""),
 			Labels:      driver.GetLabels(),
+		},
+		Spec: appsv1.StatefulSetSpec{
+			Selector: metav1.SetAsLabelSelector(driver.GetCSIControllerSelectorLabels()),
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels:      driver.GetCSIControllerPodLabels(),
+					Annotations: driver.GetAnnotations("", ""),
+				},
+				Spec: corev1.PodSpec{},
+			},
 		},
 	}
 
@@ -89,10 +105,9 @@ func (s *csiControllerSyncer) SyncFn() error {
 
 	// ensure template
 	out.Spec.Template.ObjectMeta.Labels = controllerLabels
-	out.Spec.Template.ObjectMeta.Annotations = controllerAnnotations
 
 	out.ObjectMeta.Labels = controllerLabels
-	out.ObjectMeta.Annotations = controllerAnnotations
+	ensureAnnotations(&out.Spec.Template.ObjectMeta, &out.ObjectMeta, controllerAnnotations)
 
 	err := mergo.Merge(&out.Spec.Template.Spec, s.ensurePodSpec(), mergo.WithTransformers(transformers.PodSpec))
 	if err != nil {
@@ -145,12 +160,14 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		},
 	})
 
+	maxWorkersFlag := getCommonMaxWorkersFlag()
+
 	provisionerArgs := []string{
 		"--csi-address=$(ADDRESS)",
 		"--v=5",
 		"--timeout=120s",
 		"--default-fstype=ext4",
-		"--worker-threads=10",
+		maxWorkersFlag,
 	}
 	if TopologyEnabled {
 		provisionerArgs = append(provisionerArgs, "--feature-gates=Topology=true")
@@ -163,19 +180,29 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 
 	attacher := s.ensureContainer(attacherContainerName,
 		s.getCSIAttacherImage(),
-		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=180s"},
+		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=180s", maxWorkersFlag},
 	)
 	attacher.ImagePullPolicy = s.getCSIAttacherPullPolicy()
 
 	snapshotter := s.ensureContainer(snapshotterContainerName,
 		s.getCSISnapshotterImage(),
-		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=120s"},
+		[]string{
+			"--csi-address=$(ADDRESS)",
+			"--v=5",
+			"--timeout=120s",
+			maxWorkersFlag,
+		},
 	)
 	snapshotter.ImagePullPolicy = s.getCSISnapshotterPullPolicy()
 
 	resizer := s.ensureContainer(resizerContainerName,
 		s.getCSIResizerImage(),
-		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s"},
+		[]string{
+			"--csi-address=$(ADDRESS)",
+			"--v=5",
+			"--timeout=30s",
+			getResizerMaxWorkersFlag(),
+		},
 	)
 	resizer.ImagePullPolicy = s.getCSIResizerPullPolicy()
 
@@ -187,6 +214,17 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 			"--csi-address=$(ADDRESS)", "--zap-log-level=5", "--rpc-timeout=30s"},
 	)
 	replicator.ImagePullPolicy = s.getCSIAddonsReplicatorPullPolicy()
+
+	volumegroup := s.ensureContainer(volumeGroupContainerName,
+		s.getCSIVolumeGroupImage(),
+		[]string{
+			driverNameFlag,
+			"--csi-address=$(ADDRESS)",
+			"--rpc-timeout=30s",
+			"--multiple-vgs-to-pvc=false",
+			"--disable-delete-pvcs=true",
+		})
+	volumegroup.ImagePullPolicy = s.getCSIVolumeGroupPullPolicy()
 
 	healthPortArg := fmt.Sprintf("--health-port=%v", healthPort)
 	livenessProbe := s.ensureContainer(controllerLivenessProbeContainerName,
@@ -205,6 +243,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		snapshotter,
 		resizer,
 		replicator,
+		volumegroup,
 		livenessProbe,
 	}
 }
@@ -294,7 +333,7 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 		}
 
 	case provisionerContainerName, attacherContainerName, snapshotterContainerName,
-		resizerContainerName, replicatorContainerName:
+		resizerContainerName, replicatorContainerName, volumeGroupContainerName:
 		return []corev1.EnvVar{
 			{
 				Name:  "ADDRESS",
@@ -308,7 +347,7 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 func (s *csiControllerSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 	switch name {
 	case ControllerContainerName, provisionerContainerName, attacherContainerName, snapshotterContainerName,
-		resizerContainerName, replicatorContainerName:
+		resizerContainerName, replicatorContainerName, volumeGroupContainerName:
 		return []corev1.VolumeMount{
 			{
 				Name:      socketVolumeName,
@@ -371,6 +410,10 @@ func (s *csiControllerSyncer) getCSIAddonsReplicatorImage() string {
 	return s.getSidecarImageByName(config.CSIAddonsReplicator)
 }
 
+func (s *csiControllerSyncer) getCSIVolumeGroupImage() string {
+	return s.getSidecarImageByName(config.CSIVolumeGroup)
+}
+
 func (s *csiControllerSyncer) getSidecarPullPolicy(sidecarName string) corev1.PullPolicy {
 	sidecar := s.getSidecarByName(sidecarName)
 	if sidecar != nil && sidecar.ImagePullPolicy != "" {
@@ -403,6 +446,10 @@ func (s *csiControllerSyncer) getCSIAddonsReplicatorPullPolicy() corev1.PullPoli
 	return s.getSidecarPullPolicy(config.CSIAddonsReplicator)
 }
 
+func (s *csiControllerSyncer) getCSIVolumeGroupPullPolicy() corev1.PullPolicy {
+	return s.getSidecarPullPolicy(config.CSIVolumeGroup)
+}
+
 func ensurePorts(ports ...corev1.ContainerPort) []corev1.ContainerPort {
 	return ports
 }
@@ -432,4 +479,23 @@ func getSidecarByName(driver *crutils.IBMBlockCSI, name string) *csiv1.CSISideca
 		}
 	}
 	return nil
+}
+
+func getMaxWorkersCount() int {
+	cpuCount := os.NumCPU()
+	maxWorkers := math.Min(float64(cpuCount), 32) / 2
+	return int(math.Max(maxWorkers, 2))
+}
+
+func getMaxWorkersFlag(flag string) string {
+	maxWorkersCount := getMaxWorkersCount()
+	return fmt.Sprintf("%s=%d", flag, maxWorkersCount)
+}
+
+func getCommonMaxWorkersFlag() string {
+	return getMaxWorkersFlag(commonMaxWorkersFlag)
+}
+
+func getResizerMaxWorkersFlag() string {
+	return getMaxWorkersFlag(resizerMaxWorkersFlag)
 }

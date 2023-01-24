@@ -79,8 +79,9 @@ type IBMBlockCSIReconciler struct {
 //+kubebuilder:rbac:groups="",resources=pods,verbs=get;delete;list;watch
 //+kubebuilder:rbac:groups="",resources=configmaps,verbs=get;create;delete
 //+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch
-//+kubebuilder:rbac:groups="",resources=persistentvolumeclaims,verbs=get;list;watch;update
-//+kubebuilder:rbac:groups="",resources=persistentvolumeclaims/status,verbs=patch
+//+kubebuilder:rbac:groups="",resources=persistentvolumeclaims,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups="",resources=persistentvolumeclaims/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups="",resources=persistentvolumeclaims/finalizers,verbs=update
 //+kubebuilder:rbac:groups="",resources=persistentvolumes,verbs=get;delete;list;watch;update;create;patch
 //+kubebuilder:rbac:groups="",resources=events,verbs=*
 //+kubebuilder:rbac:groups="",resources=nodes,verbs=get;list;watch
@@ -532,6 +533,7 @@ func (r *IBMBlockCSIReconciler) getClusterRoles(instance *crutils.IBMBlockCSI) [
 	externalSnapshotter := instance.GenerateExternalSnapshotterClusterRole()
 	externalResizer := instance.GenerateExternalResizerClusterRole()
 	csiAddonsReplicator := instance.GenerateCSIAddonsReplicatorClusterRole()
+	volumeGroup := instance.GenerateVolumeGroupClusterRole()
 	controllerSCC := instance.GenerateSCCForControllerClusterRole()
 	nodeSCC := instance.GenerateSCCForNodeClusterRole()
 
@@ -541,6 +543,7 @@ func (r *IBMBlockCSIReconciler) getClusterRoles(instance *crutils.IBMBlockCSI) [
 		externalSnapshotter,
 		externalResizer,
 		csiAddonsReplicator,
+		volumeGroup,
 		controllerSCC,
 		nodeSCC,
 	}
@@ -562,6 +565,7 @@ func (r *IBMBlockCSIReconciler) getClusterRoleBindings(instance *crutils.IBMBloc
 	externalSnapshotter := instance.GenerateExternalSnapshotterClusterRoleBinding()
 	externalResizer := instance.GenerateExternalResizerClusterRoleBinding()
 	csiAddonsReplicator := instance.GenerateCSIAddonsReplicatorClusterRoleBinding()
+	volumeGroup := instance.GenerateVolumeGroupClusterRoleBinding()
 	controllerSCC := instance.GenerateSCCForControllerClusterRoleBinding()
 	nodeSCC := instance.GenerateSCCForNodeClusterRoleBinding()
 
@@ -571,6 +575,7 @@ func (r *IBMBlockCSIReconciler) getClusterRoleBindings(instance *crutils.IBMBloc
 		externalSnapshotter,
 		externalResizer,
 		csiAddonsReplicator,
+		volumeGroup,
 		controllerSCC,
 		nodeSCC,
 	}
