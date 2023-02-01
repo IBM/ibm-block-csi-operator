@@ -76,8 +76,8 @@ spec:
     tag: "v0.9.0"
     imagePullPolicy: IfNotPresent
   - name: csi-volume-group
-    repository: quay.io/ibmcsiblock/csi-volume-group-operator
-    tag: "v0.9.0"
+    repository: stg-artifactory.xiv.ibm.com:5030/ibm-block-csi-volumegroup
+    tag: "1.11.0_b101_local.test"
     imagePullPolicy: IfNotPresent
   - name: livenessprobe
     repository: k8s.gcr.io/sig-storage/livenessprobe
