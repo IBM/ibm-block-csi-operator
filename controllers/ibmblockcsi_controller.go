@@ -372,7 +372,7 @@ func (r *IBMBlockCSIReconciler) restartControllerPodfromStatefulSet(logger logr.
 }
 
 func (r *IBMBlockCSIReconciler) getControllerPod(controllerStatefulset *appsv1.StatefulSet, controllerPod *corev1.Pod) error {
-	controllerPodName := fmt.Sprintf("%s-0", controllerStatefulset.Name)
+	controllerPodName := oconfig.GetControllerPodName(controllerStatefulset.Name)
 	err := r.Get(context.TODO(), types.NamespacedName{
 		Name:      controllerPodName,
 		Namespace: controllerStatefulset.Namespace,
