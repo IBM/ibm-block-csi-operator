@@ -76,8 +76,8 @@ spec:
     tag: "v0.9.0"
     imagePullPolicy: IfNotPresent
   - name: csi-volume-group
-    repository: quay.io/csiblock/volume-group-operator-staging
-    tag: "task.CSI-5156_change_all_kubernetes_objects_to_shortcuts"
+    repository: stg-artifactory.xiv.ibm.com:5030/ibm-block-csi-volume-group-amd64
+    tag: "pointer_error16"
     imagePullPolicy: IfNotPresent
   - name: livenessprobe
     repository: k8s.gcr.io/sig-storage/livenessprobe
