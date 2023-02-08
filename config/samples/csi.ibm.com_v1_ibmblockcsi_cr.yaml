@@ -77,7 +77,7 @@ spec:
     imagePullPolicy: IfNotPresent
   - name: csi-volume-group
     repository: stg-artifactory.xiv.ibm.com:5030/ibm-block-csi-volume-group-amd64
-    tag: "pointer_error16"
+    tag: "pointer_error17"
     imagePullPolicy: IfNotPresent
   - name: livenessprobe
     repository: k8s.gcr.io/sig-storage/livenessprobe
