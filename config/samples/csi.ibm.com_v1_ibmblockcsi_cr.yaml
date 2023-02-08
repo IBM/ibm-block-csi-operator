@@ -72,12 +72,12 @@ spec:
     tag: "v1.4.0"
     imagePullPolicy: IfNotPresent
   - name: csi-addons-replicator
-    repository: quay.io/ibmcsiblock/csi-block-volumereplication-operator
-    tag: "v0.9.0"
+    repository: stg-artifactory.xiv.ibm.com:5030/csi-addons-sidecar
+    tag: "source1"
     imagePullPolicy: IfNotPresent
   - name: csi-volume-group
-    repository: stg-artifactory.xiv.ibm.com:5030/ibm-block-csi-volume-group-amd64
-    tag: "pointer_error17"
+    repository: quay.io/csiblock/volume-group-operator-staging
+    tag: "v0.9.0"
     imagePullPolicy: IfNotPresent
   - name: livenessprobe
     repository: k8s.gcr.io/sig-storage/livenessprobe
