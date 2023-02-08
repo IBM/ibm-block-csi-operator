@@ -76,7 +76,7 @@ spec:
     tag: "source1"
     imagePullPolicy: IfNotPresent
   - name: csi-volume-group
-    repository: quay.io/csiblock/volume-group-operator-staging
+    repository: quay.io/ibmcsiblock/csi-block-volumereplication-operator
     tag: "v0.9.0"
     imagePullPolicy: IfNotPresent
   - name: livenessprobe
