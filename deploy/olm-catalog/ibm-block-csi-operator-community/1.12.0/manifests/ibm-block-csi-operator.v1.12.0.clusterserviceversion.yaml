@@ -1,16 +1,19 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
-  name: ibm-block-csi-operator.v1.11.0
+  name: ibm-block-csi-operator.v1.12.0
   namespace: placeholder
+  labels:
+    operatorframework.io/arch.amd64: supported
+    operatorframework.io/arch.s390x: supported
+    operatorframework.io/arch.ppc64le: supported
   annotations:
     capabilities: "Seamless Upgrades"
-    olm.skipRange: ">=1.6.0 <1.11.0"
     categories: "Storage,Cloud Provider"
     certified: "true"
-    containerImage: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.11.0
-    createdAt: "2022-08-22T11:00:00Z"
-    description: "Run IBM block storage CSI driver on OpenShift."
+    containerImage: quay.io/ibmcsiblock/ibm-block-csi-operator:1.12.0
+    createdAt: "2022-03-31T11:00:00Z"
+    description: "Run IBM block storage CSI driver."
     repository: https://github.com/IBM/ibm-block-csi-operator
     support: IBM
     alm-examples: >-
@@ -24,7 +27,7 @@ metadata:
           "spec": {
             "controller": {
               "repository": "quay.io/ibmcsiblock/ibm-block-csi-driver-controller",
-              "tag": "1.11.0",
+              "tag": "1.12.0",
               "imagePullPolicy": "IfNotPresent",
               "affinity": {
                 "nodeAffinity": {
@@ -36,7 +39,9 @@ metadata:
                             "key": "kubernetes.io/arch",
                             "operator": "In",
                             "values": [
-                              "amd64"
+                              "amd64",
+                              "s390x",
+                              "ppc64le"
                             ]
                           }
                         ]
@@ -48,7 +53,7 @@ metadata:
             },
             "node": {
               "repository": "quay.io/ibmcsiblock/ibm-block-csi-driver-node",
-              "tag": "1.11.0",
+              "tag": "1.12.0",
               "imagePullPolicy": "IfNotPresent",
               "affinity": {
                 "nodeAffinity": {
@@ -60,7 +65,9 @@ metadata:
                             "key": "kubernetes.io/arch",
                             "operator": "In",
                             "values": [
-                              "amd64"
+                              "amd64",
+                              "s390x",
+                              "ppc64le"
                             ]
                           }
                         ]
@@ -110,7 +117,7 @@ metadata:
               {
                 "name": "csi-volume-group",
                 "repository": "quay.io/ibmcsiblock/csi-volume-group-operator",
-                "tag": "v0.9.1",
+                "tag": "v0.9.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
@@ -145,7 +152,7 @@ metadata:
               "allowDelete": true,
               "dynamicNodeLabeling": false,
               "repository": "quay.io/ibmcsiblock/ibm-block-csi-host-definer",
-              "tag": "1.11.0",
+              "tag": "1.12.0",
               "imagePullPolicy": "IfNotPresent",
               "affinity": {
                 "nodeAffinity": {
@@ -157,7 +164,9 @@ metadata:
                             "key": "kubernetes.io/arch",
                             "operator": "In",
                             "values": [
-                              "amd64"
+                              "amd64",
+                              "s390x",
+                              "ppc64le"
                             ]
                           }
                         ]
@@ -185,13 +194,14 @@ spec:
     - CSI
   relatedImages:
     - name: ibm-block-csi-operator
-      image: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.11.0
-  version: 1.11.0
+      image: quay.io/ibmcsiblock/ibm-block-csi-operator:1.12.0
+  version: 1.12.0
+  replaces: ibm-block-csi-operator.v1.10.0
   maturity: stable
   maintainers:
     - name: IBM Block CSI Team
       email: csi.block1@il.ibm.com
-  minKubeVersion: 1.23.0
+  minKubeVersion: 1.24.0
   provider:
     name: IBM
   links:
@@ -226,51 +236,51 @@ spec:
         description: "Represents a block storage CSI driver"
         resources:
           - kind: ServiceAccount
-            name: ""
+            name: ''
             version: v1
           - kind: StatefulSet
-            name: ""
+            name: ''
             version: apps/v1
           - kind: DaemonSet
-            name: ""
+            name: ''
             version: apps/v1
         specDescriptors:
           - description: Controller Image Repository.
             displayName: Controller Image Repository
             path: controller.repository
             x-descriptors:
-              - "urn:alm:descriptor:com.tectonic.ui:text"
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
           - description: Controller Image Tag.
             displayName: Controller Image Tag
             path: controller.tag
             x-descriptors:
-              - "urn:alm:descriptor:com.tectonic.ui:text"
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
           - description: Node Image Repository.
             displayName: Node Image Repository
             path: node.repository
             x-descriptors:
-              - "urn:alm:descriptor:com.tectonic.ui:text"
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
           - description: Node Image Tag.
             displayName: Node Image Tag
             path: node.tag
             x-descriptors:
-              - "urn:alm:descriptor:com.tectonic.ui:text"
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
         statusDescriptors:
           - description: The current status of the driver.
             displayName: Status
             path: phase
             x-descriptors:
-              - "urn:alm:descriptor:io.kubernetes.phase"
+              - 'urn:alm:descriptor:io.kubernetes.phase'
           - description: Is the controller ready?
             displayName: Controller Ready
             path: controllerReady
             x-descriptors:
-              - "urn:alm:descriptor:text"
+              - 'urn:alm:descriptor:text'
           - description: Is the node ready?
             displayName: Node Ready
             path: nodeReady
             x-descriptors:
-              - "urn:alm:descriptor:text"
+              - 'urn:alm:descriptor:text'
           - description: The current version of the driver.
             displayName: Version
             path: version
@@ -299,33 +309,33 @@ spec:
         description: "Represents Host Definer for block storage CSI driver"
         resources:
           - kind: ServiceAccount
-            name: ""
+            name: ''
             version: v1
           - kind: Deployment
-            name: ""
+            name: ''
             version: apps/v1
         specDescriptors:
           - description: HostDefiner Image Repository.
             displayName: HostDefiner Image Repository
             path: hostdefiner.repository
             x-descriptors:
-              - "urn:alm:descriptor:com.tectonic.ui:text"
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
           - description: HostDefiner Image Tag.
             displayName: HostDefiner Image Tag
             path: hostdefiner.tag
             x-descriptors:
-              - "urn:alm:descriptor:com.tectonic.ui:text"
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
         statusDescriptors:
           - description: The current status of the host definer.
             displayName: Status
             path: phase
             x-descriptors:
-              - "urn:alm:descriptor:io.kubernetes.phase"
+              - 'urn:alm:descriptor:io.kubernetes.phase'
           - description: Is the host definer deployment ready?
             displayName: HostDefiner Ready
             path: hostdefinerReady
             x-descriptors:
-              - "urn:alm:descriptor:text"
+              - 'urn:alm:descriptor:text'
           - description: The current version of the driver.
             displayName: Version
             path: version
@@ -348,7 +358,7 @@ spec:
               resources:
                 - events
               verbs:
-                - "*"
+                - '*'
             - apiGroups:
                 - ""
               resources:
@@ -455,9 +465,9 @@ spec:
             - apiGroups:
                 - csi.ibm.com
               resources:
-                - "*"
+                - '*'
               verbs:
-                - "*"
+                - '*'
             - apiGroups:
                 - monitoring.coreos.com
               resources:
@@ -598,110 +608,6 @@ spec:
                 - volumeattachments/status
               verbs:
                 - patch
-            - apiGroups:
-                - csiaddons.openshift.io
-              resources:
-                - csiaddonsnodes
-              verbs:
-                - create
-                - delete
-                - get
-                - list
-                - patch
-                - update
-                - watch
-            - apiGroups:
-                - csiaddons.openshift.io
-              resources:
-                - csiaddonsnodes/finalizers
-              verbs:
-                - update
-            - apiGroups:
-                - csiaddons.openshift.io
-              resources:
-                - csiaddonsnodes/status
-              verbs:
-                - get
-                - patch
-                - update
-            - apiGroups:
-                - csiaddons.openshift.io
-              resources:
-                - networkfences
-              verbs:
-                - create
-                - delete
-                - get
-                - list
-                - patch
-                - update
-                - watch
-            - apiGroups:
-                - csiaddons.openshift.io
-              resources:
-                - networkfences/finalizers
-              verbs:
-                - update
-            - apiGroups:
-                - csiaddons.openshift.io
-              resources:
-                - networkfences/status
-              verbs:
-                - get
-                - patch
-                - update
-            - apiGroups:
-                - csiaddons.openshift.io
-              resources:
-                - reclaimspacecronjobs
-              verbs:
-                - create
-                - delete
-                - get
-                - list
-                - patch
-                - update
-                - watch
-            - apiGroups:
-                - csiaddons.openshift.io
-              resources:
-                - reclaimspacecronjobs/finalizers
-              verbs:
-                - update
-            - apiGroups:
-                - csiaddons.openshift.io
-              resources:
-                - reclaimspacecronjobs/status
-              verbs:
-                - get
-                - patch
-                - update
-            - apiGroups:
-                - csiaddons.openshift.io
-              resources:
-                - reclaimspacejobs
-              verbs:
-                - create
-                - delete
-                - get
-                - list
-                - patch
-                - update
-                - watch
-            - apiGroups:
-                - csiaddons.openshift.io
-              resources:
-                - reclaimspacejobs/finalizers
-              verbs:
-                - update
-            - apiGroups:
-                - csiaddons.openshift.io
-              resources:
-                - reclaimspacejobs/status
-              verbs:
-                - get
-                - patch
-                - update
 
       deployments:
         - name: ibm-block-csi-operator
@@ -726,11 +632,13 @@ spec:
                               operator: In
                               values:
                                 - amd64
+                                - s390x
+                                - ppc64le
                 containers:
                   - name: ibm-block-csi-operator
                     resources:
                       requests:
-                        memory: 50Mi
+                        memory: 100Mi
                         cpu: 50m
                       limits:
                         memory: 500Mi
@@ -749,7 +657,7 @@ spec:
                       capabilities:
                         drop:
                           - ALL
-                    image: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.11.0
+                    image: quay.io/ibmcsiblock/ibm-block-csi-operator:1.12.0
                     imagePullPolicy: IfNotPresent
                     command:
                       - ibm-block-csi-operator
