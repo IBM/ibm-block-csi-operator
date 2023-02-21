@@ -110,7 +110,7 @@ metadata:
               {
                 "name": "csi-volume-group",
                 "repository": "quay.io/ibmcsiblock/csi-volume-group-operator",
-                "tag": "v0.9.1",
+                "tag": "v0.9.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {

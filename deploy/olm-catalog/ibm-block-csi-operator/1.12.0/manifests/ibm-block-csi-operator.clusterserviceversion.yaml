@@ -74,31 +74,31 @@ metadata:
               {
                 "name": "csi-node-driver-registrar",
                 "repository": "k8s.gcr.io/sig-storage/csi-node-driver-registrar",
-                "tag": "v2.5.0",
+                "tag": "v2.6.3",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-provisioner",
                 "repository": "k8s.gcr.io/sig-storage/csi-provisioner",
-                "tag": "v3.1.0",
+                "tag": "v3.4.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-attacher",
                 "repository": "k8s.gcr.io/sig-storage/csi-attacher",
-                "tag": "v3.4.0",
+                "tag": "v4.2.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-snapshotter",
                 "repository": "k8s.gcr.io/sig-storage/csi-snapshotter",
-                "tag": "v5.0.1",
+                "tag": "v6.2.1",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-resizer",
                 "repository": "k8s.gcr.io/sig-storage/csi-resizer",
-                "tag": "v1.4.0",
+                "tag": "v1.7.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
@@ -110,13 +110,13 @@ metadata:
               {
                 "name": "csi-volume-group",
                 "repository": "quay.io/ibmcsiblock/csi-volume-group-operator",
-                "tag": "v0.9.0",
+                "tag": "v0.9.1",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "livenessprobe",
                 "repository": "k8s.gcr.io/sig-storage/livenessprobe",
-                "tag": "v2.6.0",
+                "tag": "v2.9.0",
                 "imagePullPolicy": "IfNotPresent"
               }
             ]
