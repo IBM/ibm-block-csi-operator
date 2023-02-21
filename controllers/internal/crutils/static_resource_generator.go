@@ -51,22 +51,9 @@ const (
 	volumeSnapshotsResource                  string = "volumesnapshots"
 	volumeSnapshotContentsResource           string = "volumesnapshotcontents"
 	volumeSnapshotContentsStatusResource     string = "volumesnapshotcontents/status"
-	volumeReplicationClassesResource         string = "volumereplicationclasses"
-	volumeReplicationsResource               string = "volumereplications"
-	volumeReplicationsFinalizersResource     string = "volumereplications/finalizers"
-	volumeReplicationsStatusResource         string = "volumereplications/status"
 	csiAddonsNodesResource                   string = "csiaddonsnodes"
 	csiAddonsNodesFinalizersResource         string = "csiaddonsnodes/finalizers"
 	csiAddonsNodesStatusResource             string = "csiaddonsnodes/status"
-	networkFencesResource                    string = "networkfences"
-	networkFencesFinalizersResource          string = "networkfences/finalizers"
-	networkFencesStatusResource              string = "networkfences/status"
-	reclaimSpaceCronJobsResource             string = "reclaimspacecronjobs"
-	reclaimSpaceCronJobsFinalizersResource   string = "reclaimspacecronjobs/finalizers"
-	reclaimSpaceCronJobsStatusResource       string = "reclaimspacecronjobs/status"
-	reclaimSpaceJobsResource                 string = "reclaimspacejobs"
-	reclaimSpaceJobsFinalizersResource       string = "reclaimspacejobs/finalizers"
-	reclaimSpaceJobsStatusResource           string = "reclaimspacejobs/status"
 	eventsResource                           string = "events"
 	nodesResource                            string = "nodes"
 	csiNodesResource                         string = "csinodes"
@@ -370,26 +357,6 @@ func (c *IBMBlockCSI) GenerateCSIAddonsReplicatorClusterRole() *rbacv1.ClusterRo
 		},
 		Rules: []rbacv1.PolicyRule{
 			{
-				APIGroups: []string{replicationStorageOpenshiftApiGroup},
-				Resources: []string{volumeReplicationClassesResource},
-				Verbs:     []string{verbGet, verbList, verbWatch},
-			},
-			{
-				APIGroups: []string{replicationStorageOpenshiftApiGroup},
-				Resources: []string{volumeReplicationsResource},
-				Verbs:     []string{verbCreate, verbDelete, verbGet, verbList, verbPatch, verbUpdate, verbWatch},
-			},
-			{
-				APIGroups: []string{replicationStorageOpenshiftApiGroup},
-				Resources: []string{volumeReplicationsFinalizersResource},
-				Verbs:     []string{verbUpdate},
-			},
-			{
-				APIGroups: []string{replicationStorageOpenshiftApiGroup},
-				Resources: []string{volumeReplicationsStatusResource},
-				Verbs:     []string{verbGet, verbPatch, verbUpdate},
-			},
-			{
 				APIGroups: []string{""},
 				Resources: []string{secretsResource},
 				Verbs:     []string{verbGet},
@@ -407,51 +374,6 @@ func (c *IBMBlockCSI) GenerateCSIAddonsReplicatorClusterRole() *rbacv1.ClusterRo
 			{
 				APIGroups: []string{csiAddonsApiGroup},
 				Resources: []string{csiAddonsNodesStatusResource},
-				Verbs:     []string{verbGet, verbPatch, verbUpdate},
-			},
-			{
-				APIGroups: []string{csiAddonsApiGroup},
-				Resources: []string{networkFencesResource},
-				Verbs:     []string{verbCreate, verbDelete, verbGet, verbList, verbPatch, verbUpdate, verbWatch},
-			},
-			{
-				APIGroups: []string{csiAddonsApiGroup},
-				Resources: []string{networkFencesFinalizersResource},
-				Verbs:     []string{verbUpdate},
-			},
-			{
-				APIGroups: []string{csiAddonsApiGroup},
-				Resources: []string{networkFencesStatusResource},
-				Verbs:     []string{verbGet, verbPatch, verbUpdate},
-			},
-			{
-				APIGroups: []string{csiAddonsApiGroup},
-				Resources: []string{reclaimSpaceCronJobsResource},
-				Verbs:     []string{verbCreate, verbDelete, verbGet, verbList, verbPatch, verbUpdate, verbWatch},
-			},
-			{
-				APIGroups: []string{csiAddonsApiGroup},
-				Resources: []string{reclaimSpaceCronJobsFinalizersResource},
-				Verbs:     []string{verbUpdate},
-			},
-			{
-				APIGroups: []string{csiAddonsApiGroup},
-				Resources: []string{reclaimSpaceCronJobsStatusResource},
-				Verbs:     []string{verbGet, verbPatch, verbUpdate},
-			},
-			{
-				APIGroups: []string{csiAddonsApiGroup},
-				Resources: []string{reclaimSpaceJobsResource},
-				Verbs:     []string{verbCreate, verbDelete, verbGet, verbList, verbPatch, verbUpdate, verbWatch},
-			},
-			{
-				APIGroups: []string{csiAddonsApiGroup},
-				Resources: []string{reclaimSpaceJobsFinalizersResource},
-				Verbs:     []string{verbUpdate},
-			},
-			{
-				APIGroups: []string{csiAddonsApiGroup},
-				Resources: []string{reclaimSpaceJobsStatusResource},
 				Verbs:     []string{verbGet, verbPatch, verbUpdate},
 			},
 		},
