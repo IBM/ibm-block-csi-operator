@@ -31,7 +31,6 @@ const (
 	volumeGroupApiGroup                      string = "csi.ibm.com"
 	storageApiGroup                          string = "storage.k8s.io"
 	rbacAuthorizationApiGroup                string = "rbac.authorization.k8s.io"
-	replicationStorageOpenshiftApiGroup      string = "replication.storage.openshift.io"
 	csiAddonsApiGroup                        string = "csiaddons.openshift.io"
 	storageClassesResource                   string = "storageclasses"
 	persistentVolumesResource                string = "persistentvolumes"
