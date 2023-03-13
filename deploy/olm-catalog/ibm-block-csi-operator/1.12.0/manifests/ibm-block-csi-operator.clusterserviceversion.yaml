@@ -369,6 +369,7 @@ spec:
                 - update
                 - watch
                 - patch
+                - delete
             - apiGroups:
                 - ""
               resources:
