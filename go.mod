@@ -6,7 +6,7 @@ require (
 	github.com/go-logr/logr v0.4.0
 	github.com/iancoleman/strcase v0.0.0-20191112232945-16388991a334 // indirect
 	github.com/imdario/mergo v0.3.12
-	github.com/onsi/ginkgo v1.16.4
+	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.13.0
 	github.com/pkg/errors v0.9.1
 	github.com/presslabs/controller-util v0.2.6
