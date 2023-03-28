@@ -11,15 +11,18 @@ updates:
       interval: "weekly"
     rebase-strategy: "disabled"
     reviewers:
-      - "csi-reviewers"
+      - "IBM/csi-reviewers"
     labels:
       - go
+      - dependencies
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
     rebase-strategy: "disabled"
     reviewers:
-      - "csi-reviewers"
+      - "IBM/csi-reviewers"
     labels:
-      - testing
+      - github_actions
+      - dependencies
+
