@@ -12,15 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM golang:1.16.14
+FROM golang:1.19
 
 WORKDIR /go/src/github.com/IBM/ibm-block-csi-operator/
 COPY . .
+RUN go mod download
 RUN CGO_ENABLED=1 GOOS=linux go build \
     -o build/_output/bin/ibm-block-csi-operator \
     -gcflags all=-trimpath=${GOPATH} \
 	-asmflags all=-trimpath=${GOPATH} \
-	-mod=vendor \
 	main.go
 
 

@@ -31,8 +31,8 @@ import (
 	"github.com/IBM/ibm-block-csi-operator/controllers/internal/crutils"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/util/boolptr"
-	"github.com/presslabs/controller-util/mergo/transformers"
-	"github.com/presslabs/controller-util/syncer"
+	"github.com/presslabs/controller-util/pkg/mergo/transformers"
+	"github.com/presslabs/controller-util/pkg/syncer"
 )
 
 const (
@@ -144,7 +144,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	nodePlugin.ImagePullPolicy = s.driver.Spec.Node.ImagePullPolicy
 
 	nodeContainerHealthPort := intstr.FromInt(int(healthPort))
-	nodePlugin.LivenessProbe = ensureProbe(10, 3, 10, corev1.Handler{
+	nodePlugin.LivenessProbe = ensureProbe(10, 3, 10, corev1.ProbeHandler{
 		HTTPGet: &corev1.HTTPGetAction{
 			Path:   "/healthz",
 			Port:   nodeContainerHealthPort,
@@ -176,7 +176,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 		},
 	)
 	registrar.Lifecycle = &corev1.Lifecycle{
-		PreStop: &corev1.Handler{
+		PreStop: &corev1.LifecycleHandler{
 			Exec: &corev1.ExecAction{
 				Command: []string{"/bin/sh", "-c", "rm -rf /registration/ibm-block-csi-driver-reg.sock /csi/csi.sock"},
 			},
