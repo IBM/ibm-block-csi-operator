@@ -3,11 +3,11 @@ module github.com/IBM/ibm-block-csi-operator
 go 1.15
 
 require (
-	github.com/go-logr/logr v0.4.0
+	github.com/go-logr/logr v1.2.3
 	github.com/iancoleman/strcase v0.0.0-20191112232945-16388991a334 // indirect
 	github.com/imdario/mergo v0.3.12
 	github.com/onsi/ginkgo v1.16.4
-	github.com/onsi/gomega v1.13.0
+	github.com/onsi/gomega v1.27.6
 	github.com/pkg/errors v0.9.1
 	github.com/presslabs/controller-util v0.2.6
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
