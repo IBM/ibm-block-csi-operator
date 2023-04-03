@@ -3,7 +3,7 @@ module github.com/IBM/ibm-block-csi-operator
 go 1.15
 
 require (
-	github.com/go-logr/logr v0.4.0
+	github.com/go-logr/logr v1.2.4
 	github.com/iancoleman/strcase v0.0.0-20191112232945-16388991a334 // indirect
 	github.com/imdario/mergo v0.3.12
 	github.com/onsi/ginkgo v1.16.4
