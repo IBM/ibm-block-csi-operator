@@ -288,8 +288,12 @@ rules:
   resources:
   - volumegroupcontents
   verbs:
+  - create
+  - delete
   - get
   - list
+  - patch
+  - update
   - watch
 - apiGroups:
   - volumegroup.storage.openshift.io
@@ -313,6 +317,14 @@ rules:
   - volumegroup.storage.openshift.io
   resources:
   - volumegroups/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - volumegroup.storage.openshift.io
+  resources:
+  - volumegroupcontents/status
   verbs:
   - get
   - patch
