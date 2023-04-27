@@ -17,7 +17,7 @@
 package crutils_test
 
 import (
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
