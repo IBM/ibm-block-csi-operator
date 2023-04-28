@@ -24,7 +24,7 @@ import (
 	csiv1 "github.com/IBM/ibm-block-csi-operator/api/v1"
 	testsutil "github.com/IBM/ibm-block-csi-operator/controllers/util/tests"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
