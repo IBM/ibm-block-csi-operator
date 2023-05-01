@@ -3,12 +3,12 @@ module github.com/IBM/ibm-block-csi-operator
 go 1.19
 
 require (
-	github.com/go-logr/logr v1.2.3
-	github.com/imdario/mergo v0.3.13
+	github.com/go-logr/logr v1.2.4
+	github.com/imdario/mergo v0.3.15
 	github.com/onsi/ginkgo/v2 v2.9.1
 	github.com/onsi/gomega v1.27.4
 	github.com/pkg/errors v0.9.1
-	github.com/presslabs/controller-util v0.7.0
+	github.com/presslabs/controller-util v0.7.1
 	k8s.io/api v0.25.0
 	k8s.io/apimachinery v0.27.1
 	k8s.io/client-go v0.25.0
