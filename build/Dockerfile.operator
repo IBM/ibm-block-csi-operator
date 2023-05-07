@@ -27,7 +27,7 @@ RUN CGO_ENABLED=1 GOOS=linux go build \
 FROM registry.access.redhat.com/ubi8/ubi-minimal:8.7-1049
 MAINTAINER IBM Storage
 
-ARG VERSION=1.11.0
+ARG VERSION=1.11.1
 ARG BUILD_NUMBER=0
 
 ###Required Labels
