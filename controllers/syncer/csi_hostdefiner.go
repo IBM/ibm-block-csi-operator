@@ -93,11 +93,13 @@ func (s *hostDefinerSyncer) SyncFn() error {
 }
 
 func (s *hostDefinerSyncer) ensurePodSpec() corev1.PodSpec {
+	var gracePeriod int64 = 0
 	return corev1.PodSpec{
-		Containers:         s.ensureContainersSpec(),
-		Affinity:           s.driver.Spec.HostDefiner.Affinity,
-		Tolerations:        s.driver.Spec.HostDefiner.Tolerations,
-		ServiceAccountName: config.GetNameForResource(config.HostDefinerServiceAccount, s.driver.Name),
+		Containers:                    s.ensureContainersSpec(),
+		Affinity:                      s.driver.Spec.HostDefiner.Affinity,
+		Tolerations:                   s.driver.Spec.HostDefiner.Tolerations,
+		ServiceAccountName:            config.GetNameForResource(config.HostDefinerServiceAccount, s.driver.Name),
+		TerminationGracePeriodSeconds: &gracePeriod,
 	}
 }
 
