@@ -175,7 +175,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 
 	resizer := s.ensureContainer(resizerContainerName,
 		s.getCSIResizerImage(),
-		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s"},
+		[]string{"--csi-address=$(ADDRESS)", "--v=5", "--timeout=30s", "--handle-volume-inuse-error=false"},
 	)
 	resizer.ImagePullPolicy = s.getCSIResizerPullPolicy()
 
