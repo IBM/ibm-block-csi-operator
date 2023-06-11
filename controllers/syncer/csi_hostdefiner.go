@@ -23,8 +23,8 @@ import (
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/util/boolptr"
 	"github.com/imdario/mergo"
-	"github.com/presslabs/controller-util/mergo/transformers"
-	"github.com/presslabs/controller-util/syncer"
+	"github.com/presslabs/controller-util/pkg/mergo/transformers"
+	"github.com/presslabs/controller-util/pkg/syncer"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -93,11 +93,13 @@ func (s *hostDefinerSyncer) SyncFn() error {
 }
 
 func (s *hostDefinerSyncer) ensurePodSpec() corev1.PodSpec {
+	var gracePeriod int64 = 0
 	return corev1.PodSpec{
-		Containers:         s.ensureContainersSpec(),
-		Affinity:           s.driver.Spec.HostDefiner.Affinity,
-		Tolerations:        s.driver.Spec.HostDefiner.Tolerations,
-		ServiceAccountName: config.GetNameForResource(config.HostDefinerServiceAccount, s.driver.Name),
+		Containers:                    s.ensureContainersSpec(),
+		Affinity:                      s.driver.Spec.HostDefiner.Affinity,
+		Tolerations:                   s.driver.Spec.HostDefiner.Tolerations,
+		ServiceAccountName:            config.GetNameForResource(config.HostDefinerServiceAccount, s.driver.Name),
+		TerminationGracePeriodSeconds: &gracePeriod,
 	}
 }
 
