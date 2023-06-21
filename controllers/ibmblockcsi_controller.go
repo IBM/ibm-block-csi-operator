@@ -48,7 +48,7 @@ import (
 	kubeutil "github.com/IBM/ibm-block-csi-operator/pkg/util/kubernetes"
 	oversion "github.com/IBM/ibm-block-csi-operator/version"
 	"github.com/go-logr/logr"
-	"github.com/presslabs/controller-util/syncer"
+	"github.com/presslabs/controller-util/pkg/syncer"
 	"k8s.io/client-go/rest"
 )
 
