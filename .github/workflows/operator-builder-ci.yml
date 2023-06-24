@@ -1,5 +1,5 @@
 
-name: operator-deploy-ci
+name: operator-builder-ci
 on:
   push:
     branches:
