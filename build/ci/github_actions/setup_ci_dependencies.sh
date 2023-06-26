@@ -1,6 +1,9 @@
 #!/bin/bash -xe
 set +o pipefail
 
+echo "------------------------------"
+echo $GITHUB_HEAD_REF
+echo "------------------------------"
 triggering_branch=$(echo $GITHUB_HEAD_REF| sed 's|/|.|g')
 image_version=${IMAGE_VERSION}
 build_number=${BUILD_NUMBER}
@@ -9,7 +12,7 @@ specific_tag="${image_version}_b${build_number}_${commit_hash}_${triggering_bran
 
 
 if [ "$triggering_branch" == "develop" ]; then
-  global_tag=${triggering_branch}
+  global_tag=latest
 else
   global_tag=${triggering_branch}
 fi
