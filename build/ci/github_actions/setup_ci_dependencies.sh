@@ -9,7 +9,7 @@ specific_tag="${image_version}_b${build_number}_${commit_hash}_${triggering_bran
 
 
 if [ "$triggering_branch" == "develop" ]; then
-  global_tag=latest
+  global_tag=${triggering_branch}
 else
   global_tag=${triggering_branch}
 fi
