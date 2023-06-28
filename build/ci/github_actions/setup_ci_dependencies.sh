@@ -1,7 +1,6 @@
 #!/bin/bash -xe
 set +o pipefail
 
-#echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
 triggering_branch=$(echo ${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}})
 image_version=${IMAGE_VERSION}
 build_number=${BUILD_NUMBER}
