@@ -1,4 +1,3 @@
-
 name: operator-builder-ci
 on:
   push:
@@ -15,7 +14,7 @@ on:
 env:
   IMAGE_VERSION: 'v0.9.1'
 jobs:
-  prepare_env: 
+  prepare_env:
     name: "Prepare env"
     runs-on: ubuntu-latest
     env:
@@ -25,12 +24,12 @@ jobs:
       PROD_REPOSITORY: csiblock/ibm-block-csi-operator
       STAGING_REPOSITORY: csiblock/ibm-block-csi-operator-staging
     steps:
-       - name: Checkout code
-         uses: actions/checkout@v3.2.0
-       - name: Setup dependencies
-         id: setup_dependencies
-         run: |
-           build/ci/github_actions/setup_ci_dependencies.sh
+      - name: Checkout code
+        uses: actions/checkout@v3.2.0
+      - name: Setup dependencies
+        id: setup_dependencies
+        run: |
+          build/ci/github_actions/setup_ci_dependencies.sh
     outputs:
       repository: "${{ steps.setup_dependencies.outputs.repository }}"
       specific_tag: "${{ steps.setup_dependencies.outputs.specific_tag }}"
@@ -68,46 +67,45 @@ jobs:
           registry: quay.io
           username: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}'
           password: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_PASSWORD }}'
-#      - name: Build and push operator images
-#        uses: docker/build-push-action@v3
-#        with:
-#          context: .
-#          platforms: linux/amd64,linux/ppc64le,linux/s390x
-#          push: true
-#          tags: ${{ steps.meta.outputs.tags }}
-#          labels: ${{ steps.meta.outputs.labels }}
-#          file: build/Dockerfile.operator
-#          cache-from: type=gha
-#          cache-to: type=gha,mode=max
-#          build-args: |
-#            VERSION: ${{ env.IMAGE_VERSION }}
-#            BUILD_NUMBER: ${{ github.run_number }}
-#      - name: show chosen image
-#        run: |
-#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }}:${{ needs.prepare_env.outputs.specific_tag }}
-#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }}:${{ needs.prepare_env.outputs.global_tag }}
-#      - name: save image names
-#        run: |
-#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }} >> /tmp/images.txt
-#          echo ${{ needs.prepare_env.outputs.specific_tag }} >> /tmp/images.txt
-#          echo ${{ needs.prepare_env.outputs.global_tag }} >> /tmp/images.txt
-#=================================================================================================
+      #      - name: Build and push operator images
+      #        uses: docker/build-push-action@v3
+      #        with:
+      #          context: .
+      #          platforms: linux/amd64,linux/ppc64le,linux/s390x
+      #          push: true
+      #          tags: ${{ steps.meta.outputs.tags }}
+      #          labels: ${{ steps.meta.outputs.labels }}
+      #          file: build/Dockerfile.operator
+      #          cache-from: type=gha
+      #          cache-to: type=gha,mode=max
+      #          build-args: |
+      #            VERSION: ${{ env.IMAGE_VERSION }}
+      #            BUILD_NUMBER: ${{ github.run_number }}
+      #      - name: show chosen image
+      #        run: |
+      #          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }}:${{ needs.prepare_env.outputs.specific_tag }}
+      #          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }}:${{ needs.prepare_env.outputs.global_tag }}
+      #      - name: save image names
+      #        run: |
+      #          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }} >> /tmp/images.txt
+      #          echo ${{ needs.prepare_env.outputs.specific_tag }} >> /tmp/images.txt
+      #          echo ${{ needs.prepare_env.outputs.global_tag }} >> /tmp/images.txt
+      #=================================================================================================
       - name: generate bundle manifests and metadata
         run: |
           export IMAGE_TAG=${{ needs.prepare_env.outputs.specific_tag }}
-#          export IMAGE_TAG=${{ env.BUILD_VERSION || 'dev' }}
-#          make bundle
-##          rm -rf ./bundle/manifests/ibm-storage-odf-operator_v1_serviceaccount.yaml
-#      - name: build the operator bundle image
-#        uses: docker/build-push-action@v2
-#        with:
-#          context: .
-#          file: deploy/olm-catalog/ibm-block-csi-operator-community/1.12.0/bundle-1.12.0.Dockerfile
-#          platforms: linux/amd64,linux/ppc64le,linux/s390x
-#          push: ${{ github.event_name == 'release' && github.event.action == 'published' }}
-##          tags: quay.io/ibmodffs/ibm-storage-odf-operator-bundle:${{ env.BUILD_VERSION || 'dev' }}
-#          tags: quay.io/repository/csiblock/ibm-block-csi-operator-bundle-staging:${{ specific_tag }}
-#=================================================================================================
+          make bundle
+
+      - name: build the operator bundle image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: deploy/olm-catalog/ibm-block-csi-operator-community/1.12.0/bundle-1.12.0.Dockerfile
+          platforms: linux/amd64,linux/ppc64le,linux/s390x
+          push: ${{ github.event_name == 'release' && github.event.action == 'published' }}
+          tags: quay.io/repository/csiblock/ibm-block-csi-operator-bundle-staging:${{ needs.prepare_env.outputs.specific_tag }}
+      #          tags: quay.io/ibmodffs/ibm-storage-odf-operator-bundle:${{ env.BUILD_VERSION || 'dev' }}
+      #=================================================================================================
       - uses: actions/upload-artifact@v3
         with:
           name: images
