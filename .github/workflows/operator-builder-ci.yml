@@ -91,14 +91,12 @@ jobs:
 #          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }} >> /tmp/images.txt
 #          echo ${{ needs.prepare_env.outputs.specific_tag }} >> /tmp/images.txt
 #          echo ${{ needs.prepare_env.outputs.global_tag }} >> /tmp/images.txt
-
       - name: generate bundle manifests and metadata
         run: |
 #          export IMAGE_TAG=${{ env.BUILD_VERSION || 'dev' }}
           export IMAGE_TAG=${{ specific_tag }}          
           make bundle
 #          rm -rf ./bundle/manifests/ibm-storage-odf-operator_v1_serviceaccount.yaml
-
       - name: build the operator bundle image
         uses: docker/build-push-action@v2
         with:
