@@ -94,7 +94,7 @@ jobs:
 #=================================================================================================
       - name: generate bundle manifests and metadata
         run: |
-          export IMAGE_TAG=${{ specific_tag }}
+          export IMAGE_TAG=${{ needs.prepare_env.outputs.specific_tag }}
 #          export IMAGE_TAG=${{ env.BUILD_VERSION || 'dev' }}
 #          make bundle
 ##          rm -rf ./bundle/manifests/ibm-storage-odf-operator_v1_serviceaccount.yaml
