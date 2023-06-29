@@ -92,21 +92,21 @@ jobs:
           echo ${{ needs.prepare_env.outputs.specific_tag }} >> /tmp/images.txt
           echo ${{ needs.prepare_env.outputs.global_tag }} >> /tmp/images.txt
 #=================================================================================================
-      - name: generate bundle manifests and metadata
-        run: |
-#          export IMAGE_TAG=${{ env.BUILD_VERSION || 'dev' }}
-          export IMAGE_TAG=${{ specific_tag }}          
-          make bundle
-#          rm -rf ./bundle/manifests/ibm-storage-odf-operator_v1_serviceaccount.yaml
-      - name: build the operator bundle image
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: deploy/olm-catalog/ibm-block-csi-operator-community/1.12.0/bundle-1.12.0.Dockerfile
-          platforms: linux/amd64,linux/ppc64le,linux/s390x
-          push: ${{ github.event_name == 'release' && github.event.action == 'published' }}
-#          tags: quay.io/ibmodffs/ibm-storage-odf-operator-bundle:${{ env.BUILD_VERSION || 'dev' }}
-          tags: quay.io/repository/csiblock/ibm-block-csi-operator-bundle-staging:${{ specific_tag }}
+#      - name: generate bundle manifests and metadata
+#        run: |
+##          export IMAGE_TAG=${{ env.BUILD_VERSION || 'dev' }}
+#          export IMAGE_TAG=${{ specific_tag }}
+#          make bundle
+##          rm -rf ./bundle/manifests/ibm-storage-odf-operator_v1_serviceaccount.yaml
+#      - name: build the operator bundle image
+#        uses: docker/build-push-action@v2
+#        with:
+#          context: .
+#          file: deploy/olm-catalog/ibm-block-csi-operator-community/1.12.0/bundle-1.12.0.Dockerfile
+#          platforms: linux/amd64,linux/ppc64le,linux/s390x
+#          push: ${{ github.event_name == 'release' && github.event.action == 'published' }}
+##          tags: quay.io/ibmodffs/ibm-storage-odf-operator-bundle:${{ env.BUILD_VERSION || 'dev' }}
+#          tags: quay.io/repository/csiblock/ibm-block-csi-operator-bundle-staging:${{ specific_tag }}
 #=================================================================================================
       - uses: actions/upload-artifact@v3
         with:
