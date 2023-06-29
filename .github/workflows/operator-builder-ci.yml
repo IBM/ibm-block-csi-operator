@@ -68,29 +68,30 @@ jobs:
           registry: quay.io
           username: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}'
           password: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_PASSWORD }}'
-#      - name: Build and push operator images
-#        uses: docker/build-push-action@v3
-#        with:
-#          context: .
-#          platforms: linux/amd64,linux/ppc64le,linux/s390x
-#          push: true
-#          tags: ${{ steps.meta.outputs.tags }}
-#          labels: ${{ steps.meta.outputs.labels }}
-#          file: build/Dockerfile.operator
-#          cache-from: type=gha
-#          cache-to: type=gha,mode=max
-#          build-args: |
-#            VERSION: ${{ env.IMAGE_VERSION }}
-#            BUILD_NUMBER: ${{ github.run_number }}
-#      - name: show chosen image
-#        run: |
-#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }}:${{ needs.prepare_env.outputs.specific_tag }}
-#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }}:${{ needs.prepare_env.outputs.global_tag }}
-#      - name: save image names
-#        run: |
-#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }} >> /tmp/images.txt
-#          echo ${{ needs.prepare_env.outputs.specific_tag }} >> /tmp/images.txt
-#          echo ${{ needs.prepare_env.outputs.global_tag }} >> /tmp/images.txt
+      - name: Build and push operator images
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: linux/amd64,linux/ppc64le,linux/s390x
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          file: build/Dockerfile.operator
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            VERSION: ${{ env.IMAGE_VERSION }}
+            BUILD_NUMBER: ${{ github.run_number }}
+      - name: show chosen image
+        run: |
+          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }}:${{ needs.prepare_env.outputs.specific_tag }}
+          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }}:${{ needs.prepare_env.outputs.global_tag }}
+      - name: save image names
+        run: |
+          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }} >> /tmp/images.txt
+          echo ${{ needs.prepare_env.outputs.specific_tag }} >> /tmp/images.txt
+          echo ${{ needs.prepare_env.outputs.global_tag }} >> /tmp/images.txt
+#=================================================================================================
       - name: generate bundle manifests and metadata
         run: |
 #          export IMAGE_TAG=${{ env.BUILD_VERSION || 'dev' }}
@@ -106,6 +107,7 @@ jobs:
           push: ${{ github.event_name == 'release' && github.event.action == 'published' }}
 #          tags: quay.io/ibmodffs/ibm-storage-odf-operator-bundle:${{ env.BUILD_VERSION || 'dev' }}
           tags: quay.io/repository/csiblock/ibm-block-csi-operator-bundle-staging:${{ specific_tag }}
+#=================================================================================================
       - uses: actions/upload-artifact@v3
         with:
           name: images
