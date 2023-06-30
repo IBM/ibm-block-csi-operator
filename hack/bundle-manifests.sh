@@ -38,7 +38,7 @@ dependencies:
       version: ">=${CSI_RELEASE_NUMBER}"
 EOF
 
-echo "Generating bundle manifests and metadata..."
+echo "Generating bundle manifests and metadata... ${OPERATOR_SDK_BIN} generate kustomize manifests -q "
 ${OPERATOR_SDK_BIN} generate kustomize manifests -q
 
 pushd config/manager

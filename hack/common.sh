@@ -64,7 +64,7 @@ GOOS="${GOOS:-linux}"
 GOARCH="${GOARCH:-amd64}"
 
 OCS_OC_PATH="${OCS_OC_PATH:-oc}"
-OUTDIR="builder/_output"
+OUTDIR="build/_output"
 OUTDIR_BIN="${OUTDIR}/bin"
 BUNDLE_MANIFESTS_DIR="bundle/manifests"
 BUNDLE_METADATA_DIR="bundle/metadata"
