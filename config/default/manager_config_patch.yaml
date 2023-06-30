@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ibm-storage-odf-operator
+  name: ibm-block-csi-operator
   namespace: openshift-storage
 spec:
   template:

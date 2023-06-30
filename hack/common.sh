@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright contributors to the ibm-storage-odf-operator project
+# Copyright contributors to the ibm-block-csi-operator project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
