@@ -26,7 +26,7 @@ DEFAULT_KUSTOMIZE_VERSION="v3.8.7"
 # Check IBM block storage CSI driver versions on https://www.ibm.com/docs/en/blockstg-csi-driver
 # shellcheck disable=SC2034
 CSI_CR_FILE="csi.ibm.com_v1_ibmblockcsi_cr.yaml"
-CSI_RELEASE="v1.11.1"
+CSI_RELEASE="v1.12.0"
 CSI_RELEASE_NUMBER="${CSI_RELEASE:1}"
 CSI_DEVELOP_REGISTRY="stg-artifactory.xiv.ibm.com:5030"
 CSI_LATEST_TAG="latest"
