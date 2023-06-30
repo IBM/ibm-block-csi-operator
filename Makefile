@@ -44,6 +44,8 @@ ensure-operator-sdk:
 	@echo "Ensuring operator-sdk CLI tool installed..."
 	hack/ensure-operator-sdk.sh
 
+
+
 manifests: controller-gen kustomize## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=ibm-block-csi-operator webhook paths="./..." output:crd:artifacts:config=config/crd/bases
 	hack/update_labels_in_crd.sh
@@ -53,9 +55,14 @@ generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and
 
 CONTROLLER_TOOLS_VERSION ?= v0.10.0
 
-CONTROLLER_GEN = controller-gen
-controller-gen: ## Download controller-gen locally if necessary.
-	test -s controller-gen || go install sigs.k8s.io/controller-tools/cmd/controller-gen@$(CONTROLLER_TOOLS_VERSION)
+# BRKD - check this update impact
+# CONTROLLER_GEN = controller-gen
+# controller-gen: ## Download controller-gen locally if necessary.
+# 	test -s controller-gen || go install sigs.k8s.io/controller-tools/cmd/controller-gen@$(CONTROLLER_TOOLS_VERSION)
+
+CONTROLLER_GEN = $(shell pwd)/bin/controller-gen
+controller-gen: ## Download controller-gen locally if necessary
+	$(call go-get-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@${CONTROLLER_GEN_VERSION})
 
 # BRKD - check this update impact
 # KUSTOMIZE_VERSION ?= v5.0.1
