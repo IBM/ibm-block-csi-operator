@@ -65,6 +65,11 @@ rm -rf $$TMP_DIR ;\
 }
 endef
 
+
+.PHONY: bundle ## Generate bundle manifests and metadata, then validate generated files.
+bundle: ensure-operator-sdk manifests kustomize ensure-yq
+	hack/bundle-manifests.sh
+
 # custom
 run_unit_tests_image=docker run --rm -v $(CURDIR):/go/src/github.com/IBM/ibm-block-csi-operator -t operator-unittests
 

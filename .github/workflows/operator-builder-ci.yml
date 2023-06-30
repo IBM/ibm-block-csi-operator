@@ -96,14 +96,14 @@ jobs:
           export IMAGE_TAG=${{ needs.prepare_env.outputs.specific_tag }}
           make bundle
 
-      - name: build the operator bundle image
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: deploy/olm-catalog/ibm-block-csi-operator-community/1.12.0/bundle-1.12.0.Dockerfile
-          platforms: linux/amd64,linux/ppc64le,linux/s390x
-          push: ${{ github.event_name == 'release' && github.event.action == 'published' }}
-          tags: quay.io/repository/csiblock/ibm-block-csi-operator-bundle-staging:${{ needs.prepare_env.outputs.specific_tag }}
+#      - name: build the operator bundle image
+#        uses: docker/build-push-action@v2
+#        with:
+#          context: .
+#          file: deploy/olm-catalog/ibm-block-csi-operator-community/1.12.0/bundle-1.12.0.Dockerfile
+#          platforms: linux/amd64,linux/ppc64le,linux/s390x
+#          push: ${{ github.event_name == 'release' && github.event.action == 'published' }}
+#          tags: quay.io/repository/csiblock/ibm-block-csi-operator-bundle-staging:${{ needs.prepare_env.outputs.specific_tag }}
       #          tags: quay.io/ibmodffs/ibm-storage-odf-operator-bundle:${{ env.BUILD_VERSION || 'dev' }}
       #=================================================================================================
       - uses: actions/upload-artifact@v3

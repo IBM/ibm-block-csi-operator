@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ibm-storage-odf-operator
+  namespace: openshift-storage
+spec:
+  template:
+    spec:
+      containers:
+      - name: manager
+        env:
+        - name: EXPORTER_IMAGE
+          value: quay.io/ibmcsiblock/ibm-block-csi-operator:1.12.0
