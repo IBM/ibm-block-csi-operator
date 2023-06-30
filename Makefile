@@ -32,6 +32,18 @@ help: ## Display this help.
 
 ##@ Development
 
+ensure-yq:
+	@echo "Ensuring yq CLI tool installed..."
+	hack/ensure-yq.sh
+
+ensure-opm:
+	@echo "Ensuring opm CLI tool installed..."
+	hack/ensure-opm.sh
+
+ensure-operator-sdk:
+	@echo "Ensuring operator-sdk CLI tool installed..."
+	hack/ensure-operator-sdk.sh
+
 manifests: controller-gen kustomize## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=ibm-block-csi-operator webhook paths="./..." output:crd:artifacts:config=config/crd/bases
 	hack/update_labels_in_crd.sh
