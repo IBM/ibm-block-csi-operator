@@ -66,7 +66,8 @@ generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and
 #             $(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
 CONTROLLER_GEN_VERSION="v0.4.1"
-CONTROLLER_GEN = $(shell pwd)controller-gen
+# CONTROLLER_GEN = $(shell pwd)/bin/controller-gen
+CONTROLLER_GEN = controller-gen
 controller-gen: ## Download controller-gen locally if necessary
 	$(call go-get-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@${CONTROLLER_GEN_VERSION})
 
