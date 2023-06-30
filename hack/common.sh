@@ -66,9 +66,9 @@ GOARCH="${GOARCH:-amd64}"
 OCS_OC_PATH="${OCS_OC_PATH:-oc}"
 OUTDIR="build/_output"
 OUTDIR_BIN="${OUTDIR}/bin"
-BUNDLE_MANIFESTS_DIR="bundle/manifests"
-BUNDLE_METADATA_DIR="bundle/metadata"
-CSV_PATH="${BUNDLE_MANIFESTS_DIR}/ibm-storage-odf-operator.clusterserviceversion.yaml"
+BUNDLE_MANIFESTS_DIR="deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests"
+BUNDLE_METADATA_DIR="deploy/olm-catalog/ibm-block-csi-operator/1.12.0/metadata"
+CSV_PATH="${BUNDLE_MANIFESTS_DIR}/ibm-block-csi-operator.clusterserviceversion.yaml"
 
 LOCAL_OS_TYPE=$(uname)
 

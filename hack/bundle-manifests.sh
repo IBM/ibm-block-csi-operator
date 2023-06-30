@@ -28,15 +28,16 @@ echo "Cleaning the previous artifacts that may exist..."
 rm -rf "$(dirname ${BUNDLE_METADATA_DIR})"
 mkdir -p "${BUNDLE_METADATA_DIR}"
 
-# Generate the file dependencies.yaml, which requires the minimum version of IBM Block CSI Operator.
-echo "Generating the file dependencies.yaml..."
-cat << EOF > ${BUNDLE_METADATA_DIR}/dependencies.yaml
-dependencies:
-  - type: olm.package
-    value:
-      packageName: ibm-block-csi-operator
-      version: ">=${CSI_RELEASE_NUMBER}"
-EOF
+#BRKD - no need dependencies for csi
+## Generate the file dependencies.yaml, which requires the minimum version of IBM Block CSI Operator.
+#echo "Generating the file dependencies.yaml..."
+#cat << EOF > ${BUNDLE_METADATA_DIR}/dependencies.yaml
+#dependencies:
+#  - type: olm.package
+#    value:
+#      packageName: ibm-block-csi-operator
+#      version: ">=${CSI_RELEASE_NUMBER}"
+#EOF
 
 echo "Generating bundle manifests and metadata... ${OPERATOR_SDK_BIN} generate kustomize manifests -q "
 ${OPERATOR_SDK_BIN} generate kustomize manifests -q
