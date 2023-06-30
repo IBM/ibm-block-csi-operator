@@ -42,7 +42,8 @@ CSI_GA_CR_URL="https://raw.githubusercontent.com/IBM/ibm-block-csi-operator/${CS
 CSI_VOLUME_GROUP_OPERATOR_DEVELOP_PATH="quay.io\/csiblock\/volume-group-operator-staging"
 CSI_VOLUME_GROUP_OPERATOR_TAG="v0.9.1"
 
-VCS_URL="https://github.com/IBM/ibm-storage-odf-operator"
+VCS_URL="https://github.com/IBM/ibm-block-csi-operator"
+#VCS_URL="https://github.com/IBM/ibm-storage-odf-operator"
 VCS_REF="1.4.0-$(git rev-parse --short HEAD)"
 RELEASE_VERSION=$(cat version/version.go | grep "Version =" | awk -F '"' '{print $2}')
 
@@ -54,8 +55,8 @@ DEFAULT_ENABLE_UPGRADE='False'
 PREVIOUS_CHANNELS="stable-v1.3"
 PREVIOUS_DEFAULT_CHANNEL="${PREVIOUS_CHANNELS}"
 PREVIOUS_OPERATOR_IMAGE_VERSION="v1.3.0"
-PREVIOUS_OPERATOR_IMAGE_TAG="${PREVIOUS_OPERATOR_IMAGE_VERSION:1}" #1.3.0
-PREVIOUS_BUNDLE_IMAGE_PATH="quay.io/ibmodffs/ibm-storage-odf-operator-bundle:${PREVIOUS_OPERATOR_IMAGE_TAG}"
+#PREVIOUS_OPERATOR_IMAGE_TAG="${PREVIOUS_OPERATOR_IMAGE_VERSION:1}" #1.3.0
+#PREVIOUS_BUNDLE_IMAGE_PATH="quay.io/ibmodffs/ibm-storage-odf-operator-bundle:${PREVIOUS_OPERATOR_IMAGE_TAG}"
 
 GO111MODULE="on"
 GOPROXY="https://proxy.golang.org"
@@ -83,16 +84,21 @@ DEFAULT_OPM_BIN="${OUTDIR_BIN}/opm"
 DEFAULT_OPERATOR_SDK_BIN="${OUTDIR_BIN}/operator-sdk"
 DEFAULT_KUSTOMIZE_BIN="${OUTDIR_BIN}/kustomize"
 
-DEFAULT_IMAGE_REGISTRY="quay.io/ibmodffs"
+DEFAULT_IMAGE_REGISTRY="quay.io/csiblock"
+#DEFAULT_IMAGE_REGISTRY="quay.io/ibmodffs"
 
 DEFAULT_IMAGE_TAG="latest"
 
-DEFAULT_OPERATOR_IMAGE_NAME="ibm-storage-odf-operator"
-DEFAULT_OPERATOR_BUNDLE_NAME="ibm-storage-odf-operator-bundle"
-DEFAULT_CATALOG_IMAGE_NAME="ibm-storage-odf-catalog"
-DEFAULT_MUST_GATHER_IMAGE_NAME="ibm-storage-odf-operator-must-gather"
-DEFAULT_FLASHSYSTEM_DRIVER_NAME="ibm-storage-odf-block-driver"
-DEFAULT_CONSOLE_IMAGE_NAME="ibm-storage-odf-plugin"
+DEFAULT_OPERATOR_IMAGE_NAME="ibm-block-csi-operator"
+DEFAULT_OPERATOR_BUNDLE_NAME="ibm-block-csi-operator-bundle"
+DEFAULT_CATALOG_IMAGE_NAME="ibm-block-csi-catalog"
+
+#DEFAULT_OPERATOR_IMAGE_NAME="ibm-storage-odf-operator"
+#DEFAULT_OPERATOR_BUNDLE_NAME="ibm-storage-odf-operator-bundle"
+#DEFAULT_CATALOG_IMAGE_NAME="ibm-storage-odf-catalog"
+#DEFAULT_MUST_GATHER_IMAGE_NAME="ibm-storage-odf-operator-must-gather"
+#DEFAULT_FLASHSYSTEM_DRIVER_NAME="ibm-storage-odf-block-driver"
+#DEFAULT_CONSOLE_IMAGE_NAME="ibm-storage-odf-plugin"
 
 YQ_BIN="${YQ_BIN:-${DEFAULT_YQ_BIN}}"
 OPM_BIN="${OPM_BIN:-${DEFAULT_OPM_BIN}}"
