@@ -57,12 +57,16 @@ CONTROLLER_GEN = controller-gen
 controller-gen: ## Download controller-gen locally if necessary.
 	test -s controller-gen || go install sigs.k8s.io/controller-tools/cmd/controller-gen@$(CONTROLLER_TOOLS_VERSION)
 
-KUSTOMIZE_VERSION ?= v5.0.1
-KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
+# BRKD - check this update impact
+# KUSTOMIZE_VERSION ?= v5.0.1
+# KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 
-KUSTOMIZE = kustomize
-kustomize: ## Download kustomize locally if necessary.
-	test -s /go/bin/kustomize || { curl -Ss $(KUSTOMIZE_INSTALL_SCRIPT) | bash -s -- $(subst v,,$(KUSTOMIZE_VERSION)) /go/bin/; }
+# KUSTOMIZE = kustomize
+# kustomize: ## Download kustomize locally if necessary.
+# 	test -s /go/bin/kustomize || { curl -Ss $(KUSTOMIZE_INSTALL_SCRIPT) | bash -s -- $(subst v,,$(KUSTOMIZE_VERSION)) /go/bin/; }
+
+kustomize: ## Download kustomize locally if necessary
+	hack/ensure-kustomize.sh
 
 PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
 define go-get-tool
