@@ -39,11 +39,10 @@ ensure-yq:
 ensure-opm:
 	@echo "Ensuring opm CLI tool installed..."
 	hack/ensure-opm.sh
-#
-#BRKD-1
-# ensure-operator-sdk:
-# 	@echo "Ensuring operator-sdk CLI tool installed..."
-# 	hack/ensure-operator-sdk.sh
+
+ensure-operator-sdk:
+	@echo "Ensuring operator-sdk CLI tool installed..."
+	hack/ensure-operator-sdk.sh
 
 
 # BRKD - check this update impact
