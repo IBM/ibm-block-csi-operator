@@ -100,6 +100,9 @@ endef
 bundle: ensure-operator-sdk manifests kustomize ensure-yq
 	hack/bundle-manifests.sh
 
+bundle-build: bundle ## Build the bundle image
+	hack/build-operator-bundle.sh
+
 # custom
 run_unit_tests_image=docker run --rm -v $(CURDIR):/go/src/github.com/IBM/ibm-block-csi-operator -t operator-unittests
 
