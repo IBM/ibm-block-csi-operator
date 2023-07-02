@@ -1,3 +1,4 @@
+
 name: operator-builder-ci
 on:
   push:
@@ -21,21 +22,84 @@ jobs:
       PRODUCTION: "${{ inputs.production }}"
       BUILD_NUMBER: "${{ github.run_number }}"
       GITHUB_SHA: "${{ github.sha }}"
-      PROD_REPOSITORY: csiblock/ibm-block-csi-operator
-      STAGING_REPOSITORY: csiblock/ibm-block-csi-operator-staging
+      PROD_REPOSITORY: csiblock/ibm-block-csi-operator-bundle
+      STAGING_REPOSITORY: csiblock/ibm-block-csi-operator-bundle-staging
+#      PROD_REPOSITORY: csiblock/ibm-block-csi-operator
+#      STAGING_REPOSITORY: csiblock/ibm-block-csi-operator-staging
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3.2.0
-      - name: Setup dependencies
-        id: setup_dependencies
-        run: |
-          build/ci/github_actions/setup_ci_dependencies.sh
+       - name: Checkout code
+         uses: actions/checkout@v3.2.0
+       - name: Setup dependencies
+         id: setup_dependencies
+         run: |
+           build/ci/github_actions/setup_ci_dependencies.sh
     outputs:
       repository: "${{ steps.setup_dependencies.outputs.repository }}"
       specific_tag: "${{ steps.setup_dependencies.outputs.specific_tag }}"
       global_tag: "${{ steps.setup_dependencies.outputs.global_tag }}"
+#
+#  build_and_push_images:
+#    name: "Build and push images"
+#    runs-on: ubuntu-latest
+#    env:
+#      REGISTRY: quay.io
+#    needs:
+#      - prepare_env
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3.2.0
+#      - name: Set up QEMU
+#        uses: docker/setup-qemu-action@v2
+#      - name: Set up Docker Buildx
+#        id: buildx
+#        uses: docker/setup-buildx-action@v2
+#      - name: Docker meta
+#        id: meta
+#        uses: docker/metadata-action@v4
+#        with:
+#          images: |
+#            ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }}
+#          tags: |
+#            type=raw,value=${{ needs.prepare_env.outputs.global_tag }}
+#            type=raw,value=${{ needs.prepare_env.outputs.specific_tag }}
+#          labels: |
+#            commit=${{ github.sha }}
+#      - name: Login to quay.io
+#        uses: docker/login-action@v2
+#        with:
+#          registry: quay.io
+#          username: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}'
+#          password: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_PASSWORD }}'
+#      - name: Build and push operator images
+#        uses: docker/build-push-action@v3
+#        with:
+#          context: .
+#          platforms: linux/amd64,linux/ppc64le,linux/s390x
+#          push: true
+#          tags: ${{ steps.meta.outputs.tags }}
+#          labels: ${{ steps.meta.outputs.labels }}
+#          file: build/Dockerfile.operator
+#          cache-from: type=gha
+#          cache-to: type=gha,mode=max
+#          build-args: |
+#            VERSION: ${{ env.IMAGE_VERSION }}
+#            BUILD_NUMBER: ${{ github.run_number }}
+#      - name: show chosen image
+#        run: |
+#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }}:${{ needs.prepare_env.outputs.specific_tag }}
+#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }}:${{ needs.prepare_env.outputs.global_tag }}
+#      - name: save image names
+#        run: |
+#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }} >> /tmp/images.txt
+#          echo ${{ needs.prepare_env.outputs.specific_tag }} >> /tmp/images.txt
+#          echo ${{ needs.prepare_env.outputs.global_tag }} >> /tmp/images.txt
+#      - uses: actions/upload-artifact@v3
+#        with:
+#          name: images
+#          path: /tmp/images.txt
+#          retention-days: 90
 
-  build_and_push_images:
+  build_and_push_bundle_images:
     name: "Build and push images"
     runs-on: ubuntu-latest
     env:
@@ -67,29 +131,29 @@ jobs:
           registry: quay.io
           username: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}'
           password: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_PASSWORD }}'
-            - name: Build and push operator images
-              uses: docker/build-push-action@v3
-              with:
-                context: .
-                platforms: linux/amd64,linux/ppc64le,linux/s390x
-                push: true
-                tags: ${{ steps.meta.outputs.tags }}
-                labels: ${{ steps.meta.outputs.labels }}
-                file: build/Dockerfile.operator
-                cache-from: type=gha
-                cache-to: type=gha,mode=max
-                build-args: |
-                  VERSION: ${{ env.IMAGE_VERSION }}
-                  BUILD_NUMBER: ${{ github.run_number }}
-            - name: show chosen image
-              run: |
-                echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }}:${{ needs.prepare_env.outputs.specific_tag }}
-                echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }}:${{ needs.prepare_env.outputs.global_tag }}
-            - name: save image names
-              run: |
-                echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }} >> /tmp/images.txt
-                echo ${{ needs.prepare_env.outputs.specific_tag }} >> /tmp/images.txt
-                echo ${{ needs.prepare_env.outputs.global_tag }} >> /tmp/images.txt
+      - name: Build and push operator images
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: linux/amd64,linux/ppc64le,linux/s390x
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          file: deploy/olm-catalog/ibm-block-csi-operator/1.12.0/bundle-1.12.0.Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            VERSION: ${{ env.IMAGE_VERSION }}
+            BUILD_NUMBER: ${{ github.run_number }}
+      - name: show chosen image
+        run: |
+          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }}:${{ needs.prepare_env.outputs.specific_tag }}
+          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }}:${{ needs.prepare_env.outputs.global_tag }}
+      - name: save image names
+        run: |
+          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }} >> /tmp/images.txt
+          echo ${{ needs.prepare_env.outputs.specific_tag }} >> /tmp/images.txt
+          echo ${{ needs.prepare_env.outputs.global_tag }} >> /tmp/images.txt
       - uses: actions/upload-artifact@v3
         with:
           name: images
