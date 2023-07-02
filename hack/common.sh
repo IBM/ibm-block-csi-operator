@@ -90,7 +90,7 @@ DEFAULT_IMAGE_REGISTRY="quay.io/csiblock"
 DEFAULT_IMAGE_TAG="latest"
 
 DEFAULT_OPERATOR_IMAGE_NAME="ibm-block-csi-operator"
-DEFAULT_OPERATOR_BUNDLE_NAME="ibm-block-csi-operator-bundle"
+DEFAULT_OPERATOR_BUNDLE_NAME="ibm-block-csi-operator-bundle-staging"
 DEFAULT_CATALOG_IMAGE_NAME="ibm-block-csi-catalog"
 
 #DEFAULT_OPERATOR_IMAGE_NAME="ibm-storage-odf-operator"

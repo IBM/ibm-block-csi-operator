@@ -39,10 +39,11 @@ ensure-yq:
 ensure-opm:
 	@echo "Ensuring opm CLI tool installed..."
 	hack/ensure-opm.sh
-
-ensure-operator-sdk:
-	@echo "Ensuring operator-sdk CLI tool installed..."
-	hack/ensure-operator-sdk.sh
+#
+#BRKD-1
+# ensure-operator-sdk:
+# 	@echo "Ensuring operator-sdk CLI tool installed..."
+# 	hack/ensure-operator-sdk.sh
 
 
 # BRKD - check this update impact
@@ -79,8 +80,9 @@ controller-gen: ## Download controller-gen locally if necessary
 # kustomize: ## Download kustomize locally if necessary.
 # 	test -s /go/bin/kustomize || { curl -Ss $(KUSTOMIZE_INSTALL_SCRIPT) | bash -s -- $(subst v,,$(KUSTOMIZE_VERSION)) /go/bin/; }
 
-kustomize: ## Download kustomize locally if necessary
-	hack/ensure-kustomize.sh
+#BRKD-1
+# kustomize: ## Download kustomize locally if necessary
+# 	hack/ensure-kustomize.sh
 
 PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
 define go-get-tool
