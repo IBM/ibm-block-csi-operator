@@ -47,7 +47,7 @@ VCS_URL="https://github.com/IBM/ibm-block-csi-operator"
 VCS_REF="1.4.0-$(git rev-parse --short HEAD)"
 RELEASE_VERSION=$(cat version/version.go | grep "Version =" | awk -F '"' '{print $2}')
 
-CHANNELS="stable-v1.4"
+CHANNELS="stable"
 DEFAULT_CHANNEL="${CHANNELS}"
 OPERATOR_IMAGE_VERSION="v1.4.0"
 

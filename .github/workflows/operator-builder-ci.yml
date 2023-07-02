@@ -94,7 +94,7 @@ jobs:
       - name: generate bundle manifests and metadata
         run: |
           export IMAGE_TAG=${{ needs.prepare_env.outputs.specific_tag }}
-          make bundle
+          make bundle-build
 
 #      - name: build the operator bundle image
 #        uses: docker/build-push-action@v2

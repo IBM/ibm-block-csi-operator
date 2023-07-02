@@ -28,6 +28,9 @@ build_push_bundle_image(){
   operator_channels=${4}
   echo "Building Operator bundle image ${bundle_image_name}..."
   ${OPM_BIN} alpha bundle build --directory "${directory_path}" --tag "${bundle_image_name}" --output-dir . --package "${package_operator_name}" --channels "${operator_channels}"
+
+opm alpha bundle build --directory "deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests" --tag "quay.io/csiblock/ibm-block-csi-operator-bundle-staging" --output-dir . --package "ibm-block-csi-operator" --channels "stable"
+
   echo "Pushing Operator bundle image to image registry..."
   docker push "${bundle_image_name}"
   echo
@@ -73,9 +76,10 @@ check_and_build_csi_bundle_image(){
 }
 
 
-build_push_bundle_image "${BUNDLE_FULL_IMAGE_NAME}" "bundle/metadata/" "${OPERATOR_IMAGE_NAME}" "${CHANNELS}"
-check_and_build_csi_bundle_image
-if [ "${ENABLE_UPGRADE}" == "True" ]; then
-  echo "Upgrade is enabled, pulling previous bundle image"
-  docker pull "${PREVIOUS_BUNDLE_IMAGE_PATH}"
-fi
+build_push_bundle_image "${BUNDLE_FULL_IMAGE_NAME}" "${BUNDLE_MANIFESTS_DIR}" "${OPERATOR_IMAGE_NAME}" "${CHANNELS}"
+#BRKD remove
+#check_and_build_csi_bundle_image
+#if [ "${ENABLE_UPGRADE}" == "True" ]; then
+#  echo "Upgrade is enabled, pulling previous bundle image"
+#  docker pull "${PREVIOUS_BUNDLE_IMAGE_PATH}"
+#fi

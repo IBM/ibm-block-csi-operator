@@ -98,7 +98,7 @@ endef
 
 .PHONY: bundle ## Generate bundle manifests and metadata, then validate generated files.
 bundle: ensure-operator-sdk manifests kustomize ensure-yq
-	hack/bundle-manifests.sh
+# 	hack/bundle-manifests.sh  #BRKD remove
 
 bundle-build: bundle ## Build the bundle image
 	hack/build-operator-bundle.sh
