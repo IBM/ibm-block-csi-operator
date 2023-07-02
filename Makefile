@@ -79,9 +79,8 @@ controller-gen: ## Download controller-gen locally if necessary
 # kustomize: ## Download kustomize locally if necessary.
 # 	test -s /go/bin/kustomize || { curl -Ss $(KUSTOMIZE_INSTALL_SCRIPT) | bash -s -- $(subst v,,$(KUSTOMIZE_VERSION)) /go/bin/; }
 
-#BRKD-1
-# kustomize: ## Download kustomize locally if necessary
-# 	hack/ensure-kustomize.sh
+kustomize: ## Download kustomize locally if necessary
+	hack/ensure-kustomize.sh
 
 PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
 define go-get-tool
