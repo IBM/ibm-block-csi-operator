@@ -29,7 +29,8 @@ build_push_bundle_image(){
   echo "Building Operator bundle image ${bundle_image_name}..."
   ${OPM_BIN} alpha bundle build --directory "${directory_path}" --tag "${bundle_image_name}" --output-dir . --package "${package_operator_name}" --channels "${operator_channels}"
 
-opm alpha bundle build --directory "deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests" --tag "quay.io/csiblock/ibm-block-csi-operator-bundle-staging" --output-dir . --package "ibm-block-csi-operator" --channels "stable"
+#BRKD example
+#opm alpha bundle build --directory "deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests" --tag "quay.io/csiblock/ibm-block-csi-operator-bundle-staging" --output-dir . --package "ibm-block-csi-operator" --channels "stable"
 
   echo "Pushing Operator bundle image to image registry..."
   docker push "${bundle_image_name}"
