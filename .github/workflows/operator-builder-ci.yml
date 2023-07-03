@@ -1,8 +1,8 @@
 
 name: operator-builder-ci
-on:
-  push:
-    branches:
+#on:
+#  push:
+#    branches:
 #      - operator_buider_ci_add_bundle
   pull_request:
   workflow_dispatch:
