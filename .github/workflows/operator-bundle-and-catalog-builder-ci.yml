@@ -99,10 +99,15 @@ jobs:
           path: /tmp/images.txt
           retention-days: 90
 
+      - name: Install OPM
+        run: |
+          curl -LO https://github.com/operator-framework/operator-registry/releases/latest/download/opm-linux-amd64
+          chmod +x opm-linux-amd64
+          sudo mv opm-linux-amd64 /usr/local/bin/opm
+
       - name: Build Operator Catalog
         run: |
           # Replace with your build commands to create the Operator catalog
-          GO111MODULE=on go get github.com/operator-framework/operator-registry/cmd/opm@v1.17.2
           opm alpha bundle generate --directory deploy/olm-catalog/ibm-block-csi-operator/1.12.0 --default-channel stable --output-dir /tmp/catalog --package ibm-block-csi-operator --version 1.0.0
           # Add any additional customization or modifications to the catalog if needed
 
