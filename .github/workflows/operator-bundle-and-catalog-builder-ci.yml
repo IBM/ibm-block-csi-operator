@@ -37,7 +37,7 @@ jobs:
       global_tag: "${{ steps.setup_dependencies.outputs.global_tag }}"
 
   build_and_push_bundle_images:
-    name: "Build and push images"
+    name: "build and push bundle images"
     runs-on: ubuntu-latest
     env:
       REGISTRY: quay.io
