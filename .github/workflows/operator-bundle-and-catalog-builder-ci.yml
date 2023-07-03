@@ -117,9 +117,10 @@ jobs:
 
       - name: Create catalog image
         run: |
-          docker run --rm -v $PWD:/work -w /work quay.io/operator-framework/opm:v1.27.1-amd64 index add --bundles deploy/olm-catalog/ibm-block-csi-operator/1.12.0 --tag ${{ needs.prepare_env.outputs.specific_tag }} --build-tool docker
-          docker push quay.io/csiblock/ibm-block-csi-operator-catalog-source:${{ needs.prepare_env.outputs.specific_tag }}
 
+          docker run --rm -v $PWD:/work -w /work quay.io/operator-framework/operator-sdk:latest index add --bundles csiblock/ibm-block-csi-operator-bundle-staging:${{ needs.prepare_env.outputs.specific_tag }} --tag ${{ needs.prepare_env.outputs.specific_tag }} --build-tool docker
+          docker push quay.io/csiblock/ibm-block-csi-operator-catalog-source:${{ needs.prepare_env.outputs.specific_tag }}
+#          opm index add --bundles quay.io/operator-framework/operator-bundle-prometheus@sha256:a3ee653ffa8a0d2bbb2fabb150a94da6e878b6e9eb07defd40dc884effde11a0 --tag quay.io/operator-framework/monitoring:1.0.0
 
 #          docker run --rm -v $PWD:/work -w /work quay.io/operator-framework/opm:v1.27.1-amd64 index add --bundles csiblock/ibm-block-csi-operator-bundle-staging:${{ needs.prepare_env.outputs.specific_tag }} --build-tool docker
 
