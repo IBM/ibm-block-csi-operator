@@ -1,9 +1,8 @@
-
 name: operator-bundle-and-catalog-builder-ci
 on:
   push:
-#    branches:
-#      - operator_buider_ci_add_bundle
+  #    branches:
+  #      - operator_buider_ci_add_bundle
   pull_request:
   workflow_dispatch:
     inputs:
@@ -25,12 +24,12 @@ jobs:
       PROD_REPOSITORY: csiblock/ibm-block-csi-operator-bundle
       STAGING_REPOSITORY: csiblock/ibm-block-csi-operator-bundle-staging
     steps:
-       - name: Checkout code
-         uses: actions/checkout@v3.2.0
-       - name: Setup dependencies
-         id: setup_dependencies
-         run: |
-           build/ci/github_actions/setup_ci_dependencies.sh
+      - name: Checkout code
+        uses: actions/checkout@v3.2.0
+      - name: Setup dependencies
+        id: setup_dependencies
+        run: |
+          build/ci/github_actions/setup_ci_dependencies.sh
     outputs:
       repository: "${{ steps.setup_dependencies.outputs.repository }}"
       specific_tag: "${{ steps.setup_dependencies.outputs.specific_tag }}"
@@ -122,9 +121,9 @@ jobs:
 
       - name: Create catalog image
         run: |
-#          opm index add --bundles csiblock/ibm-block-csi-operator-bundle-staging --tag ${{ needs.prepare_env.outputs.specific_tag }} --build-tool docker
-          docker run --rm -v $PWD:/work -w /work quay.io/operator-framework/opm:v1.17.1 index add --bundles csiblock/ibm-block-csi-operator-bundle-staging --tag ${{ needs.prepare_env.outputs.specific_tag }} --build-tool docker
+          docker run --rm -v $PWD:/work -w /work quay.io/operator-framework/opm:v1.27.1-amd64 index add --bundles csiblock/ibm-block-csi-operator-bundle-staging --tag ${{ needs.prepare_env.outputs.specific_tag }} --build-tool docker
           docker push quay.io/csiblock/ibm-block-csi-operator-catalog-source:${{ needs.prepare_env.outputs.specific_tag }}
+#          opm index add --bundles csiblock/ibm-block-csi-operator-bundle-staging --tag ${{ needs.prepare_env.outputs.specific_tag }} --build-tool docker
 
 ##
 ##      - name: Install OPM
