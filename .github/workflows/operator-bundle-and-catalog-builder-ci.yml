@@ -68,6 +68,11 @@ jobs:
           registry: quay.io
           username: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}'
           password: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_PASSWORD }}'
+
+      - name: Install OPM
+        run: |
+          GO111MODULE=on go get github.com/operator-framework/operator-registry/cmd/opm@v1.17.2
+
       - name: Build and push operator images
         uses: docker/build-push-action@v3
         with:
@@ -100,8 +105,7 @@ jobs:
       - name: Build Operator Catalog
         run: |
           # Replace with your build commands to create the Operator catalog
-          opm alpha bundle generate --directory deploy/olm-catalog/ibm-block-csi-operator/1.12.0 --default-channel stable --output-dir /tmp/catalog --package ibm-storage-odf-operator --version 1.0.0
-          # opm alpha bundle build --directory "bundle/metadata/" --tag "quay.io/bvered/ibm-storage-odf-operator-bundle:1.5.0_test" --output-dir . --package "ibm-storage-odf-operator" --channels "stable-v1.5"
+          opm alpha bundle generate --directory deploy/olm-catalog/ibm-block-csi-operator/1.12.0 --default-channel stable --output-dir /tmp/catalog --package ibm-block-csi-operator --version 1.0.0
           # Add any additional customization or modifications to the catalog if needed
 
       - name: Publish Catalog
