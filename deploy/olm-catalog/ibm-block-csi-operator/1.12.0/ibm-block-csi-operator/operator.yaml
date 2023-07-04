@@ -1,0 +1,41 @@
+---
+defaultChannel: stable
+name: ibm-block-csi-operator
+schema: olm.package
+---
+image: quay.io/csiblock/ibm-block-csi-operator-bundle-staging:v0.9.1_b17_175332c_operator_buider_ci_add_bundle
+name: ibm-block-csi-operator.v1.12.0
+package: ibm-block-csi-operator
+properties:
+- type: olm.gvk
+  value:
+    group: csi.ibm.com
+    kind: HostDefiner
+    version: v1
+- type: olm.gvk
+  value:
+    group: csi.ibm.com
+    kind: HostDefinition
+    version: v1
+- type: olm.gvk
+  value:
+    group: csi.ibm.com
+    kind: IBMBlockCSI
+    version: v1
+- type: olm.package
+  value:
+    packageName: ibm-block-csi-operator
+    version: 1.12.0
+relatedImages:
+- image: quay.io/csiblock/ibm-block-csi-operator-bundle-staging:v0.9.1_b17_175332c_operator_buider_ci_add_bundle
+  name: ""
+- image: quay.io/csiblock/ibm-block-csi-operator-staging:v0.9.1_b18_5faf0bd_operator_buider_ci_add_bundle
+  name: ibm-block-csi-operator
+schema: olm.bundle
+---
+schema: olm.channel
+package: ibm-block-csi-operator
+name: stable
+entries:
+  - name: ibm-block-csi-operator.v1.12.0
+    skipRange: ">=1.6.0 <1.12.0"]

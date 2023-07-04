@@ -1,8 +1,8 @@
 name: operator-bundle-and-catalog-builder-ci
 on:
   push:
-  #    branches:
-  #      - operator_buider_ci_add_bundle
+      branches:
+        - operator_buider_ci_add_bundle
   pull_request:
   workflow_dispatch:
     inputs:
@@ -13,6 +13,7 @@ on:
         required: false
 env:
   IMAGE_VERSION: 'v0.9.1'
+  CATALOG_IMAGE: quay.io/your-repo/my-operator-catalog
 jobs:
   prepare_env:
     name: "Prepare env"
@@ -21,8 +22,10 @@ jobs:
       PRODUCTION: "${{ inputs.production }}"
       BUILD_NUMBER: "${{ github.run_number }}"
       GITHUB_SHA: "${{ github.sha }}"
-      PROD_REPOSITORY: csiblock/ibm-block-csi-operator-bundle
-      STAGING_REPOSITORY: csiblock/ibm-block-csi-operator-bundle-staging
+      PROD_REPOSITORY: quay.io/csiblock/ibm-block-csi-operator-catalog-source
+      STAGING_REPOSITORY: quay.io/csiblock/ibm-block-csi-operator-catalog-source
+#      PROD_REPOSITORY: csiblock/ibm-block-csi-operator-bundle
+#      STAGING_REPOSITORY: csiblock/ibm-block-csi-operator-bundle-staging
     steps:
       - name: Checkout code
         uses: actions/checkout@v3.2.0
@@ -68,7 +71,36 @@ jobs:
           username: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}'
           password: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_PASSWORD }}'
 
-      - name: Build and push operator images
+#      - name: Build and push operator images
+#        uses: docker/build-push-action@v3
+#        with:
+#          context: .
+#          platforms: linux/amd64,linux/ppc64le,linux/s390x
+#          push: true
+#          tags: ${{ steps.meta.outputs.tags }}
+#          labels: ${{ steps.meta.outputs.labels }}
+#          file: deploy/olm-catalog/ibm-block-csi-operator/1.12.0/bundle-1.12.0.Dockerfile
+#          cache-from: type=gha
+#          cache-to: type=gha,mode=max
+#          build-args: |
+#            VERSION: ${{ env.IMAGE_VERSION }}
+#            BUILD_NUMBER: ${{ github.run_number }}
+#      - name: show chosen image
+#        run: |
+#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }}:${{ needs.prepare_env.outputs.specific_tag }}
+#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }}:${{ needs.prepare_env.outputs.global_tag }}
+#      - name: save image names
+#        run: |
+#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }} >> /tmp/images.txt
+#          echo ${{ needs.prepare_env.outputs.specific_tag }} >> /tmp/images.txt
+#          echo ${{ needs.prepare_env.outputs.global_tag }} >> /tmp/images.txt
+#      - uses: actions/upload-artifact@v3
+#        with:
+#          name: images
+#          path: /tmp/images.txt
+#          retention-days: 90
+
+      - name: Build and push catlog operator images
         uses: docker/build-push-action@v3
         with:
           context: .
@@ -76,7 +108,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          file: deploy/olm-catalog/ibm-block-csi-operator/1.12.0/bundle-1.12.0.Dockerfile
+          file: deploy/olm-catalog/ibm-block-csi-operator/1.12.0/ibm-block-csi-operator.Dockerfile
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
@@ -86,40 +118,82 @@ jobs:
         run: |
           echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }}:${{ needs.prepare_env.outputs.specific_tag }}
           echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }}:${{ needs.prepare_env.outputs.global_tag }}
-      - name: save image names
-        run: |
-          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.repository }} >> /tmp/images.txt
-          echo ${{ needs.prepare_env.outputs.specific_tag }} >> /tmp/images.txt
-          echo ${{ needs.prepare_env.outputs.global_tag }} >> /tmp/images.txt
-      - uses: actions/upload-artifact@v3
-        with:
-          name: images
-          path: /tmp/images.txt
-          retention-days: 90
 
-      - name: Checkout repository
-        uses: actions/checkout@v2
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+#jobs:
+#  build-and-push-catalog:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v2
+#
+#      - name: Set up Go
+#        uses: actions/setup-go@v2
+#        with:
+#          go-version: '1.17'
+#
+#      - name: Install OPM
+#        run: |
+#          curl -L https://github.com/operator-framework/operator-registry/releases/latest/download/opm_linux_amd64 -o opm
+#          chmod +x opm
+#          sudo mv opm /usr/local/bin/opm
+#
+#      - name: Build and push catalog image (amd64)
+#        run: |
+#          opm index add --bundles csiblock/ibm-block-csi-operator-bundle-staging --tag sha256:7a97dad61a6224144a406eaffcb1a5307ad7e737466ae4b61b8cf2f1f451dc69 --container-tool docker --architecture amd64 --tag ${CATALOG_IMAGE}:amd64
+#          docker push ${CATALOG_IMAGE}:amd64
+#
+#      - name: Build and push catalog image (ppc64le)
+#        run: |
+#          opm index add --bundles csiblock/ibm-block-csi-operator-bundle-staging --tag sha256:b35aca0da36f702df47a2de97393a6aeff0b935426443bca779b41d267dda85a --container-tool docker --architecture ppc64le --tag ${CATALOG_IMAGE}:ppc64le
+#          docker push ${CATALOG_IMAGE}:ppc64le
+#
+#      - name: Build and push catalog image (s390x)
+#        run: |
+#          opm index add --bundles csiblock/ibm-block-csi-operator-bundle-staging --tag sha256:446327180b1a51eaf57f40def95c1fbe1b866833b6921d261a452093841be2d4 --container-tool docker --architecture s390x --tag ${CATALOG_IMAGE}:s390x
+#          docker push ${CATALOG_IMAGE}:s390x
 
-      - name: Build and push bundle images
-        run: |
-          # Add commands to build and push your operator bundle images
-          # Make sure to tag the images appropriately
 
-      - name: Set up Docker CLI
-        uses: docker/login-action@v1
-        with:
-          registry: quay.io
-          username: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}'
-          password: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_PASSWORD }}'
 
-      - name: Create catalog image
-        run: |
+#          opm index add --bundles <path-to-your-operator-bundles> --tag ${GITHUB_SHA} --container-tool docker --architecture s390x --tag ${CATALOG_IMAGE}:s390x
+#          docker push ${CATALOG_IMAGE}:s390x
 
-          docker run --rm -v $PWD:/work -w /work quay.io/operator-framework/operator-sdk:latest index add --bundles csiblock/ibm-block-csi-operator-bundle-staging:${{ needs.prepare_env.outputs.specific_tag }} --tag ${{ needs.prepare_env.outputs.specific_tag }} --build-tool docker
-          docker push quay.io/csiblock/ibm-block-csi-operator-catalog-source:${{ needs.prepare_env.outputs.specific_tag }}
+
+
+
+
+
+#      - name: Checkout repository
+#        uses: actions/checkout@v2
+#
+#      - name: Set up Docker Buildx
+#        uses: docker/setup-buildx-action@v1
+#
+#      - name: Build and push bundle images
+#        run: |
+#          # Add commands to build and push your operator bundle images
+#          # Make sure to tag the images appropriately
+#
+#      - name: Set up Docker CLI
+#        uses: docker/login-action@v1
+#        with:
+#          registry: quay.io
+#          username: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}'
+#          password: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_PASSWORD }}'
+#
+#      - name: Create catalog image
+#        run: |
+#
+#          docker run --rm -v $PWD:/work -w /work quay.io/operator-framework/operator-sdk:latest index add --bundles csiblock/ibm-block-csi-operator-bundle-staging:${{ needs.prepare_env.outputs.specific_tag }} --tag ${{ needs.prepare_env.outputs.specific_tag }} --build-tool docker
+#          docker push quay.io/csiblock/ibm-block-csi-operator-catalog-source:${{ needs.prepare_env.outputs.specific_tag }}
+
+
+
+
+
+
+
+
 #          opm index add --bundles quay.io/operator-framework/operator-bundle-prometheus@sha256:a3ee653ffa8a0d2bbb2fabb150a94da6e878b6e9eb07defd40dc884effde11a0 --tag quay.io/operator-framework/monitoring:1.0.0
 
 #          docker run --rm -v $PWD:/work -w /work quay.io/operator-framework/opm:v1.27.1-amd64 index add --bundles csiblock/ibm-block-csi-operator-bundle-staging:${{ needs.prepare_env.outputs.specific_tag }} --build-tool docker
