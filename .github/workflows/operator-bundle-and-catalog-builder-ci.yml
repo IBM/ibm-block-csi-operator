@@ -22,8 +22,8 @@ jobs:
       PRODUCTION: "${{ inputs.production }}"
       BUILD_NUMBER: "${{ github.run_number }}"
       GITHUB_SHA: "${{ github.sha }}"
-      PROD_REPOSITORY: quay.io/csiblock/ibm-block-csi-operator-catalog-source
-      STAGING_REPOSITORY: quay.io/csiblock/ibm-block-csi-operator-catalog-source
+      PROD_REPOSITORY: csiblock/ibm-block-csi-operator-catalog-source
+      STAGING_REPOSITORY: csiblock/ibm-block-csi-operator-catalog-source
 #      PROD_REPOSITORY: csiblock/ibm-block-csi-operator-bundle
 #      STAGING_REPOSITORY: csiblock/ibm-block-csi-operator-bundle-staging
     steps:
