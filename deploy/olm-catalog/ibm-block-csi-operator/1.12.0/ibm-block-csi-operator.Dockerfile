@@ -7,7 +7,7 @@ ENTRYPOINT ["/bin/opm"]
 CMD ["serve", "/configs"]
 
 # Copy declarative config root into image at /configs
-ADD ibm-block-csi-operator /configs
+ADD deploy/olm-catalog/ibm-block-csi-operator/1.12.0/ibm-block-csi-operator /configs
 
 # Set DC-specific label for the location of the DC root directory
 # in the image
