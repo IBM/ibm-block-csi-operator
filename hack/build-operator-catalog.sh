@@ -83,15 +83,15 @@ init_parent_catalog() {
   echo
 }
 
-#check_and_add_csi_bundle_to_catalog() {
-#  if curl --head --silent --fail "${CSI_GA_CR_URL}" &> /dev/null; then
-#    echo "CSI release is GAed. Using official images"
-#  else
-#    echo "CSI tag doesn't exist yet, adding CSI bundle into CSI catalog."
-#    add_bundle_image_to_existing_catalog "${CSI_OPERATOR_IMAGE_NAME}" "${CSI_CHANNEL}" "${IMAGE_REGISTRY}/${CSI_DEVELOP_BUNDLE_FULL_IMAGE_NAME}:${IMAGE_TAG}" "${CSI_OPERATOR_IMAGE_NAME}.${CSI_RELEASE}"
-#    echo
-#  fi
-#}
+check_and_add_csi_bundle_to_catalog() {
+  if curl --head --silent --fail "${CSI_GA_CR_URL}" &> /dev/null; then
+    echo "CSI release is GAed. Using official images"
+  else
+    echo "CSI tag doesn't exist yet, adding CSI bundle into CSI catalog."
+    add_bundle_image_to_existing_catalog "${CSI_OPERATOR_IMAGE_NAME}" "${CSI_CHANNEL}" "${IMAGE_REGISTRY}/${CSI_DEVELOP_BUNDLE_FULL_IMAGE_NAME}:${IMAGE_TAG}" "${CSI_OPERATOR_IMAGE_NAME}.${CSI_RELEASE}"
+    echo
+  fi
+}
 
 #check_and_add_previous_odf_bundle_to_catalog(){
 #  if [ "${ENABLE_UPGRADE}" == "True" ]; then
@@ -110,8 +110,8 @@ echo
 #check_and_add_csi_bundle_to_catalog
 #echo
 
-cd -
-build_push_catalog_image "${CATALOG_IMAGE_NAME}" "${CATALOG_FULL_IMAGE_NAME}"
-
-echo "Cleaning leftovers"
-rm -rf "${CATALOG_IMAGE_NAME}".Dockerfile "${CATALOG_IMAGE_NAME}"
+#cd -
+#build_push_catalog_image "${CATALOG_IMAGE_NAME}" "${CATALOG_FULL_IMAGE_NAME}"
+#
+#echo "Cleaning leftovers"
+#rm -rf "${CATALOG_IMAGE_NAME}".Dockerfile "${CATALOG_IMAGE_NAME}"
