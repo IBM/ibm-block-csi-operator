@@ -15,12 +15,18 @@ else
 fi
 
 if [ "$PRODUCTION" = true ]; then
-  repository=${PROD_REPOSITORY}
+  operator_repository=${OPERATOR_PROD_REPOSITORY}
+  bundle_repository=${BUNDLE_OPERATOR_PROD_REPOSITORY}
+  catalog_repository=${CATALOG_OPERATOR_PROD_REPOSITORY}
   global_tag=${image_version}
 else
-  repository=${STAGING_REPOSITORY}
+  operator_repository=${OPERATOR_STAGING_REPOSITORY}
+  bundle_repository=${BUNDLE_OPERATOR_STAGING_REPOSITORY}
+  catalog_repository=${CATALOG_OPERATOR_STAGING_REPOSITORY}
 fi
 
-echo "repository=${repository}" >> $GITHUB_OUTPUT
+echo "operator_repository=${operator_repository}" >> $GITHUB_OUTPUT
+echo "bundle_repository=${bundle_repository}" >> $GITHUB_OUTPUT
+echo "catalog_repository=${catalog_repository}" >> $GITHUB_OUTPUT
 echo "specific_tag=${specific_tag}" >> $GITHUB_OUTPUT
 echo "global_tag=${global_tag}" >> $GITHUB_OUTPUT
