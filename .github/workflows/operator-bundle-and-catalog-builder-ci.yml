@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       production:
-        description: 'Click the checkbox for production images'
+        description: 'Click the checkbox for production image'
         default: false
         type: boolean
         required: false
@@ -24,8 +24,8 @@ jobs:
       GITHUB_SHA: "${{ github.sha }}"
       OPERATOR_PROD_REPOSITORY: csiblock/ibm-block-csi-operator
       OPERATOR_STAGING_REPOSITORY: csiblock/ibm-block-csi-operator-staging
-      BUNDLE_OPERATOR_PROD_REPOSITORY: ibm-block-csi-operator-bundle
-      BUNDLE_OPERATOR_STAGING_REPOSITORY: ibm-block-csi-operator-bundle-staging
+      BUNDLE_OPERATOR_PROD_REPOSITORY: csiblock/ibm-block-csi-operator-bundle
+      BUNDLE_OPERATOR_STAGING_REPOSITORY: csiblock/ibm-block-csi-operator-bundle-staging
       CATALOG_OPERATOR_PROD_REPOSITORY: csiblock/ibm-block-csi-operator-catalog-source
       CATALOG_OPERATOR_STAGING_REPOSITORY: csiblock/ibm-block-csi-operator-catalog-source
     steps:
@@ -46,8 +46,8 @@ jobs:
 
 #================================================================================================
 
-  build_and_push_multiarch_operator_images:
-    name: "build and push operator images"
+  build_and_push_multiarch_operator_image:
+    name: "build and push operator image"
     runs-on: ubuntu-latest
     env:
       REGISTRY: quay.io
@@ -79,7 +79,7 @@ jobs:
           username: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}'
           password: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_PASSWORD }}'
 
-      - name: Build and push operator images
+      - name: Build and push operator image
         uses: docker/build-push-action@v3
         with:
           context: .
@@ -95,8 +95,8 @@ jobs:
             BUILD_NUMBER: ${{ github.run_number }}
       - name: show chosen image
         run: |
-          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_operator_repository }}:${{ needs.prepare_env.outputs.specific_tag }}
-          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_operator_repository }}:${{ needs.prepare_env.outputs.global_tag }}
+          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }}:${{ needs.prepare_env.outputs.specific_tag }}
+          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }}:${{ needs.prepare_env.outputs.global_tag }}
       - name: save image names
         run: |
           echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }} >> /tmp/operator_images.txt
@@ -110,7 +110,7 @@ jobs:
 
 #================================================================================================
   build_and_push_multiarch_bundle_image:
-    name: "build and push operator images"
+    name: "build and push operator bundle image"
     runs-on: ubuntu-latest
     env:
       REGISTRY: quay.io
@@ -142,7 +142,7 @@ jobs:
           username: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}'
           password: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_PASSWORD }}'
 
-      - name: Build and push operator bundle images
+      - name: build and push operator bundle image
         uses: docker/build-push-action@v3
         with:
           context: .
@@ -173,7 +173,7 @@ jobs:
 
 #================================================================================================
   build_and_push_multiarch_catalog_image:
-    name: "build and push operator images"
+    name: "build and push operator catalog image"
     runs-on: ubuntu-latest
     env:
       REGISTRY: quay.io
@@ -205,7 +205,7 @@ jobs:
           username: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}'
           password: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_PASSWORD }}'
 
-      - name: Build and push operator catalog images
+      - name: build and push operator catalog image
         uses: docker/build-push-action@v3
         with:
           context: .
