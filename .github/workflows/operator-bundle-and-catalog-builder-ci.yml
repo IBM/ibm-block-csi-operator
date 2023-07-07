@@ -79,6 +79,7 @@ jobs:
 
       - name: replace operator image path in csv
         run: |
+          set -x
           echo - 1. replace operator tag in csv 
           pwd
           IMAGEPATH='deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests/ibm-block-csi-operator.clusterserviceversion.yaml'
