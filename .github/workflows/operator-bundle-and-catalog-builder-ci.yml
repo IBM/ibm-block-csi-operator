@@ -80,19 +80,20 @@ jobs:
 
       - name: replace operator image path in csv
         run: |
-          IMAGE_PATH="deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests/ibm-block-csi-operator.clusterserviceversion.yaml"
-          IMAGES_STR1='Image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0'
-          IMAGES_STR2="Image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:${{ needs.prepare_env.outputs.specific_tag }}"
-          cat $IMAGE_PATH | grep images:
-          sed -i "s|$IMAGES_STR1|$IMAGES_STR2|g" "$IMAGE_PATH"
-          IMAGES_STR1="image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0"
-          sed -i "s|$IMAGES_STR1|$IMAGES_STR2|g" "$IMAGE_PATH"
-          cat $IMAGE_PATH | grep images:
-
-          DEFAULT_IMAGE_TAG="DEFAULT_IMAGE_TAG=${{ needs.prepare_env.outputs.specific_tag }}"
-          DEFAULT_IMAGE_TAG_PATH="hack/common.sh"
-          echo $DEFAULT_IMAGE_TAG >> $DEFAULT_IMAGE_TAG_PATH
-          cat $DEFAULT_IMAGE_TAG_PATH | grep DEFAULT_IMAGE_TAG
+            cat $IMAGE_PATH | grep images:
+            IMAGE_PATH="deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests/ibm-block-csi-operator.clusterserviceversion.yaml"
+            IMAGES_STR1="Image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0"
+            IMAGES_STR2="Image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:${{ needs.prepare_env.outputs.specific_tag }}"
+            cat $IMAGE_PATH | grep images:
+            sed -i "s|$IMAGES_STR1|$IMAGES_STR2|g" "$IMAGE_PATH"
+            IMAGES_STR1="image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0"
+            sed -i "s|$IMAGES_STR1|$IMAGES_STR2|g" "$IMAGE_PATH"
+            cat $IMAGE_PATH | grep images:
+  
+            DEFAULT_IMAGE_TAG="DEFAULT_IMAGE_TAG=${{ needs.prepare_env.outputs.specific_tag }}"
+            DEFAULT_IMAGE_TAG_PATH="hack/common.sh"
+            echo $DEFAULT_IMAGE_TAG >> $DEFAULT_IMAGE_TAG_PATH
+            cat $DEFAULT_IMAGE_TAG_PATH | grep DEFAULT_IMAGE_TAG
 
 #      - name: Build and push operator image
 #        uses: docker/build-push-action@v3
