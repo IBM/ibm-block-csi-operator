@@ -87,7 +87,7 @@ DEFAULT_KUSTOMIZE_BIN="${OUTDIR_BIN}/kustomize"
 DEFAULT_IMAGE_REGISTRY="quay.io/csiblock"
 #DEFAULT_IMAGE_REGISTRY="quay.io/ibmodffs"
 
-DEFAULT_IMAGE_TAG=  
+DEFAULT_IMAGE_TAG="1.12.0"
 
 DEFAULT_OPERATOR_IMAGE_NAME="ibm-block-csi-operator"
 DEFAULT_OPERATOR_BUNDLE_NAME="ibm-block-csi-operator-bundle-staging"
