@@ -218,11 +218,12 @@ jobs:
 
       - name: run build opeartor catalog script
         run: |
-          echo ${{ needs.prepare_env.outputs.global_tag }}
-          DEFAULT_IMAGE_TAG="DEFAULT_IMAGE_TAG=${{ needs.prepare_env.outputs.global_tag }}"
+          echo ${{ github.run_number }}
+          DEFAULT_IMAGE_TAG="DEFAULT_IMAGE_TAG=${{ github.run_number }}"
           DEFAULT_IMAGE_TAG_PATH="hack/common.sh"
           echo $DEFAULT_IMAGE_TAG >> $DEFAULT_IMAGE_TAG_PATH
-          cat $DEFAULT_IMAGE_TAG_PATH
+          cat $DEFAULT_IMAGE_TAG_PATH | grep DEFAULT_IMAGE_TAG
+
 #          cat $DEFAULT_IMAGE_TAG_PATH | grep DEFAULT_IMAGE_TAG
 #          DEFAULT_IMAGE_TAG1="DEFAULT_IMAGE_TAG=\"1.12.0\""
 #          cat hack/common.sh | grep DEFAULT_IMAGE_TAG
