@@ -218,9 +218,18 @@ jobs:
 
       - name: run build opeartor catalog script
         run: |
-          cat hack/common.sh | grep DEFAULT_IMAGE_TAG
-          sed -i "s|DEFAULT_IMAGE_TAG\=|DEFAULT_IMAGE_TAG\=${{ needs.prepare_env.outputs.global_tag }}|g" hack/common.sh
-          cat hack/common.sh | grep DEFAULT_IMAGE_TAG
+          DEFAULT_IMAGE_TAG1="DEFAULT_IMAGE_TAG\="
+          DEFAULT_IMAGE_TAG2="DEFAULT_IMAGE_TAG\=${{ needs.prepare_env.outputs.global_tag }}"
+          DEFAULT_IMAGE_TAG_PATH="hack/common.sh"
+          cat $DEFAULT_IMAGE_TAG_PATH | grep DEFAULT_IMAGE_TAG
+          sed -i "s|$DEFAULT_IMAGE_TAG1|$DEFAULT_IMAGE_TAG2|g" "$DEFAULT_IMAGE_TAG_PATH"
+          cat $DEFAULT_IMAGE_TAG_PATH | grep DEFAULT_IMAGE_TAG         
+
+#          cat hack/common.sh | grep DEFAULT_IMAGE_TAG
+#          sed -i "s|DEFAULT_IMAGE_TAG\=|DEFAULT_IMAGE_TAG\=${{ needs.prepare_env.outputs.global_tag }}|g" hack/common.sh
+#          cat hack/common.sh | grep DEFAULT_IMAGE_TAG
+
+
 #          make build-catalog
 #          cat ibm-block-csi-catalog/ibm-block-csi-operator/index.yaml
 #          cat ibm-block-csi-catalog.Dockerfile
