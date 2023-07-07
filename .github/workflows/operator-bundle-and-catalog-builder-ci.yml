@@ -43,9 +43,10 @@ jobs:
       global_tag: "${{ steps.setup_dependencies.outputs.global_tag }}"
 
 #================================================================================================
-
 #================================================================================================
 
+  operator_job:
+    name: "operator job"
   build_and_push_multiarch_operator_image:
     name: "build and push operator image"
     runs-on: ubuntu-latest
@@ -116,13 +117,15 @@ jobs:
 #          retention-days: 90
 
 #================================================================================================
+  bundle_job:
+    name: "bundle job"
   build_and_push_multiarch_bundle_image:
     name: "build and push operator bundle image"
     runs-on: ubuntu-latest
     env:
       REGISTRY: quay.io
     needs:
-      - build and push operator image
+      - operator job
     steps:
       - name: Checkout
         uses: actions/checkout@v3.2.0
@@ -179,13 +182,15 @@ jobs:
 #          retention-days: 90
 
 #================================================================================================
+  catalog_job:
+    name: "catalog job"
   build_and_push_multiarch_catalog_image:
     name: "build and push operator catalog image"
     runs-on: ubuntu-latest
     env:
       REGISTRY: quay.io
     needs:
-      - build and push operator bundle image
+      - bundle job
     steps:
       - name: Checkout
         uses: actions/checkout@v3.2.0
