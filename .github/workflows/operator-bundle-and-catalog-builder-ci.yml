@@ -80,6 +80,7 @@ jobs:
 
       - name: replace operator image path in csv
         run: |
+          echo ${{ needs.prepare_env.outputs.specific_tag }}
           IMAGES1="Image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0"
           IMAGES2="Image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:${{ needs.prepare_env.outputs.specific_tag }}"
           IMAGES3="deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests/ibm-block-csi-operator.clusterserviceversion.yaml"
@@ -89,10 +90,10 @@ jobs:
           sed -i "s|$IMAGES1|$IMAGES2|g" "$IMAGES3"
           cat $IMAGES3 | grep images:
 
-          DEFAULT_IMAGE_TAG="DEFAULT_IMAGE_TAG=${{ needs.prepare_env.outputs.specific_tag }}"
-          DEFAULT_IMAGE_TAG_PATH="hack/common.sh"
-          echo $DEFAULT_IMAGE_TAG >> $DEFAULT_IMAGE_TAG_PATH
-          cat $DEFAULT_IMAGE_TAG_PATH | grep DEFAULT_IMAGE_TAG
+#          DEFAULT_IMAGE_TAG="DEFAULT_IMAGE_TAG=${{ needs.prepare_env.outputs.specific_tag }}"
+#          DEFAULT_IMAGE_TAG_PATH="hack/common.sh"
+#          echo $DEFAULT_IMAGE_TAG >> $DEFAULT_IMAGE_TAG_PATH
+#          cat $DEFAULT_IMAGE_TAG_PATH | grep DEFAULT_IMAGE_TAG
 
 #      - name: Build and push operator image
 #        uses: docker/build-push-action@v3
