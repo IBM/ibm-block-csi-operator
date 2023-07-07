@@ -85,7 +85,7 @@ jobs:
           IMAGES1="Image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0"
           IMAGES2="Image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:${{ needs.prepare_env.outputs.specific_tag }}"
           IMAGES3="deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests/ibm-block-csi-operator.clusterserviceversion.yaml"
-          echo ---> $IMAGES2
+          echo $IMAGES2
           sed -i "s|$IMAGES1|$IMAGES2|g" "$IMAGES3"
           IMAGES1="image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0"
           sed -i "s|$IMAGES1|$IMAGES2|g" "$IMAGES3"
