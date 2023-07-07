@@ -178,8 +178,7 @@ jobs:
 #          retention-days: 90
 
 #================================================================================================
-  catalog_job:
-    name: "catalog job"
+
   build_and_push_multiarch_catalog_image:
     name: "build and push operator catalog image"
     runs-on: ubuntu-latest
