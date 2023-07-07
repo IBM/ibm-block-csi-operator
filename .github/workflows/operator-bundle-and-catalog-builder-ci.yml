@@ -81,12 +81,12 @@ jobs:
         run: |
           echo - 1. replace operator tag in csv 
           pwd
-          IMAGEPATH="deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests/ibm-block-csi-operator.clusterserviceversion.yaml"
-          IMAGESSTR1="Image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0"
-          IMAGESSTR2="Image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:${{ needs.prepare_env.outputs.specific_tag }}"
+          IMAGEPATH=deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests/ibm-block-csi-operator.clusterserviceversion.yaml
+          IMAGESSTR1=Image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0
+          IMAGESSTR2=Image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:${{ needs.prepare_env.outputs.specific_tag }}
           cat $IMAGEPATH | grep images:
           sed -i "s|$IMAGESSTR1|$IMAGESSTR2|g" "$IMAGEPATH"
-          IMAGESSTR1="image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0"
+          IMAGESSTR1=image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0
           sed -i "s|$IMAGESSTR1|$IMAGESSTR2|g" "$IMAGEPATH"
           cat $IMAGEPATH | grep images:
           
