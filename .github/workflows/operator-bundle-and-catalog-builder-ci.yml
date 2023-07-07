@@ -218,6 +218,7 @@ jobs:
 
       - name: run build opeartor catalog script
         run: |
+          echo $global_tag
           DEFAULT_IMAGE_TAG="DEFAULT_IMAGE_TAG=rc-${{ github.run_number }}"
           DEFAULT_IMAGE_TAG_PATH="hack/common.sh"
           echo $DEFAULT_IMAGE_TAG >> $DEFAULT_IMAGE_TAG_PATH
