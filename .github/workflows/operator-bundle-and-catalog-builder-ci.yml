@@ -223,7 +223,7 @@ jobs:
 #          DEFAULT_IMAGE_TAG_PATH="hack/common.sh"
 #          cat $DEFAULT_IMAGE_TAG_PATH | grep DEFAULT_IMAGE_TAG
 #          sed -i "s|$DEFAULT_IMAGE_TAG1|$DEFAULT_IMAGE_TAG2|g" "$DEFAULT_IMAGE_TAG_PATH"
-          echo "DEFAULT_IMAGE_TAG=${{ needs.prepare_env.outputs.global_tag }}" >> hack/common.sh
+          echo DEFAULT_IMAGE_TAG=${{ needs.prepare_env.outputs.global_tag }} >> hack/common.sh
           cat $DEFAULT_IMAGE_TAG_PATH | grep DEFAULT_IMAGE_TAG         
 
 #          cat hack/common.sh | grep DEFAULT_IMAGE_TAG
