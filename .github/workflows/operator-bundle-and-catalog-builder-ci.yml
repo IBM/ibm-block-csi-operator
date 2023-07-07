@@ -44,51 +44,56 @@ jobs:
 
 #================================================================================================
 #================================================================================================
-#
-#  build_and_push_multiarch_operator_image:
-#    name: "build and push operator image"
-#    runs-on: ubuntu-latest
-#    env:
-#      REGISTRY: quay.io
-#    needs:
-#      - prepare_env
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v3.2.0
-#      - name: Set up QEMU
-#        uses: docker/setup-qemu-action@v2
-#      - name: Set up Docker Buildx
-#        id: buildx
-#        uses: docker/setup-buildx-action@v2
-#      - name: Docker meta
-#        id: meta
-#        uses: docker/metadata-action@v4
-#        with:
-#          images: |
-#            ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }}
-#          tags: |
-#            type=raw,value=${{ needs.prepare_env.outputs.global_tag }}
-#            type=raw,value=${{ needs.prepare_env.outputs.specific_tag }}
-#          labels: |
-#            commit=${{ github.sha }}
-#      - name: Login to quay.io
-#        uses: docker/login-action@v2
-#        with:
-#          registry: quay.io
-#          username: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}'
-#          password: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_PASSWORD }}'
-#
-#      - name: replace operator image path in csv
-#        run: |
-#          IMAGES1="Image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0"
-#          IMAGES2="Image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:${{ needs.prepare_env.outputs.specific_tag }}"
-#          IMAGES3="deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests/ibm-block-csi-operator.clusterserviceversion.yaml"
-#          cat $IMAGES3 | grep images:
-#          sed -i "s|$IMAGES1|$IMAGES2|g" "$IMAGES3"
-#          IMAGES1="image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0"
-#          sed -i "s|$IMAGES1|$IMAGES2|g" "$IMAGES3"
-#          cat $IMAGES3 | grep images:
-#
+
+  build_and_push_multiarch_operator_image:
+    name: "build and push operator image"
+    runs-on: ubuntu-latest
+    env:
+      REGISTRY: quay.io
+    needs:
+      - prepare_env
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.2.0
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }}
+          tags: |
+            type=raw,value=${{ needs.prepare_env.outputs.global_tag }}
+            type=raw,value=${{ needs.prepare_env.outputs.specific_tag }}
+          labels: |
+            commit=${{ github.sha }}
+      - name: Login to quay.io
+        uses: docker/login-action@v2
+        with:
+          registry: quay.io
+          username: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}'
+          password: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_PASSWORD }}'
+
+      - name: replace operator image path in csv
+        run: |
+          IMAGES1="Image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0"
+          IMAGES2="Image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:${{ needs.prepare_env.outputs.specific_tag }}"
+          IMAGES3="deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests/ibm-block-csi-operator.clusterserviceversion.yaml"
+          cat $IMAGES3 | grep images:
+          sed -i "s|$IMAGES1|$IMAGES2|g" "$IMAGES3"
+          IMAGES1="image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0"
+          sed -i "s|$IMAGES1|$IMAGES2|g" "$IMAGES3"
+          cat $IMAGES3 | grep images:
+
+          DEFAULT_IMAGE_TAG="DEFAULT_IMAGE_TAG=${{ needs.prepare_env.outputs.specific_tag }}"
+          DEFAULT_IMAGE_TAG_PATH="hack/common.sh"
+          echo $DEFAULT_IMAGE_TAG >> $DEFAULT_IMAGE_TAG_PATH
+          cat $DEFAULT_IMAGE_TAG_PATH | grep DEFAULT_IMAGE_TAG
+
 #      - name: Build and push operator image
 #        uses: docker/build-push-action@v3
 #        with:
@@ -183,54 +188,41 @@ jobs:
 #          retention-days: 90
 
 #================================================================================================
-
-  build_and_push_multiarch_catalog_image:
-    name: "build and push operator catalog image"
-    runs-on: ubuntu-latest
-#    needs: build_and_push_multiarch_bundle_image
-    env:
-      REGISTRY: quay.io
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3.2.0
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.catalog_repository }}
-          tags: |
-            type=raw,value=${{ needs.prepare_env.outputs.global_tag }}
-            type=raw,value=${{ needs.prepare_env.outputs.specific_tag }}
-          labels: |
-            commit=${{ github.sha }}
-      - name: Login to quay.io
-        uses: docker/login-action@v2
-        with:
-          registry: quay.io
-          username: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}'
-          password: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_PASSWORD }}'
-
-      - name: run build opeartor catalog script
-        run: |
-          echo ${{ needs.prepare_env.outputs.specific_tag }}
-          DEFAULT_IMAGE_TAG="DEFAULT_IMAGE_TAG=${{ needs.prepare_env.outputs.specific_tag }}"
-          DEFAULT_IMAGE_TAG_PATH="hack/common.sh"
-          echo $DEFAULT_IMAGE_TAG >> $DEFAULT_IMAGE_TAG_PATH
-          cat $DEFAULT_IMAGE_TAG_PATH | grep DEFAULT_IMAGE_TAG
-
-#          cat $DEFAULT_IMAGE_TAG_PATH | grep DEFAULT_IMAGE_TAG
-#          DEFAULT_IMAGE_TAG1="DEFAULT_IMAGE_TAG=\"1.12.0\""
-#          cat hack/common.sh | grep DEFAULT_IMAGE_TAG
-#          sed -i "s|DEFAULT_IMAGE_TAG\=|DEFAULT_IMAGE_TAG\=${{ needs.prepare_env.outputs.global_tag }}|g" hack/common.sh
-#          cat hack/common.sh | grep DEFAULT_IMAGE_TAG
-
-
+#
+#  build_and_push_multiarch_catalog_image:
+#    name: "build and push operator catalog image"
+#    runs-on: ubuntu-latest
+##    needs: build_and_push_multiarch_bundle_image
+#    env:
+#      REGISTRY: quay.io
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3.2.0
+#      - name: Set up QEMU
+#        uses: docker/setup-qemu-action@v2
+#      - name: Set up Docker Buildx
+#        id: buildx
+#        uses: docker/setup-buildx-action@v2
+#      - name: Docker meta
+#        id: meta
+#        uses: docker/metadata-action@v4
+#        with:
+#          images: |
+#            ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.catalog_repository }}
+#          tags: |
+#            type=raw,value=${{ needs.prepare_env.outputs.global_tag }}
+#            type=raw,value=${{ needs.prepare_env.outputs.specific_tag }}
+#          labels: |
+#            commit=${{ github.sha }}
+#      - name: Login to quay.io
+#        uses: docker/login-action@v2
+#        with:
+#          registry: quay.io
+#          username: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}'
+#          password: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_PASSWORD }}'
+#
+#      - name: run build opeartor catalog script
+#        run: |
 #          make build-catalog
 #          cat ibm-block-csi-catalog/ibm-block-csi-operator/index.yaml
 #          cat ibm-block-csi-catalog.Dockerfile
