@@ -79,8 +79,8 @@ jobs:
 
       - name: replace operator image path in csv
         run: |
-          echo -- replace images tags
-          pwd
+          echo - 1. replace operator tag in csv 
+          ls -lta
           IMAGE_PATH="deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests/ibm-block-csi-operator.clusterserviceversion.yaml"
           IMAGES_STR1="Image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0"
           IMAGES_STR2="Image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:${{ needs.prepare_env.outputs.specific_tag }}"
