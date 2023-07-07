@@ -32,10 +32,10 @@ add_bundle_image_to_existing_catalog() {
 
   ${OPM_BIN} validate "${operator_package_name}"
 
-  echo "------>initialize_operator_catalog "${operator_package_name}" "${channel}""
-  echo "------>add_bundle_to_catalog "${operator_package_name}" "${bundle_quay_io_image}""
-  echo "------>add_channel_entry_for_bundle "${operator_package_name}" "${channel}" "${operator_package_name_version}""
-  echo "------>"${OPM_BIN} validate "${operator_package_name}"""
+#  echo "------>initialize_operator_catalog "${operator_package_name}" "${channel}""
+#  echo "------>add_bundle_to_catalog "${operator_package_name}" "${bundle_quay_io_image}""
+#  echo "------>add_channel_entry_for_bundle "${operator_package_name}" "${channel}" "${operator_package_name_version}""
+#  echo "------>"${OPM_BIN} validate "${operator_package_name}"""
 }
 
 initialize_operator_catalog() {
