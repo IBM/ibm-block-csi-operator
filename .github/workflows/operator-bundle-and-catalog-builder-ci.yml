@@ -79,15 +79,16 @@ jobs:
 
       - name: replace operator image path in csv
         run: |
-          ls -lta
-          IMAGE_PATH="deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests/ibm-block-csi-operator.clusterserviceversion.yaml"
-          IMAGES_STR1="Image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0"
-          IMAGES_STR2="Image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:${{ needs.prepare_env.outputs.specific_tag }}"
-          cat $IMAGE_PATH | grep images:
-          sed -i "s|$IMAGES_STR1|$IMAGES_STR2|g" "$IMAGE_PATH"
-          IMAGES_STR1="image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0"
-          sed -i "s|$IMAGES_STR1|$IMAGES_STR2|g" "$IMAGE_PATH"
-          cat $IMAGE_PATH | grep images:
+          echo - 1. replace operator tag in csv 
+          pwd
+          IMAGEPATH="deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests/ibm-block-csi-operator.clusterserviceversion.yaml"
+          IMAGESSTR1="Image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0"
+          IMAGESSTR2="Image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:${{ needs.prepare_env.outputs.specific_tag }}"
+          cat $IMAGEPATH | grep images:
+          sed -i "s|$IMAGESSTR1|$IMAGESSTR2|g" "$IMAGEPATH"
+          IMAGESSTR1="image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0"
+          sed -i "s|$IMAGESSTR1|$IMAGESSTR2|g" "$IMAGEPATH"
+          cat $IMAGEPATH | grep images:
           
           echo - 1. add operator tag in common file
           DEFAULT_IMAGE_TAG="DEFAULT_IMAGE_TAG=${{ needs.prepare_env.outputs.specific_tag }}"
