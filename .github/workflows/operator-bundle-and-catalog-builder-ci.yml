@@ -86,7 +86,7 @@ jobs:
           IMAGES2="Image\: quay.io\/csiblock\/ibm-block-csi-operator-staging\:v0.9.1_b18_ba24a32_operator_buider_ci_add"
           IMAGES3="deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests/ibm-block-csi-operator.clusterserviceversion.yaml"
           sed -i "s|$IMAGES1|$IMAGES2|g" "$IMAGES3"
-          cat $IMAGES3 | grep Images:
+          cat $IMAGES3
   
   
 
