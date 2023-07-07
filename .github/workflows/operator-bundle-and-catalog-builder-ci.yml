@@ -83,11 +83,11 @@ jobs:
 #          IMAGES1="Image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0"
 #          IMAGES2="Image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:${{ needs.prepare_env.outputs.specific_tag }}"
 #          IMAGES3="deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests/ibm-block-csi-operator.clusterserviceversion.yaml"
-#          cat $IMAGES3 | images:
+#          cat $IMAGES3 | grep images:
 #          sed -i "s|$IMAGES1|$IMAGES2|g" "$IMAGES3"
 #          IMAGES1="image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0"
 #          sed -i "s|$IMAGES1|$IMAGES2|g" "$IMAGES3"
-#          cat $IMAGES3 | images:
+#          cat $IMAGES3 | grep images:
 #
 #      - name: Build and push operator image
 #        uses: docker/build-push-action@v3
@@ -218,9 +218,12 @@ jobs:
 
       - name: run build opeartor catalog script
         run: |
-          make build-catalog   
-          cat ibm-block-csi-catalog/ibm-block-csi-operator/index.yaml
-          cat ibm-block-csi-catalog.Dockerfile
+          cat hack/common.sh | grep DEFAULT_IMAGE_TAG
+          sed -i "s|DEFAULT_IMAGE_TAG=|DEFAULT_IMAGE_TAG=${{ needs.prepare_env.outputs.global_tag }}|g" hack/common.sh
+          cat hack/common.sh | grep DEFAULT_IMAGE_TAG
+#          make build-catalog
+#          cat ibm-block-csi-catalog/ibm-block-csi-operator/index.yaml
+#          cat ibm-block-csi-catalog.Dockerfile
 
 #      - name: build and push operator catalog image
 #        uses: docker/build-push-action@v3
