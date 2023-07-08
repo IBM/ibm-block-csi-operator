@@ -63,9 +63,11 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: |
+          operator_image: |
             ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }}
+          bundle_image: |
             ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.bundle_repository }}
+          catalog_image: |
             ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.catalog_repository }}
           tags: |
             type=raw,value=${{ needs.prepare_env.outputs.global_tag }}
@@ -85,7 +87,6 @@ jobs:
           echo - 1. replace operator tag in csv
           pwd
           echo "tags: ${{ steps.meta.outputs.tags }}"
-          echo "${{ needs.prepare_env.outputs.specific_tag }}"
           echo "labels: ${{ steps.meta.outputs.labels }}"
           echo "VERSION: ${{ env.IMAGE_VERSION }}"
           echo "BUILD_NUMBER: ${{ github.run_number }}"
