@@ -8,7 +8,7 @@ metadata:
     olm.skipRange: '>=1.6.0 <1.12.0'
     categories: "Storage,Cloud Provider"
     certified: "true"
-    containerImage: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.12.0
+    containerImage: quay.io/csiblock/ibm-block-csi-operator-staging:v0.9.1_b85_f8b5052_operator_buider_ci_add_bundle
     createdAt: "2022-08-22T11:00:00Z"
     description: "Run IBM block storage CSI driver on OpenShift."
     repository: https://github.com/IBM/ibm-block-csi-operator
@@ -191,7 +191,7 @@ spec:
     - CSI
   relatedImages:
     - name: ibm-block-csi-operator
-      image: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.12.0
+      image: quay.io/csiblock/ibm-block-csi-operator-staging:v0.9.1_b85_f8b5052_operator_buider_ci_add_bundle
   version: 1.12.0
   maturity: stable
   maintainers:
@@ -653,7 +653,7 @@ spec:
                       capabilities:
                         drop:
                           - ALL
-                    image: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.12.0
+                    image: quay.io/csiblock/ibm-block-csi-operator-staging:v0.9.1_b85_f8b5052_operator_buider_ci_add_bundle
                     imagePullPolicy: IfNotPresent
                     command:
                       - ibm-block-csi-operator

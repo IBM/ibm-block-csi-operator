@@ -77,25 +77,25 @@ jobs:
           username: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}'
           password: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_PASSWORD }}'
 
-      - name: replace operator image path in csv
-        run: |
-          set -x
-          echo - 1. replace operator tag in csv 
-          pwd
-          IMAGEPATH='deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests/ibm-block-csi-operator.clusterserviceversion.yaml'
-          IMAGESSTR1='Image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0'
-          IMAGESSTR2='Image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:v0.9.1_b85_f8b5052_operator_buider_ci_add_bundle'
-          sed -i "s|$IMAGESSTR1|$IMAGESSTR2|g" "$IMAGEPATH"
-          cat $IMAGEPATH | grep Image:
-          IMAGESSTR1='image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0'
-          IMAGESSTR2='image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:v0.9.1_b85_f8b5052_operator_buider_ci_add_bundle'
-          sed -i "s|$IMAGESSTR1|$IMAGESSTR2|g" "$IMAGEPATH"
-          cat $IMAGEPATH | grep image:
-          echo - 2. add operator tag in common file
-          DEFAULT_IMAGE_TAG="DEFAULT_IMAGE_TAG=v0.9.1_b85_f8b5052_operator_buider_ci_add_bundle"
-          DEFAULT_IMAGE_TAG_PATH="hack/common.sh"
-          echo $DEFAULT_IMAGE_TAG >> $DEFAULT_IMAGE_TAG_PATH
-          cat $DEFAULT_IMAGE_TAG_PATH | grep DEFAULT_IMAGE_TAG
+#      - name: replace operator image path in csv
+#        run: |
+#          set -x
+#          echo - 1. replace operator tag in csv
+#          pwd
+#          IMAGEPATH='deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests/ibm-block-csi-operator.clusterserviceversion.yaml'
+#          IMAGESSTR1='Image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0'
+#          IMAGESSTR2='Image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:v0.9.1_b85_f8b5052_operator_buider_ci_add_bundle'
+#          sed -i "s|$IMAGESSTR1|$IMAGESSTR2|g" "$IMAGEPATH"
+#          cat $IMAGEPATH | grep Image:
+#          IMAGESSTR1='image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0'
+#          IMAGESSTR2='image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:v0.9.1_b85_f8b5052_operator_buider_ci_add_bundle'
+#          sed -i "s|$IMAGESSTR1|$IMAGESSTR2|g" "$IMAGEPATH"
+#          cat $IMAGEPATH | grep image:
+#          echo - 2. add operator tag in common file
+#          DEFAULT_IMAGE_TAG="DEFAULT_IMAGE_TAG=v0.9.1_b85_f8b5052_operator_buider_ci_add_bundle"
+#          DEFAULT_IMAGE_TAG_PATH="hack/common.sh"
+#          echo $DEFAULT_IMAGE_TAG >> $DEFAULT_IMAGE_TAG_PATH
+#          cat $DEFAULT_IMAGE_TAG_PATH | grep DEFAULT_IMAGE_TAG
 
 #      - name: Build and push operator image
 #        uses: docker/build-push-action@v3
