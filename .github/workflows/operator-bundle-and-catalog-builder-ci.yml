@@ -65,6 +65,8 @@ jobs:
         with:
           images: |
             ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }}
+            ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.bundle_repository }}
+            ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.catalog_repository }}
           tags: |
             type=raw,value=${{ needs.prepare_env.outputs.global_tag }}
             type=raw,value=${{ needs.prepare_env.outputs.specific_tag }}
