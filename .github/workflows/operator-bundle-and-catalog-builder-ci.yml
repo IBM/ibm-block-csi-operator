@@ -83,6 +83,7 @@ jobs:
           echo - 1. replace operator tag in csv
           pwd
           echo "tags: ${{ steps.meta.outputs.tags }}"
+          echo "${{ needs.prepare_env.outputs.specific_tag }}"
           echo "labels: ${{ steps.meta.outputs.labels }}"
           echo "VERSION: ${{ env.IMAGE_VERSION }}"
           echo "BUILD_NUMBER: ${{ github.run_number }}"
