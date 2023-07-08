@@ -92,7 +92,7 @@ jobs:
           sed -i "s|$IMAGESSTR1|$IMAGESSTR2|g" "$IMAGEPATH"
           cat $IMAGEPATH | grep image:
           echo - 2. add operator tag in common file
-          DEFAULT_IMAGE_TAG="DEFAULT_IMAGE_TAG=${{ needs.prepare_env.outputs.specific_tag }}"
+          DEFAULT_IMAGE_TAG="DEFAULT_IMAGE_TAG=v0.9.1_b85_f8b5052_operator_buider_ci_add_bundle"
           DEFAULT_IMAGE_TAG_PATH="hack/common.sh"
           echo $DEFAULT_IMAGE_TAG >> $DEFAULT_IMAGE_TAG_PATH
           cat $DEFAULT_IMAGE_TAG_PATH | grep DEFAULT_IMAGE_TAG
