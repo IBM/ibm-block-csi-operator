@@ -65,8 +65,6 @@ jobs:
         with:
           images: |
             ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }}
-#            ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.bundle_repository }}
-#            ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.catalog_repository }}
           tags: |
             type=raw,value=${{ needs.prepare_env.outputs.global_tag }}
             type=raw,value=${{ needs.prepare_env.outputs.specific_tag }}
@@ -79,63 +77,55 @@ jobs:
           username: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}'
           password: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_PASSWORD }}'
 
-#      - name: replace operator image path in csv
-#        run: |
-#          set -x
-#          echo - 1. replace operator tag in csv
-#          pwd
-#          tags: ghcr.io/${{ github.repository }}:${{ env.tag }}
-#          echo "tags: ${{ steps.meta.outputs.tags }}"
-#          echo "${{ needs.prepare_env.outputs.specific_tag }}"
-#          echo "labels: ${{ steps.meta.outputs.labels }}"
-#          echo "VERSION: ${{ env.IMAGE_VERSION }}"
-#          echo "BUILD_NUMBER: ${{ github.run_number }}"
+      - name: replace operator image path in csv
+        run: |
+          IMAGEPATH='deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests/ibm-block-csi-operator.clusterserviceversion.yaml'
+          IMAGESSTR1='Image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0'
+          IMAGESSTR2='Image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:${{ needs.prepare_env.outputs.specific_tag }}'
+          sed -i "s|$IMAGESSTR1|$IMAGESSTR2|g" "$IMAGEPATH"
+          cat $IMAGEPATH | grep Image:
+          IMAGESSTR1='image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0'
+          IMAGESSTR2='image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:${{ needs.prepare_env.outputs.specific_tag }}'
+          sed -i "s|$IMAGESSTR1|$IMAGESSTR2|g" "$IMAGEPATH"
+          cat $IMAGEPATH | grep image:
+          echo - 2. add operator tag in common file
+          DEFAULT_IMAGE_TAG="DEFAULT_IMAGE_TAG=${{ needs.prepare_env.outputs.specific_tag }}"
+          DEFAULT_IMAGE_TAG_PATH="hack/common.sh"
+          echo $DEFAULT_IMAGE_TAG >> $DEFAULT_IMAGE_TAG_PATH
+          cat $DEFAULT_IMAGE_TAG_PATH | grep DEFAULT_IMAGE_TAG
 
-#          IMAGEPATH='deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests/ibm-block-csi-operator.clusterserviceversion.yaml'
-#          IMAGESSTR1='Image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0'
-#          IMAGESSTR2='Image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:v0.9.1_b85_f8b5052_operator_buider_ci_add_bundle'
-#          sed -i "s|$IMAGESSTR1|$IMAGESSTR2|g" "$IMAGEPATH"
-#          cat $IMAGEPATH | grep Image:
-#          IMAGESSTR1='image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0'
-#          IMAGESSTR2='image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:v0.9.1_b85_f8b5052_operator_buider_ci_add_bundle'
-#          sed -i "s|$IMAGESSTR1|$IMAGESSTR2|g" "$IMAGEPATH"
-#          cat $IMAGEPATH | grep image:
-#          echo - 2. add operator tag in common file
-#          DEFAULT_IMAGE_TAG="DEFAULT_IMAGE_TAG=v0.9.1_b85_f8b5052_operator_buider_ci_add_bundle"
-#          DEFAULT_IMAGE_TAG_PATH="hack/common.sh"
-#          echo $DEFAULT_IMAGE_TAG >> $DEFAULT_IMAGE_TAG_PATH
-#          cat $DEFAULT_IMAGE_TAG_PATH | grep DEFAULT_IMAGE_TAG
+#================================================================================================
+      - 
+      - name: Build and push operator image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: linux/amd64,linux/ppc64le,linux/s390x
+          push: true
+#          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }}:${{ needs.prepare_env.outputs.specific_tag }}
+          labels: ${{ steps.meta.outputs.labels }}
+          file: build/Dockerfile.operator
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            VERSION: ${{ env.IMAGE_VERSION }}
+            BUILD_NUMBER: ${{ github.run_number }}
 
-#      - name: Build and push operator image
-#        uses: docker/build-push-action@v3
-#        with:
-#          context: .
-#          platforms: linux/amd64,linux/ppc64le,linux/s390x
-#          push: true
-##          tags: ${{ steps.meta.outputs.tags }}
-#          tags: ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.bundle_repository }}:${{ needs.prepare_env.outputs.specific_tag }}
-#          labels: ${{ steps.meta.outputs.labels }}
-#          file: build/Dockerfile.operator
-#          cache-from: type=gha
-#          cache-to: type=gha,mode=max
-#          build-args: |
-#            VERSION: ${{ env.IMAGE_VERSION }}
-#            BUILD_NUMBER: ${{ github.run_number }}
-#
-#      - name: show chosen image
-#        run: |
-#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }}:${{ needs.prepare_env.outputs.specific_tag }}
-#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }}:${{ needs.prepare_env.outputs.global_tag }}
-#      - name: save image names
-#        run: |
-#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }} >> /tmp/operator_images.txt
-#          echo ${{ needs.prepare_env.outputs.specific_tag }} >> /tmp/operator_images.txt
-#          echo ${{ needs.prepare_env.outputs.global_tag }} >> /tmp/operator_images.txt
-#      - uses: actions/upload-artifact@v3
-#        with:
-#          name: images
-#          path: /tmp/operator_images.txt
-#          retention-days: 90
+      - name: show chosen image
+        run: |
+          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }}:${{ needs.prepare_env.outputs.specific_tag }}
+          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }}:${{ needs.prepare_env.outputs.global_tag }}
+      - name: save image names
+        run: |
+          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }} >> /tmp/operator_images.txt
+          echo ${{ needs.prepare_env.outputs.specific_tag }} >> /tmp/operator_images.txt
+          echo ${{ needs.prepare_env.outputs.global_tag }} >> /tmp/operator_images.txt
+      - uses: actions/upload-artifact@v3
+        with:
+          name: images
+          path: /tmp/operator_images.txt
+          retention-days: 90
 
 #================================================================================================
 
@@ -171,38 +161,39 @@ jobs:
 
 #================================================================================================
 
-##brkd remove cat part
-#      - name: run build opeartor catalog script
-#        run: |
-#          make build-catalog
-#          cat ibm-block-csi-catalog/ibm-block-csi-operator/index.yaml
-#          cat ibm-block-csi-catalog.Dockerfile
-#
-#      - name: build and push operator catalog image
-#        uses: docker/build-push-action@v3
-#        with:
-#          context: .
-#          platforms: linux/amd64,linux/ppc64le,linux/s390x
-#          push: true
+#brkd remove cat part
+      - name: run build opeartor catalog script
+        run: |
+          make build-catalog
+          cat ibm-block-csi-catalog/ibm-block-csi-operator/index.yaml
+          cat ibm-block-csi-catalog.Dockerfile
+
+      - name: build and push operator catalog image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: linux/amd64,linux/ppc64le,linux/s390x
+          push: true
 #          tags: ${{ steps.meta.outputs.tags }}
-#          labels: ${{ steps.meta.outputs.labels }}
-#          file: deploy/olm-catalog/ibm-block-csi-operator/1.12.0/ibm-block-csi-operator.Dockerfile
-#          cache-from: type=gha
-#          cache-to: type=gha,mode=max
-#          build-args: |
-#            VERSION: ${{ env.IMAGE_VERSION }}
-#            BUILD_NUMBER: ${{ github.run_number }}
-#      - name: show chosen image
-#        run: |
-#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.catalog_repository }}:${{ needs.prepare_env.outputs.specific_tag }}
-#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.catalog_repository }}:${{ needs.prepare_env.outputs.global_tag }}
-#      - name: save image names
-#        run: |
-#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.catalog_repository }} >> /tmp/catalog_images.txt
-#          echo ${{ needs.prepare_env.outputs.specific_tag }} >> /tmp/catalog_images.txt
-#          echo ${{ needs.prepare_env.outputs.global_tag }} >> /tmp/catalog_images.txt
-#      - uses: actions/upload-artifact@v3
-#        with:
-#          name: images
-#          path: /tmp/catalog_images.txt
-#          retention-days: 90
+          tags: ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.catalog_repository }}:${{ needs.prepare_env.outputs.specific_tag }}
+          labels: ${{ steps.meta.outputs.labels }}
+          file: deploy/olm-catalog/ibm-block-csi-operator/1.12.0/ibm-block-csi-operator.Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            VERSION: ${{ env.IMAGE_VERSION }}
+            BUILD_NUMBER: ${{ github.run_number }}
+      - name: show chosen image
+        run: |
+          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.catalog_repository }}:${{ needs.prepare_env.outputs.specific_tag }}
+          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.catalog_repository }}:${{ needs.prepare_env.outputs.global_tag }}
+      - name: save image names
+        run: |
+          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.catalog_repository }} >> /tmp/catalog_images.txt
+          echo ${{ needs.prepare_env.outputs.specific_tag }} >> /tmp/catalog_images.txt
+          echo ${{ needs.prepare_env.outputs.global_tag }} >> /tmp/catalog_images.txt
+      - uses: actions/upload-artifact@v3
+        with:
+          name: images
+          path: /tmp/catalog_images.txt
+          retention-days: 90
