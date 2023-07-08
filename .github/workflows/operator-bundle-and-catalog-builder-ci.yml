@@ -95,7 +95,7 @@ jobs:
           cat $DEFAULT_IMAGE_TAG_PATH | grep DEFAULT_IMAGE_TAG
 
 #================================================================================================
-      - 
+
       - name: Build and push operator image
         uses: docker/build-push-action@v3
         with:
