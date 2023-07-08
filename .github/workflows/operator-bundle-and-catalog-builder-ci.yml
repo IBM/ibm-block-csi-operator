@@ -132,7 +132,9 @@ jobs:
   build_and_push_multiarch_bundle_image:
     name: "build and push operator bundle image"
     runs-on: ubuntu-latest
-    needs: build_and_push_multiarch_operator_image
+#    needs: build_and_push_multiarch_operator_image
+    needs:
+      - prepare_env
     env:
       REGISTRY: quay.io
     steps:
@@ -213,7 +215,9 @@ jobs:
   build_and_push_multiarch_catalog_image:
     name: "build and push operator catalog image"
     runs-on: ubuntu-latest
-    needs: build_and_push_multiarch_bundle_image
+#    needs: build_and_push_multiarch_bundle_image
+    needs:
+      - prepare_env
     env:
       REGISTRY: quay.io
     steps:
@@ -241,6 +245,22 @@ jobs:
           registry: quay.io
           username: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}'
           password: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_PASSWORD }}'
+
+#brkd remove cat part
+      - name: test parameters
+        run: |
+          set -x
+          echo "tags: ${{ steps.meta.outputs.tags }}"
+          echo "labels: ${{ steps.meta.outputs.labels }}"
+          echo "VERSION: ${{ env.IMAGE_VERSION }}"
+          echo "BUILD_NUMBER: ${{ github.run_number }}"
+          echo "${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.bundle_repository }}:${{ needs.prepare_env.outputs.specific_tag }}"
+          echo "${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.bundle_repository }}:${{ needs.prepare_env.outputs.global_tag }}"
+          echo "operator_repository: "${{ steps.setup_dependencies.outputs.operator_repository }}""
+          echo "bundle_repository: "${{ steps.setup_dependencies.outputs.bundle_repository }}""
+          echo "catalog_repository: "${{ steps.setup_dependencies.outputs.catalog_repository }}""
+          echo "specific_tag: "${{ steps.setup_dependencies.outputs.specific_tag }}""
+          echo "global_tag: "${{ steps.setup_dependencies.outputs.global_tag }}""
 #
 ##brkd remove cat part
 #      - name: run build opeartor catalog script
