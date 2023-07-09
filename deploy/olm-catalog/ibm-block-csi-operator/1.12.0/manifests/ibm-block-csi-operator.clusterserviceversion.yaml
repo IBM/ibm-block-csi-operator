@@ -3,6 +3,10 @@ kind: ClusterServiceVersion
 metadata:
   name: ibm-block-csi-operator.v1.12.0
   namespace: placeholder
+  labels:
+    operatorframework.io/arch.amd64: supported
+    operatorframework.io/arch.s390x: supported
+    operatorframework.io/arch.ppc64le: supported
   annotations:
     capabilities: "Seamless Upgrades"
     olm.skipRange: '>=1.6.0 <1.12.0'
