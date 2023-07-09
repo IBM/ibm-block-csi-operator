@@ -1,10 +1,10 @@
 name: operator-bundle-and-catalog-builder-ci
-#on:
-#  push:
+on:
+  push:
 #    branches:
 #      - operator_buider_ci_add_bundle
-#  pull_request:
-#  workflow_dispatch:
+  pull_request:
+  workflow_dispatch:
 #    inputs:
 #      production:
 #        description: 'Click the checkbox for production image'
