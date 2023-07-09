@@ -74,83 +74,83 @@ jobs:
           username: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_USERNAME }}'
           password: '${{ secrets.CSIBLOCK_DOCKER_REGISTRY_PASSWORD }}'
 
-      - name: replace operator image path in csv
-        run: |
-          IMAGEPATH='deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests/ibm-block-csi-operator.clusterserviceversion.yaml'
-          IMAGESSTR1='Image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0'
-          IMAGESSTR2='Image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:${{ needs.prepare_env.outputs.specific_tag }}'
-          sed -i "s|$IMAGESSTR1|$IMAGESSTR2|g" "$IMAGEPATH"
-          cat $IMAGEPATH | grep Image:
-          IMAGESSTR1='image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0'
-          IMAGESSTR2='image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:${{ needs.prepare_env.outputs.specific_tag }}'
-          sed -i "s|$IMAGESSTR1|$IMAGESSTR2|g" "$IMAGEPATH"
-          cat $IMAGEPATH | grep image:
-          echo - 2. add operator tag in common file
-          DEFAULT_IMAGE_TAG="DEFAULT_IMAGE_TAG=${{ needs.prepare_env.outputs.specific_tag }}"
-          DEFAULT_IMAGE_TAG_PATH="hack/common.sh"
-          echo $DEFAULT_IMAGE_TAG >> $DEFAULT_IMAGE_TAG_PATH
-          cat $DEFAULT_IMAGE_TAG_PATH | grep DEFAULT_IMAGE_TAG
-
-      - name: Build and push operator image
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          platforms: linux/amd64,linux/ppc64le,linux/s390x
-          push: true
-#          tags: ${{ steps.meta.outputs.tags }}
-          tags: ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }}:${{ needs.prepare_env.outputs.specific_tag }}
-          labels: ${{ steps.meta.outputs.labels }}
-          file: build/Dockerfile.operator
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          build-args: |
-            VERSION: ${{ env.IMAGE_VERSION }}
-            BUILD_NUMBER: ${{ github.run_number }}
-
-      - name: show chosen image
-        run: |
-          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }}:${{ needs.prepare_env.outputs.specific_tag }}
-          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }}:${{ needs.prepare_env.outputs.global_tag }}
-      - name: save image names
-        run: |
-          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }} >> /tmp/operator_images.txt
-          echo ${{ needs.prepare_env.outputs.specific_tag }} >> /tmp/operator_images.txt
-          echo ${{ needs.prepare_env.outputs.global_tag }} >> /tmp/operator_images.txt
-      - uses: actions/upload-artifact@v3
-        with:
-          name: images
-          path: /tmp/operator_images.txt
-          retention-days: 90
-
-      - name: build and push operator bundle image
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          platforms: linux/amd64,linux/ppc64le,linux/s390x
-          push: true
-#          tags: ${{ steps.meta.outputs.tags }}
-          tags: ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.bundle_repository }}:${{ needs.prepare_env.outputs.specific_tag }}
-          labels: ${{ steps.meta.outputs.labels }}
-          file: deploy/olm-catalog/ibm-block-csi-operator/1.12.0/bundle-1.12.0.Dockerfile
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          build-args: |
-            VERSION: ${{ env.IMAGE_VERSION }}
-            BUILD_NUMBER: ${{ github.run_number }}
-      - name: show chosen image
-        run: |
-          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.bundle_repository }}:${{ needs.prepare_env.outputs.specific_tag }}
-          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.bundle_repository }}:${{ needs.prepare_env.outputs.global_tag }}
-      - name: save image names
-        run: |
-          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.bundle_repository }} >> /tmp/bundle_images.txt
-          echo ${{ needs.prepare_env.outputs.specific_tag }} >> /tmp/bundle_images.txt
-          echo ${{ needs.prepare_env.outputs.global_tag }} >> /tmp/bundle_images.txt
-      - uses: actions/upload-artifact@v3
-        with:
-          name: images
-          path: /tmp/bundle_images.txt
-          retention-days: 90
+#      - name: replace operator image path in csv
+#        run: |
+#          IMAGEPATH='deploy/olm-catalog/ibm-block-csi-operator/1.12.0/manifests/ibm-block-csi-operator.clusterserviceversion.yaml'
+#          IMAGESSTR1='Image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0'
+#          IMAGESSTR2='Image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:${{ needs.prepare_env.outputs.specific_tag }}'
+#          sed -i "s|$IMAGESSTR1|$IMAGESSTR2|g" "$IMAGEPATH"
+#          cat $IMAGEPATH | grep Image:
+#          IMAGESSTR1='image\: registry.connect.redhat.com\/ibm\/ibm-block-csi-operator\:1.12.0'
+#          IMAGESSTR2='image\: ${{ env.REGISTRY }}\/${{ needs.prepare_env.outputs.operator_repository }}\:${{ needs.prepare_env.outputs.specific_tag }}'
+#          sed -i "s|$IMAGESSTR1|$IMAGESSTR2|g" "$IMAGEPATH"
+#          cat $IMAGEPATH | grep image:
+#          echo - 2. add operator tag in common file
+#          DEFAULT_IMAGE_TAG="DEFAULT_IMAGE_TAG=${{ needs.prepare_env.outputs.specific_tag }}"
+#          DEFAULT_IMAGE_TAG_PATH="hack/common.sh"
+#          echo $DEFAULT_IMAGE_TAG >> $DEFAULT_IMAGE_TAG_PATH
+#          cat $DEFAULT_IMAGE_TAG_PATH | grep DEFAULT_IMAGE_TAG
+#
+#      - name: Build and push operator image
+#        uses: docker/build-push-action@v3
+#        with:
+#          context: .
+#          platforms: linux/amd64,linux/ppc64le,linux/s390x
+#          push: true
+##          tags: ${{ steps.meta.outputs.tags }}
+#          tags: ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }}:${{ needs.prepare_env.outputs.specific_tag }}
+#          labels: ${{ steps.meta.outputs.labels }}
+#          file: build/Dockerfile.operator
+#          cache-from: type=gha
+#          cache-to: type=gha,mode=max
+#          build-args: |
+#            VERSION: ${{ env.IMAGE_VERSION }}
+#            BUILD_NUMBER: ${{ github.run_number }}
+#
+#      - name: show chosen image
+#        run: |
+#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }}:${{ needs.prepare_env.outputs.specific_tag }}
+#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }}:${{ needs.prepare_env.outputs.global_tag }}
+#      - name: save image names
+#        run: |
+#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }} >> /tmp/operator_images.txt
+#          echo ${{ needs.prepare_env.outputs.specific_tag }} >> /tmp/operator_images.txt
+#          echo ${{ needs.prepare_env.outputs.global_tag }} >> /tmp/operator_images.txt
+#      - uses: actions/upload-artifact@v3
+#        with:
+#          name: images
+#          path: /tmp/operator_images.txt
+#          retention-days: 90
+#
+#      - name: build and push operator bundle image
+#        uses: docker/build-push-action@v3
+#        with:
+#          context: .
+#          platforms: linux/amd64,linux/ppc64le,linux/s390x
+#          push: true
+##          tags: ${{ steps.meta.outputs.tags }}
+#          tags: ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.bundle_repository }}:${{ needs.prepare_env.outputs.specific_tag }}
+#          labels: ${{ steps.meta.outputs.labels }}
+#          file: deploy/olm-catalog/ibm-block-csi-operator/1.12.0/bundle-1.12.0.Dockerfile
+#          cache-from: type=gha
+#          cache-to: type=gha,mode=max
+#          build-args: |
+#            VERSION: ${{ env.IMAGE_VERSION }}
+#            BUILD_NUMBER: ${{ github.run_number }}
+#      - name: show chosen image
+#        run: |
+#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.bundle_repository }}:${{ needs.prepare_env.outputs.specific_tag }}
+#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.bundle_repository }}:${{ needs.prepare_env.outputs.global_tag }}
+#      - name: save image names
+#        run: |
+#          echo ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.bundle_repository }} >> /tmp/bundle_images.txt
+#          echo ${{ needs.prepare_env.outputs.specific_tag }} >> /tmp/bundle_images.txt
+#          echo ${{ needs.prepare_env.outputs.global_tag }} >> /tmp/bundle_images.txt
+#      - uses: actions/upload-artifact@v3
+#        with:
+#          name: images
+#          path: /tmp/bundle_images.txt
+#          retention-days: 90
 
 #================================================================================================
 

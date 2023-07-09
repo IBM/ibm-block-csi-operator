@@ -12,7 +12,6 @@ metadata:
     olm.skipRange: '>=1.6.0 <1.12.0'
     categories: "Storage,Cloud Provider"
     certified: "true"
-    containerImage: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.12.0
     createdAt: "2022-08-22T11:00:00Z"
     description: "Run IBM block storage CSI driver on OpenShift."
     repository: https://github.com/IBM/ibm-block-csi-operator
