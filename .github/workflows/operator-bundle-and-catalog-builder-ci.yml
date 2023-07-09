@@ -1,5 +1,5 @@
 name: operator-bundle-and-catalog-builder-ci
-on:
+#on:
 #  push:
 #    branches:
 #      - operator_buider_ci_add_bundle
