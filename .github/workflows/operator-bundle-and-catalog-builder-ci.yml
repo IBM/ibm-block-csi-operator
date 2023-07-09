@@ -155,11 +155,11 @@ jobs:
 #================================================================================================
 
 #brkd remove cat part
-      - name: run build opeartor catalog script
-        run: |
-          make build-catalog
-          cat ibm-block-csi-catalog/ibm-block-csi-operator/index.yaml
-          cat ibm-block-csi-catalog.Dockerfile
+#      - name: run build opeartor catalog script
+#        run: |
+#          make build-catalog
+#          cat ibm-block-csi-catalog/ibm-block-csi-operator/index.yaml
+#          cat ibm-block-csi-catalog.Dockerfile
 
       - name: build and push operator catalog image
         uses: docker/build-push-action@v3
