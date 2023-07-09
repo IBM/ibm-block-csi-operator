@@ -1,16 +1,16 @@
 name: operator-bundle-and-catalog-builder-ci
 on:
-  push:
-    branches:
-      - operator_buider_ci_add_bundle
-  pull_request:
-  workflow_dispatch:
-    inputs:
-      production:
-        description: 'Click the checkbox for production image'
-        default: false
-        type: boolean
-        required: false
+#  push:
+#    branches:
+#      - operator_buider_ci_add_bundle
+#  pull_request:
+#  workflow_dispatch:
+#    inputs:
+#      production:
+#        description: 'Click the checkbox for production image'
+#        default: false
+#        type: boolean
+#        required: false
 env:
   IMAGE_VERSION: 'v0.9.1'
 jobs:
@@ -21,11 +21,11 @@ jobs:
       PRODUCTION: "${{ inputs.production }}"
       BUILD_NUMBER: "${{ github.run_number }}"
       GITHUB_SHA: "${{ github.sha }}"
-      OPERATOR_PROD_REPOSITORY: csiblock/ibm-block-csi-operator
+#      OPERATOR_PROD_REPOSITORY: csiblock/ibm-block-csi-operator
       OPERATOR_STAGING_REPOSITORY: csiblock/ibm-block-csi-operator-staging
-      BUNDLE_OPERATOR_PROD_REPOSITORY: csiblock/ibm-block-csi-operator-bundle
+#      BUNDLE_OPERATOR_PROD_REPOSITORY: csiblock/ibm-block-csi-operator-bundle
       BUNDLE_OPERATOR_STAGING_REPOSITORY: csiblock/ibm-block-csi-operator-bundle-staging
-      CATALOG_OPERATOR_PROD_REPOSITORY: csiblock/ibm-block-csi-operator-catalog-source
+#      CATALOG_OPERATOR_PROD_REPOSITORY: csiblock/ibm-block-csi-operator-catalog-source
       CATALOG_OPERATOR_STAGING_REPOSITORY: csiblock/ibm-block-csi-operator-catalog-source
     steps:
       - name: Checkout code
@@ -40,9 +40,6 @@ jobs:
       catalog_repository: "${{ steps.setup_dependencies.outputs.catalog_repository }}"
       specific_tag: "${{ steps.setup_dependencies.outputs.specific_tag }}"
       global_tag: "${{ steps.setup_dependencies.outputs.global_tag }}"
-
-  #================================================================================================
-  #================================================================================================
 
   build_and_push_multiarch_operator_and_catalog_images:
     name: "build and push operator image"
@@ -63,11 +60,11 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: |
-            ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }}
-          tags: |
-            type=raw,value=${{ needs.prepare_env.outputs.global_tag }}
-            type=raw,value=${{ needs.prepare_env.outputs.specific_tag }}
+#          images: |
+#            ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }}
+#          tags: |
+#            type=raw,value=${{ needs.prepare_env.outputs.global_tag }}
+#            type=raw,value=${{ needs.prepare_env.outputs.specific_tag }}
           labels: |
             commit=${{ github.sha }}
       - name: Login to quay.io
@@ -93,8 +90,6 @@ jobs:
           DEFAULT_IMAGE_TAG_PATH="hack/common.sh"
           echo $DEFAULT_IMAGE_TAG >> $DEFAULT_IMAGE_TAG_PATH
           cat $DEFAULT_IMAGE_TAG_PATH | grep DEFAULT_IMAGE_TAG
-
-#================================================================================================
 
       - name: Build and push operator image
         uses: docker/build-push-action@v3
@@ -126,8 +121,6 @@ jobs:
           name: images
           path: /tmp/operator_images.txt
           retention-days: 90
-
-#================================================================================================
 
       - name: build and push operator bundle image
         uses: docker/build-push-action@v3
