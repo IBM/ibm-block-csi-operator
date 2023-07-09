@@ -60,11 +60,11 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-#          images: |
-#            ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }}
-#          tags: |
-#            type=raw,value=${{ needs.prepare_env.outputs.global_tag }}
-#            type=raw,value=${{ needs.prepare_env.outputs.specific_tag }}
+          images: |
+            ${{ env.REGISTRY }}/${{ needs.prepare_env.outputs.operator_repository }}
+          tags: |
+            type=raw,value=${{ needs.prepare_env.outputs.global_tag }}
+            type=raw,value=${{ needs.prepare_env.outputs.specific_tag }}
           labels: |
             commit=${{ github.sha }}
       - name: Login to quay.io
