@@ -1,5 +1,5 @@
 
-name: operator-builder-ci
+name: check_quay_push
 on:
   push:
     branches:
