@@ -1,9 +1,9 @@
 
 name: operator-builder-ci
-#on:
-#  push:
-#    branches:
-#      - operator_buider_ci_add_bundle
+on:
+  push:
+    branches:
+      - check_quay_push
   pull_request:
   workflow_dispatch:
     inputs:
