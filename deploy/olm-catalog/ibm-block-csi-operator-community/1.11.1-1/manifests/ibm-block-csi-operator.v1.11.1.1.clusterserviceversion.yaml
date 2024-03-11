@@ -1,16 +1,19 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
-  name: ibm-block-csi-operator.v1.11.1.1
+  name: ibm-block-csi-operator.v1.11.1-1
   namespace: placeholder
+  labels:
+    operatorframework.io/arch.amd64: supported
+    operatorframework.io/arch.s390x: supported
+    operatorframework.io/arch.ppc64le: supported
   annotations:
     capabilities: "Seamless Upgrades"
-    olm.skipRange: '>=1.6.0 <1.11.1.1'
     categories: "Storage,Cloud Provider"
     certified: "true"
-    containerImage: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.11.1.1
-    createdAt: "2022-08-22T11:00:00Z"
-    description: "Run IBM block storage CSI driver on OpenShift."
+    containerImage: quay.io/ibmcsiblock/ibm-block-csi-operator:1.11.1-1
+    createdAt: "2022-03-31T11:00:00Z"
+    description: "Run IBM block storage CSI driver."
     repository: https://github.com/IBM/ibm-block-csi-operator
     support: IBM
     alm-examples: >-
@@ -36,7 +39,9 @@ metadata:
                             "key": "kubernetes.io/arch",
                             "operator": "In",
                             "values": [
-                              "amd64"
+                              "amd64",
+                              "s390x",
+                              "ppc64le"
                             ]
                           }
                         ]
@@ -60,7 +65,9 @@ metadata:
                             "key": "kubernetes.io/arch",
                             "operator": "In",
                             "values": [
-                              "amd64"
+                              "amd64",
+                              "s390x",
+                              "ppc64le"
                             ]
                           }
                         ]
@@ -157,7 +164,9 @@ metadata:
                             "key": "kubernetes.io/arch",
                             "operator": "In",
                             "values": [
-                              "amd64"
+                              "amd64",
+                              "s390x",
+                              "ppc64le"
                             ]
                           }
                         ]
@@ -185,8 +194,9 @@ spec:
     - CSI
   relatedImages:
     - name: ibm-block-csi-operator
-      image: registry.connect.redhat.com/ibm/ibm-block-csi-operator@sha256:8b05154ee23a34da3ceff6c481af23b9a665c8bc4058d6470de929f1111d8d1f
-  version: 1.11.1.1
+      image: quay.io/ibmcsiblock/ibm-block-csi-operator:1.11.1-1
+  version: 1.11.1-1
+  replaces: ibm-block-csi-operator.v1.11.1
   maturity: stable
   maintainers:
     - name: IBM Block CSI Team
@@ -622,11 +632,13 @@ spec:
                               operator: In
                               values:
                                 - amd64
+                                - s390x
+                                - ppc64le
                 containers:
                   - name: ibm-block-csi-operator
                     resources:
                       requests:
-                        memory: 50Mi
+                        memory: 100Mi
                         cpu: 50m
                       limits:
                         memory: 500Mi
@@ -645,7 +657,7 @@ spec:
                       capabilities:
                         drop:
                           - ALL
-                    image: registry.connect.redhat.com/ibm/ibm-block-csi-operator@sha256:8b05154ee23a34da3ceff6c481af23b9a665c8bc4058d6470de929f1111d8d1f
+                    image: quay.io/ibmcsiblock/ibm-block-csi-operator:1.11.1-1
                     imagePullPolicy: IfNotPresent
                     command:
                       - ibm-block-csi-operator
