@@ -60,6 +60,7 @@ RUN chmod 0444 ${IBMBlockCSI_CR_YAML} \
 COPY --from=0 /go/src/github.com/IBM/ibm-block-csi-operator/build/_output/bin/ibm-block-csi-operator ${OPERATOR}
 
 COPY build/bin /usr/local/bin
+RUN  chmod +x /usr/local/bin/user_setup
 RUN  /usr/local/bin/user_setup
 
 ENTRYPOINT ["/usr/local/bin/entrypoint"]
