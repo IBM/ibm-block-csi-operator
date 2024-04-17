@@ -9,7 +9,7 @@ metadata:
     categories: "Storage,Cloud Provider"
     certified: "true"
     containerImage: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.11.2
-    createdAt: "2022-08-22T11:00:00Z"
+    createdAt: "2024-04-15T11:00:00Z"
     description: "Run IBM block storage CSI driver on OpenShift."
     repository: https://github.com/IBM/ibm-block-csi-operator
     support: IBM
@@ -191,7 +191,7 @@ spec:
   maintainers:
     - name: IBM Block CSI Team
       email: csi.block1@il.ibm.com
-  minKubeVersion: 1.23.0
+  minKubeVersion: 1.27.0
   provider:
     name: IBM
   links:
@@ -626,7 +626,7 @@ spec:
                   - name: ibm-block-csi-operator
                     resources:
                       requests:
-                        memory: 50Mi
+                        memory: 100Mi
                         cpu: 50m
                       limits:
                         memory: 500Mi
