@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/go-logr/logr v1.4.1
 	github.com/imdario/mergo v0.3.16
-	github.com/onsi/ginkgo/v2 v2.17.2
+	github.com/onsi/ginkgo/v2 v2.17.3
 	github.com/onsi/gomega v1.33.1
 	github.com/pkg/errors v0.9.1
 	github.com/presslabs/controller-util v0.10.2
