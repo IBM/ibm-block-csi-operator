@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/name: host-definer
     app.kubernetes.io/instance: ibm-block-csi
     app.kubernetes.io/managed-by: ibm-block-csi-operator
-    release: v1.11.1.1
+    release: v1.11.1
 spec:
   hostDefiner:
 #    prefix:                       # Optional.
