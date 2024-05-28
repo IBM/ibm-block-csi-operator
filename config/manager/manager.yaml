@@ -20,7 +20,7 @@ spec:
         productID: 5027566ef6c54de49028be7df25119e1
         productMetric: FREE
         productName: IBM Block CSI Driver
-        productVersion: 1.11.1-1
+        productVersion: 1.11.1.1
       labels:
         app.kubernetes.io/instance: ibm-block-csi-operator
         app.kubernetes.io/managed-by: ibm-block-csi-operator
@@ -54,7 +54,7 @@ spec:
               fieldPath: metadata.name
         - name: OPERATOR_NAME
           value: ibm-block-csi-operator
-        image: quay.io/ibmcsiblock/ibm-block-csi-operator:1.11.1-1
+        image: quay.io/ibmcsiblock/ibm-block-csi-operator:1.11.1.1
         imagePullPolicy: IfNotPresent
         livenessProbe:
           exec:
