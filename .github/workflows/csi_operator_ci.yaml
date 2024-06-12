@@ -1,0 +1,91 @@
+name: Community Operators test
+on:
+  push:
+    branches:
+      - develop
+      - master
+  pull_request:
+    branches:
+      - develop
+      - master
+jobs:
+  operator_image_build:
+   name: "set env"
+   runs-on: ubuntu-latest
+   steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+   outputs:
+     operator_image_for_test: "ibmcom/ibm-block-csi-operator:latest"
+
+  prepare_env:
+   name: "prepare env"
+   needs: operator_image_build
+   runs-on: ubuntu-latest
+   steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup dependencies
+        id: setup_dependencies
+        run: |
+          build/ci/community/setup_ci_dependencies.sh
+      - name: Save dependencies files
+        uses: actions/upload-artifact@v2
+        with:
+          name: gitconfig-file
+          path: |
+            /home/runner/.gitconfig
+            /home/runner/.bash_profile
+          retention-days: 1
+      - uses: FranzDiebold/github-env-vars-action@v2
+      - name: Prepare env
+        id: environment_setup
+        run: |
+          build/ci/community/prepare_env.sh
+   outputs:
+     image_branch_tag: "${{ steps.setup_dependencies.outputs.image_branch_tag }}"
+     community_operators_path: "${{ steps.environment_setup.outputs.community_operators_path }}"
+     upstream_community_operators_path: "${{ steps.environment_setup.outputs.upstream_community_operators_path }}"
+     repository_path: "${{ steps.environment_setup.outputs.repository_path }}"
+     operator_image_for_test: ${{ needs.operator_image_build.outputs.operator_image_for_test }}
+     csv_file:  ${{ steps.environment_setup.outputs.csv_file }}
+
+  CI-csi-demo-pr:
+    name: "community-operators fork checks"
+    needs: prepare_env
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      original_community_operators_repository: "k8s-operatorhub/community-operators"
+      original_community_operators_repository_prod: "redhat-openshift-ecosystem/community-operators-prod"
+      forked_community_operators_repository: "csiblock/community-operators"
+      forked_community_operators_repository_prod: "csiblock/community-operators-prod"
+      community_operators_kubernetes_branch: "ibm-block-csi-update-kubernetes-${{ github.run_number }}"
+      community_operators_openshift_branch: "ibm-block-csi-update-openshift-${{ github.run_number }}"
+      github_token: ${{ secrets.CSIBLOCK_GITHUB_TOKEN }}
+      repository_path: ${{ needs.prepare_env.outputs.repository_path }}
+      operator_image_for_test: ${{ needs.prepare_env.outputs.operator_image_for_test }}
+      csv_file: ${{ needs.prepare_env.outputs.csv_file }}
+      github_build_number: ${{ github.run_number }}
+      latest_operator_version: ${{ needs.prepare_env.outputs.image_branch_tag }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Retrieve gitconfig file
+        uses: actions/download-artifact@v2
+        with:
+          name: gitconfig-file
+          path: /home/runner
+      - name: Create demo PR
+        run: |
+          build/ci/community/create_demo_pr.sh
+      - name: Wait for all demo PR checks to finish
+        run: |
+          build/ci/community/wait_demo_pr_checks.sh
+      - name: Assert all demo PR checks passed
+        run: |
+          build/ci/community/check_all_checks.sh
+      - name: Clean demo PR
+        if: always()
+        run: |
+          build/ci/community/clean_demo_pr.sh
