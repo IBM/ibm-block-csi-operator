@@ -9,10 +9,19 @@ metadata:
     categories: "Storage,Cloud Provider"
     certified: "true"
     containerImage: registry.connect.redhat.com/ibm/ibm-block-csi-operator:1.12.0
-    createdAt: "2022-08-22T11:00:00Z"
+    createdAt: "2024-08-27T11:00:00Z"
     description: "Run IBM block storage CSI driver on OpenShift."
     repository: https://github.com/IBM/ibm-block-csi-operator
     support: IBM
+    operators.openshift.io/valid-subscription: ""
+    features.operators.openshift.io/disconnected: "false"
+    features.operators.openshift.io/fips-compliant: "false"
+    features.operators.openshift.io/proxy-aware: "false"
+    features.operators.openshift.io/tls-profiles: "false"
+    features.operators.openshift.io/token-auth-aws: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
+    features.operators.openshift.io/csi: "true"
     alm-examples: >-
       [
         {
@@ -73,32 +82,32 @@ metadata:
             "sidecars": [
               {
                 "name": "csi-node-driver-registrar",
-                "repository": "k8s.gcr.io/sig-storage/csi-node-driver-registrar",
-                "tag": "v2.6.3",
+                "repository": "registry.k8s.io/sig-storage/csi-node-driver-registrar",
+                "tag": "v2.9.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-provisioner",
-                "repository": "k8s.gcr.io/sig-storage/csi-provisioner",
-                "tag": "v3.4.0",
+                "repository": "registry.k8s.io/sig-storage/csi-provisioner",
+                "tag": "v3.6.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-attacher",
-                "repository": "k8s.gcr.io/sig-storage/csi-attacher",
-                "tag": "v4.2.0",
+                "repository": "registry.k8s.io/sig-storage/csi-attacher",
+                "tag": "v4.4.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-snapshotter",
                 "repository": "k8s.gcr.io/sig-storage/csi-snapshotter",
-                "tag": "v6.2.1",
+                "tag": "v6.3.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
                 "name": "csi-resizer",
-                "repository": "k8s.gcr.io/sig-storage/csi-resizer",
-                "tag": "v1.7.0",
+                "repository": "registry.k8s.io/sig-storage/csi-resizer",
+                "tag": "v1.9.0",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
@@ -115,8 +124,8 @@ metadata:
               },
               {
                 "name": "livenessprobe",
-                "repository": "k8s.gcr.io/sig-storage/livenessprobe",
-                "tag": "v2.9.0",
+                "repository": "registry.k8s.io/sig-storage/livenessprobe",
+                "tag": "v2.12.0",
                 "imagePullPolicy": "IfNotPresent"
               }
             ]
@@ -191,7 +200,7 @@ spec:
   maintainers:
     - name: IBM Block CSI Team
       email: csi.block1@il.ibm.com
-  minKubeVersion: 1.24.0
+  minKubeVersion: 1.26.0
   provider:
     name: IBM
   links:
@@ -626,7 +635,7 @@ spec:
                   - name: ibm-block-csi-operator
                     resources:
                       requests:
-                        memory: 50Mi
+                        memory: 100Mi
                         cpu: 50m
                       limits:
                         memory: 500Mi
