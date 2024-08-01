@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/name: ibm-block-csi-operator
     csi: ibm
     product: ibm-block-csi-driver
-    release: v1.11.3
+    release: v1.12.0-beta
   name: hostdefiners.csi.ibm.com
 spec:
   group: csi.ibm.com
@@ -1015,7 +1015,7 @@ metadata:
     app.kubernetes.io/name: ibm-block-csi-operator
     csi: ibm
     product: ibm-block-csi-driver
-    release: v1.11.3
+    release: v1.12.0-beta
   name: hostdefinitions.csi.ibm.com
 spec:
   group: csi.ibm.com
@@ -1118,7 +1118,7 @@ metadata:
     app.kubernetes.io/name: ibm-block-csi-operator
     csi: ibm
     product: ibm-block-csi-driver
-    release: v1.11.3
+    release: v1.12.0-beta
   name: ibmblockcsis.csi.ibm.com
 spec:
   group: csi.ibm.com
@@ -3063,7 +3063,7 @@ metadata:
     app.kubernetes.io/name: ibm-block-csi-operator
     csi: ibm
     product: ibm-block-csi-driver
-    release: v1.11.3
+    release: v1.12.0-beta
   name: ibm-block-csi-operator
   namespace: default
 ---
@@ -3384,7 +3384,7 @@ spec:
         productID: 5027566ef6c54de49028be7df25119e1
         productMetric: FREE
         productName: IBM Block CSI Driver
-        productVersion: 1.11.3
+        productVersion: 1.12.0-beta
       labels:
         app.kubernetes.io/instance: ibm-block-csi-operator
         app.kubernetes.io/managed-by: ibm-block-csi-operator
