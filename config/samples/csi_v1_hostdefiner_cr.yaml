@@ -14,8 +14,8 @@ spec:
 #    connectivityType:             # Optional. Values nvme/fc/iscsi. The default is chosen dynamically.
 #    allowDelete: true             # Optional. Values true/false. The default is true.
 #    dynamicNodeLabeling: false    # Optional. Values true/false. The default is false.
-    repository: quay.io/ibmcsiblock/ibm-block-csi-host-definer
-    tag: "1.11.2"
+    repository: quay.io/ibmcsiblock/ibm-block-csi-host-definer-amd64
+    tag: "rwx_beta"
     imagePullPolicy: IfNotPresent
     affinity:
       nodeAffinity:
@@ -26,8 +26,6 @@ spec:
                   operator: In
                   values:
                     - amd64
-                    - s390x
-                    - ppc64le
 #    tolerations:
 #    - effect: NoSchedule
 #      key: node-role.kubernetes.io/master

@@ -12,8 +12,8 @@ spec:
   # controller is a statefulSet with ibm-block-csi-controller container
   # and csi-provisioner, csi-attacher, csi-snapshotter and livenessprobe sidecars.
   controller:
-    repository: quay.io/ibmcsiblock/ibm-block-csi-driver-controller
-    tag: "1.11.2"
+    repository: quay.io/ibmcsiblock/ibm-block-csi-driver-controller-amd64
+    tag: "rwx_beta"
     imagePullPolicy: IfNotPresent
     affinity:
       nodeAffinity:
@@ -24,14 +24,12 @@ spec:
                   operator: In
                   values:
                     - amd64
-                    - s390x
-                    - ppc64le
 
   # node is a daemonSet with ibm-block-csi-node container
   # and csi-node-driver-registrar and livenessprobe sidecars.
   node:
-    repository: quay.io/ibmcsiblock/ibm-block-csi-driver-node
-    tag: "1.11.2"
+    repository: quay.io/ibmcsiblock/ibm-block-csi-driver-node-amd64
+    tag: "rwx_beta"
     imagePullPolicy: IfNotPresent
     affinity:
       nodeAffinity:
@@ -42,8 +40,6 @@ spec:
                   operator: In
                   values:
                     - amd64
-                    - s390x
-                    - ppc64le
 
 #    tolerations:
 #    - effect: NoSchedule
