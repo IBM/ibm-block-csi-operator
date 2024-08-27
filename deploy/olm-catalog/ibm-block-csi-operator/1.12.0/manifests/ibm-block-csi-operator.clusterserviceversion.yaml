@@ -598,6 +598,60 @@ spec:
                 - volumeattachments/status
               verbs:
                 - patch
+            - apiGroups:
+                - volumegroup.storage.openshift.io
+              resources:
+                - volumegroupclasses
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - volumegroup.storage.openshift.io
+              resources:
+                - volumegroupcontents
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - volumegroup.storage.openshift.io
+              resources:
+                - volumegroups
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - volumegroup.storage.openshift.io
+              resources:
+                - volumegroups/finalizers
+              verbs:
+                - update
+            - apiGroups:
+                - volumegroup.storage.openshift.io
+              resources:
+                - volumegroups/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - volumegroup.storage.openshift.io
+              resources:
+                - volumegroupcontents/status
+              verbs:
+                - get
+                - patch
+                - update
 
       deployments:
         - name: ibm-block-csi-operator

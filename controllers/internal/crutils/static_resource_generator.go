@@ -28,7 +28,8 @@ import (
 const (
 	snapshotStorageApiGroup                  string = "snapshot.storage.k8s.io"
 	securityOpenshiftApiGroup                string = "security.openshift.io"
-	volumeGroupApiGroup                      string = "csi.ibm.com"
+	IBMVolumeGroupApiGroup                   string = "csi.ibm.com"
+	communityVolumeGroupApiGroup             string = "volumegroup.storage.openshift.io"
 	storageApiGroup                          string = "storage.k8s.io"
 	rbacAuthorizationApiGroup                string = "rbac.authorization.k8s.io"
 	replicationStorageOpenshiftApiGroup      string = "replication.storage.openshift.io"
@@ -412,34 +413,64 @@ func (c *IBMBlockCSI) GenerateVolumeGroupClusterRole() *rbacv1.ClusterRole {
 		},
 		Rules: []rbacv1.PolicyRule{
 			{
-				APIGroups: []string{volumeGroupApiGroup},
+				APIGroups: []string{communityVolumeGroupApiGroup},
 				Resources: []string{volumeGroupsResources},
 				Verbs:     []string{verbGet, verbList, verbWatch, verbCreate, verbUpdate, verbPatch, verbDelete},
 			},
 			{
-				APIGroups: []string{volumeGroupApiGroup},
+				APIGroups: []string{communityVolumeGroupApiGroup},
 				Resources: []string{volumeGroupsStatusResource},
 				Verbs:     []string{verbGet, verbUpdate, verbPatch},
 			},
 			{
-				APIGroups: []string{volumeGroupApiGroup},
+				APIGroups: []string{communityVolumeGroupApiGroup},
 				Resources: []string{volumeGroupsFinalizersResource},
 				Verbs:     []string{verbUpdate},
 			},
 			{
-				APIGroups: []string{volumeGroupApiGroup},
+				APIGroups: []string{communityVolumeGroupApiGroup},
 				Resources: []string{volumeGroupClassesResource},
 				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 			{
-				APIGroups: []string{volumeGroupApiGroup},
+				APIGroups: []string{communityVolumeGroupApiGroup},
 				Resources: []string{volumeGroupContentsResource},
 				Verbs:     []string{verbGet, verbList, verbWatch, verbCreate, verbUpdate, verbPatch, verbDelete},
 			},
 			{
-				APIGroups: []string{volumeGroupApiGroup},
+				APIGroups: []string{communityVolumeGroupApiGroup},
 				Resources: []string{volumeGroupContentsStatusResource},
+				Verbs:     []string{verbGet, verbUpdate, verbPatch},
+			},
+			{
+				APIGroups: []string{IBMVolumeGroupApiGroup},
+				Resources: []string{volumeGroupsResources},
 				Verbs:     []string{verbGet, verbList, verbWatch, verbCreate, verbUpdate, verbPatch, verbDelete},
+			},
+			{
+				APIGroups: []string{IBMVolumeGroupApiGroup},
+				Resources: []string{volumeGroupsStatusResource},
+				Verbs:     []string{verbGet, verbUpdate, verbPatch},
+			},
+			{
+				APIGroups: []string{IBMVolumeGroupApiGroup},
+				Resources: []string{volumeGroupsFinalizersResource},
+				Verbs:     []string{verbUpdate},
+			},
+			{
+				APIGroups: []string{IBMVolumeGroupApiGroup},
+				Resources: []string{volumeGroupClassesResource},
+				Verbs:     []string{verbGet, verbList, verbWatch},
+			},
+			{
+				APIGroups: []string{IBMVolumeGroupApiGroup},
+				Resources: []string{volumeGroupContentsResource},
+				Verbs:     []string{verbGet, verbList, verbWatch, verbCreate, verbUpdate, verbPatch, verbDelete},
+			},
+			{
+				APIGroups: []string{IBMVolumeGroupApiGroup},
+				Resources: []string{volumeGroupContentsStatusResource},
+				Verbs:     []string{verbGet, verbUpdate, verbPatch},
 			},
 			{
 				APIGroups: []string{""},
