@@ -147,5 +147,9 @@ func (s *hostDefinerSyncer) getEnv() []corev1.EnvVar {
 			Name:  "DYNAMIC_NODE_LABELING",
 			Value: strconv.FormatBool(s.driver.Spec.HostDefiner.DynamicNodeLabeling),
 		},
+                {
+                        Name:  "PORT_SET",
+                        Value: s.driver.Spec.HostDefiner.PortSet,
+                },
 	}
 }

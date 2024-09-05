@@ -14,6 +14,7 @@ spec:
 #    connectivityType:             # Optional. Values nvme/fc/iscsi. The default is chosen dynamically.
 #    allowDelete: true             # Optional. Values true/false. The default is true.
 #    dynamicNodeLabeling: false    # Optional. Values true/false. The default is false.
+#    portSet:                      # Optional. Port set for new SVC port definitions
     repository: quay.io/lechapitre/new_hd_test
     tag: "eyalp_fabrix_fix"
     imagePullPolicy: IfNotPresent

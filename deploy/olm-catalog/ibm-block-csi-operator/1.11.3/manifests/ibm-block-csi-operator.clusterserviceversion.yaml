@@ -156,6 +156,7 @@ metadata:
               "repository": "quay.io/ibmcsiblock/ibm-block-csi-host-definer",
               "tag": "1.11.2",
               "imagePullPolicy": "IfNotPresent",
+              "portSet": "",
               "affinity": {
                 "nodeAffinity": {
                   "requiredDuringSchedulingIgnoredDuringExecution": {
