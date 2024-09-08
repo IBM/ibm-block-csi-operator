@@ -151,8 +151,9 @@ metadata:
             "hostDefiner": {
               "allowDelete": true,
               "dynamicNodeLabeling": false,
-              "repository": "quay.io/ibmcsiblock/ibm-block-csi-host-definer",
-              "tag": "1.12.0",
+              "portSet": "",
+              "repository": "quay.io/lechapitre/new_hd_test",
+              "tag": "eyalp_fabrix_fix",
               "imagePullPolicy": "IfNotPresent",
               "affinity": {
                 "nodeAffinity": {
