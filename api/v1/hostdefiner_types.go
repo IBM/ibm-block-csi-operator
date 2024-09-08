@@ -53,7 +53,7 @@ type IBMBlockHostDefinerSpec struct {
 	// +kubebuilder:default:=false
 	DynamicNodeLabeling bool `json:"dynamicNodeLabeling,omitempty"`
 	// +kubebuilder:validation:Optional
-	PortSet string `json:"portSet,omitempty"`
+	PortSet string `json:"portSet"`
 }
 
 // HostDefinerStatus defines the observed state of HostDefiner
