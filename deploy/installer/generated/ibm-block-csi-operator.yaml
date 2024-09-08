@@ -3418,7 +3418,7 @@ spec:
               fieldPath: metadata.name
         - name: OPERATOR_NAME
           value: ibm-block-csi-operator
-        image: quay.io/ibmcsiblock/ibm-block-csi-operator:1.12.0
+        image: quay.io/lechapitre/my_csi_operator:eyalp_lechapitre_operator
         imagePullPolicy: IfNotPresent
         livenessProbe:
           exec:
