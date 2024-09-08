@@ -156,7 +156,6 @@ metadata:
               "repository": "quay.io/lechapitre/new_hd_test",
               "tag": "eyalp_fabrix_fix",
               "imagePullPolicy": "IfNotPresent",
-              "portSet": "",
               "affinity": {
                 "nodeAffinity": {
                   "requiredDuringSchedulingIgnoredDuringExecution": {
