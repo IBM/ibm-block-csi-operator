@@ -201,7 +201,7 @@ spec:
   maintainers:
     - name: IBM Block CSI Team
       email: csi.block1@il.ibm.com
-  minKubeVersion: 1.26.0
+  minKubeVersion: 1.29.0
   provider:
     name: IBM
   links:
