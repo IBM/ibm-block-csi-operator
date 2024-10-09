@@ -155,40 +155,6 @@ rules:
   - update
   - watch
 - apiGroups:
-  - replication.storage.openshift.io
-  resources:
-  - volumereplicationclasses
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - replication.storage.openshift.io
-  resources:
-  - volumereplications
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - replication.storage.openshift.io
-  resources:
-  - volumereplications/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - replication.storage.openshift.io
-  resources:
-  - volumereplications/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
   - security.openshift.io
   resourceNames:
   - anyuid
@@ -275,3 +241,29 @@ rules:
   - volumeattachments/status
   verbs:
   - patch
+- apiGroups:
+  - csiaddons.openshift.io
+  resources:
+  - csiaddonsnodes
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - csiaddons.openshift.io
+  resources:
+  - csiaddonsnodes/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - csiaddons.openshift.io
+  resources:
+  - csiaddonsnodes/status
+  verbs:
+  - get
+  - patch
+  - update

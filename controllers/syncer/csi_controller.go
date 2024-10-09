@@ -136,7 +136,7 @@ func (s *csiControllerSyncer) ensurePodSpec() corev1.PodSpec {
 func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	controllerPlugin := s.ensureContainer(ControllerContainerName,
 		s.driver.GetCSIControllerImage(),
-		[]string{"--csi-endpoint=$(CSI_ENDPOINT)"},
+		[]string{"--csi-endpoint=$(CSI_ENDPOINT)", "--csi-addons-endpoint=$(CSI_ADDONS_ENDPOINT)"},
 	)
 
 	controllerPlugin.Resources = ensureResources("40m", "800m", "40Mi", "400Mi")
@@ -208,12 +208,17 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	)
 	resizer.ImagePullPolicy = s.getCSIResizerPullPolicy()
 
-	leaderElectionNamespaceFlag := fmt.Sprintf("--leader-election-namespace=%s", s.driver.Namespace)
 	driverNameFlag := fmt.Sprintf("--driver-name=%s", config.DriverName)
+	statfulSetName := config.GetNameForResource(config.CSIController, s.driver.Name)
+	controllerPodName := fmt.Sprintf("--pod=%s", config.GetControllerPodName(statfulSetName))
+	controllerPodNamespace := fmt.Sprintf("--namespace=%s", s.driver.Namespace)
+	controllerPort := fmt.Sprintf("--controller-port=%s", "9087")
 	replicator := s.ensureContainer(replicatorContainerName,
 		s.getCSIAddonsReplicatorImage(),
-		[]string{leaderElectionNamespaceFlag, driverNameFlag,
-			"--csi-address=$(ADDRESS)", "--zap-log-level=5", "--rpc-timeout=30s"},
+		[]string{controllerPodName, controllerPodNamespace, controllerPort,
+			"--csi-addons-address=$(CSI_ADDONS_ENDPOINT)",
+			"--node-id=$(NODE_ID)", "--pod-uid=$(POD_UID)",
+			"--controller-ip=$(POD_IP)"},
 	)
 	replicator.ImagePullPolicy = s.getCSIAddonsReplicatorPullPolicy()
 
@@ -329,6 +334,18 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 				Value: config.CSIEndpoint,
 			},
 			{
+				Name:  "CSI_ADDONS_ENDPOINT",
+				Value: config.CSIAddonsEndpoint,
+			},
+			{
+				Name: "NODE_ID",
+				ValueFrom: &corev1.EnvVarSource{
+					FieldRef: &corev1.ObjectFieldSelector{
+						FieldPath: "spec.nodeName",
+					},
+				},
+			},
+			{
 				Name:  "CSI_LOGLEVEL",
 				Value: config.DefaultLogLevel,
 			},
@@ -337,9 +354,40 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 				Value: strconv.FormatBool(s.driver.Spec.EnableCallHome),
 			},
 		}
+	case replicatorContainerName:
+		return []corev1.EnvVar{
+			{
+				Name:  "CSI_ADDONS_ENDPOINT",
+				Value: config.CSIAddonsEndpoint,
+			},
+			{
+				Name: "NODE_ID",
+				ValueFrom: &corev1.EnvVarSource{
+					FieldRef: &corev1.ObjectFieldSelector{
+						FieldPath: "spec.nodeName",
+					},
+				},
+			},
+			{
+				Name: "POD_IP",
+				ValueFrom: &corev1.EnvVarSource{
+					FieldRef: &corev1.ObjectFieldSelector{
+						FieldPath: "status.podIP",
+					},
+				},
+			},
+			{
+				Name: "POD_UID",
+				ValueFrom: &corev1.EnvVarSource{
+					FieldRef: &corev1.ObjectFieldSelector{
+						FieldPath: "metadata.uid",
+					},
+				},
+			},
+		}
 
 	case provisionerContainerName, attacherContainerName, snapshotterContainerName,
-		resizerContainerName, replicatorContainerName, volumeGroupContainerName:
+		resizerContainerName, volumeGroupContainerName:
 		return []corev1.EnvVar{
 			{
 				Name:  "ADDRESS",

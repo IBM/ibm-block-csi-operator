@@ -488,17 +488,9 @@ spec:
                 - update
                 - watch
             - apiGroups:
-                - replication.storage.openshift.io
+                - csiaddons.openshift.io
               resources:
-                - volumereplicationclasses
-              verbs:
-                - get
-                - list
-                - watch
-            - apiGroups:
-                - replication.storage.openshift.io
-              resources:
-                - volumereplications
+                - csiaddonsnodes
               verbs:
                 - create
                 - delete
@@ -508,15 +500,15 @@ spec:
                 - update
                 - watch
             - apiGroups:
-                - replication.storage.openshift.io
+                - csiaddons.openshift.io
               resources:
-                - volumereplications/finalizers
+                - csiaddonsnodes/finalizers
               verbs:
                 - update
             - apiGroups:
-                - replication.storage.openshift.io
+                - csiaddons.openshift.io
               resources:
-                - volumereplications/status
+                - csiaddonsnodes/status
               verbs:
                 - get
                 - patch

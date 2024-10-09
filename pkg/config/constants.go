@@ -61,4 +61,5 @@ const (
 	NodeRegistrarSocketPath                               = "/var/lib/kubelet/plugins/block.csi.ibm.com/csi.sock"
 	CSIEndpoint                                           = "unix:///var/lib/csi/sockets/pluginproxy/csi.sock"
 	CSINodeEndpoint                                       = "unix:///csi/csi.sock"
+	CSIAddonsEndpoint                                     = "unix:///var/lib/csi/sockets/pluginproxy/csi-addons.sock"
 )
