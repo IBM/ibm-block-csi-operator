@@ -35,7 +35,7 @@ spec:
               More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
             type: string
           kind:
-            desciption: |-
+            description: |-
               Kind is a string value representing the REST resource this object represents.
               Servers may infer this from the endpoint the client submits requests to.
               Cannot be updated.
@@ -1204,7 +1204,7 @@ spec:
                                     topologyKey:
                                       description: |-
                                         This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
-                                        the labelSelector n the specified namespaces, where co-located is defined as running on a node
+                                        the labelSelector in the specified namespaces, where co-located is defined as running on a node
                                         whose value of the label with key topologyKey matches that of any node on which any of the
                                         selected pods is running.
                                         Empty topologyKey is not allowed.
