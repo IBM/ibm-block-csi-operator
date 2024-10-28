@@ -46,8 +46,6 @@ metadata:
                             "operator": "In",
                             "values": [
                               "amd64"
-                              "s390x",
-                              "ppc64le"
                             ]
                           }
                         ]
@@ -72,8 +70,6 @@ metadata:
                             "operator": "In",
                             "values": [
                               "amd64"
-                              "s390x",
-                              "ppc64le"
                             ]
                           }
                         ]
@@ -171,8 +167,6 @@ metadata:
                             "operator": "In",
                             "values": [
                               "amd64"
-                              "s390x",
-                              "ppc64le"
                             ]
                           }
                         ]
@@ -637,8 +631,6 @@ spec:
                               operator: In
                               values:
                                 - amd64
-                                - s390x
-                                - ppc64le
                 containers:
                   - name: ibm-block-csi-operator
                     resources:
