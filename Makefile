@@ -39,7 +39,7 @@ manifests: controller-gen kustomize## Generate WebhookConfiguration, ClusterRole
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
-CONTROLLER_TOOLS_VERSION ?= v0.10.0
+CONTROLLER_TOOLS_VERSION ?= v0.14.0
 
 CONTROLLER_GEN = controller-gen
 controller-gen: ## Download controller-gen locally if necessary.
