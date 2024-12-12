@@ -33,6 +33,7 @@ ARG BUILD_NUMBER=0
 ###Required Labels
 LABEL name="Operator for IBM block storage CSI driver" \
       vendor="IBM" \
+      maintainer="IBM" \
       version=$VERSION \
       release=$BUILD_NUMBER \
       summary="The operator for IBM block storage CSI driver" \
