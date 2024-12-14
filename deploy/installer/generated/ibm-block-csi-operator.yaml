@@ -922,7 +922,7 @@ spec:
                     default: false
                     type: boolean
                   portSet:
-                    description: Port Set for new SVC storage port definitions
+                    description: Port Set for new FlashSystem storage port definitions
                     type: string
                   imagePullPolicy:
                     description: PullPolicy describes a policy for if/when to pull
