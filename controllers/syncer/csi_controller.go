@@ -34,8 +34,8 @@ import (
 	"github.com/IBM/ibm-block-csi-operator/controllers/internal/crutils"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/util/boolptr"
-	"github.com/presslabs/controller-util/mergo/transformers"
-	"github.com/presslabs/controller-util/syncer"
+	"github.com/presslabs/controller-util/pkg/mergo/transformers"
+	"github.com/presslabs/controller-util/pkg/syncer"
 )
 
 const (
@@ -152,7 +152,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 	controllerPlugin.ImagePullPolicy = s.driver.Spec.Controller.ImagePullPolicy
 
 	controllerContainerHealthPort := intstr.FromInt(int(healthPort))
-	controllerPlugin.LivenessProbe = ensureProbe(10, 100, 5, corev1.Handler{
+	controllerPlugin.LivenessProbe = ensureProbe(10, 100, 5, corev1.ProbeHandler{
 		HTTPGet: &corev1.HTTPGetAction{
 			Path:   "/healthz",
 			Port:   controllerContainerHealthPort,
@@ -201,6 +201,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 			"--csi-address=$(ADDRESS)",
 			"--v=5",
 			"--timeout=30s",
+			"--handle-volume-inuse-error=false",
 			getResizerMaxWorkersFlag(),
 		},
 	)
@@ -454,12 +455,12 @@ func ensurePorts(ports ...corev1.ContainerPort) []corev1.ContainerPort {
 	return ports
 }
 
-func ensureProbe(delay, timeout, period int32, handler corev1.Handler) *corev1.Probe {
+func ensureProbe(delay, timeout, period int32, handler corev1.ProbeHandler) *corev1.Probe {
 	return &corev1.Probe{
 		InitialDelaySeconds: delay,
 		TimeoutSeconds:      timeout,
 		PeriodSeconds:       period,
-		Handler:             handler,
+		ProbeHandler:        handler,
 		SuccessThreshold:    1,
 		FailureThreshold:    30,
 	}

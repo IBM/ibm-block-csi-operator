@@ -12,27 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM golang:1.16.14
+FROM golang:1.22
 
 WORKDIR /go/src/github.com/IBM/ibm-block-csi-operator/
 COPY . .
+RUN go mod download
 RUN CGO_ENABLED=1 GOOS=linux go build \
     -o build/_output/bin/ibm-block-csi-operator \
     -gcflags all=-trimpath=${GOPATH} \
 	-asmflags all=-trimpath=${GOPATH} \
-	-mod=vendor \
 	main.go
 
 
-FROM registry.access.redhat.com/ubi8/ubi-minimal:8.7-1049
+FROM registry.access.redhat.com/ubi9-minimal:9.5-1733767867
 MAINTAINER IBM Storage
 
-ARG VERSION=1.11.1
+ARG VERSION=1.12.0
 ARG BUILD_NUMBER=0
 
 ###Required Labels
 LABEL name="Operator for IBM block storage CSI driver" \
       vendor="IBM" \
+      maintainer="IBM" \
       version=$VERSION \
       release=$BUILD_NUMBER \
       summary="The operator for IBM block storage CSI driver" \
@@ -60,8 +61,13 @@ RUN chmod 0444 ${IBMBlockCSI_CR_YAML} \
 COPY --from=0 /go/src/github.com/IBM/ibm-block-csi-operator/build/_output/bin/ibm-block-csi-operator ${OPERATOR}
 
 COPY build/bin /usr/local/bin
+RUN  chmod +x /usr/local/bin/user_setup
 RUN  /usr/local/bin/user_setup
 
+#USER root
+#RUN microdnf update -y
+
+#USER default
 ENTRYPOINT ["/usr/local/bin/entrypoint"]
 
 USER ${USER_UID}

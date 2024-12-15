@@ -23,8 +23,8 @@ import (
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/util/boolptr"
 	"github.com/imdario/mergo"
-	"github.com/presslabs/controller-util/mergo/transformers"
-	"github.com/presslabs/controller-util/syncer"
+	"github.com/presslabs/controller-util/pkg/mergo/transformers"
+	"github.com/presslabs/controller-util/pkg/syncer"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -147,5 +147,9 @@ func (s *hostDefinerSyncer) getEnv() []corev1.EnvVar {
 			Name:  "DYNAMIC_NODE_LABELING",
 			Value: strconv.FormatBool(s.driver.Spec.HostDefiner.DynamicNodeLabeling),
 		},
+                {
+                        Name:  "PORT_SET",
+                        Value: s.driver.Spec.HostDefiner.PortSet,
+                },
 	}
 }
