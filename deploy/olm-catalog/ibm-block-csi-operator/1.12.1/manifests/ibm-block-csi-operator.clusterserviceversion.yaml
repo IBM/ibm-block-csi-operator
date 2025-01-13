@@ -99,7 +99,7 @@ metadata:
               },
               {
                 "name": "csi-snapshotter",
-                "repository": "k8s.gcr.io/sig-storage/csi-snapshotter",
+                "repository": "registry.k8s.io/sig-storage/csi-snapshotter",
                 "tag": "v6.3.0",
                 "imagePullPolicy": "IfNotPresent"
               },
