@@ -31,7 +31,7 @@ const (
 	volumeGroupApiGroup                      string = "csi.ibm.com"
 	storageApiGroup                          string = "storage.k8s.io"
 	rbacAuthorizationApiGroup                string = "rbac.authorization.k8s.io"
-	replicationStorageOpenshiftApiGroup      string = "replication.storage.openshift.io"
+	csiAddonsApiGroup                        string = "csiaddons.openshift.io"
 	storageClassesResource                   string = "storageclasses"
 	persistentVolumesResource                string = "persistentvolumes"
 	persistentVolumeClaimsResource           string = "persistentvolumeclaims"
@@ -50,10 +50,9 @@ const (
 	volumeSnapshotsResource                  string = "volumesnapshots"
 	volumeSnapshotContentsResource           string = "volumesnapshotcontents"
 	volumeSnapshotContentsStatusResource     string = "volumesnapshotcontents/status"
-	volumeReplicationClassesResource         string = "volumereplicationclasses"
-	volumeReplicationsResource               string = "volumereplications"
-	volumeReplicationsFinalizersResource     string = "volumereplications/finalizers"
-	volumeReplicationsStatusResource         string = "volumereplications/status"
+	csiAddonsNodesResource                   string = "csiaddonsnodes"
+	csiAddonsNodesFinalizersResource         string = "csiaddonsnodes/finalizers"
+	csiAddonsNodesStatusResource             string = "csiaddonsnodes/status"
 	eventsResource                           string = "events"
 	nodesResource                            string = "nodes"
 	csiNodesResource                         string = "csinodes"
@@ -357,29 +356,24 @@ func (c *IBMBlockCSI) GenerateCSIAddonsReplicatorClusterRole() *rbacv1.ClusterRo
 		},
 		Rules: []rbacv1.PolicyRule{
 			{
-				APIGroups: []string{replicationStorageOpenshiftApiGroup},
-				Resources: []string{volumeReplicationClassesResource},
-				Verbs:     []string{verbGet, verbList, verbWatch},
-			},
-			{
-				APIGroups: []string{replicationStorageOpenshiftApiGroup},
-				Resources: []string{volumeReplicationsResource},
-				Verbs:     []string{verbCreate, verbDelete, verbGet, verbList, verbPatch, verbUpdate, verbWatch},
-			},
-			{
-				APIGroups: []string{replicationStorageOpenshiftApiGroup},
-				Resources: []string{volumeReplicationsFinalizersResource},
-				Verbs:     []string{verbUpdate},
-			},
-			{
-				APIGroups: []string{replicationStorageOpenshiftApiGroup},
-				Resources: []string{volumeReplicationsStatusResource},
-				Verbs:     []string{verbGet, verbPatch, verbUpdate},
-			},
-			{
 				APIGroups: []string{""},
 				Resources: []string{secretsResource},
 				Verbs:     []string{verbGet},
+			},
+			{
+				APIGroups: []string{csiAddonsApiGroup},
+				Resources: []string{csiAddonsNodesResource},
+				Verbs:     []string{verbCreate, verbDelete, verbGet, verbList, verbPatch, verbUpdate, verbWatch},
+			},
+			{
+				APIGroups: []string{csiAddonsApiGroup},
+				Resources: []string{csiAddonsNodesFinalizersResource},
+				Verbs:     []string{verbUpdate},
+			},
+			{
+				APIGroups: []string{csiAddonsApiGroup},
+				Resources: []string{csiAddonsNodesStatusResource},
+				Verbs:     []string{verbGet, verbPatch, verbUpdate},
 			},
 		},
 	}

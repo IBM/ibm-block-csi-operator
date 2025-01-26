@@ -74,3 +74,7 @@ func GetNameForResource(name ResourceName, driverName string) string {
 		return fmt.Sprintf("%s-%s", driverName, name)
 	}
 }
+
+func GetControllerPodName(statefulSetName string) string {
+	return fmt.Sprintf("%s-0", statefulSetName)
+}
