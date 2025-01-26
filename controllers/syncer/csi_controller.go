@@ -202,6 +202,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 			"--csi-address=$(ADDRESS)",
 			"--v=5",
 			"--timeout=30s",
+			"--handle-volume-inuse-error=false",
 			getResizerMaxWorkersFlag(),
 		},
 	)
