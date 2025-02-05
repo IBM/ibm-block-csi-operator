@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/name: ibm-block-csi-operator
     csi: ibm
     product: ibm-block-csi-driver
-    release: v1.12.1
+    release: v1.12.2
   name: hostdefiners.csi.ibm.com
 spec:
   group: csi.ibm.com
@@ -1018,7 +1018,7 @@ metadata:
     app.kubernetes.io/name: ibm-block-csi-operator
     csi: ibm
     product: ibm-block-csi-driver
-    release: v1.12.1
+    release: v1.12.2
   name: hostdefinitions.csi.ibm.com
 spec:
   group: csi.ibm.com
@@ -1121,7 +1121,7 @@ metadata:
     app.kubernetes.io/name: ibm-block-csi-operator
     csi: ibm
     product: ibm-block-csi-driver
-    release: v1.12.1
+    release: v1.12.2
   name: ibmblockcsis.csi.ibm.com
 spec:
   group: csi.ibm.com
@@ -3066,7 +3066,7 @@ metadata:
     app.kubernetes.io/name: ibm-block-csi-operator
     csi: ibm
     product: ibm-block-csi-driver
-    release: v1.12.1
+    release: v1.12.2
   name: ibm-block-csi-operator
   namespace: default
 ---
@@ -3387,7 +3387,7 @@ spec:
         productID: 5027566ef6c54de49028be7df25119e1
         productMetric: FREE
         productName: IBM Block CSI Driver
-        productVersion: 1.12.1
+        productVersion: 1.12.2
       labels:
         app.kubernetes.io/instance: ibm-block-csi-operator
         app.kubernetes.io/managed-by: ibm-block-csi-operator
@@ -3421,7 +3421,7 @@ spec:
               fieldPath: metadata.name
         - name: OPERATOR_NAME
           value: ibm-block-csi-operator
-        image: quay.io/ibmcsiblock/ibm-block-csi-operator:1.12.1
+        image: quay.io/ibmcsiblock/ibm-block-csi-operator:1.12.2
         imagePullPolicy: IfNotPresent
         livenessProbe:
           exec:
