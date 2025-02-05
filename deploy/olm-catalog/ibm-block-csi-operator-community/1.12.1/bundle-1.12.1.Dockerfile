@@ -9,5 +9,5 @@ LABEL operators.operatorframework.io.bundle.package.v1=ibm-block-csi-operator-co
 
 COPY manifests /manifests/
 COPY metadata /metadata/
-LABEL com.redhat.openshift.versions="v4.14-v4.19"
+LABEL com.redhat.openshift.versions="v4.14-v4.18"
 LABEL com.redhat.delivery.operator.bundle=true
