@@ -34,6 +34,7 @@ import (
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 
 	operatorConfig "github.com/IBM/ibm-block-csi-operator/pkg/config"
 
@@ -89,8 +90,12 @@ func main() {
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:    scheme,
-		Port:      9443,
-		Namespace: namespace,
+		//Port:      9443,
+		Cache: cache.Options {
+			DefaultNamespaces: map[string]cache.Config {
+				namespace: {},
+			},
+		},
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
