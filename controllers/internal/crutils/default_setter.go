@@ -98,6 +98,9 @@ func (c *IBMBlockCSI) setDefaultForNilSliceFields() {
 	if c.Spec.Node.Tolerations == nil {
 		c.Spec.Node.Tolerations = []corev1.Toleration{}
 	}
+	if c.Spec.EnableCallHome == nil {
+		c.Spec.EnableCallHome = "true"
+	}
 }
 
 func (c *IBMBlockCSI) setDefaultSidecars() bool {

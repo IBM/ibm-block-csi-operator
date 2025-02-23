@@ -52,7 +52,6 @@ type IBMBlockCSISpec struct {
 	HealthPort uint16 `json:"healthPort,omitempty"`
 
 	// +kubebuilder:validation:Optional
-	// +kubebuilder:default:=true
 	EnableCallHome bool `json:"enableCallHome,omitempty"`
 }
 
