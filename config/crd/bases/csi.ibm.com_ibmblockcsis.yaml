@@ -1029,7 +1029,7 @@ spec:
                 - tag
                 type: object
               enableCallHome:
-                type: boolean
+                type: string
               healthPort:
                 type: integer
               imagePullSecrets:

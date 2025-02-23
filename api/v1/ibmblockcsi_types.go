@@ -52,7 +52,7 @@ type IBMBlockCSISpec struct {
 	HealthPort uint16 `json:"healthPort,omitempty"`
 
 	// +kubebuilder:validation:Optional
-	EnableCallHome bool `json:"enableCallHome,omitempty"`
+	EnableCallHome string `json:"enableCallHome,omitempty"`
 }
 
 // seems not work in this way, need to figure out why
