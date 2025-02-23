@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"math"
 	os "runtime"
-	"strconv"
 
 	"github.com/imdario/mergo"
 	appsv1 "k8s.io/api/apps/v1"
@@ -334,7 +333,7 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 			},
 			{
 				Name:  "ENABLE_CALL_HOME",
-				Value: strconv.FormatBool(s.driver.Spec.EnableCallHome),
+				Value: s.driver.Spec.EnableCallHome,
 			},
 		}
 
