@@ -535,6 +535,9 @@ spec:
                 - repository
                 - tag
                 type: object
+              enableCallHome:
+                default: true
+                type: string
               healthPort:
                 type: integer
               imagePullSecrets:
