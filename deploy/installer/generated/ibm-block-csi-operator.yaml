@@ -2205,6 +2205,8 @@ spec:
                 type: object
               enableCallHome:
                 type: string
+              odfVersionForCallHome:
+                type: string
               healthPort:
                 type: integer
               imagePullSecrets:

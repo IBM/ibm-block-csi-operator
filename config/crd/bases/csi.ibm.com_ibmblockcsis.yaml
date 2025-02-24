@@ -2016,6 +2016,8 @@ spec:
                 - repository
                 - tag
                 type: object
+              odfVersionForCallHome:
+                type: string
               sidecars:
                 items:
                   properties:

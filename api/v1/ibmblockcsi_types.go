@@ -53,6 +53,9 @@ type IBMBlockCSISpec struct {
 
 	// +kubebuilder:validation:Optional
 	EnableCallHome string `json:"enableCallHome,omitempty"`
+
+	// +kubebuilder:validation:Optional
+	ODFVersionForCallHome string `json:"odfVersionForCallHome,omitempty"`
 }
 
 // seems not work in this way, need to figure out why

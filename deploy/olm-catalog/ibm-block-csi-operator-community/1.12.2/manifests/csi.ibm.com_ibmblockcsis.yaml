@@ -538,6 +538,9 @@ spec:
               enableCallHome:
                 default: true
                 type: string
+              odfVersionForCallHome:
+                default: true
+                type: string
               healthPort:
                 type: integer
               imagePullSecrets:

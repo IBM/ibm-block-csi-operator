@@ -335,6 +335,10 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 				Name:  "ENABLE_CALL_HOME",
 				Value: s.driver.Spec.EnableCallHome,
 			},
+			{
+				Name:  "ODF_VERSION_FOR_CALL_HOME",
+				Value: s.driver.Spec.ODFVersionForCallHome,
+			},
 		}
 
 	case provisionerContainerName, attacherContainerName, snapshotterContainerName,
