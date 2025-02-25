@@ -88,7 +88,7 @@ metadata:
               {
                 "name": "csi-provisioner",
                 "repository": "registry.k8s.io/sig-storage/csi-provisioner",
-                "tag": "v5.2.0",
+                "tag": "v4.0.1",
                 "imagePullPolicy": "IfNotPresent"
               },
               {
