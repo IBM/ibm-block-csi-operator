@@ -1030,6 +1030,8 @@ spec:
                 type: object
               enableCallHome:
                 type: string
+              svcSshPort:
+                type: integer
               healthPort:
                 type: integer
               imagePullSecrets:

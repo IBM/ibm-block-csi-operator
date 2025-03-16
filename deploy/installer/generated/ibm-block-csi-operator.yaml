@@ -2207,6 +2207,8 @@ spec:
                 type: string
               odfVersionForCallHome:
                 type: string
+              svcSshPort:
+                type: integer
               healthPort:
                 type: integer
               imagePullSecrets:
