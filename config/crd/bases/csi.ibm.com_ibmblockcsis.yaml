@@ -2039,6 +2039,8 @@ spec:
                   - tag
                   type: object
                 type: array
+              svcSshPort:
+                type: integer
             required:
             - controller
             - node

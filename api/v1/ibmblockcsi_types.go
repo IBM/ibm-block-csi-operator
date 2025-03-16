@@ -56,6 +56,9 @@ type IBMBlockCSISpec struct {
 
 	// +kubebuilder:validation:Optional
 	ODFVersionForCallHome string `json:"odfVersionForCallHome,omitempty"`
+
+	// +kubebuilder:validation:Optional
+	SvcSshPort uint16 `json:"svcSshPort"`
 }
 
 // seems not work in this way, need to figure out why
