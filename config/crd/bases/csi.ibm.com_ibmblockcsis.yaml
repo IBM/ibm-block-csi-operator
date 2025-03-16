@@ -1030,8 +1030,6 @@ spec:
                 type: object
               enableCallHome:
                 type: string
-              svcSshPort:
-                type: integer
               healthPort:
                 type: integer
               imagePullSecrets:
@@ -2041,6 +2039,8 @@ spec:
                   - tag
                   type: object
                 type: array
+              svcSshPort:
+                type: integer
             required:
             - controller
             - node

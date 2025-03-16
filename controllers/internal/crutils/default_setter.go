@@ -101,8 +101,8 @@ func (c *IBMBlockCSI) setDefaultForNilSliceFields() {
 	if c.Spec.EnableCallHome == "" {
 		c.Spec.EnableCallHome = "true"
 	}
-	if c.Spec.SvsSshPort == 0 {
-		c.Spec.EnableCallHome = 22
+	if c.Spec.SvcSshPort == 0 {
+		c.Spec.SvcSshPort = 22
 	}
 }
 

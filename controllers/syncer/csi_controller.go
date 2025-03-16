@@ -19,6 +19,7 @@ package syncer
 import (
 	"fmt"
 	"math"
+	"strconv"
 	os "runtime"
 
 	"github.com/imdario/mergo"
@@ -340,8 +341,9 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 				Value: s.driver.Spec.ODFVersionForCallHome,
 			},
 			{
+				// TODO consider a different type of port. now uint16
 				Name:  "SVC_SSH_PORT",
-				Value: s.driver.Spec.SvcSshPort,
+				Value: strconv.FormatUint(uint64(s.driver.Spec.SvcSshPort), 10),
 			},
 		}
 
