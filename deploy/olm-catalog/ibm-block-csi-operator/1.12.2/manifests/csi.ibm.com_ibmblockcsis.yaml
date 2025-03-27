@@ -536,10 +536,10 @@ spec:
                 - tag
                 type: object
               enableCallHome:
-                default: true
+                default: "true"
                 type: string
               odfVersionForCallHome:
-                default: true
+                default: "true"
                 type: string
               healthPort:
                 type: integer
