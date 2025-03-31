@@ -2,7 +2,7 @@ module github.com/IBM/ibm-block-csi-operator
 
 go 1.23.0
 
-toolchain go1.23.5
+toolchain go1.24.1
 
 require (
 	github.com/go-logr/logr v1.4.2
@@ -10,7 +10,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.22.2
 	github.com/onsi/gomega v1.36.2
 	github.com/pkg/errors v0.9.1
-	github.com/presslabs/controller-util v0.13.0
+	github.com/presslabs/controller-util v0.15.0
 	k8s.io/api v0.32.2
 	k8s.io/apimachinery v0.32.2
 	k8s.io/client-go v0.32.2
