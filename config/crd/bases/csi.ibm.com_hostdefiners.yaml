@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/name: ibm-block-csi-operator
     csi: ibm
     product: ibm-block-csi-driver
-    release: v1.12.2
+    release: v1.12.3
   name: hostdefiners.csi.ibm.com
 spec:
   group: csi.ibm.com
