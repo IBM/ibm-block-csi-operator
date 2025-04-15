@@ -11,7 +11,7 @@ updates:
       interval: "weekly"
     rebase-strategy: "disabled"
     reviewers:
-      - "IBM/csi-reviewers"
+      - "IBM/block-csi"
     labels:
       - go
       - dependencies
@@ -21,7 +21,7 @@ updates:
       interval: "weekly"
     rebase-strategy: "disabled"
     reviewers:
-      - "IBM/csi-reviewers"
+      - "IBM/block-csi"
     labels:
       - github_actions
       - dependencies

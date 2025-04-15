@@ -50,6 +50,12 @@ type IBMBlockCSISpec struct {
 	ImagePullSecrets []string `json:"imagePullSecrets,omitempty"`
 
 	HealthPort uint16 `json:"healthPort,omitempty"`
+
+	// +kubebuilder:validation:Optional
+	EnableCallHome string `json:"enableCallHome,omitempty"`
+
+	// +kubebuilder:validation:Optional
+	ODFVersionForCallHome string `json:"odfVersionForCallHome,omitempty"`
 }
 
 // seems not work in this way, need to figure out why

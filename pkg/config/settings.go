@@ -36,7 +36,7 @@ const (
 	NodeAgentPort = "10086"
 
 	IBMRegistryUsername          = "ibmcom"
-	K8SRegistryUsername          = "k8s.gcr.io/sig-storage"
+	K8SRegistryUsername          = "registry.k8s.io/sig-storage"
 	QuayRegistryUsername         = "quay.io/k8scsi"
 	QuayAddonsRegistryUsername   = "quay.io/csiaddons"
 	QuayCSIBlockRegistryUsername = "quay.io/ibmcsiblock"

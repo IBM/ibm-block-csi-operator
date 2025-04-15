@@ -39,7 +39,7 @@ manifests: controller-gen kustomize## Generate WebhookConfiguration, ClusterRole
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
-CONTROLLER_TOOLS_VERSION ?= v0.14.0
+CONTROLLER_TOOLS_VERSION ?= v0.17.0
 
 CONTROLLER_GEN = controller-gen
 controller-gen: ## Download controller-gen locally if necessary.
@@ -83,7 +83,7 @@ run-unit-tests:
 KUBERNETES_VERSION=1.23.1
 .PHONY: test
 test: check-generated-manifests update
-ifeq (s390x, $(shell hack/get-arch.sh))
+ifneq (amd64, $(shell hack/get-arch.sh))
 	ginkgo -r -v -skipPackage envtest
 else
 	export KUBEBUILDER_ASSETS=$(shell setup-envtest use -p path ${KUBERNETES_VERSION});\

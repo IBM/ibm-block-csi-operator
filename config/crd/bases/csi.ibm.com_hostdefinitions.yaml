@@ -2,14 +2,14 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.17.0
   labels:
     app.kubernetes.io/instance: ibm-block-csi-operator
     app.kubernetes.io/managed-by: ibm-block-csi-operator
     app.kubernetes.io/name: ibm-block-csi-operator
     csi: ibm
     product: ibm-block-csi-driver
-    release: v1.12.0
+    release: v1.12.2
   name: hostdefinitions.csi.ibm.com
 spec:
   group: csi.ibm.com

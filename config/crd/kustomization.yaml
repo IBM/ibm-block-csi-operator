@@ -4,7 +4,7 @@ commonLabels:
   app.kubernetes.io/name: ibm-block-csi-operator
   app.kubernetes.io/instance: ibm-block-csi-operator
   app.kubernetes.io/managed-by: ibm-block-csi-operator
-  release: v1.12.0
+  release: v1.12.2
   
 resources:
 - bases/csi.ibm.com_ibmblockcsis.yaml
