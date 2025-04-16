@@ -18,8 +18,6 @@ package syncer
 
 import (
 	"fmt"
-	"math"
-	os "runtime"
 
 	"github.com/imdario/mergo"
 	appsv1 "k8s.io/api/apps/v1"
