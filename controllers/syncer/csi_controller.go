@@ -491,9 +491,7 @@ func getSidecarByName(driver *crutils.IBMBlockCSI, name string) *csiv1.CSISideca
 }
 
 func getMaxWorkersCount() int {
-	cpuCount := os.NumCPU()
-	maxWorkers := math.Min(float64(cpuCount), 32) / 2
-	return int(math.Max(maxWorkers, 2))
+	return 2
 }
 
 func getMaxWorkersFlag(flag string) string {
