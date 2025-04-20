@@ -1012,14 +1012,12 @@ spec:
                   imagePullPolicy:
                     description: PullPolicy describes a policy for if/when to pull a container image
                     type: string
+                  memoryRequirements:
+                    type: string
                   repository:
                     type: string
                   tag:
                     type: string
-                  memoryRequirements:
-                    type: string
-                  workersLimit:
-                    type: integer
                   tolerations:
                     items:
                       description: The pod this Toleration is attached to tolerates any taint that matches the triple <key,value,effect> using the matching operator <operator>.
@@ -1042,6 +1040,8 @@ spec:
                           type: string
                       type: object
                     type: array
+                  workersLimit:
+                    type: integer
                 required:
                 - repository
                 - tag

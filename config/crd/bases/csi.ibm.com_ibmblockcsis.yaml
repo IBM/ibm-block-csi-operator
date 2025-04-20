@@ -1970,14 +1970,12 @@ spec:
                     description: PullPolicy describes a policy for if/when to pull
                       a container image
                     type: string
+                  memoryRequirements:
+                    type: string
                   repository:
                     type: string
                   tag:
                     type: string
-                  memoryRequirements:
-                    type: string
-                  workersLimit:
-                    type: integer
                   tolerations:
                     items:
                       description: |-
@@ -2016,6 +2014,8 @@ spec:
                           type: string
                       type: object
                     type: array
+                  workersLimit:
+                    type: integer
                 required:
                 - repository
                 - tag
