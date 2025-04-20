@@ -1012,6 +1012,8 @@ spec:
                   imagePullPolicy:
                     description: PullPolicy describes a policy for if/when to pull a container image
                     type: string
+                  memoryRequirements:
+                    type: string
                   repository:
                     type: string
                   tag:
@@ -1038,6 +1040,8 @@ spec:
                           type: string
                       type: object
                     type: array
+                  workersLimit:
+                    type: integer
                 required:
                 - repository
                 - tag

@@ -18,6 +18,9 @@ package syncer
 
 import (
 	"fmt"
+	"strings"
+	"strconv"
+	"os"
 
 	"github.com/imdario/mergo"
 	appsv1 "k8s.io/api/apps/v1"
@@ -130,7 +133,30 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 		},
 	)
 
-	nodePlugin.Resources = ensureResources("40m", "1000m", "40Mi", "400Mi")
+
+	cpuRequests := "40m"
+	cpuLimits := "1000m"
+	memoryRequests := "40Mi"
+	memoryLimits := "400Mi"
+
+	configMemoryRequirements := s.driver.Spec.Node.MemoryRequirements
+
+	if configMemoryRequirements != "" {
+		configMemorySlice := strings.Split(configMemoryRequirements, ",")
+		if len(configMemorySlice) != 4 {
+			os.Exit(1)
+		}
+		cpuRequests = configMemorySlice[0]
+		cpuLimits = configMemorySlice[1]
+		memoryRequests = configMemorySlice[2]
+		memoryLimits = configMemorySlice[3]
+	}
+
+	nodePlugin.Resources = ensureResources(cpuRequests, cpuLimits, memoryRequests, memoryLimits)
+
+	if s.driver.Spec.Node.WorkersLimit != 0 {
+		nodePlugin.Args = append(nodePlugin.Args, "--max-invocations" + strconv.Itoa(int(s.driver.Spec.Node.WorkersLimit)))
+	}
 
 	healthPort := s.driver.Spec.HealthPort
 	if healthPort == 0 {

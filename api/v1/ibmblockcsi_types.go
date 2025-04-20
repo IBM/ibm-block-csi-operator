@@ -107,6 +107,10 @@ type IBMBlockCSINodeSpec struct {
 
 	// +kubebuilder:validation:Optional
 	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
+
+	MemoryRequirements string `json:"memoryRequirements,omitempty"`
+
+	WorkersLimit uint16 `json:"workersLimit,omitempty"`
 }
 
 // IBMBlockCSIStatus defines the observed state of IBMBlockCSI
