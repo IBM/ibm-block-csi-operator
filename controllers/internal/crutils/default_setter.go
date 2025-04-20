@@ -98,6 +98,9 @@ func (c *IBMBlockCSI) setDefaultForNilSliceFields() {
 	if c.Spec.Node.Tolerations == nil {
 		c.Spec.Node.Tolerations = []corev1.Toleration{}
 	}
+	if c.Spec.Node.MemoryRequirements == nil {
+		c.Spec.Node.MemoryRequirements = "40m,1000m,40Mi,400Mi"
+	}
 	if c.Spec.EnableCallHome == "" {
 		c.Spec.EnableCallHome = "true"
 	}

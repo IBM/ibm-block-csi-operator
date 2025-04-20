@@ -2161,6 +2161,10 @@ spec:
                     type: string
                   tag:
                     type: string
+                  memoryRequirements:
+                    type: string
+                  workersLimit:
+                    type: integer
                   tolerations:
                     items:
                       description: |-
