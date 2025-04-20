@@ -127,6 +127,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 			"--hostname=$(KUBE_NODE_NAME)",
 			"--config-file-path=./config.yaml",
 			"--loglevel=$(CSI_LOGLEVEL)",
+			"--worker-threads=1",
 		},
 	)
 
