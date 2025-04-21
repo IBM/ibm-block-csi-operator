@@ -151,7 +151,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	nodePlugin.Resources = ensureResources(cpuRequests, cpuLimits, memoryRequests, memoryLimits)
 
 	if s.driver.Spec.Node.WorkersLimit != 0 {
-		nodePlugin.Args = append(nodePlugin.Args, "--worker-threads=" + strconv.Itoa(s.driver.Spec.Node.WorkersLimit))
+		nodePlugin.Args = append(nodePlugin.Args, "--worker-threads=" + strconv.Itoa(int(s.driver.Spec.Node.WorkersLimit)))
 	}
 
 	healthPort := s.driver.Spec.HealthPort
