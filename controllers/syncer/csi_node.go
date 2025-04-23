@@ -130,7 +130,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 		},
 	)
 
-	nodePlugin.Resources = ensureResources("40m", "1000m", "40Mi", "400Mi")
+	nodePlugin.Resources = ensureResources("40m", "1000m", "40Mi", "600Mi")
 
 	healthPort := s.driver.Spec.HealthPort
 	if healthPort == 0 {
