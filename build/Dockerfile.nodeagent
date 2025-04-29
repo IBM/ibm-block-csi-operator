@@ -5,7 +5,7 @@ COPY . .
 RUN CGO_ENABLED=1 GOOS=linux go build -mod vendor -o ibm-node-agent -gcflags all=-trimpath=${GOPATH} -asmflags all=-trimpath=${GOPATH} cmd/node/main.go
 
 
-FROM registry.access.redhat.com/ubi9-minimal:9.5-1742914212
+FROM registry.access.redhat.com/ubi9-minimal:9.5-1745855087
 
 ENV PATH="/driver:${PATH}"
 RUN yum install -y iscsi-initiator-utils && yum clean all
