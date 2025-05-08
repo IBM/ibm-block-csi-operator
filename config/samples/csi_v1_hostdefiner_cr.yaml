@@ -16,7 +16,7 @@ spec:
 #    dynamicNodeLabeling: false    # Optional. Values true/false. The default is false.
 #    portSet:                      # Optional. Port set for new FlashSystem port definitions
     repository: quay.io/ibmcsiblock/ibm-block-csi-host-definer
-    tag: "1.12.2"
+    tag: "1.12.3"
     imagePullPolicy: IfNotPresent
     affinity:
       nodeAffinity:

@@ -3609,7 +3609,7 @@ spec:
               fieldPath: metadata.name
         - name: OPERATOR_NAME
           value: ibm-block-csi-operator
-        image: quay.io/ibmcsiblock/ibm-block-csi-operator:1.12.2
+        image: quay.io/ibmcsiblock/ibm-block-csi-operator:1.12.3
         imagePullPolicy: IfNotPresent
         livenessProbe:
           exec:
