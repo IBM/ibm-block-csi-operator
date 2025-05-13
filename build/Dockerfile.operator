@@ -50,7 +50,6 @@ ENV OPERATOR=/usr/local/bin/ibm-block-csi-operator \
 COPY build/health_check.sh .
 RUN chmod 777 ./health_check.sh
 COPY ./LICENSE /licenses/
-COPY ./NOTICES /licenses/
 COPY ./config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml ${IBMBlockCSI_CR_YAML}
 COPY ./config/samples/csi_v1_hostdefiner_cr.yaml ${HostDefiner_CR_YAML}
 RUN chmod 0444 ${IBMBlockCSI_CR_YAML} \
