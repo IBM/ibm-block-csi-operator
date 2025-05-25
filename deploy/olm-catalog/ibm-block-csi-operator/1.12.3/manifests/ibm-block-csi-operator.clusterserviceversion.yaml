@@ -199,7 +199,7 @@ spec:
     - ibm-block-csi-operator.v1.11.4
     - ibm-block-csi-operator.v1.12.0
     - ibm-block-csi-operator.v1.12.1
-    - ibm-block-csi-operator.v1.12.3
+    - ibm-block-csi-operator.v1.12.2
   maturity: stable
   maintainers:
     - name: IBM Block CSI Team
