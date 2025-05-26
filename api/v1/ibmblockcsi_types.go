@@ -56,6 +56,9 @@ type IBMBlockCSISpec struct {
 
 	// +kubebuilder:validation:Optional
 	ODFVersionForCallHome string `json:"odfVersionForCallHome,omitempty"`
+
+	// +kubebuilder:validation:Optional
+	SvcSshPort uint16 `json:"svcSshPort"`
 }
 
 // seems not work in this way, need to figure out why
@@ -107,6 +110,10 @@ type IBMBlockCSINodeSpec struct {
 
 	// +kubebuilder:validation:Optional
 	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
+
+	MemoryRequirements string `json:"memoryRequirements,omitempty"`
+
+	WorkersLimit uint16 `json:"workersLimit,omitempty"`
 }
 
 // IBMBlockCSIStatus defines the observed state of IBMBlockCSI

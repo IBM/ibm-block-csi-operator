@@ -1,6 +1,6 @@
 pipeline {
     parameters {
-        string(name: 'IMAGE_VERSION', defaultValue: "1.12.2")
+        string(name: 'IMAGE_VERSION', defaultValue: "1.12.3")
         string(name: 'DOCKER_REGISTRY', defaultValue: DEFAULT_DOCKER_REGISTRY)
         string(name: 'EMAIL_TO', defaultValue: "")
     }
@@ -28,7 +28,7 @@ pipeline {
         stage ('Build and push images') {
             steps {
                 script {
-                    registryUrl = "${DOCKER_REGISTRY}"
+                    def registryUrl = "${DOCKER_REGISTRY}"
                     withCredentials([usernamePassword(credentialsId: registryCredentialsID, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh 'docker login -u $USERNAME -p $PASSWORD ${DOCKER_REGISTRY}'
                         sh './build/ci/build_push_image.sh build/_output/reports/images_url'

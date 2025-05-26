@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM golang:1.23
+FROM golang:1.24
 
 WORKDIR /go/src/github.com/IBM/ibm-block-csi-operator/
 COPY . .
@@ -24,10 +24,9 @@ RUN CGO_ENABLED=1 GOOS=linux go build \
 	main.go
 
 
-FROM registry.access.redhat.com/ubi9-minimal:9.5-1739420147
-MAINTAINER IBM Storage
+FROM registry.access.redhat.com/ubi9-minimal:9.5-1745855087
 
-ARG VERSION=1.12.2
+ARG VERSION=1.12.3
 ARG BUILD_NUMBER=0
 
 ###Required Labels
@@ -51,7 +50,6 @@ ENV OPERATOR=/usr/local/bin/ibm-block-csi-operator \
 COPY build/health_check.sh .
 RUN chmod 777 ./health_check.sh
 COPY ./LICENSE /licenses/
-COPY ./NOTICES /licenses/
 COPY ./config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml ${IBMBlockCSI_CR_YAML}
 COPY ./config/samples/csi_v1_hostdefiner_cr.yaml ${HostDefiner_CR_YAML}
 RUN chmod 0444 ${IBMBlockCSI_CR_YAML} \
