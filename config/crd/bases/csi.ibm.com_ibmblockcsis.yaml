@@ -2006,6 +2006,8 @@ spec:
                 type: object
               odfVersionForCallHome:
                 type: string
+              cleanScsiDevice:
+                type: string
               sidecars:
                 items:
                   properties:

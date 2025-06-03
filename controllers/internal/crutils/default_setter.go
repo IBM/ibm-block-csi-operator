@@ -104,6 +104,9 @@ func (c *IBMBlockCSI) setDefaultForNilSliceFields() {
 	if c.Spec.Node.MemoryRequirements == "" {
 		c.Spec.Node.MemoryRequirements = "40m,1000m,40Mi,500Mi"
 	}
+	if c.Spec.Node.CleanScsiDevice == "" {
+		c.Spec.Node.CleanScsiDevice = "true"
+	}
 	if c.Spec.EnableCallHome == "" {
 		c.Spec.EnableCallHome = "true"
 	}

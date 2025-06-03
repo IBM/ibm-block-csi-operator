@@ -3195,6 +3195,8 @@ spec:
                     type: array
                   workersLimit:
                     type: integer
+                  cleanScsiDevice:
+                    type: string
                 required:
                 - repository
                 - tag

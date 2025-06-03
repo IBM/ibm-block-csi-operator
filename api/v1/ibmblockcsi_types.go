@@ -114,6 +114,9 @@ type IBMBlockCSINodeSpec struct {
 	MemoryRequirements string `json:"memoryRequirements,omitempty"`
 
 	WorkersLimit uint16 `json:"workersLimit,omitempty"`
+
+	CleanScsiDevice string `json:"cleanScsiDevice,omitempty"`
+
 }
 
 // IBMBlockCSIStatus defines the observed state of IBMBlockCSI
