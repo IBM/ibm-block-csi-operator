@@ -224,6 +224,11 @@ spec:
   labels:
     alm-owner-ibmblockcsi: ibmblockcsioperator
     operated-by: ibmblockcsioperator
+    operatorframework.io/os.zos: supported
+    operatorframework.io/os.linux: supported
+    operatorframework.io/arch.s390x: supported
+    operatorframework.io/arch.amd64: supported
+    operatorframework.io/arch.ppc64le: supported
   selector:
     matchLabels:
       alm-owner-ibmblockcsi: ibmblockcsioperator
