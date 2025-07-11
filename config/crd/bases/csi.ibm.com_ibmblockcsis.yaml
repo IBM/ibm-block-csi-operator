@@ -1956,6 +1956,8 @@ spec:
                     type: string
                   memoryRequirements:
                     type: string
+                  cleanScsiDevice:
+                    type: string
                   repository:
                     type: string
                   tag:
@@ -2005,8 +2007,6 @@ spec:
                 - tag
                 type: object
               odfVersionForCallHome:
-                type: string
-              cleanScsiDevice:
                 type: string
               sidecars:
                 items:

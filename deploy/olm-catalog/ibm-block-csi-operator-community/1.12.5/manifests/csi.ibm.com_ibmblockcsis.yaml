@@ -1014,6 +1014,8 @@ spec:
                     type: string
                   memoryRequirements:
                     type: string
+                  cleanScsiDevice:
+                    type: string
                   repository:
                     type: string
                   tag:
@@ -1042,8 +1044,6 @@ spec:
                     type: array
                   workersLimit:
                     type: integer
-                  cleanScsiDevice:
-                    type: string
                 required:
                 - repository
                 - tag
