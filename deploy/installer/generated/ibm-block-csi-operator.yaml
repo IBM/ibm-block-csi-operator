@@ -3145,6 +3145,8 @@ spec:
                             x-kubernetes-list-type: atomic
                         type: object
                     type: object
+                  cleanScsiDevice:
+                    type: string
                   imagePullPolicy:
                     description: PullPolicy describes a policy for if/when to pull
                       a container image
@@ -3195,8 +3197,6 @@ spec:
                     type: array
                   workersLimit:
                     type: integer
-                  cleanScsiDevice:
-                    type: string
                 required:
                 - repository
                 - tag
