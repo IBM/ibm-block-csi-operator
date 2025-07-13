@@ -3145,13 +3145,13 @@ spec:
                             x-kubernetes-list-type: atomic
                         type: object
                     type: object
+                  cleanScsiDevice:
+                    type: string
                   imagePullPolicy:
                     description: PullPolicy describes a policy for if/when to pull
                       a container image
                     type: string
                   memoryRequirements:
-                    type: string
-                  cleanScsiDevice:
                     type: string
                   repository:
                     type: string
