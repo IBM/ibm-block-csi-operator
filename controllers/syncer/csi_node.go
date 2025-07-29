@@ -19,8 +19,13 @@ package syncer
 import (
 	"fmt"
 	"strings"
-	"strconv"
 	"os"
+
+	"context"
+	"io/ioutil"
+
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 
 	"github.com/imdario/mergo"
 	appsv1 "k8s.io/api/apps/v1"
@@ -149,10 +154,44 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 
 	nodePlugin.Resources = ensureResources(cpuRequests, cpuLimits, memoryRequests, memoryLimits)
 
-	if s.driver.Spec.Node.WorkersLimit != 0 {
-		nodePlugin.Args = append(nodePlugin.Args, "--max-invocations=" + strconv.Itoa(int(s.driver.Spec.Node.WorkersLimit)))
-	}
 	nodePlugin.Args = append(nodePlugin.Args, "--clean-scsi-device=" + s.driver.Spec.Node.CleanScsiDevice)
+
+	value := "0"
+
+
+	ns, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
+	if err != nil {
+		value = "3"
+	} else {
+		namespace := string(ns)
+
+		// In-cluster config
+		config, err := rest.InClusterConfig()
+		if err != nil {
+			value = "4"
+		} else {
+			clientset, err := kubernetes.NewForConfig(config)
+			if err != nil {
+				value = "5"
+			} else {
+				cmName := "ibm-csi-configmap"
+				cm, err := clientset.CoreV1().ConfigMaps(namespace).Get(context.TODO(), cmName, metav1.GetOptions{})
+				if err != nil {
+					value = "6"
+				} else {
+					key := "max-invocations"
+					valuevar, ok := cm.Data[key]
+					if !ok {
+						value = "7"
+					} else {
+						value = valuevar
+					}
+				}
+			}
+		}
+	}
+
+	nodePlugin.Args = append(nodePlugin.Args, "--max-invocations=" + value)
 
 	healthPort := s.driver.Spec.HealthPort
 	if healthPort == 0 {
