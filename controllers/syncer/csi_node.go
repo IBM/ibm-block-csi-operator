@@ -19,8 +19,13 @@ package syncer
 import (
 	"fmt"
 	"strings"
-	"strconv"
 	"os"
+
+	"context"
+	"io/ioutil"
+
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 
 	"github.com/imdario/mergo"
 	appsv1 "k8s.io/api/apps/v1"
@@ -134,10 +139,44 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	)
 
 
-	configMemoryRequirements := s.driver.Spec.Node.MemoryRequirements
-	if configMemoryRequirements == "" {
-		configMemoryRequirements = "40m,1000m,40Mi,500Mi"
+	ns, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
+	if err != nil {
+		os.Exit(2)
 	}
+	namespace := string(ns)
+
+	// In-cluster config
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		os.Exit(3)
+	}
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		os.Exit(4)
+	}
+	cmName := "ibm-csi-node-config"
+	cm, err := clientset.CoreV1().ConfigMaps(namespace).Get(context.TODO(), cmName, metav1.GetOptions{})
+	if err != nil {
+		os.Exit(5)
+	}
+
+	configMemoryRequirements := "40m,1000m,40Mi,500Mi"
+	cleanScsiDevice := "true"
+	maxInvocations := "2"
+
+	valuevar, ok := cm.Data["workersLimit"]
+	if ok {
+		maxInvocations = valuevar
+	}
+	valuevar, ok = cm.Data["memoryRequirements"]
+	if ok {
+		configMemoryRequirements = valuevar
+	}
+	valuevar, ok = cm.Data["cleanScsiDevice"]
+	if ok {
+		cleanScsiDevice = valuevar
+	}
+
 	configMemorySlice := strings.Split(configMemoryRequirements, ",")
 	if len(configMemorySlice) != 4 {
 		os.Exit(1)
@@ -149,10 +188,9 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 
 	nodePlugin.Resources = ensureResources(cpuRequests, cpuLimits, memoryRequests, memoryLimits)
 
-	if s.driver.Spec.Node.WorkersLimit != 0 {
-		nodePlugin.Args = append(nodePlugin.Args, "--max-invocations=" + strconv.Itoa(int(s.driver.Spec.Node.WorkersLimit)))
-	}
-	nodePlugin.Args = append(nodePlugin.Args, "--clean-scsi-device=" + s.driver.Spec.Node.CleanScsiDevice)
+	nodePlugin.Args = append(nodePlugin.Args, "--clean-scsi-device=" + cleanScsiDevice)
+
+	nodePlugin.Args = append(nodePlugin.Args, "--max-invocations=" + maxInvocations)
 
 	healthPort := s.driver.Spec.HealthPort
 	if healthPort == 0 {

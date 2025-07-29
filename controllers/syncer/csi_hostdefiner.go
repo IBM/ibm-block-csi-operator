@@ -17,8 +17,6 @@
 package syncer
 
 import (
-	"strconv"
-
 	"github.com/IBM/ibm-block-csi-operator/controllers/internal/hostdefiner"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/util/boolptr"
@@ -131,25 +129,5 @@ func (s *hostDefinerSyncer) ensureContainer(name, image string, args []string) c
 
 func (s *hostDefinerSyncer) getEnv() []corev1.EnvVar {
 	return []corev1.EnvVar{
-		{
-			Name:  "PREFIX",
-			Value: s.driver.Spec.HostDefiner.Prefix,
-		},
-		{
-			Name:  "CONNECTIVITY_TYPE",
-			Value: s.driver.Spec.HostDefiner.ConnectivityType,
-		},
-		{
-			Name:  "ALLOW_DELETE",
-			Value: strconv.FormatBool(s.driver.Spec.HostDefiner.AllowDelete),
-		},
-		{
-			Name:  "DYNAMIC_NODE_LABELING",
-			Value: strconv.FormatBool(s.driver.Spec.HostDefiner.DynamicNodeLabeling),
-		},
-                {
-                        Name:  "PORT_SET",
-                        Value: s.driver.Spec.HostDefiner.PortSet,
-                },
 	}
 }
