@@ -535,7 +535,7 @@ func (c *IBMBlockCSI) GenerateSCCForNodeClusterRole() *rbacv1.ClusterRole {
 			},
 			{
 				APIGroups: []string{""},
-				Resources: []string{nodesResource},
+				Resources: []string{nodesResource, config.ConfigMapsResource},
 				Verbs:     []string{verbGet},
 			},
 		},

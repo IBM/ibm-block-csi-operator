@@ -80,6 +80,11 @@ func (c *HostDefiner) GenerateHostDefinerClusterRole() *rbacv1.ClusterRole {
 				Verbs:     []string{config.VerbGet, config.VerbPatch, config.VerbWatch, config.VerbList},
 			},
 			{
+				APIGroups: []string{""},
+				Resources: []string{config.ConfigMapsResource},
+				Verbs:     []string{config.VerbGet},
+			},
+			{
 				APIGroups: []string{config.APIGroup},
 				Resources: []string{config.HostDefinerResource},
 				Verbs:     []string{config.VerbGet, config.VerbList, config.VerbWatch},

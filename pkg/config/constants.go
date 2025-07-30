@@ -25,6 +25,7 @@ const (
 	ProductName                  = "ibm-block-csi-driver"
 	RbacAuthorizationApiGroup    = "rbac.authorization.k8s.io"
 	CsiNodesResource             = "csinodes"
+	ConfigMapsResource           = "configmaps"
 	SecretsResource              = "secrets"
 	PodsResource                 = "pods"
 	VerbGet                      = "get"
