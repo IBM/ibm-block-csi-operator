@@ -98,20 +98,8 @@ func (c *IBMBlockCSI) setDefaultForNilSliceFields() {
 	if c.Spec.Node.Tolerations == nil {
 		c.Spec.Node.Tolerations = []corev1.Toleration{}
 	}
-	if c.Spec.Node.WorkersLimit == 0 {
-		c.Spec.Node.WorkersLimit = 2
-	}
-	if c.Spec.Node.MemoryRequirements == "" {
-		c.Spec.Node.MemoryRequirements = "40m,1000m,40Mi,500Mi"
-	}
-	if c.Spec.Node.CleanScsiDevice == "" {
-		c.Spec.Node.CleanScsiDevice = "true"
-	}
 	if c.Spec.EnableCallHome == "" {
 		c.Spec.EnableCallHome = "true"
-	}
-	if c.Spec.SvcSshPort == 0 {
-		c.Spec.SvcSshPort = 22
 	}
 }
 

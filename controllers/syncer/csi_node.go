@@ -19,7 +19,6 @@ package syncer
 import (
 	"fmt"
 	"strings"
-	"strconv"
 	"os"
 
 	"github.com/imdario/mergo"
@@ -133,11 +132,25 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 		},
 	)
 
+	configMapData := GetConfigMap("ibm-csi-node-config")
 
-	configMemoryRequirements := s.driver.Spec.Node.MemoryRequirements
-	if configMemoryRequirements == "" {
-		configMemoryRequirements = "40m,1000m,40Mi,500Mi"
+	configMemoryRequirements := "40m,1000m,40Mi,500Mi"
+	cleanScsiDevice := "true"
+	maxInvocations := "2"
+
+	valuevar, ok := GetConfigMapValue(configMapData, "workersLimit")
+	if ok {
+		maxInvocations = valuevar
 	}
+	valuevar, ok = GetConfigMapValue(configMapData, "memoryRequirements")
+	if ok {
+		configMemoryRequirements = valuevar
+	}
+	valuevar, ok = GetConfigMapValue(configMapData, "cleanScsiDevice")
+	if ok {
+		cleanScsiDevice = valuevar
+	}
+
 	configMemorySlice := strings.Split(configMemoryRequirements, ",")
 	if len(configMemorySlice) != 4 {
 		os.Exit(1)
@@ -149,10 +162,9 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 
 	nodePlugin.Resources = ensureResources(cpuRequests, cpuLimits, memoryRequests, memoryLimits)
 
-	if s.driver.Spec.Node.WorkersLimit != 0 {
-		nodePlugin.Args = append(nodePlugin.Args, "--max-invocations=" + strconv.Itoa(int(s.driver.Spec.Node.WorkersLimit)))
-	}
-	nodePlugin.Args = append(nodePlugin.Args, "--clean-scsi-device=" + s.driver.Spec.Node.CleanScsiDevice)
+	nodePlugin.Args = append(nodePlugin.Args, "--clean-scsi-device=" + cleanScsiDevice)
+
+	nodePlugin.Args = append(nodePlugin.Args, "--max-invocations=" + maxInvocations)
 
 	healthPort := s.driver.Spec.HealthPort
 	if healthPort == 0 {

@@ -19,7 +19,6 @@ package syncer
 import (
 	"fmt"
 	"math"
-	"strconv"
 	os "runtime"
 
 	"github.com/imdario/mergo"
@@ -323,6 +322,13 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 
 	switch name {
 	case ControllerContainerName:
+        configMapData := GetConfigMap("ibm-csi-node-config")
+		svcSshPort := "22"
+		valuevar, ok := GetConfigMapValue(configMapData, "svcSshPort")
+		if ok {
+			svcSshPort = valuevar
+		}
+
 		return []corev1.EnvVar{
 			{
 				Name:  "CSI_ENDPOINT",
@@ -341,9 +347,8 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 				Value: s.driver.Spec.ODFVersionForCallHome,
 			},
 			{
-				// TODO consider a different type of port. now uint16
 				Name:  "SVC_SSH_PORT",
-				Value: strconv.FormatUint(uint64(s.driver.Spec.SvcSshPort), 10),
+				Value: svcSshPort,
 			},
 		}
 

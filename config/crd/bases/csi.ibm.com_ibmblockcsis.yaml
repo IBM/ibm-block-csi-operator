@@ -1950,13 +1950,9 @@ spec:
                             x-kubernetes-list-type: atomic
                         type: object
                     type: object
-                  cleanScsiDevice:
-                    type: string
                   imagePullPolicy:
                     description: PullPolicy describes a policy for if/when to pull
                       a container image
-                    type: string
-                  memoryRequirements:
                     type: string
                   repository:
                     type: string
@@ -2000,8 +1996,6 @@ spec:
                           type: string
                       type: object
                     type: array
-                  workersLimit:
-                    type: integer
                 required:
                 - repository
                 - tag
@@ -2029,8 +2023,6 @@ spec:
                   - tag
                   type: object
                 type: array
-              svcSshPort:
-                type: integer
             required:
             - controller
             - node
