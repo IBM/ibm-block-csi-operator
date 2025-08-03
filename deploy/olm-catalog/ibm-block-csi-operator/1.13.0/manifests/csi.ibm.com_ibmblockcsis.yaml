@@ -1009,12 +1009,8 @@ spec:
                             type: array
                         type: object
                     type: object
-                  cleanScsiDevice:
-                    type: string
                   imagePullPolicy:
                     description: PullPolicy describes a policy for if/when to pull a container image
-                    type: string
-                  memoryRequirements:
                     type: string
                   repository:
                     type: string
@@ -1042,8 +1038,6 @@ spec:
                           type: string
                       type: object
                     type: array
-                  workersLimit:
-                    type: integer
                 required:
                 - repository
                 - tag

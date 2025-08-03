@@ -976,21 +976,9 @@ spec:
                             x-kubernetes-list-type: atomic
                         type: object
                     type: object
-                  allowDelete:
-                    default: true
-                    type: boolean
-                  connectivityType:
-                    type: string
-                  dynamicNodeLabeling:
-                    default: false
-                    type: boolean
                   imagePullPolicy:
                     description: PullPolicy describes a policy for if/when to pull
                       a container image
-                    type: string
-                  portSet:
-                    type: string
-                  prefix:
                     type: string
                   repository:
                     type: string
@@ -2207,8 +2195,6 @@ spec:
                 type: string
               odfVersionForCallHome:
                 type: string
-              svcSshPort:
-                type: integer
               healthPort:
                 type: integer
               imagePullSecrets:
@@ -3145,13 +3131,9 @@ spec:
                             x-kubernetes-list-type: atomic
                         type: object
                     type: object
-                  cleanScsiDevice:
-                    type: string
                   imagePullPolicy:
                     description: PullPolicy describes a policy for if/when to pull
                       a container image
-                    type: string
-                  memoryRequirements:
                     type: string
                   repository:
                     type: string
@@ -3195,8 +3177,6 @@ spec:
                           type: string
                       type: object
                     type: array
-                  workersLimit:
-                    type: integer
                 required:
                 - repository
                 - tag

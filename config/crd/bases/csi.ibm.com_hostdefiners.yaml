@@ -968,21 +968,9 @@ spec:
                             x-kubernetes-list-type: atomic
                         type: object
                     type: object
-                  allowDelete:
-                    default: true
-                    type: boolean
-                  connectivityType:
-                    type: string
-                  dynamicNodeLabeling:
-                    default: false
-                    type: boolean
                   imagePullPolicy:
                     description: PullPolicy describes a policy for if/when to pull
                       a container image
-                    type: string
-                  portSet:
-                    type: string
-                  prefix:
                     type: string
                   repository:
                     type: string

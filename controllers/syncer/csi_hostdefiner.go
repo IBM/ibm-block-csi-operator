@@ -17,8 +17,6 @@
 package syncer
 
 import (
-	"strconv"
-
 	"github.com/IBM/ibm-block-csi-operator/controllers/internal/hostdefiner"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/util/boolptr"
@@ -130,26 +128,53 @@ func (s *hostDefinerSyncer) ensureContainer(name, image string, args []string) c
 }
 
 func (s *hostDefinerSyncer) getEnv() []corev1.EnvVar {
+	configMapData := GetConfigMap("ibm-csi-hostdefiner-config")
+	prefix := ""
+	connectivityType := ""
+	allowDelete := "true"
+	dynamicNodeLabeling := "false"
+	portSet := ""
+	valuevar, ok := GetConfigMapValue(configMapData, "prefix")
+	if ok {
+		prefix = valuevar
+	}
+	valuevar, ok = GetConfigMapValue(configMapData, "connectivityType")
+	if ok {
+		connectivityType = valuevar
+	}
+	valuevar, ok = GetConfigMapValue(configMapData, "allowDelete")
+	if ok {
+		allowDelete = valuevar
+	}
+	valuevar, ok = GetConfigMapValue(configMapData, "dynamicNodeLabeling")
+	if ok {
+		dynamicNodeLabeling = valuevar
+	}
+	valuevar, ok = GetConfigMapValue(configMapData, "portSet")
+	if ok {
+		portSet = valuevar
+	}
+
 	return []corev1.EnvVar{
 		{
 			Name:  "PREFIX",
-			Value: s.driver.Spec.HostDefiner.Prefix,
+			Value: prefix,
 		},
 		{
 			Name:  "CONNECTIVITY_TYPE",
-			Value: s.driver.Spec.HostDefiner.ConnectivityType,
+			Value: connectivityType,
 		},
 		{
 			Name:  "ALLOW_DELETE",
-			Value: strconv.FormatBool(s.driver.Spec.HostDefiner.AllowDelete),
+			Value: allowDelete,
 		},
 		{
 			Name:  "DYNAMIC_NODE_LABELING",
-			Value: strconv.FormatBool(s.driver.Spec.HostDefiner.DynamicNodeLabeling),
+			Value: dynamicNodeLabeling,
 		},
                 {
                         Name:  "PORT_SET",
-                        Value: s.driver.Spec.HostDefiner.PortSet,
+                        Value: portSet,
                 },
 	}
 }

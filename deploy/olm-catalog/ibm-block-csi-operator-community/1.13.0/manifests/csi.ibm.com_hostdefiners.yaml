@@ -501,21 +501,8 @@ spec:
                             type: array
                         type: object
                     type: object
-                  allowDelete:
-                    default: true
-                    type: boolean
-                  connectivityType:
-                    type: string
-                  dynamicNodeLabeling:
-                    default: false
-                    type: boolean
-                  portSet:
-                    description: Port Set for new FlashSystem storage port definitions
-                    type: string
                   imagePullPolicy:
                     description: PullPolicy describes a policy for if/when to pull a container image
-                    type: string
-                  prefix:
                     type: string
                   repository:
                     type: string
