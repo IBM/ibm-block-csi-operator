@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/name: ibm-block-csi-operator
     csi: ibm
     product: ibm-block-csi-driver
-    release: v1.12.3
+    release: v1.12.5
   name: ibmblockcsis.csi.ibm.com
 spec:
   group: csi.ibm.com
@@ -1950,6 +1950,8 @@ spec:
                             x-kubernetes-list-type: atomic
                         type: object
                     type: object
+                  cleanScsiDevice:
+                    type: string
                   imagePullPolicy:
                     description: PullPolicy describes a policy for if/when to pull
                       a container image

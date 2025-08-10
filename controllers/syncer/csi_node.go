@@ -152,6 +152,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	if s.driver.Spec.Node.WorkersLimit != 0 {
 		nodePlugin.Args = append(nodePlugin.Args, "--max-invocations=" + strconv.Itoa(int(s.driver.Spec.Node.WorkersLimit)))
 	}
+	nodePlugin.Args = append(nodePlugin.Args, "--clean-scsi-device=" + s.driver.Spec.Node.CleanScsiDevice)
 
 	healthPort := s.driver.Spec.HealthPort
 	if healthPort == 0 {
