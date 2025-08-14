@@ -69,14 +69,14 @@ func GetConfigMap(configMapName string) (map[string]string) {
 }
 
 // GetConfigMapValue extracts a specific value from a ConfigMap data map.
-func GetConfigMapValue(configMapData map[string]string, key string) (string, bool) {
+func GetConfigMapValue(configMapData map[string]string, key string, defaultvalue string) (string, bool) {
 	if configMapData == nil {
-		return "", false
+		return defaultvalue, false
 	}
 
 	value, exists := configMapData[key]
 	if !exists {
-		return "", false
+		return defaultvalue, false
 	}
 
 	return value, true

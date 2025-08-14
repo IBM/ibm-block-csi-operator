@@ -19,6 +19,8 @@ package syncer
 import (
 	"fmt"
 	"math"
+	"strconv"
+	"log"
 	os "runtime"
 
 	"github.com/imdario/mergo"
@@ -323,10 +325,10 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 	switch name {
 	case ControllerContainerName:
         configMapData := GetConfigMap("ibm-csi-node-config")
-		svcSshPort := "22"
-		valuevar, ok := GetConfigMapValue(configMapData, "svcSshPort")
-		if ok {
-			svcSshPort = valuevar
+		svcSshPort, _ := GetConfigMapValue(configMapData, "svcSshPort" , "22")
+		_, err :=  strconv.ParseUint(svcSshPort, 10, 16)
+		if err != nil {
+			log.Fatal("svcSshPort is not a valid number")
 		}
 
 		return []corev1.EnvVar{

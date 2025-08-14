@@ -17,6 +17,7 @@
 package syncer
 
 import (
+	"log"
 	"github.com/IBM/ibm-block-csi-operator/controllers/internal/hostdefiner"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
 	"github.com/IBM/ibm-block-csi-operator/pkg/util/boolptr"
@@ -127,33 +128,22 @@ func (s *hostDefinerSyncer) ensureContainer(name, image string, args []string) c
 	}
 }
 
+func verifyBoolean(parametername string, s string) {
+	if s != "true" && s != "false" {
+		log.Fatalf("Error: %q is not a valid boolean: %q", parametername, s)
+	}
+}
+
 func (s *hostDefinerSyncer) getEnv() []corev1.EnvVar {
 	configMapData := GetConfigMap("ibm-csi-hostdefiner-config")
-	prefix := ""
-	connectivityType := ""
-	allowDelete := "true"
-	dynamicNodeLabeling := "false"
-	portSet := ""
-	valuevar, ok := GetConfigMapValue(configMapData, "prefix")
-	if ok {
-		prefix = valuevar
-	}
-	valuevar, ok = GetConfigMapValue(configMapData, "connectivityType")
-	if ok {
-		connectivityType = valuevar
-	}
-	valuevar, ok = GetConfigMapValue(configMapData, "allowDelete")
-	if ok {
-		allowDelete = valuevar
-	}
-	valuevar, ok = GetConfigMapValue(configMapData, "dynamicNodeLabeling")
-	if ok {
-		dynamicNodeLabeling = valuevar
-	}
-	valuevar, ok = GetConfigMapValue(configMapData, "portSet")
-	if ok {
-		portSet = valuevar
-	}
+	prefix, _ := GetConfigMapValue(configMapData, "prefix", "")
+	connectivityType, _ := GetConfigMapValue(configMapData, "connectivityType", "")
+	allowDelete, _ := GetConfigMapValue(configMapData, "allowDelete", "true")
+	dynamicNodeLabeling, _ := GetConfigMapValue(configMapData, "dynamicNodeLabeling", "false")
+	portSet, _ := GetConfigMapValue(configMapData, "portSet", "")
+
+	verifyBoolean("allowDelete", allowDelete)
+	verifyBoolean("dynamicNodeLabeling", dynamicNodeLabeling)
 
 	return []corev1.EnvVar{
 		{
