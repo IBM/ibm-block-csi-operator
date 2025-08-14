@@ -19,6 +19,8 @@ package syncer
 import (
 	"fmt"
 	"strings"
+	"strconv"
+	"log"
 	"os"
 
 	"github.com/imdario/mergo"
@@ -134,22 +136,9 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 
 	configMapData := GetConfigMap("ibm-csi-node-config")
 
-	configMemoryRequirements := "40m,1000m,40Mi,500Mi"
-	cleanScsiDevice := "true"
-	maxInvocations := "2"
-
-	valuevar, ok := GetConfigMapValue(configMapData, "workersLimit")
-	if ok {
-		maxInvocations = valuevar
-	}
-	valuevar, ok = GetConfigMapValue(configMapData, "memoryRequirements")
-	if ok {
-		configMemoryRequirements = valuevar
-	}
-	valuevar, ok = GetConfigMapValue(configMapData, "cleanScsiDevice")
-	if ok {
-		cleanScsiDevice = valuevar
-	}
+	maxInvocations, _ := GetConfigMapValue(configMapData, "workersLimit", "2")
+	configMemoryRequirements, _ := GetConfigMapValue(configMapData, "memoryRequirements", "40m,1000m,40Mi,500Mi")
+	cleanScsiDevice, _ := GetConfigMapValue(configMapData, "cleanScsiDevice", "true")
 
 	configMemorySlice := strings.Split(configMemoryRequirements, ",")
 	if len(configMemorySlice) != 4 {
@@ -161,6 +150,14 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	memoryLimits := configMemorySlice[3]
 
 	nodePlugin.Resources = ensureResources(cpuRequests, cpuLimits, memoryRequests, memoryLimits)
+
+	_, err := strconv.ParseUint(maxInvocations, 10, 16)
+	if err != nil {
+		log.Fatal("maxInvocations is not a valid number")
+	}
+	if cleanScsiDevice != "true" && cleanScsiDevice != "false" {
+		log.Fatal("cleanScsiDevice is not boolean")
+	}
 
 	nodePlugin.Args = append(nodePlugin.Args, "--clean-scsi-device=" + cleanScsiDevice)
 
