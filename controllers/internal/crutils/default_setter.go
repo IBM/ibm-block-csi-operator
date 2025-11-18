@@ -99,7 +99,7 @@ func (c *IBMBlockCSI) setDefaultForNilSliceFields() {
 		c.Spec.Node.Tolerations = []corev1.Toleration{}
 	}
 	if c.Spec.Node.WorkersLimit == 0 {
-		c.Spec.Node.WorkersLimit = 2
+		c.Spec.Node.WorkersLimit = 10
 	}
 	if c.Spec.Node.MemoryRequirements == "" {
 		c.Spec.Node.MemoryRequirements = "40m,1000m,40Mi,500Mi"
