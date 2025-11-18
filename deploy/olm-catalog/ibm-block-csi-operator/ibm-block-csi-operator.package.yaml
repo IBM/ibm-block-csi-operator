@@ -1,5 +1,5 @@
 channels:
-- currentCSV: ibm-block-csi-operator.v1.12.5
+- currentCSV: ibm-block-csi-operator.v1.12.6
   name: stable
 defaultChannel: stable
 packageName: ibm-block-csi-operator
