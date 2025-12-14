@@ -324,12 +324,24 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 
 	switch name {
 	case ControllerContainerName:
-        configMapData := GetConfigMap("ibm-csi-node-config")
+		configMapData := GetConfigMap("ibm-csi-node-config")
+
+		// Port
+		//
 		svcSshPort, _ := GetConfigMapValue(configMapData, "svcSshPort" , "22")
 		_, err :=  strconv.ParseUint(svcSshPort, 10, 16)
 		if err != nil {
 			log.Fatal("svcSshPort is not a valid number")
 		}
+
+		// Max invocations
+		//
+		maxInvocations, _ := GetConfigMapValue(configMapData, "workersLimit", "10")
+		_, err = strconv.ParseUint(maxInvocations, 10, 16)
+		if err != nil {
+			log.Fatal("maxInvocations is not a valid number")
+		}
+
 
 		return []corev1.EnvVar{
 			{
@@ -351,6 +363,10 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 			{
 				Name:  "SVC_SSH_PORT",
 				Value: svcSshPort,
+			},
+			{
+				Name:  "WORKERS_LIMIT",
+				Value: maxInvocations,
 			},
 		}
 
