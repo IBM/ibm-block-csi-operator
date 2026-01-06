@@ -337,11 +337,14 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 
 		// Config map as JSON
 		//
-		cfgMapBytes, cfgerr := json.Marshal(configMapData)
-		if cfgerr != nil {
-			log.Fatal("Could not json.Marshal config map data")
+		cfgMapJsonString := ""
+		if configMapData != nil {
+			cfgMapBytes, cfgerr := json.Marshal(configMapData)
+			if cfgerr != nil {
+				log.Fatal("Could not json.Marshal config map data")
+			}
+			cfgMapJsonString = string(cfgMapBytes)
 		}
-		cfgMapJsonString := string(cfgMapBytes)
 
 		return []corev1.EnvVar{
 			{
