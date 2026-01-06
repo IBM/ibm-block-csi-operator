@@ -17,6 +17,7 @@
 package syncer
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 	"strconv"
@@ -334,14 +335,13 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 			log.Fatal("svcSshPort is not a valid number")
 		}
 
-		// Max invocations
+		// Config map as JSON
 		//
-		maxInvocations, _ := GetConfigMapValue(configMapData, "workersLimit", "10")
-		_, err = strconv.ParseUint(maxInvocations, 10, 16)
-		if err != nil {
-			log.Fatal("maxInvocations is not a valid number")
+		cfgMapBytes, cfgerr := json.Marshal(configMapData)
+		if cfgerr != nil {
+			log.Fatal("Could not json.Marshal config map data")
 		}
-
+		cfgMapJsonString := string(cfgMapBytes)
 
 		return []corev1.EnvVar{
 			{
@@ -365,8 +365,8 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 				Value: svcSshPort,
 			},
 			{
-				Name:  "WORKERS_LIMIT",
-				Value: maxInvocations,
+				Name:  "CSI_NODE_CONFIG",
+				Value: cfgMapJsonString,
 			},
 		}
 
