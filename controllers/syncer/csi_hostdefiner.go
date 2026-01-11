@@ -17,6 +17,7 @@
 package syncer
 
 import (
+	"encoding/json"
 	"log"
 	"github.com/IBM/ibm-block-csi-operator/controllers/internal/hostdefiner"
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
@@ -145,6 +146,13 @@ func (s *hostDefinerSyncer) getEnv() []corev1.EnvVar {
 	verifyBoolean("allowDelete", allowDelete)
 	verifyBoolean("dynamicNodeLabeling", dynamicNodeLabeling)
 
+	hdCfgMapJsonString := ""
+	cfgMapBytes, cfgerr := json.Marshal(configMapData)
+	if cfgerr != nil {
+		log.Fatal("Could not json.Marshal HD config map data")
+	}
+	hdCfgMapJsonString = string(cfgMapBytes)
+
 	return []corev1.EnvVar{
 		{
 			Name:  "PREFIX",
@@ -166,5 +174,9 @@ func (s *hostDefinerSyncer) getEnv() []corev1.EnvVar {
                         Name:  "PORT_SET",
                         Value: portSet,
                 },
+		{
+			Name:  "CSI_HOSTDEFINER_CONFIG",
+			Value: hdCfgMapJsonString,
+		},
 	}
 }

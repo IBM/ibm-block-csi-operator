@@ -335,15 +335,27 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 			log.Fatal("svcSshPort is not a valid number")
 		}
 
-		// Config map as JSON
+		// Config map for node as JSON
 		//
 		cfgMapJsonString := ""
 		if configMapData != nil {
 			cfgMapBytes, cfgerr := json.Marshal(configMapData)
 			if cfgerr != nil {
-				log.Fatal("Could not json.Marshal config map data")
+				log.Fatal("Could not json.Marshal NODE config map data")
 			}
 			cfgMapJsonString = string(cfgMapBytes)
+		}
+
+		// Config map for hostdefine as JSON
+		//
+		hdConfigMapData := GetConfigMap("ibm-csi-hostdefiner-config")
+		hdCfgMapJsonString := ""
+		if hdConfigMapData != nil {
+			cfgMapBytes, cfgerr := json.Marshal(hdConfigMapData)
+			if cfgerr != nil {
+				log.Fatal("Could not json.Marshal HD config map data")
+			}
+			hdCfgMapJsonString = string(cfgMapBytes)
 		}
 
 		return []corev1.EnvVar{
@@ -370,6 +382,10 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 			{
 				Name:  "CSI_NODE_CONFIG",
 				Value: cfgMapJsonString,
+			},
+			{
+				Name:  "CSI_HOSTDEFINER_CONFIG",
+				Value: hdCfgMapJsonString,
 			},
 		}
 
