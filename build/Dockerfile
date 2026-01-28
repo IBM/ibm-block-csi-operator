@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi9-minimal:9.7-1764794109
+FROM registry.access.redhat.com/ubi9-minimal:9.7-1769056855
 
 ENV OPERATOR=/usr/local/bin/ibm-block-csi-operator \
     USER_UID=1001 \
