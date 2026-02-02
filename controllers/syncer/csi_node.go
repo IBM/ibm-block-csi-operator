@@ -136,7 +136,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 
 	configMapData := GetConfigMap("ibm-csi-node-config")
 
-	maxInvocations, _ := GetConfigMapValue(configMapData, "workersLimit", "2")
+	maxInvocations, _ := GetConfigMapValue(configMapData, "workersLimit", "10")
 	configMemoryRequirements, _ := GetConfigMapValue(configMapData, "memoryRequirements", "40m,1000m,40Mi,500Mi")
 	cleanScsiDevice, _ := GetConfigMapValue(configMapData, "cleanScsiDevice", "true")
 
