@@ -20,8 +20,13 @@ ENV GO111MODULE=on \
 ENV IBMBlockCSI_CR_YAML=$WORKDIR/config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml \
     HostDefiner_CR_YAML=$WORKDIR/config/samples/csi_v1_hostdefiner_cr.yaml
 WORKDIR $WORKDIR
-RUN go install github.com/onsi/ginkgo/v2/ginkgo@v2.23.4 \
-    && go install sigs.k8s.io/controller-runtime/tools/setup-envtest@v0.0.0-20220322150744-c46b410039fd
+
+RUN go install github.com/onsi/ginkgo/v2/ginkgo@v2.23.4
+RUN go install sigs.k8s.io/controller-runtime/tools/setup-envtest@release-0.22
+ENV K8S_VERSION=1.31.0
+RUN setup-envtest use ${K8S_VERSION} --bin-dir /usr/local/kubebuilder/bin -p path && \
+    chmod +x /usr/local/kubebuilder/bin/*
+
 COPY Makefile .
 
 RUN make kustomize \
