@@ -363,7 +363,7 @@ func (s *csiNodeSyncer) ensureVolumes() []corev1.Volume {
 		ensureVolume("sys-dir", ensureHostPathVolumeSource("/sys", "Directory")),
 		ensureVolume("host-dir", ensureHostPathVolumeSource("/", "Directory")),
 		ensureVolume("iscsi", ensureHostPathVolumeSource("/etc/iscsi", "Directory")),
-		ensureVolume("host-run", ensureHostPathVolumeSource("/run", "Directory"))
+		ensureVolume("host-run", ensureHostPathVolumeSource("/run", "Directory")),
 	}
 }
 
