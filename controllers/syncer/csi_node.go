@@ -195,6 +195,7 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 		"SETGID",
 		"SETUID",
 		"DAC_OVERRIDE",
+		"SYS_ADMIN",
 	)
 
 	// node driver registrar sidecar
@@ -324,6 +325,10 @@ func (s *csiNodeSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 				Name:      "iscsi",
 				MountPath: "/etc/iscsi",
 			},
+                        {
+                                Name:      "host-run",
+                                MountPath: "/run",
+                        },
 		}
 
 	case csiNodeDriverRegistrarContainerName:
@@ -358,6 +363,7 @@ func (s *csiNodeSyncer) ensureVolumes() []corev1.Volume {
 		ensureVolume("sys-dir", ensureHostPathVolumeSource("/sys", "Directory")),
 		ensureVolume("host-dir", ensureHostPathVolumeSource("/", "Directory")),
 		ensureVolume("iscsi", ensureHostPathVolumeSource("/etc/iscsi", "Directory")),
+		ensureVolume("host-run", ensureHostPathVolumeSource("/run", "Directory"))
 	}
 }
 
