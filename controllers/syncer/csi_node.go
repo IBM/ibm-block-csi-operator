@@ -116,6 +116,7 @@ func (s *csiNodeSyncer) ensurePodSpec() corev1.PodSpec {
 		Volumes:            s.ensureVolumes(),
 		HostIPC:            true,
 		HostNetwork:        true,
+		HostPID:            true,
 		ServiceAccountName: config.GetNameForResource(config.CSINodeServiceAccount, s.driver.Name),
 		Affinity:           s.driver.Spec.Node.Affinity,
 		Tolerations:        s.driver.Spec.Node.Tolerations,
