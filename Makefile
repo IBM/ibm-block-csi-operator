@@ -72,23 +72,7 @@ run_unit_tests_image=docker run --rm -v $(CURDIR):/go/src/github.com/IBM/ibm-blo
 olm-validation:
 	build/ci/olm_validation.sh
 
-.PHONY: build-unit-tests-image
-build-unit-tests-image:
-	docker build -f build/ci/Dockerfile.unittest -t operator-unittests .
-
-.PHONY: run-unit-tests
-run-unit-tests:
-	$(run_unit_tests_image) make test
-
 KUBERNETES_VERSION=1.23.1
-.PHONY: test
-test: check-generated-manifests update
-ifneq (amd64, $(shell hack/get-arch.sh))
-	ginkgo -r -v -skipPackage envtest
-else
-	export KUBEBUILDER_ASSETS=$(shell setup-envtest use -p path ${KUBERNETES_VERSION});\
-	ginkgo -r -v
-endif
 
 .PHONY: update
 update: kustomize
