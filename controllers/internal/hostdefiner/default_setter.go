@@ -28,9 +28,6 @@ func (c *HostDefiner) SetDefaults() bool {
 
 	c.setDefaultForNilSliceFields()
 
-	if c.isUnofficialRepo(c.Spec.HostDefiner.Repository) {
-		return false
-	}
 	return c.setDefaults()
 }
 
@@ -41,16 +38,6 @@ func (c *HostDefiner) setDefaultForNilSliceFields() {
 	if c.Spec.HostDefiner.Tolerations == nil {
 		c.Spec.HostDefiner.Tolerations = []corev1.Toleration{}
 	}
-}
-
-func (c *HostDefiner) isUnofficialRepo(repo string) bool {
-	if repo != "" {
-		var registryUsername = path.Dir(repo)
-		if !config.OfficialRegistriesUsernames.Has(registryUsername) {
-			return true
-		}
-	}
-	return false
 }
 
 func (c *HostDefiner) setDefaults() bool {
