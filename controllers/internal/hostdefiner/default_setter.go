@@ -17,8 +17,6 @@
 package hostdefiner
 
 import (
-	"path"
-
 	corev1 "k8s.io/api/core/v1"
 
 	"github.com/IBM/ibm-block-csi-operator/pkg/config"
