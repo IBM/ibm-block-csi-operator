@@ -3551,6 +3551,8 @@ metadata:
   name: ibm-block-csi-operator
   namespace: default
 spec:
+  strategy:
+    type: Recreate
   replicas: 1
   selector:
     matchLabels:
