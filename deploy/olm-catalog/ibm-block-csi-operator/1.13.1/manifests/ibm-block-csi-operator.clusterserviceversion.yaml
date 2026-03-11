@@ -628,6 +628,8 @@ spec:
       deployments:
         - name: ibm-block-csi-operator
           spec:
+            strategy:
+              type: Recreate
             replicas: 1
             selector:
               matchLabels:
