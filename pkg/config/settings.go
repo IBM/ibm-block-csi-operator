@@ -35,12 +35,13 @@ const (
 
 	NodeAgentPort = "10086"
 
-	IBMRegistryUsername          = "ibmcom"
-	K8SRegistryUsername          = "registry.k8s.io/sig-storage"
-	QuayRegistryUsername         = "quay.io/k8scsi"
-	QuayAddonsRegistryUsername   = "quay.io/csiaddons"
-	QuayCSIBlockRegistryUsername = "quay.io/ibmcsiblock"
-	RedHatRegistryUsername       = "registry.redhat.io/openshift4"
+	IBMRegistryUsername                = "ibmcom"
+	K8SRegistryUsername                = "registry.k8s.io/sig-storage"
+	QuayRegistryUsername               = "quay.io/k8scsi"
+	QuayAddonsRegistryUsername         = "quay.io/csiaddons"
+	QuayCSIBlockRegistryUsername       = "quay.io/ibmcsiblock"
+	QuayCSIBlockCustomRegistryUsername = "quay.io/csiblock"
+	RedHatRegistryUsername             = "registry.redhat.io/openshift4"
 )
 
 var DefaultIBMBlockCSICr v1.IBMBlockCSI
@@ -51,7 +52,7 @@ var DefaultSidecarsByName map[string]v1.CSISidecar
 
 var OfficialRegistriesUsernames = sets.NewString(IBMRegistryUsername, K8SRegistryUsername,
 	QuayRegistryUsername, QuayAddonsRegistryUsername, QuayCSIBlockRegistryUsername,
-	RedHatRegistryUsername)
+	QuayCSIBlockCustomRegistryUsername, RedHatRegistryUsername)
 
 func LoadDefaultsOfIBMBlockCSI() error {
 	yamlFile, err := getCrYamlFile(EnvNameIBMBlockCSICrYaml)
