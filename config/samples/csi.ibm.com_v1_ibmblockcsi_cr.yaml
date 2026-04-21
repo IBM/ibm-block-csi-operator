@@ -13,8 +13,8 @@ spec:
   # and csi-provisioner, csi-attacher, csi-snapshotter and livenessprobe sidecars.
   controller:
     repository: quay.io/csiblock/ibm-block-csi-driver-controller-amd64
-    tag: "1.13.2_b1799_origin.shlomitn.fix-1.13.1"
-    imagePullPolicy: IfNotPresent
+    tag: "1.13.1-fix"
+    imagePullPolicy: Always
     affinity:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
@@ -31,8 +31,8 @@ spec:
   # and csi-node-driver-registrar and livenessprobe sidecars.
   node:
     repository: quay.io/csiblock/ibm-block-csi-driver-node-amd64
-    tag: "1.13.2_b1799_origin.shlomitn.fix-1.13.1"
-    imagePullPolicy: IfNotPresent
+    tag: "1.13.1-fix"
+    imagePullPolicy: Always
     affinity:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
