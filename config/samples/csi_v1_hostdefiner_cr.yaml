@@ -10,9 +10,9 @@ metadata:
     release: v1.13.2
 spec:
   hostDefiner:
-    repository: quay.io/ibmcsiblock/ibm-block-csi-host-definer
-    tag: "1.13.2"
-    imagePullPolicy: IfNotPresent
+    repository: quay.io/csiblock/ibm-block-csi-host-definer-amd64
+    tag: "1.13.2_b1820_origin.shlomitn.fixes-1.13.2"
+    imagePullPolicy: Always
     affinity:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:

@@ -40,6 +40,7 @@ const (
 	QuayRegistryUsername         = "quay.io/k8scsi"
 	QuayAddonsRegistryUsername   = "quay.io/csiaddons"
 	QuayCSIBlockRegistryUsername = "quay.io/ibmcsiblock"
+	QuayCSIBlockCustomRegistryUsername = "quay.io/csiblock"
 	RedHatRegistryUsername       = "registry.redhat.io/openshift4"
 )
 
@@ -51,7 +52,7 @@ var DefaultSidecarsByName map[string]v1.CSISidecar
 
 var OfficialRegistriesUsernames = sets.NewString(IBMRegistryUsername, K8SRegistryUsername,
 	QuayRegistryUsername, QuayAddonsRegistryUsername, QuayCSIBlockRegistryUsername,
-	RedHatRegistryUsername)
+	QuayCSIBlockCustomRegistryUsername, RedHatRegistryUsername)
 
 func LoadDefaultsOfIBMBlockCSI() error {
 	yamlFile, err := getCrYamlFile(EnvNameIBMBlockCSICrYaml)
