@@ -17,6 +17,8 @@ spec:
     kind: HostDefinition
     listKind: HostDefinitionList
     plural: hostdefinitions
+    shortNames:
+    - hd
     singular: hostdefinition
   scope: Cluster
   versions:
