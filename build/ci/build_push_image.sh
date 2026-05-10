@@ -10,6 +10,11 @@ done
 branch=`echo $GIT_BRANCH| sed 's|/|.|g'`  #not sure if docker accept / in the version
 specific_tag="${IMAGE_VERSION}_b${BUILD_NUMBER}_${branch}"
 
+# Add optional suffix to specific_tag if BUILD_TAG_SUFFIX is provided
+if [ -n "${BUILD_TAG_SUFFIX:-}" ]; then
+    specific_tag="${specific_tag}_${BUILD_TAG_SUFFIX}"
+fi
+
 # Set latest tag only if its from develop branch or master and prepare tags
 [ "$GIT_BRANCH" = "develop" -o "$GIT_BRANCH" = "origin/develop" -o "$GIT_BRANCH" = "master" ] && tag_latest="true" || tag_latest="false"
 
