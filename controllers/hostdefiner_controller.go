@@ -110,6 +110,32 @@ func (r *HostDefinerReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		}
 		return reconcile.Result{}, nil
 	}
+
+	// Check if this is an upgrade scenario (deployment already exists)
+	// Only enforce upgrade ordering during upgrades, not initial deployment
+	isUpgrade, err := r.isUpgradeScenario(instance)
+	if err != nil {
+		reqLogger.Error(err, "Failed to check if this is an upgrade scenario")
+		return reconcile.Result{RequeueAfter: 30 * time.Second}, err
+	}
+
+	if isUpgrade {
+		// Check if IBMBlockCSI controller and node are ready before proceeding with HostDefiner upgrade
+		// This ensures proper upgrade ordering: controller -> node -> hostdefiner
+		ready, requeueAfter, err := r.checkIBMBlockCSIReadiness(instance)
+		if err != nil {
+			reqLogger.Error(err, "Failed to check IBMBlockCSI readiness")
+			return reconcile.Result{RequeueAfter: 30 * time.Second}, err
+		}
+		if !ready {
+			reqLogger.Info("Waiting for IBMBlockCSI controller and node to be ready before upgrading HostDefiner",
+				"RequeueAfter", requeueAfter)
+			return reconcile.Result{RequeueAfter: requeueAfter}, nil
+		}
+	} else {
+		reqLogger.Info("Initial HostDefiner deployment detected, proceeding without waiting for IBMBlockCSI")
+	}
+
 	originalStatus := *instance.Status.DeepCopy()
 
 	for _, rec := range []hostDefinerReconciler{
@@ -431,6 +457,25 @@ func (r *HostDefinerReconciler) updateStatus(instance *hostdefiner.HostDefiner, 
 		return err
 	}
 
+// isUpgradeScenario checks if the HostDefiner deployment already exists
+// Returns true if deployment exists (upgrade scenario), false if not (initial deployment)
+func (r *HostDefinerReconciler) isUpgradeScenario(instance *hostdefiner.HostDefiner) (bool, error) {
+	deployment, err := r.getDeployment(instance)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			// Deployment doesn't exist yet - this is an initial deployment
+			return false, nil
+		}
+		// Some other error occurred
+		return false, err
+	}
+
+	// Deployment exists - this is an upgrade scenario
+	// Additional check: ensure deployment has at least one ready replica to confirm it's truly an upgrade
+	// and not a failed initial deployment
+	return deployment.Status.ReadyReplicas > 0 || deployment.Status.Replicas > 0, nil
+}
+
 	r.updateStatusFields(instance, deployment)
 
 	if !reflect.DeepEqual(originalStatus, instance.Status) {
@@ -442,6 +487,60 @@ func (r *HostDefinerReconciler) updateStatus(instance *hostdefiner.HostDefiner, 
 	}
 
 	return nil
+
+// checkIBMBlockCSIReadiness checks if the IBMBlockCSI controller and node are ready
+// Returns: (ready bool, requeueAfter time.Duration, error)
+// - ready: true if both controller and node are ready, false otherwise
+// - requeueAfter: duration to wait before requeuing if not ready
+// - error: any error encountered while checking readiness
+func (r *HostDefinerReconciler) checkIBMBlockCSIReadiness(instance *hostdefiner.HostDefiner) (bool, time.Duration, error) {
+	logger := hostDefinerLog.WithName("checkIBMBlockCSIReadiness")
+
+	// Try to find IBMBlockCSI CR in the same namespace
+	ibmBlockCSIList := &csiv1.IBMBlockCSIList{}
+	err := r.List(context.TODO(), ibmBlockCSIList, client.InNamespace(instance.Namespace))
+	if err != nil {
+		logger.Error(err, "Failed to list IBMBlockCSI resources", "Namespace", instance.Namespace)
+		return false, 30 * time.Second, err
+	}
+
+	// If no IBMBlockCSI CR found, allow HostDefiner to proceed
+	// This handles cases where HostDefiner is deployed independently
+	if len(ibmBlockCSIList.Items) == 0 {
+		logger.Info("No IBMBlockCSI CR found in namespace, proceeding with HostDefiner reconciliation",
+			"Namespace", instance.Namespace)
+		return true, 0, nil
+	}
+
+	// Check the first IBMBlockCSI CR (typically there should be only one per namespace)
+	ibmBlockCSI := &ibmBlockCSIList.Items[0]
+
+	// Check if both controller and node are ready
+	if !ibmBlockCSI.Status.ControllerReady {
+		logger.Info("IBMBlockCSI controller is not ready yet, waiting before upgrading HostDefiner",
+			"IBMBlockCSI", ibmBlockCSI.Name,
+			"ControllerReady", ibmBlockCSI.Status.ControllerReady,
+			"Phase", ibmBlockCSI.Status.Phase)
+		return false, 30 * time.Second, nil
+	}
+
+	if !ibmBlockCSI.Status.NodeReady {
+		logger.Info("IBMBlockCSI node is not ready yet, waiting before upgrading HostDefiner",
+			"IBMBlockCSI", ibmBlockCSI.Name,
+			"NodeReady", ibmBlockCSI.Status.NodeReady,
+			"Phase", ibmBlockCSI.Status.Phase)
+		return false, 30 * time.Second, nil
+	}
+
+	// Both controller and node are ready
+	logger.Info("IBMBlockCSI controller and node are ready, proceeding with HostDefiner reconciliation",
+		"IBMBlockCSI", ibmBlockCSI.Name,
+		"ControllerReady", ibmBlockCSI.Status.ControllerReady,
+		"NodeReady", ibmBlockCSI.Status.NodeReady,
+		"Phase", ibmBlockCSI.Status.Phase)
+
+	return true, 0, nil
+}
 }
 
 func (r *HostDefinerReconciler) updateStatusFields(instance *hostdefiner.HostDefiner, deployment *appsv1.Deployment) {
