@@ -470,8 +470,8 @@ func (r *HostDefinerReconciler) updateStatus(instance *hostdefiner.HostDefiner, 
 	return nil
 }
 
-// isUpgradeScenario checks if the HostDefiner deployment already exists and if an image upgrade is happening
-// Returns true if deployment exists (upgrade scenario), false if not (initial deployment)
+// isUpgradeScenario checks if the HostDefiner deployment already exists
+// Returns true if deployment exists with replicas (upgrade scenario), false if not (initial deployment)
 func (r *HostDefinerReconciler) isUpgradeScenario(instance *hostdefiner.HostDefiner) (bool, error) {
 	deployment, err := r.getDeployment(instance)
 	if err != nil {
@@ -483,26 +483,8 @@ func (r *HostDefinerReconciler) isUpgradeScenario(instance *hostdefiner.HostDefi
 		return false, err
 	}
 
-	// Deployment exists - check if it has replicas (confirms it's not a failed initial deployment)
-	if deployment.Status.ReadyReplicas == 0 && deployment.Status.Replicas == 0 {
-		// No replicas yet, treat as initial deployment
-		return false, nil
-	}
-
-	// Check if the deployment image matches the desired image from the CR
-	// If they don't match, an upgrade is in progress or about to start
-	desiredImage := instance.GetHostDefinerImage()
-	if len(deployment.Spec.Template.Spec.Containers) > 0 {
-		currentImage := deployment.Spec.Template.Spec.Containers[0].Image
-		if currentImage != desiredImage {
-			// Images don't match - this is definitely an upgrade scenario
-			return true, nil
-		}
-	}
-
-	// Deployment exists with matching image - this is an upgrade scenario
-	// (could be config changes or other updates)
-	return true, nil
+	// Deployment exists with replicas - this is an upgrade scenario
+	return deployment.Status.ReadyReplicas > 0 || deployment.Status.Replicas > 0, nil
 }
 
 // checkIBMBlockCSIReadiness checks if the IBMBlockCSI controller and node are ready
@@ -573,40 +555,20 @@ func (r *HostDefinerReconciler) checkIBMBlockCSIReadiness(instance *hostdefiner.
 	return true, 0, nil
 }
 
-// isIBMBlockCSIUpgradeInProgress checks if IBMBlockCSI controller or node images don't match the CR spec
-// or if the actual running pods don't match the StatefulSet/DaemonSet spec
-// This detects upgrades before the status is updated
+// isIBMBlockCSIUpgradeInProgress checks if IBMBlockCSI controller or node are being upgraded
+// by comparing actual running pod images with StatefulSet/DaemonSet specs
 func (r *HostDefinerReconciler) isIBMBlockCSIUpgradeInProgress(ibmBlockCSI *csiv1.IBMBlockCSI) (bool, error) {
 	logger := hostDefinerLog.WithName("isIBMBlockCSIUpgradeInProgress")
 
-	// Check controller StatefulSet and Pod
+	// Check if controller pod images match StatefulSet spec
+	// This catches the case where StatefulSet is updated but pod hasn't been recreated yet
 	controllerSS := &appsv1.StatefulSet{}
 	err := r.Get(context.TODO(), types.NamespacedName{
 		Name:      oconfig.GetNameForResource(oconfig.CSIController, ibmBlockCSI.Name),
 		Namespace: ibmBlockCSI.Namespace,
 	}, controllerSS)
 
-	if err != nil && !errors.IsNotFound(err) {
-		return false, err
-	}
-
 	if err == nil {
-		// Check if controller StatefulSet image matches CR spec
-		desiredControllerImage := fmt.Sprintf("%s:%s", ibmBlockCSI.Spec.Controller.Repository, ibmBlockCSI.Spec.Controller.Tag)
-		for _, container := range controllerSS.Spec.Template.Spec.Containers {
-			if container.Name == "ibm-block-csi-controller" {
-				if container.Image != desiredControllerImage {
-					logger.Info("Controller StatefulSet image mismatch detected",
-						"desired", desiredControllerImage,
-						"current", container.Image)
-					return true, nil
-				}
-				break
-			}
-		}
-
-		// Also check if the actual controller pod images match the StatefulSet spec
-		// This catches the case where StatefulSet is updated but pod hasn't been recreated yet
 		controllerPod := &corev1.Pod{}
 		controllerPodName := fmt.Sprintf("%s-0", controllerSS.Name)
 		err = r.Get(context.TODO(), types.NamespacedName{
@@ -630,33 +592,14 @@ func (r *HostDefinerReconciler) isIBMBlockCSIUpgradeInProgress(ibmBlockCSI *csiv
 		}
 	}
 
-	// Check node DaemonSet
+	// Check if node DaemonSet update is in progress
 	nodeDaemonSet := &appsv1.DaemonSet{}
 	err = r.Get(context.TODO(), types.NamespacedName{
 		Name:      oconfig.GetNameForResource(oconfig.CSINode, ibmBlockCSI.Name),
 		Namespace: ibmBlockCSI.Namespace,
 	}, nodeDaemonSet)
 
-	if err != nil && !errors.IsNotFound(err) {
-		return false, err
-	}
-
 	if err == nil {
-		// Check if node DaemonSet image matches CR spec
-		desiredNodeImage := fmt.Sprintf("%s:%s", ibmBlockCSI.Spec.Node.Repository, ibmBlockCSI.Spec.Node.Tag)
-		for _, container := range nodeDaemonSet.Spec.Template.Spec.Containers {
-			if container.Name == "ibm-block-csi-node" {
-				if container.Image != desiredNodeImage {
-					logger.Info("Node DaemonSet image mismatch detected",
-						"desired", desiredNodeImage,
-						"current", container.Image)
-					return true, nil
-				}
-				break
-			}
-		}
-
-		// Check if node pods are being updated (check if all pods match the DaemonSet spec)
 		if nodeDaemonSet.Status.UpdatedNumberScheduled < nodeDaemonSet.Status.DesiredNumberScheduled {
 			logger.Info("Node DaemonSet update in progress",
 				"UpdatedNumberScheduled", nodeDaemonSet.Status.UpdatedNumberScheduled,
