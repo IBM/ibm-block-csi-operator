@@ -457,6 +457,19 @@ func (r *HostDefinerReconciler) updateStatus(instance *hostdefiner.HostDefiner, 
 		return err
 	}
 
+	r.updateStatusFields(instance, deployment)
+
+	if !reflect.DeepEqual(originalStatus, instance.Status) {
+		logger.Info("updating HostDefiner status", "name", instance.Name, "from", originalStatus, "to", instance.Status)
+		sErr := r.Status().Update(context.TODO(), instance.Unwrap())
+		if sErr != nil {
+			return sErr
+		}
+	}
+
+	return nil
+}
+
 // isUpgradeScenario checks if the HostDefiner deployment already exists
 // Returns true if deployment exists (upgrade scenario), false if not (initial deployment)
 func (r *HostDefinerReconciler) isUpgradeScenario(instance *hostdefiner.HostDefiner) (bool, error) {
@@ -475,18 +488,6 @@ func (r *HostDefinerReconciler) isUpgradeScenario(instance *hostdefiner.HostDefi
 	// and not a failed initial deployment
 	return deployment.Status.ReadyReplicas > 0 || deployment.Status.Replicas > 0, nil
 }
-
-	r.updateStatusFields(instance, deployment)
-
-	if !reflect.DeepEqual(originalStatus, instance.Status) {
-		logger.Info("updating HostDefiner status", "name", instance.Name, "from", originalStatus, "to", instance.Status)
-		sErr := r.Status().Update(context.TODO(), instance.Unwrap())
-		if sErr != nil {
-			return sErr
-		}
-	}
-
-	return nil
 
 // checkIBMBlockCSIReadiness checks if the IBMBlockCSI controller and node are ready
 // Returns: (ready bool, requeueAfter time.Duration, error)
@@ -540,7 +541,6 @@ func (r *HostDefinerReconciler) checkIBMBlockCSIReadiness(instance *hostdefiner.
 		"Phase", ibmBlockCSI.Status.Phase)
 
 	return true, 0, nil
-}
 }
 
 func (r *HostDefinerReconciler) updateStatusFields(instance *hostdefiner.HostDefiner, deployment *appsv1.Deployment) {
