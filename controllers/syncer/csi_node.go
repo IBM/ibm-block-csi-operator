@@ -331,10 +331,6 @@ func (s *csiNodeSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
                                 Name:      "host-run",
                                 MountPath: "/run",
                         },
-                        {
-                                Name:      "nvme",
-                                MountPath: "/etc/nvme",
-                        },
 		}
 
 	case csiNodeDriverRegistrarContainerName:
@@ -370,7 +366,6 @@ func (s *csiNodeSyncer) ensureVolumes() []corev1.Volume {
 		ensureVolume("host-dir", ensureHostPathVolumeSource("/", "Directory")),
 		ensureVolume("iscsi", ensureHostPathVolumeSource("/etc/iscsi", "Directory")),
 		ensureVolume("host-run", ensureHostPathVolumeSource("/run", "Directory")),
-		ensureVolume("nvme", ensureHostPathVolumeSource("/etc/nvme", "DirectoryOrCreate")),
 	}
 }
 
