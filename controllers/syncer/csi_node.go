@@ -312,10 +312,12 @@ func (s *csiNodeSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
 			{
 				Name:      "device-dir",
 				MountPath: "/dev",
+				MountPropagation: &mountPropagationB,
 			},
 			{
 				Name:      "sys-dir",
 				MountPath: "/sys",
+				MountPropagation: &mountPropagationB,
 			},
 			{
 				Name:             "host-dir",
