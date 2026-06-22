@@ -23,7 +23,7 @@ RUN CGO_ENABLED=1 GOOS=linux go build \
 	-asmflags all=-trimpath=${GOPATH} \
 	main.go
 
-FROM registry.access.redhat.com/ubi9-minimal:9.8-1779809423
+FROM registry.access.redhat.com/ubi9-minimal:9.8-1781496742
 
 ARG VERSION=1.14.0
 ARG BUILD_NUMBER=0
