@@ -1,0 +1,88 @@
+pipeline {
+    parameters {
+        string(name: 'UPGRADE_CSI_CONTROLLER_IMAGE', defaultValue: '', description: 'E.g.:\nquay.io/csiblock/ibm-block-csi-driver-controller-amd64:1.13.2_b1825_origin.release-1.13.2')
+        string(name: 'UPGRADE_CSI_NODE_IMAGE', defaultValue: '', description: 'E.g.:\nquay.io/csiblock/ibm-block-csi-driver-node-amd64:1.13.2_b1825_origin.release-1.13.2')
+        string(name: 'UPGRADE_CSI_HOST_DEFINITION_IMAGE', defaultValue: '', description: 'E.g.:\nquay.io/csiblock/ibm-block-csi-host-definer-amd64:1.13.2_b1825_origin.release-1.13.2')
+        string(name: 'IMAGE_VERSION', defaultValue: '1.14.0', description: 'Only for the image tag name')
+        string(name: 'DOCKER_REGISTRY', defaultValue: DEFAULT_DOCKER_REGISTRY)
+        string(name: 'BUILD_TAG_SUFFIX', defaultValue: 'test-upgrade', description: 'Optional suffix to append the image tag')
+        string(name: 'EMAIL_TO', defaultValue: '')
+        booleanParam(name: 'SKIP_UNIT_TEST', defaultValue: true, description: 'Skip unit tests stage')
+    }
+    environment {
+        registryCredentialsID = 'quay_io_credentials'
+    }
+    options {
+        ansiColor('xterm')
+    }
+    agent {
+        label "${env.AGENT_LABEL}"
+    }
+    stages {
+        stage ('Modify operator code for upgrade images') {
+            steps {
+                sh './build/ci/upgrade-tests/modify_upgrade_images.sh'
+            }
+        }
+        stage ('Prepare reports directory') {
+            steps {
+                sh 'mkdir -p build/_output/reports && chmod 777 build/_output/reports'
+            }
+        }
+        stage ('Run unit tests') {
+            when {
+                expression { return !params.SKIP_UNIT_TEST }
+            }
+            steps {
+                sh './build/ci/run_unittests.sh'
+            }
+        }
+        stage ('Run OLM validations') {
+            steps {
+                sh './build/ci/run_olm_validation.sh'
+            }
+        }
+        stage ('Build and push images') {
+            steps {
+                script {
+                    def registryUrl = "${DOCKER_REGISTRY}"
+                    withCredentials([usernamePassword(credentialsId: registryCredentialsID, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        sh 'docker login -u $USERNAME -p $PASSWORD ${DOCKER_REGISTRY}'
+                        sh './build/ci/build_push_image.sh build/_output/reports/images_url'
+                        sh 'docker logout ${DOCKER_REGISTRY}'
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            sh 'ls -la build/_output/reports/'
+            // junit 'build/reports/*.xml'
+            archiveArtifacts 'build/_output/reports/images_url'
+            sh '[ -d build/_output/reports ] && rm -rf build/_output/reports'
+            script {
+                manager.addShortText("${env.GIT_BRANCH}")
+            }
+        }
+
+        failure {
+            emailext body: 'Check console output at $BUILD_URL to view the results. \n\n ${CHANGES} \n\n -------------------------------------------------- \n${BUILD_LOG, maxLines=100, escapeHtml=false}',
+                    to: "${env.EMAIL_TO}",
+                    subject: 'Build failed in Jenkins: $PROJECT_NAME - #$BUILD_NUMBER'
+        }
+        unstable {
+            emailext body: 'Check console output at $BUILD_URL to view the results. \n\n ${CHANGES} \n\n -------------------------------------------------- \n${BUILD_LOG, maxLines=100, escapeHtml=false}',
+                    to: "${env.EMAIL_TO}",
+                    subject: 'Unstable build in Jenkins: $PROJECT_NAME - #$BUILD_NUMBER'
+        }
+        changed {
+            emailext body: 'Check console output at $BUILD_URL to view the results.',
+                    to: "${env.EMAIL_TO}",
+                    subject: 'Jenkins build is back to normal: $PROJECT_NAME - #$BUILD_NUMBER'
+        }
+
+    }
+}
+
+// Made with Bob

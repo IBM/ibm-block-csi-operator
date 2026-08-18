@@ -5,7 +5,6 @@ This is the official operator to deploy and manage IBM block storage CSI driver.
 
 For compatibility, prerequisites, release notes, and other user information, see [IBM block storage CSI driver documentation](https://www.ibm.com/docs/en/stg-block-csi-driver).
 
-
 ### SecurityContextConstraints Requirements
 
 The operator uses the restricted and privileged SCC for deployments. 
@@ -92,7 +91,7 @@ volumes:
 
 ## Licensing
 
-Copyright 2025 IBM Corp.
+Copyright 2026 IBM Corp.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

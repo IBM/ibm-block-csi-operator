@@ -80,7 +80,7 @@ build-unit-tests-image:
 run-unit-tests:
 	$(run_unit_tests_image) make test
 
-KUBERNETES_VERSION=1.23.1
+KUBERNETES_VERSION=1.31.0
 .PHONY: test
 test: check-generated-manifests update
 ifneq (amd64, $(shell hack/get-arch.sh))

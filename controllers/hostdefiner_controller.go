@@ -1,5 +1,5 @@
 /**
- * Copyright 2025 IBM Corp.
+ * Copyright 2026 IBM Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,6 +110,21 @@ func (r *HostDefinerReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		}
 		return reconcile.Result{}, nil
 	}
+
+	// Check if IBMBlockCSI controller and node are ready before proceeding with HostDefiner upgrade
+	// This ensures proper upgrade ordering: controller -> node -> hostdefiner
+	// For initial deployments, this check returns immediately
+	ready, requeueAfter, err := r.checkIBMBlockCSIReadiness(instance)
+	if err != nil {
+		reqLogger.Error(err, "Failed to check IBMBlockCSI readiness")
+		return reconcile.Result{RequeueAfter: 30 * time.Second}, err
+	}
+	if !ready {
+		reqLogger.Info("Waiting for IBMBlockCSI controller and node to be ready before upgrading HostDefiner",
+			"RequeueAfter", requeueAfter)
+		return reconcile.Result{RequeueAfter: requeueAfter}, nil
+	}
+
 	originalStatus := *instance.Status.DeepCopy()
 
 	for _, rec := range []hostDefinerReconciler{
@@ -442,6 +457,145 @@ func (r *HostDefinerReconciler) updateStatus(instance *hostdefiner.HostDefiner, 
 	}
 
 	return nil
+}
+
+// checkIBMBlockCSIReadiness checks if the IBMBlockCSI controller and node are ready
+// For initial deployments (no existing HostDefiner deployment), returns ready immediately
+// For upgrades, waits for IBMBlockCSI controller and node to be ready
+// Returns: (ready bool, requeueAfter time.Duration, error)
+func (r *HostDefinerReconciler) checkIBMBlockCSIReadiness(instance *hostdefiner.HostDefiner) (bool, time.Duration, error) {
+	logger := hostDefinerLog.WithName("checkIBMBlockCSIReadiness")
+
+	// Check if HostDefiner deployment exists - if not, this is initial deployment
+	deployment, err := r.getDeployment(instance)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			// Deployment doesn't exist - initial deployment, proceed immediately
+			logger.Info("Initial HostDefiner deployment, proceeding without waiting for IBMBlockCSI")
+			return true, 0, nil
+		}
+		return false, 30 * time.Second, err
+	}
+
+	// Deployment exists but has no replicas - treat as initial deployment
+	if deployment.Status.ReadyReplicas == 0 && deployment.Status.Replicas == 0 {
+		logger.Info("HostDefiner deployment has no replicas, treating as initial deployment")
+		return true, 0, nil
+	}
+
+	// This is an upgrade scenario - check IBMBlockCSI readiness
+	ibmBlockCSIList := &csiv1.IBMBlockCSIList{}
+	err = r.List(context.TODO(), ibmBlockCSIList, client.InNamespace(instance.Namespace))
+	if err != nil {
+		logger.Error(err, "Failed to list IBMBlockCSI resources", "Namespace", instance.Namespace)
+		return false, 30 * time.Second, err
+	}
+
+	// If no IBMBlockCSI CR found, allow HostDefiner to proceed
+	if len(ibmBlockCSIList.Items) == 0 {
+		logger.Info("No IBMBlockCSI CR found in namespace, proceeding with HostDefiner upgrade",
+			"Namespace", instance.Namespace)
+		return true, 0, nil
+	}
+
+	// Check the first IBMBlockCSI CR
+	ibmBlockCSI := &ibmBlockCSIList.Items[0]
+
+	// First, check if an upgrade is in progress by comparing CR spec images with actual deployments
+	// This catches upgrades before the status is updated
+	upgradeInProgress, err := r.isIBMBlockCSIUpgradeInProgress(ibmBlockCSI)
+	if err != nil {
+		logger.Error(err, "Failed to check if IBMBlockCSI upgrade is in progress")
+		return false, 30 * time.Second, err
+	}
+
+	if upgradeInProgress {
+		logger.Info("IBMBlockCSI upgrade detected (image mismatch), waiting before upgrading HostDefiner",
+			"IBMBlockCSI", ibmBlockCSI.Name)
+		return false, 30 * time.Second, nil
+	}
+
+	// Check if both controller and node are ready
+	if !ibmBlockCSI.Status.ControllerReady {
+		logger.Info("IBMBlockCSI controller is not ready yet, waiting before upgrading HostDefiner",
+			"IBMBlockCSI", ibmBlockCSI.Name,
+			"ControllerReady", ibmBlockCSI.Status.ControllerReady,
+			"Phase", ibmBlockCSI.Status.Phase)
+		return false, 30 * time.Second, nil
+	}
+
+	if !ibmBlockCSI.Status.NodeReady {
+		logger.Info("IBMBlockCSI node is not ready yet, waiting before upgrading HostDefiner",
+			"IBMBlockCSI", ibmBlockCSI.Name,
+			"NodeReady", ibmBlockCSI.Status.NodeReady,
+			"Phase", ibmBlockCSI.Status.Phase)
+		return false, 30 * time.Second, nil
+	}
+
+	// Both controller and node are ready
+	logger.Info("IBMBlockCSI controller and node are ready, proceeding with HostDefiner reconciliation",
+		"IBMBlockCSI", ibmBlockCSI.Name,
+		"ControllerReady", ibmBlockCSI.Status.ControllerReady,
+		"NodeReady", ibmBlockCSI.Status.NodeReady,
+		"Phase", ibmBlockCSI.Status.Phase)
+
+	return true, 0, nil
+}
+
+// isIBMBlockCSIUpgradeInProgress checks if IBMBlockCSI controller or node are being upgraded
+// by comparing actual running pod images with StatefulSet/DaemonSet specs
+func (r *HostDefinerReconciler) isIBMBlockCSIUpgradeInProgress(ibmBlockCSI *csiv1.IBMBlockCSI) (bool, error) {
+	logger := hostDefinerLog.WithName("isIBMBlockCSIUpgradeInProgress")
+
+	// Check if controller pod images match StatefulSet spec
+	// This catches the case where StatefulSet is updated but pod hasn't been recreated yet
+	controllerSS := &appsv1.StatefulSet{}
+	err := r.Get(context.TODO(), types.NamespacedName{
+		Name:      oconfig.GetNameForResource(oconfig.CSIController, ibmBlockCSI.Name),
+		Namespace: ibmBlockCSI.Namespace,
+	}, controllerSS)
+
+	if err == nil {
+		controllerPod := &corev1.Pod{}
+		controllerPodName := fmt.Sprintf("%s-0", controllerSS.Name)
+		err = r.Get(context.TODO(), types.NamespacedName{
+			Name:      controllerPodName,
+			Namespace: ibmBlockCSI.Namespace,
+		}, controllerPod)
+
+		if err == nil {
+			// Compare pod images with StatefulSet spec images
+			for _, ssContainer := range controllerSS.Spec.Template.Spec.Containers {
+				for _, podContainer := range controllerPod.Spec.Containers {
+					if ssContainer.Name == podContainer.Name && ssContainer.Image != podContainer.Image {
+						logger.Info("Controller pod image not synced with StatefulSet",
+							"container", ssContainer.Name,
+							"statefulSetImage", ssContainer.Image,
+							"podImage", podContainer.Image)
+						return true, nil
+					}
+				}
+			}
+		}
+	}
+
+	// Check if node DaemonSet update is in progress
+	nodeDaemonSet := &appsv1.DaemonSet{}
+	err = r.Get(context.TODO(), types.NamespacedName{
+		Name:      oconfig.GetNameForResource(oconfig.CSINode, ibmBlockCSI.Name),
+		Namespace: ibmBlockCSI.Namespace,
+	}, nodeDaemonSet)
+
+	if err == nil {
+		if nodeDaemonSet.Status.UpdatedNumberScheduled < nodeDaemonSet.Status.DesiredNumberScheduled {
+			logger.Info("Node DaemonSet update in progress",
+				"UpdatedNumberScheduled", nodeDaemonSet.Status.UpdatedNumberScheduled,
+				"DesiredNumberScheduled", nodeDaemonSet.Status.DesiredNumberScheduled)
+			return true, nil
+		}
+	}
+
+	return false, nil
 }
 
 func (r *HostDefinerReconciler) updateStatusFields(instance *hostdefiner.HostDefiner, deployment *appsv1.Deployment) {

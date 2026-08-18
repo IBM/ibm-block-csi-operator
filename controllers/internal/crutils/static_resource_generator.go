@@ -69,6 +69,7 @@ const (
 )
 
 func (c *IBMBlockCSI) GenerateCSIDriver() *storagev1.CSIDriver {
+	fsGroupPolicy := storagev1.FileFSGroupPolicy
 	return &storagev1.CSIDriver{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: config.DriverName,
@@ -76,6 +77,7 @@ func (c *IBMBlockCSI) GenerateCSIDriver() *storagev1.CSIDriver {
 		Spec: storagev1.CSIDriverSpec{
 			AttachRequired: boolptr.True(),
 			PodInfoOnMount: boolptr.False(),
+			FSGroupPolicy:  &fsGroupPolicy,
 		},
 	}
 }
@@ -536,7 +538,7 @@ func (c *IBMBlockCSI) GenerateSCCForNodeClusterRole() *rbacv1.ClusterRole {
 			{
 				APIGroups: []string{""},
 				Resources: []string{nodesResource},
-				Verbs:     []string{verbGet},
+				Verbs:     []string{verbGet, verbUpdate, verbPatch},
 			},
 		},
 	}
