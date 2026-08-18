@@ -101,10 +101,6 @@ func (r *HostDefinerReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 			return reconcile.Result{}, nil
 		}
 
-		if err := r.deleteClusterRolesAndBindings(instance); err != nil {
-			return reconcile.Result{}, err
-		}
-
 		if err := r.removeFinalizer(instance); err != nil {
 			return reconcile.Result{}, err
 		}
