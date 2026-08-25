@@ -15,12 +15,16 @@
 #     export UPGRADE_CSI_CONTROLLER_IMAGE="quay.io/csiblock/ibm-block-csi-driver-controller-amd64:1.13.2_b1825_origin.release-1.13.2"
 #     export UPGRADE_CSI_NODE_IMAGE="quay.io/csiblock/ibm-block-csi-driver-node-amd64:1.13.2_b1825_origin.release-1.13.2"
 #     export UPGRADE_CSI_HOST_DEFINITION_IMAGE="quay.io/csiblock/ibm-block-csi-host-definer-amd64:1.13.2_b1825_origin.release-1.13.2"
+#     export UPGRADE_CSI_VOLUME_GROUP_IMAGE="quay.io/csiblock/csi-volume-group-operator:1.13.2_b1825_origin.release-1.13.2"
+#     export UPGRADE_CSI_VOLUMEREPLICATION_IMAGE="quay.io/csiblock/csi-block-volumereplication-operator:1.13.2_b1825_origin.release-1.13.2"
 #     ./build/ci/upgrade-tests/modify_upgrade_images.sh
 #
 # Environment Variables:
 #   UPGRADE_CSI_CONTROLLER_IMAGE      - Full image path for controller (repository:tag)
 #   UPGRADE_CSI_NODE_IMAGE            - Full image path for node (repository:tag)
 #   UPGRADE_CSI_HOST_DEFINITION_IMAGE - Full image path for host definer (repository:tag)
+#   UPGRADE_CSI_VOLUME_GROUP_IMAGE       - Full image path for csi-volume-group sidecar (repository:tag)
+#   UPGRADE_CSI_VOLUMEREPLICATION_IMAGE  - Full image path for csi-block-volumereplication sidecar (repository:tag)
 #
 # Modified Files:
 #   - config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml
@@ -31,9 +35,9 @@
 
 set -e
 
-# Show usage (as defined in lines 3-29) if --help is provided
+# Show usage (as defined in lines 3-34) if --help is provided
 if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-    sed -n '3,29p' "$0" | sed 's/^# //' | sed 's/^#//' | sed 's/^#\+$//'
+    sed -n '3,34p' "$0" | sed 's/^# //' | sed 's/^#//' | sed 's/^#\+$//'
     exit 0
 fi
 
@@ -72,12 +76,14 @@ extract_registry_username() {
 }
 
 # Validate that at least one image is provided
-if [ -z "${UPGRADE_CSI_CONTROLLER_IMAGE}" ] && [ -z "${UPGRADE_CSI_NODE_IMAGE}" ] && [ -z "${UPGRADE_CSI_HOST_DEFINITION_IMAGE}" ]; then
+if [ -z "${UPGRADE_CSI_CONTROLLER_IMAGE}" ] && [ -z "${UPGRADE_CSI_NODE_IMAGE}" ] && [ -z "${UPGRADE_CSI_HOST_DEFINITION_IMAGE}" ] && [ -z "${UPGRADE_CSI_VOLUME_GROUP_IMAGE}" ] && [ -z "${UPGRADE_CSI_VOLUMEREPLICATION_IMAGE}" ]; then
     echo "ERROR: No upgrade images provided!"
     echo "Please set at least one of the following environment variables:"
     echo "  - UPGRADE_CSI_CONTROLLER_IMAGE"
     echo "  - UPGRADE_CSI_NODE_IMAGE"
     echo "  - UPGRADE_CSI_HOST_DEFINITION_IMAGE"
+    echo "  - UPGRADE_CSI_VOLUME_GROUP_IMAGE"
+    echo "  - UPGRADE_CSI_VOLUMEREPLICATION_IMAGE"
     echo ""
     echo "Run with --help for usage information"
     exit 1
@@ -87,6 +93,8 @@ echo "Input Images:"
 echo "  Upgrade Controller Image: ${UPGRADE_CSI_CONTROLLER_IMAGE:-<not set>}"
 echo "  Upgrade Node Image: ${UPGRADE_CSI_NODE_IMAGE:-<not set>}"
 echo "  Upgrade Host Definer Image: ${UPGRADE_CSI_HOST_DEFINITION_IMAGE:-<not set>}"
+echo "  Upgrade CSI Volume Group Image: ${UPGRADE_CSI_VOLUME_GROUP_IMAGE:-<not set>}"
+echo "  Upgrade CSI Volumereplication Image: ${UPGRADE_CSI_VOLUMEREPLICATION_IMAGE:-<not set>}"
 
 # Extract repository and tag for each image
 UPGRADE_CSI_CONTROLLER_REPO=$(extract_repository "${UPGRADE_CSI_CONTROLLER_IMAGE}")
@@ -98,8 +106,35 @@ UPGRADE_CSI_NODE_TAG=$(extract_tag "${UPGRADE_CSI_NODE_IMAGE}")
 UPGRADE_CSI_HOST_DEFINER_REPO=$(extract_repository "${UPGRADE_CSI_HOST_DEFINITION_IMAGE}")
 UPGRADE_CSI_HOST_DEFINER_TAG=$(extract_tag "${UPGRADE_CSI_HOST_DEFINITION_IMAGE}")
 
-# Extract custom registry username
-UPGRADE_CUSTOM_REGISTRY_USERNAME=$(extract_registry_username "${UPGRADE_CSI_CONTROLLER_REPO}")
+UPGRADE_CSI_VOLUME_GROUP_REPO=$(extract_repository "${UPGRADE_CSI_VOLUME_GROUP_IMAGE}")
+UPGRADE_CSI_VOLUME_GROUP_TAG=$(extract_tag "${UPGRADE_CSI_VOLUME_GROUP_IMAGE}")
+
+UPGRADE_CSI_VOLUMEREPLICATION_REPO=$(extract_repository "${UPGRADE_CSI_VOLUMEREPLICATION_IMAGE}")
+UPGRADE_CSI_VOLUMEREPLICATION_TAG=$(extract_tag "${UPGRADE_CSI_VOLUMEREPLICATION_IMAGE}")
+
+# Collect all unique custom registry usernames from all provided images,
+# skipping registries already present in pkg/config/settings.go
+UPGRADE_CUSTOM_REGISTRY_USERNAMES=()
+for _repo in "${UPGRADE_CSI_CONTROLLER_REPO}" "${UPGRADE_CSI_NODE_REPO}" "${UPGRADE_CSI_HOST_DEFINER_REPO}" "${UPGRADE_CSI_VOLUME_GROUP_REPO}" "${UPGRADE_CSI_VOLUMEREPLICATION_REPO}"; do
+    if [ -z "${_repo}" ]; then
+        continue
+    fi
+    _reg=$(extract_registry_username "${_repo}")
+    # Skip if already present in settings.go or already collected
+    if grep -q "\"${_reg}\"" pkg/config/settings.go; then
+        continue
+    fi
+    _already=false
+    for _existing in "${UPGRADE_CUSTOM_REGISTRY_USERNAMES[@]}"; do
+        if [ "${_existing}" = "${_reg}" ]; then
+            _already=true
+            break
+        fi
+    done
+    if [ "${_already}" = false ]; then
+        UPGRADE_CUSTOM_REGISTRY_USERNAMES+=("${_reg}")
+    fi
+done
 
 echo ""
 echo "Parsed values:"
@@ -109,7 +144,11 @@ echo "Node Repository: ${UPGRADE_CSI_NODE_REPO}"
 echo "Node Tag: ${UPGRADE_CSI_NODE_TAG}"
 echo "Host Definer Repository: ${UPGRADE_CSI_HOST_DEFINER_REPO}"
 echo "Host Definer Tag: ${UPGRADE_CSI_HOST_DEFINER_TAG}"
-echo "Custom Registry Username: ${UPGRADE_CUSTOM_REGISTRY_USERNAME}"
+echo "CSI Volume Group Repository: ${UPGRADE_CSI_VOLUME_GROUP_REPO}"
+echo "CSI Volume Group Tag: ${UPGRADE_CSI_VOLUME_GROUP_TAG}"
+echo "CSI Volumereplication Repository: ${UPGRADE_CSI_VOLUMEREPLICATION_REPO}"
+echo "CSI Volumereplication Tag: ${UPGRADE_CSI_VOLUMEREPLICATION_TAG}"
+echo "Custom Registry Usernames: ${UPGRADE_CUSTOM_REGISTRY_USERNAMES[*]:-<none>}"
 echo ""
 
 # Store original files for diff comparison
@@ -131,6 +170,18 @@ if [ -n "${UPGRADE_CSI_NODE_REPO}" ] && [ -n "${UPGRADE_CSI_NODE_TAG}" ]; then
     sed -i "/node:/,/tag:/ s|tag: \".*\"|tag: \"${UPGRADE_CSI_NODE_TAG}\"|" config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml
 fi
 
+if [ -n "${UPGRADE_CSI_VOLUMEREPLICATION_REPO}" ] && [ -n "${UPGRADE_CSI_VOLUMEREPLICATION_TAG}" ]; then
+    echo "Modifying config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml for csi-addons-replicator sidecar image..."
+    sed -i "s|repository: quay.io/.*csi-block-volumereplication-operator.*|repository: ${UPGRADE_CSI_VOLUMEREPLICATION_REPO}|g" config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml
+    sed -i "/csi-addons-replicator/,/tag:/ s|tag: \".*\"|tag: \"${UPGRADE_CSI_VOLUMEREPLICATION_TAG}\"|" config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml
+fi
+
+if [ -n "${UPGRADE_CSI_VOLUME_GROUP_REPO}" ] && [ -n "${UPGRADE_CSI_VOLUME_GROUP_TAG}" ]; then
+    echo "Modifying config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml for csi-volume-group sidecar image..."
+    sed -i "s|repository: quay.io/.*csi-volume-group-operator.*|repository: ${UPGRADE_CSI_VOLUME_GROUP_REPO}|g" config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml
+    sed -i "/csi-volume-group/,/tag:/ s|tag: \".*\"|tag: \"${UPGRADE_CSI_VOLUME_GROUP_TAG}\"|" config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml
+fi
+
 # Modify csi_v1_hostdefiner_cr.yaml
 if [ -n "${UPGRADE_CSI_HOST_DEFINER_REPO}" ] && [ -n "${UPGRADE_CSI_HOST_DEFINER_TAG}" ]; then
     echo "Modifying config/samples/csi_v1_hostdefiner_cr.yaml for host definer image..."
@@ -138,22 +189,19 @@ if [ -n "${UPGRADE_CSI_HOST_DEFINER_REPO}" ] && [ -n "${UPGRADE_CSI_HOST_DEFINER
     sed -i "/hostDefiner:/,/tag:/ s|tag: \".*\"|tag: \"${UPGRADE_CSI_HOST_DEFINER_TAG}\"|" config/samples/csi_v1_hostdefiner_cr.yaml
 fi
 
-# Modify pkg/config/settings.go to add custom registry username
-if [ -n "${UPGRADE_CUSTOM_REGISTRY_USERNAME}" ]; then
-    echo "Modifying pkg/config/settings.go to add custom registry username..."
-    
-    # Check if the custom registry username constant already exists
-    if ! grep -q "QuayCSIBlockCustomRegistryUsername" pkg/config/settings.go; then
-        # Add the constant after QuayCSIBlockRegistryUsername
-        sed -i "/QuayCSIBlockRegistryUsername = \"quay.io\/ibmcsiblock\"/a\\
-\\tQuayCSIBlockCustomRegistryUsername = \"${UPGRADE_CUSTOM_REGISTRY_USERNAME}\"" pkg/config/settings.go
-        
-        # Add to OfficialRegistriesUsernames
-        sed -i "s|RedHatRegistryUsername)|QuayCSIBlockCustomRegistryUsername, RedHatRegistryUsername)|g" pkg/config/settings.go
-    else
-        # Update existing constant
-        sed -i "s|QuayCSIBlockCustomRegistryUsername = \".*\"|QuayCSIBlockCustomRegistryUsername = \"${UPGRADE_CUSTOM_REGISTRY_USERNAME}\"|g" pkg/config/settings.go
-    fi
+# Modify pkg/config/settings.go to add all custom registry usernames
+if [ "${#UPGRADE_CUSTOM_REGISTRY_USERNAMES[@]}" -gt 0 ]; then
+    echo "Modifying pkg/config/settings.go to add custom registry usernames: ${UPGRADE_CUSTOM_REGISTRY_USERNAMES[*]}..."
+
+    for _reg in "${UPGRADE_CUSTOM_REGISTRY_USERNAMES[@]}"; do
+        if ! grep -q "\"${_reg}\"" pkg/config/settings.go; then
+            # Escape dots for sed (slashes are safe inside | delimiters)
+            _reg_escaped=$(echo "${_reg}" | sed 's/\./\\./g')
+            # Append before the closing paren on the last line of sets.NewString(...)
+            # Match the line that contains RedHatRegistryUsername and replace its trailing )
+            sed -i "/RedHatRegistryUsername/ s|)$|, \"${_reg_escaped}\")|" pkg/config/settings.go
+        fi
+    done
 fi
 
 echo ""
@@ -192,7 +240,7 @@ show_diff() {
 }
 
 # Show diffs for each modified file
-if [ -n "${UPGRADE_CSI_CONTROLLER_IMAGE}" ] || [ -n "${UPGRADE_CSI_NODE_IMAGE}" ]; then
+if [ -n "${UPGRADE_CSI_CONTROLLER_IMAGE}" ] || [ -n "${UPGRADE_CSI_NODE_IMAGE}" ] || [ -n "${UPGRADE_CSI_VOLUME_GROUP_IMAGE}" ] || [ -n "${UPGRADE_CSI_VOLUMEREPLICATION_IMAGE}" ]; then
     show_diff "config/samples/csi.ibm.com_v1_ibmblockcsi_cr.yaml" "${TEMP_DIR}/csi.ibm.com_v1_ibmblockcsi_cr.yaml.orig"
 fi
 
@@ -200,7 +248,7 @@ if [ -n "${UPGRADE_CSI_HOST_DEFINITION_IMAGE}" ]; then
     show_diff "config/samples/csi_v1_hostdefiner_cr.yaml" "${TEMP_DIR}/csi_v1_hostdefiner_cr.yaml.orig"
 fi
 
-if [ -n "${UPGRADE_CUSTOM_REGISTRY_USERNAME}" ]; then
+if [ "${#UPGRADE_CUSTOM_REGISTRY_USERNAMES[@]}" -gt 0 ]; then
     show_diff "pkg/config/settings.go" "${TEMP_DIR}/settings.go.orig"
 fi
 
@@ -211,3 +259,5 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "✅ All modifications applied successfully!"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
+
+# Made with Bob

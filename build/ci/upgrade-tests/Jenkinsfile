@@ -3,6 +3,8 @@ pipeline {
         string(name: 'UPGRADE_CSI_CONTROLLER_IMAGE', defaultValue: '', description: 'E.g.:\nquay.io/csiblock/ibm-block-csi-driver-controller-amd64:1.13.2_b1825_origin.release-1.13.2')
         string(name: 'UPGRADE_CSI_NODE_IMAGE', defaultValue: '', description: 'E.g.:\nquay.io/csiblock/ibm-block-csi-driver-node-amd64:1.13.2_b1825_origin.release-1.13.2')
         string(name: 'UPGRADE_CSI_HOST_DEFINITION_IMAGE', defaultValue: '', description: 'E.g.:\nquay.io/csiblock/ibm-block-csi-host-definer-amd64:1.13.2_b1825_origin.release-1.13.2')
+        string(name: 'UPGRADE_CSI_VOLUME_GROUP_IMAGE', defaultValue: '', description: 'E.g.:\nquay.io/csiblock/csi-volume-group-operator:1.13.2_b1825_origin.release-1.13.2')
+        string(name: 'UPGRADE_CSI_VOLUMEREPLICATION_IMAGE', defaultValue: '', description: 'E.g.:\nquay.io/csiblock/csi-block-volumereplication-operator:1.13.2_b1825_origin.release-1.13.2')
         string(name: 'IMAGE_VERSION', defaultValue: '1.14.0', description: 'Only for the image tag name')
         string(name: 'DOCKER_REGISTRY', defaultValue: DEFAULT_DOCKER_REGISTRY)
         string(name: 'BUILD_TAG_SUFFIX', defaultValue: 'test-upgrade', description: 'Optional suffix to append the image tag')
