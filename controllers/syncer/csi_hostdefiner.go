@@ -142,6 +142,7 @@ func (s *hostDefinerSyncer) getEnv() []corev1.EnvVar {
 	allowDelete, _ := GetConfigMapValue(configMapData, "allowDelete", "true")
 	dynamicNodeLabeling, _ := GetConfigMapValue(configMapData, "dynamicNodeLabeling", "false")
 	portSet, _ := GetConfigMapValue(configMapData, "portSet", "")
+	hdDebugMemory, _ := GetConfigMapValue(configMapData, "HD_DEBUG_MEMORY", "")
 
 	verifyBoolean("allowDelete", allowDelete)
 	verifyBoolean("dynamicNodeLabeling", dynamicNodeLabeling)
@@ -177,6 +178,10 @@ func (s *hostDefinerSyncer) getEnv() []corev1.EnvVar {
 		{
 			Name:  "CSI_HOSTDEFINER_CONFIG",
 			Value: hdCfgMapJsonString,
+		},
+		{
+			Name:  "HD_DEBUG_MEMORY",
+			Value: hdDebugMemory,
 		},
 	}
 }
