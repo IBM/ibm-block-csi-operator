@@ -143,6 +143,8 @@ func (s *hostDefinerSyncer) getEnv() []corev1.EnvVar {
 	dynamicNodeLabeling, _ := GetConfigMapValue(configMapData, "dynamicNodeLabeling", "false")
 	portSet, _ := GetConfigMapValue(configMapData, "portSet", "")
 	hdDebugMemory, _ := GetConfigMapValue(configMapData, "hdDebugMemory", "")
+	hdDebugMemoryNFrames, _ := GetConfigMapValue(configMapData, "hdDebugMemoryNFrames", "5")
+	hdDebugMemoryInterval, _ := GetConfigMapValue(configMapData, "hdDebugMemoryInterval", "2.0")
 
 	verifyBoolean("allowDelete", allowDelete)
 	verifyBoolean("dynamicNodeLabeling", dynamicNodeLabeling)
@@ -182,6 +184,14 @@ func (s *hostDefinerSyncer) getEnv() []corev1.EnvVar {
 		{
 			Name:  "HD_DEBUG_MEMORY",
 			Value: hdDebugMemory,
+		},
+		{
+			Name:  "HD_DEBUG_MEMORY_NFRAMES",
+			Value: hdDebugMemoryNFrames,
+		},
+		{
+			Name:  "HD_DEBUG_MEMORY_INTERVAL",
+			Value: hdDebugMemoryInterval,
 		},
 	}
 }
