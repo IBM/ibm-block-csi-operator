@@ -73,7 +73,7 @@ spec:
     imagePullPolicy: IfNotPresent
   - name: csi-addons-replicator
     repository: quay.io/ibmcsiblock/csi-block-volumereplication-operator
-    tag: "v0.9.7"
+    tag: "v0.9.8"
     imagePullPolicy: IfNotPresent
   - name: csi-volume-group
     repository: quay.io/ibmcsiblock/csi-volume-group-operator
