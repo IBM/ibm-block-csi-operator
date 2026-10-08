@@ -107,7 +107,7 @@ func (s *hostDefinerSyncer) ensureContainersSpec() []corev1.Container {
 		[]string{},
 	)
 
-	hostDefinerPlugin.Resources = ensureResources("40m", "800m", "40Mi", "400Mi")
+	hostDefinerPlugin.Resources = ensureResourcesFromConfigMap("ibm-csi-hostdefiner-config", "40m,800m,40Mi,400Mi")
 
 	hostDefinerPlugin.ImagePullPolicy = s.driver.Spec.HostDefiner.ImagePullPolicy
 

@@ -18,10 +18,8 @@ package syncer
 
 import (
 	"fmt"
-	"strings"
 	"strconv"
 	"log"
-	"os"
 
 	"github.com/imdario/mergo"
 	appsv1 "k8s.io/api/apps/v1"
@@ -137,19 +135,9 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 	configMapData := GetConfigMap("ibm-csi-node-config")
 
 	maxInvocations, _ := GetConfigMapValue(configMapData, "workersLimit", "10")
-	configMemoryRequirements, _ := GetConfigMapValue(configMapData, "memoryRequirements", "40m,1000m,40Mi,500Mi")
 	cleanScsiDevice, _ := GetConfigMapValue(configMapData, "cleanScsiDevice", "true")
 
-	configMemorySlice := strings.Split(configMemoryRequirements, ",")
-	if len(configMemorySlice) != 4 {
-		os.Exit(1)
-	}
-	cpuRequests := configMemorySlice[0]
-	cpuLimits := configMemorySlice[1]
-	memoryRequests := configMemorySlice[2]
-	memoryLimits := configMemorySlice[3]
-
-	nodePlugin.Resources = ensureResources(cpuRequests, cpuLimits, memoryRequests, memoryLimits)
+	nodePlugin.Resources = ensureResourcesFromConfigMap("ibm-csi-node-config", "40m,1000m,40Mi,500Mi")
 
 	_, err := strconv.ParseUint(maxInvocations, 10, 16)
 	if err != nil {
