@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"math"
 	"strconv"
-	"strings"
 	"log"
 	os "runtime"
 
@@ -142,18 +141,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		[]string{"--csi-endpoint=$(CSI_ENDPOINT)"},
 	)
 
-	configMapData := GetConfigMap("ibm-csi-controller-config")
-	configMemoryRequirements, _ := GetConfigMapValue(configMapData, "memoryRequirements", "40m,800m,40Mi,400Mi")
-	configMemorySlice := strings.Split(configMemoryRequirements, ",")
-	if len(configMemorySlice) != 4 {
-		log.Fatal("memoryRequirements in ibm-csi-controller-config is not valid (expected 4 comma-separated values: cpuReq,cpuLim,memReq,memLim)")
-	}
-	cpuRequests := configMemorySlice[0]
-	cpuLimits := configMemorySlice[1]
-	memoryRequests := configMemorySlice[2]
-	memoryLimits := configMemorySlice[3]
-
-	controllerPlugin.Resources = ensureResources(cpuRequests, cpuLimits, memoryRequests, memoryLimits)
+	controllerPlugin.Resources = ensureResourcesFromConfigMap("ibm-csi-controller-config", "40m,800m,40Mi,400Mi")
 
 	healthPort := s.driver.Spec.HealthPort
 	if healthPort == 0 {
