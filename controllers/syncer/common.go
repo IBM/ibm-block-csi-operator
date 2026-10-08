@@ -18,12 +18,15 @@ package syncer
 
 import (
 	"context"
+	"log"
 	"os"
+	"strings"
 
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 )
 
 var defaultAnnotations = []string{
@@ -80,4 +83,18 @@ func GetConfigMapValue(configMapData map[string]string, key string, defaultvalue
 	}
 
 	return value, true
+}
+
+// ensureResourcesFromConfigMap reads the memoryRequirements key from the given ConfigMap
+// (falling back to defaultRequirements if absent) and returns a populated ResourceRequirements.
+// defaultRequirements and the ConfigMap value must be a comma-separated string of exactly
+// four values: cpuRequests,cpuLimits,memoryRequests,memoryLimits.
+func ensureResourcesFromConfigMap(configMapName, defaultRequirements string) corev1.ResourceRequirements {
+	configMapData := GetConfigMap(configMapName)
+	value, _ := GetConfigMapValue(configMapData, "memoryRequirements", defaultRequirements)
+	parts := strings.Split(value, ",")
+	if len(parts) != 4 {
+		log.Fatalf("memoryRequirements in %s is not valid (expected 4 comma-separated values: cpuReq,cpuLim,memReq,memLim)", configMapName)
+	}
+	return ensureResources(parts[0], parts[1], parts[2], parts[3])
 }
