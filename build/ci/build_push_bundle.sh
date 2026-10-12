@@ -19,11 +19,11 @@
 # Script to build and push CSI operator bundle image
 
 # Environment variables with defaults
-BUNDLE_VERSION="${BUNDLE_VERSION:-1.14.0}"
+BUNDLE_VERSION="${BUNDLE_VERSION:-1.14.1}"
 DOCKER_REGISTRY="${DOCKER_REGISTRY:-quay.io/ibmcsiblock}"
 BUNDLE_IMAGE_NAME="${BUNDLE_IMAGE_NAME:-ibm-block-csi-operator-bundle}"
 OPERATOR_PACKAGE_NAME="${OPERATOR_PACKAGE_NAME:-ibm-block-csi-operator}"
-OPERATOR_CHANNELS="${OPERATOR_CHANNELS:-stable-v1.14.0}"
+OPERATOR_CHANNELS="${OPERATOR_CHANNELS:-stable-v1.14.1}"
 BUILD_NUMBER="${BUILD_NUMBER:-1}"
 GIT_BRANCH="${GIT_BRANCH:-develop}"
 OVERRIDE_CSV="${OVERRIDE_CSV:-false}"

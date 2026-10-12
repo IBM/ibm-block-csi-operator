@@ -25,7 +25,7 @@ RUN CGO_ENABLED=1 GOOS=linux go build \
 
 FROM registry.access.redhat.com/ubi9-minimal:9.8-1788939036
 
-ARG VERSION=1.14.0
+ARG VERSION=1.14.1
 ARG BUILD_NUMBER=0
 
 ###Required Labels
