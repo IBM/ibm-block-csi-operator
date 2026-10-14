@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM golang:1.25.14
+FROM golang:1.26.9
 
 WORKDIR /go/src/github.com/IBM/ibm-block-csi-operator/
 COPY . .
@@ -23,7 +23,7 @@ RUN CGO_ENABLED=1 GOOS=linux go build \
 	-asmflags all=-trimpath=${GOPATH} \
 	main.go
 
-FROM registry.access.redhat.com/ubi9-minimal:9.8-1789349365
+FROM registry.access.redhat.com/ubi9-minimal:9.8-1791898448
 
 ARG VERSION=1.15.0
 ARG BUILD_NUMBER=0
