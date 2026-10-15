@@ -504,6 +504,14 @@ spec:
                 - update
                 - watch
             - apiGroups:
+                - ramendr.openshift.io
+              resources:
+                - volumereplicationgroups
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
                 - replication.storage.openshift.io
               resources:
                 - volumereplicationclasses
