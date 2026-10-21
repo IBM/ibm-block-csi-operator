@@ -358,6 +358,12 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 			hdCfgMapJsonString = string(cfgMapBytes)
 		}
 
+		// NVMe-TCP is blocked unless explicitly allowed in the controller config map
+		//
+		controllerConfigMapData := GetConfigMap("ibm-csi-controller-config")
+		enableNvmeTcp, _ := GetConfigMapValue(controllerConfigMapData, "enableNvmeTcp", "false")
+		verifyBoolean("enableNvmeTcp", enableNvmeTcp)
+
 		return []corev1.EnvVar{
 			{
 				Name:  "CSI_ENDPOINT",
@@ -386,6 +392,10 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 			{
 				Name:  "CSI_HOSTDEFINER_CONFIG",
 				Value: hdCfgMapJsonString,
+			},
+			{
+				Name:  "ENABLE_NVME_TCP",
+				Value: enableNvmeTcp,
 			},
 		}
 
