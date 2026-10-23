@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"math"
 	"strconv"
+	"strings"
 	"log"
 	os "runtime"
 
@@ -57,6 +58,10 @@ const (
 
 	controllerContainerHealthPortName          = "healthz"
 	controllerContainerDefaultHealthPortNumber = 9808
+
+	controllerConfigMapName = "ibm-csi-controller-config"
+	enableNvmeTcpKey        = "enableNvmeTcp"
+	enableNvmeTcpEnvVar     = "ENABLE_NVME_TCP"
 )
 
 var TopologyEnabled = false
@@ -358,6 +363,10 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 			hdCfgMapJsonString = string(cfgMapBytes)
 		}
 
+		// NVMe-TCP is blocked unless explicitly allowed in the controller config map
+		//
+		enableNvmeTcp := s.getEnableNvmeTcp(GetConfigMap(controllerConfigMapName))
+
 		return []corev1.EnvVar{
 			{
 				Name:  "CSI_ENDPOINT",
@@ -387,6 +396,10 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 				Name:  "CSI_HOSTDEFINER_CONFIG",
 				Value: hdCfgMapJsonString,
 			},
+			{
+				Name:  enableNvmeTcpEnvVar,
+				Value: enableNvmeTcp,
+			},
 		}
 
 	case provisionerContainerName, attacherContainerName, snapshotterContainerName,
@@ -399,6 +412,44 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 		}
 	}
 	return nil
+}
+
+// getEnableNvmeTcp returns "true" or "false" for ENABLE_NVME_TCP.
+// Only "true" enables and only "false" disables (case-insensitive). Any other value is
+// logged and the value currently applied on the controller is kept ("false" if none).
+func (s *csiControllerSyncer) getEnableNvmeTcp(configMapData map[string]string) string {
+	enableNvmeTcp, _ := GetConfigMapValue(configMapData, enableNvmeTcpKey, "false")
+	normalizedValue := strings.ToLower(strings.TrimSpace(enableNvmeTcp))
+	if normalizedValue == "true" || normalizedValue == "false" {
+		return normalizedValue
+	}
+	currentValue := s.getCurrentControllerEnvValue(enableNvmeTcpEnvVar, "false")
+	if currentValue != "true" {
+		currentValue = "false"
+	}
+	log.Printf("Error: %q in ConfigMap %q is not a valid boolean: %q, keeping current value %q",
+		enableNvmeTcpKey, controllerConfigMapName, enableNvmeTcp, currentValue)
+	return currentValue
+}
+
+// getCurrentControllerEnvValue returns the value of envName on the controller container
+// of the existing StatefulSet, or defaultValue if it is not set.
+func (s *csiControllerSyncer) getCurrentControllerEnvValue(envName string, defaultValue string) string {
+	statefulSet, ok := s.obj.(*appsv1.StatefulSet)
+	if !ok {
+		return defaultValue
+	}
+	for _, container := range statefulSet.Spec.Template.Spec.Containers {
+		if container.Name != ControllerContainerName {
+			continue
+		}
+		for _, env := range container.Env {
+			if env.Name == envName {
+				return env.Value
+			}
+		}
+	}
+	return defaultValue
 }
 
 func (s *csiControllerSyncer) getVolumeMountsFor(name string) []corev1.VolumeMount {
