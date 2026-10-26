@@ -3,13 +3,16 @@
 # ----------------------------------------------------------------
 # This script is for internal use in CI
 # The script create, inspect and push new docker manifest.
+# Before creating the manifest, all per-arch images are normalized to Docker Schema v2 (skopeo),
+# and after pushing, the manifest list is verified to contain a single child mediaType (no mixed Docker/OCI list).
 # The script validates the whole process. If something gets wrong the script will fail with error.
 # Pre-requisites:
 #    1. Run docker login to the external registry in advance.
 #    2. The internal images should exist in advance.
 #    3. The designated manifest should NOT exist (the script will create it).
 #    4. "docker manifest" is enabled.
-#    5. Optional: set environment MANIFEST_FLAG with dedicated flags for docker manifest commands.
+#    5. "skopeo" and "jq" are installed.
+#    6. Optional: set environment MANIFEST_FLAG with dedicated flags for docker manifest commands.
 #       For example to push docker manifest for internal registry without certificates, one can use: export MANIFEST_FLAG="--insecure"
 # ----------------------------------------------------------------
 
@@ -43,6 +46,11 @@ dockerhub_prefix_manifest="docker.io_"
 convert_manifest_filename=$(echo "$manifest" | sed -e 's|/|_|g' -e 's|:|-|g')
 specific_manifest_dirname="$manifest_dirname/${convert_manifest_filename}"
 specific_manifest_dirname_with_prefix="$manifest_dirname/${dockerhub_prefix_manifest}${convert_manifest_filename}"
+command -v skopeo >/dev/null || abort 1 "skopeo is required to normalize and verify manifest media types."
+command -v jq >/dev/null || abort 1 "jq is required to verify manifest media types."
+skopeo_tls_flags=""
+[[ "$MANIFEST_FLAG" == *--insecure* ]] && skopeo_tls_flags="--src-tls-verify=false --dest-tls-verify=false"
+
 echo "1. Make sure architecture images do not exist locally and if so remove them first for clean state..."
 [ -n "$(docker images -q $image_amd64)" ] && { docker rmi $image_amd64 || abort 1 "fail to clean image before creating manifest. [$image_amd64]"; } || :
 [ -n "$(docker images -q $image_ppc64le)" ] && { docker rmi $image_ppc64le || abort 1 "fail to clean image before creating manifest. [$image_ppc64le]"; } || :
@@ -56,6 +64,11 @@ else
   docker manifest inspect $MANIFEST_FLAG $manifest && echo "manifest inspect should NOT exist before pushing it. BUT fail_if_exist is not true so skip validation." || :
 fi
 
+echo "2.1 Normalize all architecture images to Docker Schema v2 (avoid mixed Docker/OCI manifest list)..."
+for arch_image in ${image_amd64} ${image_ppc64le} ${image_s390x}; do
+  skopeo copy $skopeo_tls_flags --format v2s2 "docker://${arch_image}" "docker://${arch_image}" || abort 2 "fail to normalize image to v2s2. [$arch_image]"
+done
+
 echo "3. Manifest creation and push..."
 docker manifest create $MANIFEST_FLAG $manifest ${image_amd64} ${image_ppc64le} ${image_s390x} || abort 2 "fail to create manifest."
 docker manifest inspect $MANIFEST_FLAG $manifest || abort 2 "fail to inspect local manifest."
@@ -65,6 +78,11 @@ docker manifest push $MANIFEST_FLAG --purge $manifest || abort 2 "fail to push m
 ls -ld $specific_manifest_dirname $specific_manifest_dirname_with_prefix && abort 2 "Local manifest file should NOT exist after successful manifest push. Please check." || :
 
 echo "4. Remote manifest validation..."
+# Verify that all child manifests have the exact same mediaType
+media_types=$(skopeo inspect $skopeo_tls_flags --raw "docker://${manifest}" | jq -r '.manifests[].mediaType' | sort -u)
+media_types_count=$(echo "$media_types" | wc -l | tr -d ' ')
+[ "$media_types_count" -ne 1 ] && abort 3 "Mixed manifest list detected in [$manifest]: $media_types"
+echo "SUCCESS: Manifest list is uniform ($media_types)"
 docker manifest inspect $MANIFEST_FLAG $manifest || abort 3 "fail to inspect remote manifest."
 docker pull $manifest || abort 3 "fail pull remote manifest."
 expected_arch=$(uname -m)
