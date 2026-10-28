@@ -84,7 +84,7 @@ KUBERNETES_VERSION=1.31.0
 .PHONY: test
 test: check-generated-manifests update
 ifneq (amd64, $(shell hack/get-arch.sh))
-	ginkgo -r -v -skipPackage envtest
+	GOMAXPROCS=4 GOFLAGS="-p=2" ginkgo -r -v --compilers=2 --skip-package envtest
 else
 	export KUBEBUILDER_ASSETS=$(shell setup-envtest use -p path ${KUBERNETES_VERSION});\
 	ginkgo -r -v
