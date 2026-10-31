@@ -32,7 +32,6 @@ const (
 	storageApiGroup                          string = "storage.k8s.io"
 	rbacAuthorizationApiGroup                string = "rbac.authorization.k8s.io"
 	replicationStorageOpenshiftApiGroup      string = "replication.storage.openshift.io"
-	ramenDrApiGroup                          string = "ramendr.openshift.io"
 	storageClassesResource                   string = "storageclasses"
 	persistentVolumesResource                string = "persistentvolumes"
 	persistentVolumeClaimsResource           string = "persistentvolumeclaims"
@@ -55,7 +54,6 @@ const (
 	volumeReplicationsResource               string = "volumereplications"
 	volumeReplicationsFinalizersResource     string = "volumereplications/finalizers"
 	volumeReplicationsStatusResource         string = "volumereplications/status"
-	volumeReplicationGroupsResource          string = "volumereplicationgroups"
 	eventsResource                           string = "events"
 	nodesResource                            string = "nodes"
 	csiNodesResource                         string = "csinodes"
@@ -541,21 +539,6 @@ func (c *IBMBlockCSI) GenerateSCCForNodeClusterRole() *rbacv1.ClusterRole {
 				APIGroups: []string{""},
 				Resources: []string{nodesResource},
 				Verbs:     []string{verbGet, verbUpdate, verbPatch},
-			},
-			{
-				APIGroups: []string{""},
-				Resources: []string{podsResource},
-				Verbs:     []string{verbList},
-			},
-			{
-				APIGroups: []string{""},
-				Resources: []string{persistentVolumeClaimsResource, persistentVolumesResource},
-				Verbs:     []string{verbGet},
-			},
-			{
-				APIGroups: []string{ramenDrApiGroup},
-				Resources: []string{volumeReplicationGroupsResource},
-				Verbs:     []string{verbGet, verbList, verbWatch},
 			},
 		},
 	}
