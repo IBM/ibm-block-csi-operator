@@ -358,7 +358,7 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 			hdCfgMapJsonString = string(cfgMapBytes)
 		}
 
-		return []corev1.EnvVar{
+		controllerEnvVars := []corev1.EnvVar{
 			{
 				Name:  "CSI_ENDPOINT",
 				Value: config.CSIEndpoint,
@@ -388,6 +388,10 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 				Value: hdCfgMapJsonString,
 			},
 		}
+
+		// Optional SSH keepalive settings, passed only when set in the node ConfigMap.
+		//
+		return append(controllerEnvVars, getSvcSshKeepaliveEnvVars(configMapData)...)
 
 	case provisionerContainerName, attacherContainerName, snapshotterContainerName,
 		resizerContainerName, replicatorContainerName, volumeGroupContainerName:
