@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"math"
 	"strconv"
+	"strings"
 	"log"
 	os "runtime"
 
@@ -57,6 +58,23 @@ const (
 
 	controllerContainerHealthPortName          = "healthz"
 	controllerContainerDefaultHealthPortNumber = 9808
+
+	controllerConfigMapName = "ibm-csi-controller-config"
+
+	// Number of VolumeReplications the replicator processes at the same time.
+	// Each one holds a gRPC worker of the controller (at least 10), so at most 8 are allowed,
+	// which always leaves workers for the other CSI calls.
+	maxConcurrentVolumeReplicationsKey     = "maxConcurrentVolumeReplications"
+	maxConcurrentVolumeReplicationsFlag    = "--max-concurrent-reconciles"
+	defaultMaxConcurrentVolumeReplications = 1
+	maxMaxConcurrentVolumeReplications     = 8
+
+	// Number of connections the controller keeps to each IBM Storage Virtualize system.
+	// The controller caps its connection pool at 10.
+	maxStorageConnectionsKey     = "maxStorageConnections"
+	maxStorageConnectionsEnvVar  = "SVC_MAX_CONNECTIONS"
+	defaultMaxStorageConnections = 2
+	maxMaxStorageConnections     = 10
 )
 
 var TopologyEnabled = false
@@ -141,7 +159,7 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 		[]string{"--csi-endpoint=$(CSI_ENDPOINT)"},
 	)
 
-	controllerPlugin.Resources = ensureResourcesFromConfigMap("ibm-csi-controller-config", "40m,800m,40Mi,400Mi")
+	controllerPlugin.Resources = ensureResourcesFromConfigMap(controllerConfigMapName, "40m,800m,40Mi,400Mi")
 
 	healthPort := s.driver.Spec.HealthPort
 	if healthPort == 0 {
@@ -212,10 +230,19 @@ func (s *csiControllerSyncer) ensureContainersSpec() []corev1.Container {
 
 	leaderElectionNamespaceFlag := fmt.Sprintf("--leader-election-namespace=%s", s.driver.Namespace)
 	driverNameFlag := fmt.Sprintf("--driver-name=%s", config.DriverName)
+	replicatorArgs := []string{leaderElectionNamespaceFlag, driverNameFlag,
+		"--csi-address=$(ADDRESS)", "--zap-log-level=5", "--rpc-timeout=30s"}
+	// the flag is passed only when it is not the default, so a replicator image without it keeps working
+	maxConcurrentVolumeReplications := s.getMaxConcurrentVolumeReplications(GetConfigMap(controllerConfigMapName))
+	if maxConcurrentVolumeReplications != defaultMaxConcurrentVolumeReplications {
+		replicatorArgs = append(replicatorArgs,
+			fmt.Sprintf("%s=%d", maxConcurrentVolumeReplicationsFlag, maxConcurrentVolumeReplications))
+	}
+	log.Printf("%s: %s=%d, args: %v", replicatorContainerName, maxConcurrentVolumeReplicationsKey,
+		maxConcurrentVolumeReplications, replicatorArgs)
 	replicator := s.ensureContainer(replicatorContainerName,
 		s.getCSIAddonsReplicatorImage(),
-		[]string{leaderElectionNamespaceFlag, driverNameFlag,
-			"--csi-address=$(ADDRESS)", "--zap-log-level=5", "--rpc-timeout=30s"},
+		replicatorArgs,
 	)
 	replicator.ImagePullPolicy = s.getCSIAddonsReplicatorPullPolicy()
 
@@ -358,6 +385,10 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 			hdCfgMapJsonString = string(cfgMapBytes)
 		}
 
+		maxStorageConnections := s.getMaxStorageConnections(GetConfigMap(controllerConfigMapName))
+		log.Printf("%s: %s=%d, env %s=%d", ControllerContainerName, maxStorageConnectionsKey,
+			maxStorageConnections, maxStorageConnectionsEnvVar, maxStorageConnections)
+
 		return []corev1.EnvVar{
 			{
 				Name:  "CSI_ENDPOINT",
@@ -387,6 +418,10 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 				Name:  "CSI_HOSTDEFINER_CONFIG",
 				Value: hdCfgMapJsonString,
 			},
+			{
+				Name:  maxStorageConnectionsEnvVar,
+				Value: strconv.Itoa(maxStorageConnections),
+			},
 		}
 
 	case provisionerContainerName, attacherContainerName, snapshotterContainerName,
@@ -396,6 +431,99 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 				Name:  "ADDRESS",
 				Value: config.ControllerSocketPath,
 			},
+		}
+	}
+	return nil
+}
+
+// getMaxConcurrentVolumeReplications returns the value of maxConcurrentVolumeReplications.
+// A missing key gives the default. An invalid value is logged and the value currently applied is kept.
+func (s *csiControllerSyncer) getMaxConcurrentVolumeReplications(configMapData map[string]string) int {
+	currentValue := defaultMaxConcurrentVolumeReplications
+	if currentFlagValue := s.getCurrentContainerFlagValue(replicatorContainerName,
+		maxConcurrentVolumeReplicationsFlag); currentFlagValue != "" {
+		if parsedValue, err := strconv.Atoi(currentFlagValue); err == nil {
+			currentValue = parsedValue
+		}
+	}
+	return getIntFromControllerConfigMap(configMapData, maxConcurrentVolumeReplicationsKey,
+		defaultMaxConcurrentVolumeReplications, maxMaxConcurrentVolumeReplications, currentValue)
+}
+
+// getMaxStorageConnections returns the value of maxStorageConnections.
+// A missing key gives the default. An invalid value is logged and the value currently applied is kept.
+func (s *csiControllerSyncer) getMaxStorageConnections(configMapData map[string]string) int {
+	currentValue := defaultMaxStorageConnections
+	if currentEnvValue := s.getCurrentContainerEnvValue(ControllerContainerName,
+		maxStorageConnectionsEnvVar); currentEnvValue != "" {
+		if parsedValue, err := strconv.Atoi(currentEnvValue); err == nil {
+			currentValue = parsedValue
+		}
+	}
+	return getIntFromControllerConfigMap(configMapData, maxStorageConnectionsKey,
+		defaultMaxStorageConnections, maxMaxStorageConnections, currentValue)
+}
+
+// getIntFromControllerConfigMap returns the integer value of key in the controller ConfigMap, which must be
+// between 1 and maxValue. A missing or empty key gives defaultValue. Any other value is logged
+// and currentValue is kept.
+func getIntFromControllerConfigMap(configMapData map[string]string, key string, defaultValue int, maxValue int,
+	currentValue int) int {
+	value, exists := GetConfigMapValue(configMapData, key, "")
+	trimmedValue := strings.TrimSpace(value)
+	if !exists || trimmedValue == "" {
+		log.Printf("%q is not set in ConfigMap %q, using default %d", key, controllerConfigMapName, defaultValue)
+		return defaultValue
+	}
+	parsedValue, err := strconv.Atoi(trimmedValue)
+	if err == nil && parsedValue >= 1 && parsedValue <= maxValue {
+		log.Printf("%q in ConfigMap %q is %d", key, controllerConfigMapName, parsedValue)
+		return parsedValue
+	}
+	log.Printf("Error: %q in ConfigMap %q must be an integer between 1 and %d: %q, keeping current value %d",
+		key, controllerConfigMapName, maxValue, value, currentValue)
+	return currentValue
+}
+
+// getCurrentContainerFlagValue returns the value of flag (passed as flag=value) on the container
+// containerName of the existing StatefulSet, or "" if it is not set.
+func (s *csiControllerSyncer) getCurrentContainerFlagValue(containerName string, flag string) string {
+	container := s.getCurrentContainer(containerName)
+	if container == nil {
+		return ""
+	}
+	for _, arg := range container.Args {
+		if strings.HasPrefix(arg, flag+"=") {
+			return strings.TrimPrefix(arg, flag+"=")
+		}
+	}
+	return ""
+}
+
+// getCurrentContainerEnvValue returns the value of envName on the container containerName
+// of the existing StatefulSet, or "" if it is not set.
+func (s *csiControllerSyncer) getCurrentContainerEnvValue(containerName string, envName string) string {
+	container := s.getCurrentContainer(containerName)
+	if container == nil {
+		return ""
+	}
+	for _, env := range container.Env {
+		if env.Name == envName {
+			return env.Value
+		}
+	}
+	return ""
+}
+
+// getCurrentContainer returns the container containerName of the existing StatefulSet, or nil.
+func (s *csiControllerSyncer) getCurrentContainer(containerName string) *corev1.Container {
+	statefulSet, ok := s.obj.(*appsv1.StatefulSet)
+	if !ok {
+		return nil
+	}
+	for i := range statefulSet.Spec.Template.Spec.Containers {
+		if statefulSet.Spec.Template.Spec.Containers[i].Name == containerName {
+			return &statefulSet.Spec.Template.Spec.Containers[i]
 		}
 	}
 	return nil
