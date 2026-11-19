@@ -105,18 +105,35 @@ func (s *csiNodeSyncer) SyncFn(daemonSetRestartedKey string, daemonSetRestartedV
 		return err
 	}
 
+	for i := range out.Spec.Template.Spec.Containers {
+		if out.Spec.Template.Spec.Containers[i].Name == csiNodeDriverRegistrarContainerName {
+			out.Spec.Template.Spec.Containers[i].Lifecycle = nil
+		}
+	}
+
 	return nil
 }
 
 func (s *csiNodeSyncer) ensurePodSpec() corev1.PodSpec {
+	configMapData := GetConfigMap("ibm-csi-node-config")
+
+	quiesceTimeoutStr, _ := GetConfigMapValue(configMapData, "quiesceTimeoutSeconds", "45")
+	quiesceTimeoutSeconds, err := strconv.ParseInt(quiesceTimeoutStr, 10, 64)
+	if err != nil {
+		quiesceTimeoutSeconds = "45"
+	}
+
+	gracePeriod := quiesceTimeoutSeconds + 15
+
 	return corev1.PodSpec{
-		Containers:         s.ensureContainersSpec(),
-		Volumes:            s.ensureVolumes(),
-		HostIPC:            true,
-		HostNetwork:        true,
-		ServiceAccountName: config.GetNameForResource(config.CSINodeServiceAccount, s.driver.Name),
-		Affinity:           s.driver.Spec.Node.Affinity,
-		Tolerations:        s.driver.Spec.Node.Tolerations,
+		Containers:                    s.ensureContainersSpec(configMapData, quiesceTimeoutSeconds),
+		Volumes:                       s.ensureVolumes(),
+		HostIPC:                       true,
+		HostNetwork:                   true,
+		ServiceAccountName:            config.GetNameForResource(config.CSINodeServiceAccount, s.driver.Name),
+		Affinity:                      s.driver.Spec.Node.Affinity,
+		Tolerations:                   s.driver.Spec.Node.Tolerations,
+		TerminationGracePeriodSeconds: &gracePeriod,
 	}
 }
 
@@ -194,13 +211,35 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 			"--v=5",
 		},
 	)
-	registrar.Lifecycle = &corev1.Lifecycle{
+
+	quiesceSock, _ := GetConfigMapValue(configMapData, "quiesceSocket", "/csi/quiesce.sock")
+	quiescePeriodSeconds, _ := GetConfigMapValue(configMapData, "quiescePeriodSeconds", "10")
+	quiesceTimeoutSeconds, _ := GetConfigMapValue(configMapData, "quiesceTimeoutSeconds", "45")
+
+
+	nodePlugin.Args = append(nodePlugin.Args,
+		"--clean-scsi-device="+cleanScsiDevice,
+		"--max-invocations="+maxInvocations,
+		"--shutdown-quiet-period="+quiescePeriodSeconds,
+		"--shutdown-giveup-timeout="+quiesceTimeoutSeconds,
+		"--quiesce-sock="+quiesceSock,
+	)
+
+	nodePlugin.Lifecycle = &corev1.Lifecycle{
 		PreStop: &corev1.LifecycleHandler{
 			Exec: &corev1.ExecAction{
-				Command: []string{"/bin/sh", "-c", "rm -rf /registration/ibm-block-csi-driver-reg.sock /csi/csi.sock"},
+				Command: []string{
+					"/proc/1/exe",
+					"--prestop",
+					"--quiesce-sock="+quiesceSock,
+					"--shutdown-giveup-timeout="+quiesceTimeoutSeconds,
+				},
 			},
 		},
 	}
+
+	registrar.Lifecycle = nil
+
 	registrar.SecurityContext = &corev1.SecurityContext{AllowPrivilegeEscalation: boolptr.False()}
 	fillSecurityContextCapabilities(registrar.SecurityContext)
 	registrar.ImagePullPolicy = s.getCSINodeDriverRegistrarPullPolicy()
