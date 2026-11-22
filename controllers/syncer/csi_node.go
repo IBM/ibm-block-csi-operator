@@ -231,8 +231,8 @@ func (s *csiNodeSyncer) ensureContainersSpec() []corev1.Container {
 				Command: []string{
 					"/proc/1/exe",
 					"--prestop",
-					"--quiesce-sock="+quiesceSock,
-					"--shutdown-giveup-timeout="+quiesceTimeoutSeconds,
+					"--quiesce-sock=" + quiesceSock,
+					"--shutdown-giveup-timeout=" + quiesceTimeoutSeconds,
 				},
 			},
 		},
