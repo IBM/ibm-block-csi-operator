@@ -120,13 +120,13 @@ func (s *csiNodeSyncer) ensurePodSpec() corev1.PodSpec {
 	quiesceTimeoutStr, _ := GetConfigMapValue(configMapData, "quiesceTimeoutSeconds", "45")
 	quiesceTimeoutSeconds, err := strconv.ParseInt(quiesceTimeoutStr, 10, 64)
 	if err != nil {
-		quiesceTimeoutSeconds = "45"
+		quiesceTimeoutSeconds = 45
 	}
 
 	gracePeriod := quiesceTimeoutSeconds + 15
 
 	return corev1.PodSpec{
-		Containers:                    s.ensureContainersSpec(configMapData, quiesceTimeoutSeconds),
+		Containers:                    s.ensureContainersSpec(),
 		Volumes:                       s.ensureVolumes(),
 		HostIPC:                       true,
 		HostNetwork:                   true,
