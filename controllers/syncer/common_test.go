@@ -80,6 +80,52 @@ func TestGetSvcSshKeepaliveEnvVars(t *testing.T) {
 			},
 			expected: []corev1.EnvVar{{Name: "SVC_TCP_KEEPCNT", Value: "5"}},
 		},
+		{
+			name: "values that are not a strict positive integer are left out",
+			configMapData: map[string]string{
+				"svcSshKeepaliveInterval": "+5",
+				"svcTcpKeepidle":          " 5 ",
+				"svcTcpKeepintvl":         "1_0",
+				"svcTcpKeepcnt":           "0x10",
+				"svcTcpUserTimeout":       "4294967296",
+			},
+			expected: []corev1.EnvVar{},
+		},
+		{
+			name: "values above the maximum are left out",
+			configMapData: map[string]string{
+				"svcSshKeepaliveInterval": "3601",
+				"svcTcpKeepidle":          "32768",
+				"svcTcpKeepintvl":         "32768",
+				"svcTcpKeepcnt":           "128",
+				"svcTcpUserTimeout":       "600001",
+			},
+			expected: []corev1.EnvVar{},
+		},
+		{
+			name: "values at the maximum are kept",
+			configMapData: map[string]string{
+				"svcSshKeepaliveInterval": "3600",
+				"svcTcpKeepidle":          "32767",
+				"svcTcpKeepintvl":         "32767",
+				"svcTcpKeepcnt":           "127",
+				"svcTcpUserTimeout":       "600000",
+			},
+			expected: []corev1.EnvVar{
+				{Name: "SVC_SSH_KEEPALIVE_INTERVAL", Value: "3600"},
+				{Name: "SVC_TCP_KEEPIDLE", Value: "32767"},
+				{Name: "SVC_TCP_KEEPINTVL", Value: "32767"},
+				{Name: "SVC_TCP_KEEPCNT", Value: "127"},
+				{Name: "SVC_TCP_USER_TIMEOUT", Value: "600000"},
+			},
+		},
+		{
+			name: "value of 1 is kept",
+			configMapData: map[string]string{
+				"svcTcpKeepcnt": "1",
+			},
+			expected: []corev1.EnvVar{{Name: "SVC_TCP_KEEPCNT", Value: "1"}},
+		},
 	}
 
 	for _, test := range tests {

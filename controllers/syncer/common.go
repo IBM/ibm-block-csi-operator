@@ -101,21 +101,30 @@ func ensureResourcesFromConfigMap(configMapName, defaultRequirements string) cor
 }
 
 // svcSshKeepaliveSettings maps a ConfigMap key to the controller env var that carries the optional
-// SSH keepalive setting to the driver.
+// SSH keepalive setting to the driver, with the maximal allowed value. The driver does not validate
+// the values.
+// Units and driver defaults:
+//
+//	svcSshKeepaliveInterval - seconds, default 15
+//	svcTcpKeepidle          - seconds, default 15
+//	svcTcpKeepintvl         - seconds, default 5
+//	svcTcpKeepcnt           - number of probes, default 3
+//	svcTcpUserTimeout       - MILLISECONDS, default 30000
 var svcSshKeepaliveSettings = []struct {
 	configMapKey string
 	envVarName   string
+	maxValue     uint64
 }{
-	{"svcSshKeepaliveInterval", "SVC_SSH_KEEPALIVE_INTERVAL"},
-	{"svcTcpKeepidle", "SVC_TCP_KEEPIDLE"},
-	{"svcTcpKeepintvl", "SVC_TCP_KEEPINTVL"},
-	{"svcTcpKeepcnt", "SVC_TCP_KEEPCNT"},
-	{"svcTcpUserTimeout", "SVC_TCP_USER_TIMEOUT"},
+	{"svcSshKeepaliveInterval", "SVC_SSH_KEEPALIVE_INTERVAL", 3600},
+	{"svcTcpKeepidle", "SVC_TCP_KEEPIDLE", 32767},
+	{"svcTcpKeepintvl", "SVC_TCP_KEEPINTVL", 32767},
+	{"svcTcpKeepcnt", "SVC_TCP_KEEPCNT", 127},
+	{"svcTcpUserTimeout", "SVC_TCP_USER_TIMEOUT", 600000},
 }
 
 // getSvcSshKeepaliveEnvVars returns the optional SSH keepalive env vars that are set to a valid
-// (positive whole number) value in the given ConfigMap data. A key that is missing, empty or not
-// valid is left out with a warning, so the driver keeps its default for it.
+// value in the given ConfigMap data: a positive integer, not above the maximum of the key. A key
+// that is missing, empty or not valid is left out with a warning, so the driver keeps its default for it.
 func getSvcSshKeepaliveEnvVars(configMapData map[string]string) []corev1.EnvVar {
 	envVars := []corev1.EnvVar{}
 	for _, setting := range svcSshKeepaliveSettings {
@@ -124,9 +133,9 @@ func getSvcSshKeepaliveEnvVars(configMapData map[string]string) []corev1.EnvVar 
 			continue
 		}
 		number, err := strconv.ParseUint(value, 10, 32)
-		if err != nil || number == 0 {
-			log.Printf("Ignoring invalid value %q of %s, a positive number is required. The default is used.",
-				value, setting.configMapKey)
+		if err != nil || number == 0 || number > setting.maxValue {
+			log.Printf("Ignoring invalid value %q of %s, a positive integer up to %d is required. The default is used.",
+				value, setting.configMapKey, setting.maxValue)
 			continue
 		}
 		envVars = append(envVars, corev1.EnvVar{Name: setting.envVarName, Value: value})

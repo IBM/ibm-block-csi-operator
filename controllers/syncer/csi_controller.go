@@ -390,7 +390,6 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 		}
 
 		// Optional SSH keepalive settings, passed only when set in the node ConfigMap.
-		//
 		return append(controllerEnvVars, getSvcSshKeepaliveEnvVars(configMapData)...)
 
 	case provisionerContainerName, attacherContainerName, snapshotterContainerName,
