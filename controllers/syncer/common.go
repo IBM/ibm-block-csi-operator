@@ -102,24 +102,24 @@ func ensureResourcesFromConfigMap(configMapName, defaultRequirements string) cor
 
 // svcSshKeepaliveSettings maps a ConfigMap key to the controller env var that carries the optional
 // SSH keepalive setting to the driver, with the maximal allowed value. The driver does not validate
-// the values.
-// Units and driver defaults:
+// the values. The unit is part of each name (Seconds, Ms), except for the probe count.
+// Driver defaults:
 //
-//	svcSshKeepaliveInterval - seconds, default 15
-//	svcTcpKeepidle          - seconds, default 15
-//	svcTcpKeepintvl         - seconds, default 5
-//	svcTcpKeepcnt           - number of probes, default 3
-//	svcTcpUserTimeout       - MILLISECONDS, default 30000
+//	svcSshKeepaliveIntervalSeconds - default 15
+//	svcTcpKeepidleSeconds          - default 15
+//	svcTcpKeepintvlSeconds         - default 5
+//	svcTcpKeepcnt                  - number of probes, default 3
+//	svcTcpUserTimeoutMs            - default 30000
 var svcSshKeepaliveSettings = []struct {
 	configMapKey string
 	envVarName   string
 	maxValue     uint64
 }{
-	{"svcSshKeepaliveInterval", "SVC_SSH_KEEPALIVE_INTERVAL", 3600},
-	{"svcTcpKeepidle", "SVC_TCP_KEEPIDLE", 32767},
-	{"svcTcpKeepintvl", "SVC_TCP_KEEPINTVL", 32767},
+	{"svcSshKeepaliveIntervalSeconds", "SVC_SSH_KEEPALIVE_INTERVAL_SECONDS", 3600},
+	{"svcTcpKeepidleSeconds", "SVC_TCP_KEEPIDLE_SECONDS", 32767},
+	{"svcTcpKeepintvlSeconds", "SVC_TCP_KEEPINTVL_SECONDS", 32767},
 	{"svcTcpKeepcnt", "SVC_TCP_KEEPCNT", 127},
-	{"svcTcpUserTimeout", "SVC_TCP_USER_TIMEOUT", 600000},
+	{"svcTcpUserTimeoutMs", "SVC_TCP_USER_TIMEOUT_MS", 600000},
 }
 
 // getSvcSshKeepaliveEnvVars returns the optional SSH keepalive env vars that are set to a valid
