@@ -325,11 +325,11 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 
 	switch name {
 	case ControllerContainerName:
-		configMapData := GetConfigMap("ibm-csi-node-config")
+		nodeConfigMapData := GetConfigMap("ibm-csi-node-config")
 
 		// Port
 		//
-		svcSshPort, _ := GetConfigMapValue(configMapData, "svcSshPort" , "22")
+		svcSshPort, _ := GetConfigMapValue(nodeConfigMapData, "svcSshPort" , "22")
 		_, err :=  strconv.ParseUint(svcSshPort, 10, 16)
 		if err != nil {
 			log.Fatal("svcSshPort is not a valid number")
@@ -337,13 +337,13 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 
 		// Config map for node as JSON
 		//
-		cfgMapJsonString := ""
-		if configMapData != nil {
-			cfgMapBytes, cfgerr := json.Marshal(configMapData)
+		nodeCfgMapJsonString := ""
+		if nodeConfigMapData != nil {
+			cfgMapBytes, cfgerr := json.Marshal(nodeConfigMapData)
 			if cfgerr != nil {
 				log.Fatal("Could not json.Marshal NODE config map data")
 			}
-			cfgMapJsonString = string(cfgMapBytes)
+			nodeCfgMapJsonString = string(cfgMapBytes)
 		}
 
 		// Config map for hostdefine as JSON
@@ -356,6 +356,18 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 				log.Fatal("Could not json.Marshal HD config map data")
 			}
 			hdCfgMapJsonString = string(cfgMapBytes)
+		}
+
+		// Config map for controller as JSON
+		//
+		ctrlConfigMapData := GetConfigMap("ibm-csi-controller-config")
+		ctrlCfgMapJsonString := ""
+		if ctrlConfigMapData != nil {
+			cfgMapBytes, cfgerr := json.Marshal(ctrlConfigMapData)
+			if cfgerr != nil {
+				log.Fatal("Could not json.Marshal Controller config map data")
+			}
+			ctrlCfgMapJsonString = string(cfgMapBytes)
 		}
 
 		controllerEnvVars := []corev1.EnvVar{
@@ -381,16 +393,20 @@ func (s *csiControllerSyncer) getEnvFor(name string) []corev1.EnvVar {
 			},
 			{
 				Name:  "CSI_NODE_CONFIG",
-				Value: cfgMapJsonString,
+				Value: nodeCfgMapJsonString,
 			},
 			{
 				Name:  "CSI_HOSTDEFINER_CONFIG",
 				Value: hdCfgMapJsonString,
 			},
+			{
+				Name:  "CSI_CONTROLLER_CONFIG",
+				Value: ctrlCfgMapJsonString,
+			},
 		}
 
 		// Optional SSH keepalive settings, passed only when set in the node ConfigMap.
-		return append(controllerEnvVars, getSvcSshKeepaliveEnvVars(configMapData)...)
+		return append(controllerEnvVars, getSvcSshKeepaliveEnvVars(nodeConfigMapData)...)
 
 	case provisionerContainerName, attacherContainerName, snapshotterContainerName,
 		resizerContainerName, replicatorContainerName, volumeGroupContainerName:
