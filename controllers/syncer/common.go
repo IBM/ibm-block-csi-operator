@@ -125,10 +125,10 @@ var svcSshKeepaliveSettings = []struct {
 // getSvcSshKeepaliveEnvVars returns the optional SSH keepalive env vars that are set to a valid
 // value in the given ConfigMap data: a positive integer, not above the maximum of the key. A key
 // that is missing, empty or not valid is left out with a warning, so the driver keeps its default for it.
-func getSvcSshKeepaliveEnvVars(configMapData map[string]string) []corev1.EnvVar {
+func getSvcSshKeepaliveEnvVars(nodeConfigMapData map[string]string) []corev1.EnvVar {
 	envVars := []corev1.EnvVar{}
 	for _, setting := range svcSshKeepaliveSettings {
-		value, exists := GetConfigMapValue(configMapData, setting.configMapKey, "")
+		value, exists := GetConfigMapValue(nodeConfigMapData, setting.configMapKey, "")
 		if !exists || value == "" {
 			continue
 		}

@@ -25,23 +25,23 @@ import (
 
 func TestGetSvcSshKeepaliveEnvVars(t *testing.T) {
 	tests := []struct {
-		name          string
-		configMapData map[string]string
-		expected      []corev1.EnvVar
+		name              string
+		nodeConfigMapData map[string]string
+		expected          []corev1.EnvVar
 	}{
 		{
-			name:          "no config map",
-			configMapData: nil,
-			expected:      []corev1.EnvVar{},
+			name:              "no config map",
+			nodeConfigMapData: nil,
+			expected:          []corev1.EnvVar{},
 		},
 		{
-			name:          "config map without keepalive keys",
-			configMapData: map[string]string{"svcSshPort": "22", "workersLimit": "10"},
-			expected:      []corev1.EnvVar{},
+			name:              "config map without keepalive keys",
+			nodeConfigMapData: map[string]string{"svcSshPort": "22", "workersLimit": "10"},
+			expected:          []corev1.EnvVar{},
 		},
 		{
 			name: "all keys set",
-			configMapData: map[string]string{
+			nodeConfigMapData: map[string]string{
 				"svcSshKeepaliveIntervalSeconds": "20",
 				"svcTcpKeepidleSeconds":          "25",
 				"svcTcpKeepintvlSeconds":         "6",
@@ -57,13 +57,13 @@ func TestGetSvcSshKeepaliveEnvVars(t *testing.T) {
 			},
 		},
 		{
-			name:          "only one key set",
-			configMapData: map[string]string{"svcTcpUserTimeoutMs": "60000"},
-			expected:      []corev1.EnvVar{{Name: "SVC_TCP_USER_TIMEOUT_MS", Value: "60000"}},
+			name:              "only one key set",
+			nodeConfigMapData: map[string]string{"svcTcpUserTimeoutMs": "60000"},
+			expected:          []corev1.EnvVar{{Name: "SVC_TCP_USER_TIMEOUT_MS", Value: "60000"}},
 		},
 		{
 			name: "invalid and empty values are left out",
-			configMapData: map[string]string{
+			nodeConfigMapData: map[string]string{
 				"svcSshKeepaliveIntervalSeconds": "abc",
 				"svcTcpKeepidleSeconds":          "0",
 				"svcTcpKeepintvlSeconds":         "-5",
@@ -74,7 +74,7 @@ func TestGetSvcSshKeepaliveEnvVars(t *testing.T) {
 		},
 		{
 			name: "valid values are kept next to invalid ones",
-			configMapData: map[string]string{
+			nodeConfigMapData: map[string]string{
 				"svcTcpKeepidleSeconds": "abc",
 				"svcTcpKeepcnt":         "5",
 			},
@@ -82,7 +82,7 @@ func TestGetSvcSshKeepaliveEnvVars(t *testing.T) {
 		},
 		{
 			name: "values that are not a strict positive integer are left out",
-			configMapData: map[string]string{
+			nodeConfigMapData: map[string]string{
 				"svcSshKeepaliveIntervalSeconds": "+5",
 				"svcTcpKeepidleSeconds":          " 5 ",
 				"svcTcpKeepintvlSeconds":         "1_0",
@@ -93,7 +93,7 @@ func TestGetSvcSshKeepaliveEnvVars(t *testing.T) {
 		},
 		{
 			name: "values above the maximum are left out",
-			configMapData: map[string]string{
+			nodeConfigMapData: map[string]string{
 				"svcSshKeepaliveIntervalSeconds": "3601",
 				"svcTcpKeepidleSeconds":          "32768",
 				"svcTcpKeepintvlSeconds":         "32768",
@@ -104,7 +104,7 @@ func TestGetSvcSshKeepaliveEnvVars(t *testing.T) {
 		},
 		{
 			name: "values at the maximum are kept",
-			configMapData: map[string]string{
+			nodeConfigMapData: map[string]string{
 				"svcSshKeepaliveIntervalSeconds": "3600",
 				"svcTcpKeepidleSeconds":          "32767",
 				"svcTcpKeepintvlSeconds":         "32767",
@@ -121,7 +121,7 @@ func TestGetSvcSshKeepaliveEnvVars(t *testing.T) {
 		},
 		{
 			name: "value of 1 is kept",
-			configMapData: map[string]string{
+			nodeConfigMapData: map[string]string{
 				"svcTcpKeepcnt": "1",
 			},
 			expected: []corev1.EnvVar{{Name: "SVC_TCP_KEEPCNT", Value: "1"}},
@@ -130,7 +130,7 @@ func TestGetSvcSshKeepaliveEnvVars(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			actual := getSvcSshKeepaliveEnvVars(test.configMapData)
+			actual := getSvcSshKeepaliveEnvVars(test.nodeConfigMapData)
 			if !reflect.DeepEqual(test.expected, actual) {
 				t.Errorf("expected %v, got %v", test.expected, actual)
 			}
